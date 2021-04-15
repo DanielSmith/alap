@@ -1,2 +1,2 @@
 # alap
-alap - Any link, all places. Give links multiple choices.
+alap - Any link, all places. Enhance links with multiple targets.+
