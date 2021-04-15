@@ -1,5 +1,5 @@
 {
-  "name": "alap",
+  "name": "@javajoint/alap",
   "version": "1.0.0",
   "description": "alap - Any link, all places. Enhance links with multiple targets.",
   "main": "index.js",
