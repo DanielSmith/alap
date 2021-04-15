@@ -1,0 +1,19 @@
+{
+  "name": "alap",
+  "version": "1.0.0",
+  "description": "alap - Any link, all places. Give links multiple choices.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielSmith/alap.git"
+  },
+  "author": "Daniel Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanielSmith/alap/issues"
+  },
+  "homepage": "https://github.com/DanielSmith/alap#readme"
+}
