@@ -2,7 +2,7 @@
   "name": "@javajoint/alap",
   "version": "1.0.0",
   "description": "alap - Any link, all places. Enhance links with multiple targets.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

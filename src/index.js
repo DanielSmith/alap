@@ -1,10 +1,22 @@
-const alap = {};
+// const alap = {};
 let refNames = {};
 let alapConfig = {};
 let alapElem = null;
 let curTimerID = 0;
+function hey() {
+  alert("hehehe");
+}
 
-(function () {
+export default function alap(
+  config = {
+    none: "nothing",
+  }
+) {
+  hey();
+
+  alert("hey");
+  console.dir(config);
+
   let bodyClickHandler = null;
   let bodyKeyHandler = null;
   let menuMouseEnterHandler = null;
@@ -47,10 +59,12 @@ let curTimerID = 0;
     stopTimer();
   }
 
+  /*
   bodyClickHandler = function (event) {
     // event.preventDefault();
     removeMenu();
   };
+*/
 
   bodyKeyHandler = function (event) {
     if (event.keyCode == 27) {
@@ -338,7 +352,4 @@ let curTimerID = 0;
     alapElem.addEventListener("mouseleave", menuMouseLeaveHandler);
     alapElem.addEventListener("mouseenter", menuMouseEnterHandler);
   }
-
-  // API
-  alap.init = init;
-})();
+}
