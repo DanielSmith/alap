@@ -1,20 +1,10 @@
 // const alap = {};
 let refNames = {};
-let alapConfig = {};
+let alapConfig;
 let alapElem = null;
 let curTimerID = 0;
-function hey() {
-  alert("hehehe");
-}
 
-export default function alap(
-  config = {
-    none: "nothing",
-  }
-) {
-  hey();
-
-  alert("hey");
+export default function alap(config) {
   console.dir(config);
 
   let bodyClickHandler = null;
@@ -24,34 +14,39 @@ export default function alap(
   let theBody = document.querySelector("body");
   let alapActive = false;
 
-  function init(config = {}) {
-    // is there an existing alap elenent?
-    alapElem = document.getElementById("alap");
-    if (alapElem) {
-      document.removeChild(alapElem);
-    }
-
-    // start fresh
-    alapElem = document.createElement("div");
-    alapElem.setAttribute("id", "alap");
-
-    document.body.append(alapElem);
-    alapConfig = Object.assign({}, config);
-
-    // any element with the class of 'alap'... does not have to be an
-    // anchor ("a")
-    let myLinks = Array.from(document.getElementsByClassName("alap"));
-
-    for (const curLink of myLinks) {
-      // dont allow more than one listener for a given signature
-      // init may be called more than once (when elements are dynamically added
-      // or updated). It's safe to call this when there is no listener bound
-      curLink.removeEventListener("click", doClick);
-
-      // ok, now we're good to bind
-      curLink.addEventListener("click", doClick, false);
-    }
+  // function init(config = {}) {
+  // is there an existing alap elenent?
+  alapElem = document.getElementById("alap");
+  if (alapElem) {
+    document.removeChild(alapElem);
   }
+
+  // start fresh
+  alapElem = document.createElement("div");
+  alapElem.setAttribute("id", "alap");
+
+  document.body.append(alapElem);
+  alapConfig = Object.assign({}, config);
+  // alapConfig = config;
+  // alapConfig = { ...config };
+  console.dir(alapConfig);
+
+  // any element with the class of 'alap'... does not have to be an
+  // anchor ("a")
+  let myLinks = Array.from(document.getElementsByClassName("alap"));
+
+  console.dir(myLinks);
+
+  for (const curLink of myLinks) {
+    // dont allow more than one listener for a given signature
+    // init may be called more than once (when elements are dynamically added
+    // or updated). It's safe to call this when there is no listener bound
+    curLink.removeEventListener("click", doClick);
+
+    // ok, now we're good to bind
+    curLink.addEventListener("click", doClick, false);
+  }
+  // }
 
   function removeMenu() {
     const alapElem = document.getElementById("alap");
@@ -95,6 +90,8 @@ export default function alap(
     let knownWords = [];
     let myData = "";
 
+    if (!theStr) return [];
+
     // if we need to split for tag intersections and diffs later,
     // we provide a consistent space separated string
     myData = theStr.replace(/\s+|["']+/g, "");
@@ -109,7 +106,7 @@ export default function alap(
     let dataElem = myData.split(",");
     // console.dir(dataElem);
 
-    for (curDataElem of dataElem) {
+    for (const curDataElem of dataElem) {
       let curWord = curDataElem.toString();
 
       // too short? dont bother
@@ -143,20 +140,27 @@ export default function alap(
   }
 
   function searchTags(searchStr) {
-    let theConfig = alapConfig.allLinks;
+    // let theConfig = alapConfig.allLinks;
     let resultSet = [];
 
     if (searchStr.charAt(0) == ".") {
       searchStr = searchStr.slice(1);
     }
 
-    for (var key in theConfig) {
-      theTags = cleanArgList(theConfig[key].tags);
+    // alert(searchStr);
 
-      var foundMatch = 0;
-      var numTags = theTags.length;
+    console.dir(alapConfig);
+    console.dir(alapConfig.allLinks);
 
-      for (var i = 0; i < numTags && foundMatch == 0; i++) {
+    for (const key in alapConfig.allLinks) {
+      console.log(key);
+
+      let theTags = cleanArgList(alapConfig.allLinks[key].tags);
+
+      let foundMatch = 0;
+      const numTags = theTags.length;
+
+      for (let i = 0; i < numTags && foundMatch == 0; i++) {
         if (theTags[i] == searchStr) {
           foundMatch++;
           resultSet.push(key);
@@ -181,9 +185,10 @@ export default function alap(
   }
 
   function parseElem(theElem) {
+    // alert(theElem);
     let resultSet = [];
+    let curResultSet = [];
     let myIDsWithTag = [];
-    let theConfig = alapConfig.allLinks;
 
     let tokens = theElem.split(" ");
 
@@ -194,7 +199,9 @@ export default function alap(
     // are we looking for an 'OR'?
     let needUnion = 0;
 
-    for (curToken of tokens) {
+    console.dir(tokens);
+
+    for (const curToken of tokens) {
       const firstChar = curToken.charAt(0);
 
       switch (firstChar) {
@@ -240,13 +247,14 @@ export default function alap(
 
         // the normal case of getting data from an id
         default:
-          if (theConfig[curToken] !== undefined) {
+          if (alapConfig.allLinks[curToken] !== undefined) {
             resultSet.push(curToken.toString());
           }
           break;
       }
     }
 
+    console.dir(resultSet);
     return resultSet;
   }
 
@@ -274,6 +282,8 @@ export default function alap(
   function doClick(event) {
     event.preventDefault();
     event.stopPropagation();
+
+    let allDataElem;
     let theData = event.target.getAttribute("data-alap-linkitems");
 
     let theCSSClass = event.target.getAttribute("data-alap-cssclass") || null;
@@ -298,6 +308,8 @@ export default function alap(
     theBody.addEventListener("keydown", bodyKeyHandler);
 
     let myOffset = offset(event.target);
+
+    console.dir(myOffset);
     let divCSS = {};
 
     divCSS.zIndex = 10;
@@ -307,34 +319,50 @@ export default function alap(
 
     divCSS.background = forceColorOpaque(anchorCSS.backgroundColor);
 
-    alapElem.style.top = 10;
-    alapElem.style.left = myOffset.left;
+    // alapElem.style.top = 10;
+    // alapElem.style.left = myOffset.left;
     alapElem.style.display = "block";
+
+    // redo this...
+    // alapElem.style.cssText = `
+    // top: 10px;
+    // position: absolute;
+    // border: 2px solid black;
+    // zIndex: ${divCSS.zIndex};
+    // left: ${myOffset.left}px;
+    // top: ${myOffset.top}px;
+    // opacity: 1;
+    // background: ${divCSS.background};
+    // `;
 
     // redo this...
     alapElem.style.cssText = `
     top: 10px;                        
     position: absolute;
     border: 2px solid black;
-    zIndex: ${divCSS.zIndex};
+    zIndex: 10;
     left: ${myOffset.left}px;
     top: ${myOffset.top}px;
+    width: 200px;
     opacity: 1;
-    background: ${divCSS.background};
+    background: #ffccee;
     `;
 
-    dataElem = parseLine(theData);
-    // console.dir(dataElem);
+    allDataElem = parseLine(theData);
+    console.dir(allDataElem);
 
-    for (curElem of dataElem) {
+    for (const curElem of allDataElem) {
       theTargets = [...theTargets, ...parseElem(curElem)];
     }
 
-    // console.dir(theTargets);
+    console.dir(theTargets);
+    console.dir(alapConfig);
 
     let menuHTML = `<ol ${cssAttr}>`;
     theTargets.map((curTarget) => {
       let curInfo = alapConfig.allLinks[curTarget];
+
+      // alert(curTarget);
 
       menuHTML += `
         <li><a target="alapwindow"
@@ -342,6 +370,8 @@ export default function alap(
         `;
     });
     menuHTML += `</ol>`;
+
+    console.log(menuHTML);
 
     alapElem.innerHTML = menuHTML;
 
