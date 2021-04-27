@@ -54,12 +54,10 @@ export default function alap(config) {
     stopTimer();
   }
 
-  /*
   bodyClickHandler = function (event) {
-    // event.preventDefault();
+    event.preventDefault();
     removeMenu();
   };
-*/
 
   bodyKeyHandler = function (event) {
     if (event.keyCode == 27) {
