@@ -27,15 +27,10 @@ export default function alap(config) {
 
   document.body.append(alapElem);
   alapConfig = Object.assign({}, config);
-  // alapConfig = config;
-  // alapConfig = { ...config };
-  console.dir(alapConfig);
 
   // any element with the class of 'alap'... does not have to be an
   // anchor ("a")
   let myLinks = Array.from(document.getElementsByClassName("alap"));
-
-  console.dir(myLinks);
 
   for (const curLink of myLinks) {
     // dont allow more than one listener for a given signature
@@ -308,7 +303,7 @@ export default function alap(config) {
 
     let myOffset = offset(event.target);
 
-    console.dir(myOffset);
+    myOffset.top += 20;
     let divCSS = {};
 
     divCSS.zIndex = 10;
@@ -336,7 +331,6 @@ export default function alap(config) {
 
     // redo this...
     alapElem.style.cssText = `
-    top: 10px;                        
     position: absolute;
     border: 2px solid black;
     zIndex: 10;
@@ -344,11 +338,10 @@ export default function alap(config) {
     top: ${myOffset.top}px;
     width: 200px;
     opacity: 1;
-    background: #ffccee;
+    background: #ffffff;
     `;
 
     allDataElem = parseLine(theData);
-    console.dir(allDataElem);
 
     for (const curElem of allDataElem) {
       theTargets = [...theTargets, ...parseElem(curElem)];
