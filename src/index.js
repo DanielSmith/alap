@@ -55,8 +55,14 @@ export default function alap(config) {
   }
 
   bodyClickHandler = function (event) {
-    event.preventDefault();
-    removeMenu();
+    // event.preventDefault();
+    let inMenu = event.target.closest("#alap");
+
+    if (!inMenu) {
+      removeMenu();
+    }
+
+    console.log(inMenu);
   };
 
   bodyKeyHandler = function (event) {
@@ -87,6 +93,8 @@ export default function alap(config) {
   function parseLine(theStr) {
     let knownWords = [];
     let myData = "";
+    let recurseIdElement;
+    let checkline;
 
     if (!theStr) return [];
 
@@ -145,14 +153,7 @@ export default function alap(config) {
       searchStr = searchStr.slice(1);
     }
 
-    // alert(searchStr);
-
-    console.dir(alapConfig);
-    console.dir(alapConfig.allLinks);
-
     for (const key in alapConfig.allLinks) {
-      console.log(key);
-
       let theTags = cleanArgList(alapConfig.allLinks[key].tags);
 
       let foundMatch = 0;
@@ -353,8 +354,8 @@ export default function alap(config) {
       theTargets = [...theTargets, ...parseElem(curElem)];
     }
 
-    console.dir(theTargets);
-    console.dir(alapConfig);
+    // console.dir(theTargets);
+    // console.dir(alapConfig);
 
     let menuHTML = `<ol ${cssAttr}>`;
     theTargets.map((curTarget) => {
@@ -368,8 +369,6 @@ export default function alap(config) {
         `;
     });
     menuHTML += `</ol>`;
-
-    console.log(menuHTML);
 
     alapElem.innerHTML = menuHTML;
 
