@@ -3,7 +3,7 @@
 import { alapConfig } from "./config.js";
 
 // our lib
-import alap from "../src/index.js";
+import { alap } from "../dist/index.js";
 
 // pass the config objecty
 alap(alapConfig);

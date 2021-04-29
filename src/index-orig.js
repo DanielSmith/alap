@@ -1,90 +1,91 @@
-export default class alap {
-  refNames = {};
-  alapConfig;
-  alapElem = null;
-  curTimerID = 0;
-  theBody = null;
+// const alap = {};
+let refNames = {};
+let alapConfig;
+let alapElem = null;
+let curTimerID = 0;
 
-  constructor(config) {
-    alert("alap constuctor");
-    // let bodyClickHandler = null;
-    // let bodyKeyHandler = null;
-    // let menuMouseEnterHandler = null;
-    // let menuMouseLeaveHandler = null;
-    this.theBody = document.querySelector("body");
+export default function alap(config) {
+  console.dir(config);
 
-    // function init(config = {}) {
-    // is there an existing alap elenent?
-    this.alapElem = document.getElementById("alap");
-    if (this.alapElem) {
-      document.removeChild(this.alapElem);
-    }
+  let bodyClickHandler = null;
+  let bodyKeyHandler = null;
+  let menuMouseEnterHandler = null;
+  let menuMouseLeaveHandler = null;
+  let theBody = document.querySelector("body");
+  let alapActive = false;
 
-    // start fresh
-    this.alapElem = document.createElement("div");
-    this.alapElem.setAttribute("id", "alap");
-
-    document.body.append(this.alapElem);
-    this.alapConfig = Object.assign({}, config);
-
-    // any element with the class of 'alap'... does not have to be an
-    // anchor ("a")
-    let myLinks = Array.from(document.getElementsByClassName("alap"));
-
-    for (const curLink of myLinks) {
-      // dont allow more than one listener for a given signature
-      // init may be called more than once (when elements are dynamically added
-      // or updated). It's safe to call this when there is no listener bound
-      curLink.removeEventListener("click", this.doClick);
-
-      // ok, now we're good to bind
-      curLink.addEventListener("click", this.doClick, false);
-    }
+  // function init(config = {}) {
+  // is there an existing alap elenent?
+  alapElem = document.getElementById("alap");
+  if (alapElem) {
+    document.removeChild(alapElem);
   }
 
-  removeMenu() {
-    const this.alapElem = document.getElementById("alap");
-    this.alapElem.style.display = "none";
-    this.stopTimer();
+  // start fresh
+  alapElem = document.createElement("div");
+  alapElem.setAttribute("id", "alap");
+
+  document.body.append(alapElem);
+  alapConfig = Object.assign({}, config);
+
+  // any element with the class of 'alap'... does not have to be an
+  // anchor ("a")
+  let myLinks = Array.from(document.getElementsByClassName("alap"));
+
+  for (const curLink of myLinks) {
+    // dont allow more than one listener for a given signature
+    // init may be called more than once (when elements are dynamically added
+    // or updated). It's safe to call this when there is no listener bound
+    curLink.removeEventListener("click", doClick);
+
+    // ok, now we're good to bind
+    curLink.addEventListener("click", doClick, false);
+  }
+  // }
+
+  function removeMenu() {
+    const alapElem = document.getElementById("alap");
+    alapElem.style.display = "none";
+    stopTimer();
   }
 
-  bodyClickHandler(event) {
+  bodyClickHandler = function (event) {
     // event.preventDefault();
     let inMenu = event.target.closest("#alap");
 
     if (!inMenu) {
-      this.removeMenu();
+      removeMenu();
     }
 
     console.log(inMenu);
-  }
+  };
 
-  bodyKeyHandler(event) {
+  bodyKeyHandler = function (event) {
     if (event.keyCode == 27) {
-      this.removeMenu();
+      removeMenu();
     }
-  }
+  };
 
   menuMouseLeaveHandler = () => {
     console.log("mouse out");
-    this.startTimer();
+    startTimer();
   };
 
   menuMouseEnterHandler = () => {
     console.log("mouse enter");
-    this.stopTimer();
+    stopTimer();
   };
 
-  startTimer() {
-    this.curTimerID = setTimeout(this.removeMenu, 3000);
-    console.log("start", this.curTimerID);
+  function startTimer() {
+    curTimerID = setTimeout(removeMenu, 3000);
+    console.log("start", curTimerID);
   }
 
-  stopTimer() {
-    clearTimeout(this.curTimerID);
+  function stopTimer() {
+    clearTimeout(curTimerID);
   }
 
-  parseLine(theStr) {
+  function parseLine(theStr) {
     let knownWords = [];
     let myData = "";
     let recurseIdElement;
@@ -104,6 +105,7 @@ export default class alap {
     myData = myData.replace(/\#{1,}/g, "#");
 
     let dataElem = myData.split(",");
+    // console.dir(dataElem);
 
     for (const curDataElem of dataElem) {
       let curWord = curDataElem.toString();
@@ -113,12 +115,12 @@ export default class alap {
         continue;
       }
 
-      if (this.refNames.hasOwnProperty(curWord)) {
+      if (refNames.hasOwnProperty(curWord)) {
         // console.log("already have seen");
         // console.log(curWord);
       } else {
         if (curWord.charAt(0) == "#") {
-          this.refNames[curWord] = 1;
+          refNames[curWord] = 1;
 
           // go find a list of items elsewhere and bundle them in with
           // our current line...oh, and do it recursively...
@@ -128,7 +130,7 @@ export default class alap {
           recurseIdElement = document.getElementById(theId);
 
           checkline = recurseIdElement.getAttribute("data-alap-linkitems");
-          knownWords.push.apply(knownWords, this.parseLine(checkline));
+          knownWords.push.apply(knownWords, parseLine(checkline));
         } else {
           knownWords.push(curWord);
         }
@@ -138,7 +140,7 @@ export default class alap {
     return knownWords;
   }
 
-  searchTags(searchStr) {
+  function searchTags(searchStr) {
     // let theConfig = alapConfig.allLinks;
     let resultSet = [];
 
@@ -146,8 +148,8 @@ export default class alap {
       searchStr = searchStr.slice(1);
     }
 
-    for (const key in this.alapConfig.allLinks) {
-      let theTags = cleanArgList(this.alapConfig.allLinks[key].tags);
+    for (const key in alapConfig.allLinks) {
+      let theTags = cleanArgList(alapConfig.allLinks[key].tags);
 
       let foundMatch = 0;
       const numTags = theTags.length;
@@ -163,7 +165,7 @@ export default class alap {
     return resultSet;
   }
 
-  cleanArgList(aList) {
+  function cleanArgList(aList) {
     const allElems = [];
 
     // may need to test here for an object...
@@ -176,7 +178,7 @@ export default class alap {
     return allElems;
   }
 
-  parseElem(theElem) {
+  function parseElem(theElem) {
     // alert(theElem);
     let resultSet = [];
     let curResultSet = [];
@@ -190,6 +192,8 @@ export default class alap {
     let needWithout = 0;
     // are we looking for an 'OR'?
     let needUnion = 0;
+
+    console.dir(tokens);
 
     for (const curToken of tokens) {
       const firstChar = curToken.charAt(0);
@@ -218,7 +222,7 @@ export default class alap {
 
         // we're looking for a tag
         case ".":
-          curResultSet = this.searchTags(curToken);
+          curResultSet = searchTags(curToken);
 
           if (needWithout) {
             resultSet = resultSet.filter((x) => !curResultSet.includes(x));
@@ -237,25 +241,25 @@ export default class alap {
 
         // the normal case of getting data from an id
         default:
-          if (this.alapConfig.allLinks[curToken] !== undefined) {
+          if (alapConfig.allLinks[curToken] !== undefined) {
             resultSet.push(curToken.toString());
           }
           break;
       }
     }
 
-    // console.dir(resultSet);
+    console.dir(resultSet);
     return resultSet;
   }
 
-  offset(el) {
-    const rect = el.getBoundingClientRect(),
+  function offset(el) {
+    var rect = el.getBoundingClientRect(),
       scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
       scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     return { top: rect.top + scrollTop, left: rect.left + scrollLeft };
   }
 
-  forceColorOpaque(color) {
+  function forceColorOpaque(color) {
     let m = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
     if (m) {
       return "rgba(" + [m[1], m[2], m[3], "1.0"].join(",") + ")";
@@ -269,7 +273,7 @@ export default class alap {
     }
   }
 
-  doClick(event) {
+  function doClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -282,6 +286,7 @@ export default class alap {
     let allSeen = {};
     let anchorCSS = getComputedStyle(event.target, ":hover");
 
+    alapActive = true;
     refNames = {};
 
     if (theCSSClass) {
@@ -290,11 +295,11 @@ export default class alap {
     }
 
     // in case we have any strays...
-    this.theBody.removeEventListener("click", this.bodyClickHandler);
-    this.theBody.removeEventListener("keydown", this.bodyKeyHandler);
+    theBody.removeEventListener("click", bodyClickHandler);
+    theBody.removeEventListener("keydown", bodyKeyHandler);
 
-    this.theBody.addEventListener("click", this.bodyClickHandler, { once: true });
-    this.theBody.addEventListener("keydown", tnis.bodyKeyHandler);
+    theBody.addEventListener("click", bodyClickHandler, { once: true });
+    theBody.addEventListener("keydown", bodyKeyHandler);
 
     let myOffset = offset(event.target);
 
@@ -310,7 +315,7 @@ export default class alap {
 
     // alapElem.style.top = 10;
     // alapElem.style.left = myOffset.left;
-    this.alapElem.style.display = "block";
+    alapElem.style.display = "block";
 
     // redo this...
     // alapElem.style.cssText = `
@@ -325,18 +330,18 @@ export default class alap {
     // `;
 
     // redo this...
-    this.alapElem.style.cssText = `
-      position: absolute;
-      border: 2px solid black;
-      zIndex: 10;
-      left: ${myOffset.left}px;
-      top: ${myOffset.top}px;
-      width: 200px;
-      opacity: 1;
-      background: #ffffff;
-      `;
+    alapElem.style.cssText = `
+    position: absolute;
+    border: 2px solid black;
+    zIndex: 10;
+    left: ${myOffset.left}px;
+    top: ${myOffset.top}px;
+    width: 200px;
+    opacity: 1;
+    background: #ffffff;
+    `;
 
-    allDataElem = this.parseLine(theData);
+    allDataElem = parseLine(theData);
 
     for (const curElem of allDataElem) {
       theTargets = [...theTargets, ...parseElem(curElem)];
@@ -352,19 +357,19 @@ export default class alap {
       // alert(curTarget);
 
       menuHTML += `
-          <li><a target="alapwindow"
-          href=${curInfo.url}>${curInfo.label}</a></li>
-          `;
+        <li><a target="alapwindow"
+        href=${curInfo.url}>${curInfo.label}</a></li>
+        `;
     });
     menuHTML += `</ol>`;
 
-    this.alapElem.innerHTML = menuHTML;
+    alapElem.innerHTML = menuHTML;
 
     // strays?
-    this.alapElem.removeEventListener("mouseleave", this.menuMouseLeaveHandler);
-    this.alapElem.removeEventListener("mouseenter", this.menuMouseEnterHandler);
+    alapElem.removeEventListener("mouseleave", menuMouseLeaveHandler);
+    alapElem.removeEventListener("mouseenter", menuMouseEnterHandler);
     // add event handler on our menu for mouseouts...
-    this.alapElem.addEventListener("mouseleave", this.menuMouseLeaveHandler);
-    this.alapElem.addEventListener("mouseenter", this.menuMouseEnterHandler);
+    alapElem.addEventListener("mouseleave", menuMouseLeaveHandler);
+    alapElem.addEventListener("mouseenter", menuMouseEnterHandler);
   }
 }
