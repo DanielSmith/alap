@@ -6,11 +6,12 @@ export default class alap {
   theBody = null;
 
   constructor(config) {
-    alert("alap constuctor");
-    // let bodyClickHandler = null;
-    // let bodyKeyHandler = null;
-    // let menuMouseEnterHandler = null;
-    // let menuMouseLeaveHandler = null;
+    this.configure(config);
+
+    this.boundDoClick = () => this.doClick();
+  }
+
+  configure(config) {
     this.theBody = document.querySelector("body");
 
     // function init(config = {}) {
@@ -26,10 +27,12 @@ export default class alap {
 
     document.body.append(this.alapElem);
     this.alapConfig = Object.assign({}, config);
+    console.dir(this.alapConfig);
 
     // any element with the class of 'alap'... does not have to be an
     // anchor ("a")
     let myLinks = Array.from(document.getElementsByClassName("alap"));
+    console.dir(myLinks);
 
     for (const curLink of myLinks) {
       // dont allow more than one listener for a given signature
@@ -37,13 +40,19 @@ export default class alap {
       // or updated). It's safe to call this when there is no listener bound
       curLink.removeEventListener("click", this.doClick);
 
+      console.log(curLink);
+
       // ok, now we're good to bind
-      curLink.addEventListener("click", this.doClick, false);
+      curLink.addEventListener("click", this.doClick.bind(this), false);
     }
   }
 
+  afun(arg) {
+    alert("  dls  see" + arg);
+  }
+
   removeMenu() {
-    const this.alapElem = document.getElementById("alap");
+    this.alapElem = document.getElementById("alap");
     this.alapElem.style.display = "none";
     this.stopTimer();
   }
@@ -65,18 +74,18 @@ export default class alap {
     }
   }
 
-  menuMouseLeaveHandler = () => {
+  menuMouseLeaveHandler() {
     console.log("mouse out");
     this.startTimer();
-  };
+  }
 
-  menuMouseEnterHandler = () => {
+  menuMouseEnterHandler() {
     console.log("mouse enter");
     this.stopTimer();
-  };
+  }
 
   startTimer() {
-    this.curTimerID = setTimeout(this.removeMenu, 3000);
+    this.curTimerID = setTimeout(this.removeMenu.bind(this), 3000);
     console.log("start", this.curTimerID);
   }
 
@@ -147,7 +156,7 @@ export default class alap {
     }
 
     for (const key in this.alapConfig.allLinks) {
-      let theTags = cleanArgList(this.alapConfig.allLinks[key].tags);
+      let theTags = this.cleanArgList(this.alapConfig.allLinks[key].tags);
 
       let foundMatch = 0;
       const numTags = theTags.length;
@@ -282,7 +291,8 @@ export default class alap {
     let allSeen = {};
     let anchorCSS = getComputedStyle(event.target, ":hover");
 
-    refNames = {};
+    // may not be needed
+    this.refNames = {};
 
     if (theCSSClass) {
       cssAttr = `class="${theCSSClass}"`;
@@ -293,10 +303,12 @@ export default class alap {
     this.theBody.removeEventListener("click", this.bodyClickHandler);
     this.theBody.removeEventListener("keydown", this.bodyKeyHandler);
 
-    this.theBody.addEventListener("click", this.bodyClickHandler, { once: true });
-    this.theBody.addEventListener("keydown", tnis.bodyKeyHandler);
+    this.theBody.addEventListener("click", this.bodyClickHandler.bind(this), {
+      once: true,
+    });
+    this.theBody.addEventListener("keydown", this.bodyKeyHandler.bind(this));
 
-    let myOffset = offset(event.target);
+    let myOffset = this.offset(event.target);
 
     myOffset.top += 20;
     let divCSS = {};
@@ -306,7 +318,7 @@ export default class alap {
       divCSS.zIndex = anchorCSS.zIndex + 10;
     }
 
-    divCSS.background = forceColorOpaque(anchorCSS.backgroundColor);
+    divCSS.background = this.forceColorOpaque(anchorCSS.backgroundColor);
 
     // alapElem.style.top = 10;
     // alapElem.style.left = myOffset.left;
@@ -339,7 +351,7 @@ export default class alap {
     allDataElem = this.parseLine(theData);
 
     for (const curElem of allDataElem) {
-      theTargets = [...theTargets, ...parseElem(curElem)];
+      theTargets = [...theTargets, ...this.parseElem(curElem)];
     }
 
     // console.dir(theTargets);
@@ -347,7 +359,7 @@ export default class alap {
 
     let menuHTML = `<ol ${cssAttr}>`;
     theTargets.map((curTarget) => {
-      let curInfo = alapConfig.allLinks[curTarget];
+      let curInfo = this.alapConfig.allLinks[curTarget];
 
       // alert(curTarget);
 
@@ -363,8 +375,18 @@ export default class alap {
     // strays?
     this.alapElem.removeEventListener("mouseleave", this.menuMouseLeaveHandler);
     this.alapElem.removeEventListener("mouseenter", this.menuMouseEnterHandler);
+
+    // exit any existing timer...
+    this.stopTimer();
+    this.startTimer();
     // add event handler on our menu for mouseouts...
-    this.alapElem.addEventListener("mouseleave", this.menuMouseLeaveHandler);
-    this.alapElem.addEventListener("mouseenter", this.menuMouseEnterHandler);
+    this.alapElem.addEventListener(
+      "mouseleave",
+      this.menuMouseLeaveHandler.bind(this)
+    );
+    this.alapElem.addEventListener(
+      "mouseenter",
+      this.menuMouseEnterHandler.bind(this)
+    );
   }
 }
