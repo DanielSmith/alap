@@ -40,15 +40,11 @@ export default class alap {
       // or updated). It's safe to call this when there is no listener bound
       curLink.removeEventListener("click", this.doClick);
 
-      console.log(curLink);
+      // console.log(curLink);
 
       // ok, now we're good to bind
       curLink.addEventListener("click", this.doClick.bind(this), false);
     }
-  }
-
-  afun(arg) {
-    alert("  dls  see" + arg);
   }
 
   removeMenu() {
@@ -64,8 +60,6 @@ export default class alap {
     if (!inMenu) {
       this.removeMenu();
     }
-
-    console.log(inMenu);
   }
 
   bodyKeyHandler(event) {
@@ -75,18 +69,15 @@ export default class alap {
   }
 
   menuMouseLeaveHandler() {
-    console.log("mouse out");
     this.startTimer();
   }
 
   menuMouseEnterHandler() {
-    console.log("mouse enter");
     this.stopTimer();
   }
 
   startTimer() {
     this.curTimerID = setTimeout(this.removeMenu.bind(this), 3000);
-    console.log("start", this.curTimerID);
   }
 
   stopTimer() {
@@ -111,6 +102,9 @@ export default class alap {
     myData = myData.replace(/,{1,}/g, ",");
     myData = myData.replace(/\.{1,}/g, ".");
     myData = myData.replace(/\#{1,}/g, "#");
+
+    // for future use, '@' for macro...
+    myData = myData.replace(/\@{1,}/g, "@");
 
     let dataElem = myData.split(",");
 
@@ -244,6 +238,10 @@ export default class alap {
 
           break;
 
+        // this is a no-op for now, reserving '@' for future use as macro
+        case "@":
+          break;
+
         // the normal case of getting data from an id
         default:
           if (this.alapConfig.allLinks[curToken] !== undefined) {
@@ -288,7 +286,6 @@ export default class alap {
     let theCSSClass = event.target.getAttribute("data-alap-cssclass") || null;
     let cssAttr = "";
     let theTargets = [];
-    let allSeen = {};
     let anchorCSS = getComputedStyle(event.target, ":hover");
 
     // may not be needed
