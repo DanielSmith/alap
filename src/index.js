@@ -4,10 +4,10 @@ export default class alap {
   alapElem = null;
   curTimerID = 0;
   theBody = null;
+  listType = "ol";
 
   constructor(config) {
     this.configure(config);
-
     this.boundDoClick = () => this.doClick();
   }
 
@@ -29,6 +29,8 @@ export default class alap {
     this.alapConfig = Object.assign({}, config);
     console.dir(this.alapConfig);
 
+    this.listType = this.getSetting("listType", "ul");
+
     // any element with the class of 'alap'... does not have to be an
     // anchor ("a")
     let myLinks = Array.from(document.getElementsByClassName("alap"));
@@ -45,6 +47,18 @@ export default class alap {
       // ok, now we're good to bind
       curLink.addEventListener("click", this.doClick.bind(this), false);
     }
+  }
+
+  getSetting(settingName, defaultValue = "") {
+    let retVal = defaultValue;
+
+    if (this.alapConfig && this.alapConfig.settings) {
+      if (this.alapConfig.settings[settingName]) {
+        retVal = this.alapConfig.settings[settingName];
+      }
+    }
+
+    return retVal;
   }
 
   removeMenu() {
@@ -77,11 +91,15 @@ export default class alap {
   }
 
   startTimer() {
+    if (this.curTimerID) {
+      clearTimeout(this.curTimerID);
+    }
     this.curTimerID = setTimeout(this.removeMenu.bind(this), 3000);
   }
 
   stopTimer() {
     clearTimeout(this.curTimerID);
+    this.curTimerID = 0;
   }
 
   parseLine(theStr) {
@@ -322,8 +340,6 @@ export default class alap {
       divCSS.zIndex = anchorCSS.zIndex + 10;
     }
 
-    divCSS.backgroundColor = "red"; // this.forceColorOpaque(anchorCSS.backgroundColor);
-
     // alapElem.style.top = 10;
     // alapElem.style.left = myOffset.left;
     this.alapElem.style.display = "block";
@@ -354,7 +370,7 @@ export default class alap {
       theTargets = [...theTargets, ...this.parseElem(curElem)];
     }
 
-    let menuHTML = `<ol ${cssAttr}>`;
+    let menuHTML = `<${this.listType} ${cssAttr}>`;
     theTargets.map((curTarget) => {
       let curInfo = this.alapConfig.allLinks[curTarget];
 
@@ -365,7 +381,7 @@ export default class alap {
           href=${curInfo.url}>${curInfo.label}</a></li>
           `;
     });
-    menuHTML += `</ol>`;
+    menuHTML += `</${this.listType}>`;
 
     this.alapElem.innerHTML = menuHTML;
 
