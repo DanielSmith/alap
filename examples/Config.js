@@ -3,6 +3,11 @@
  */
 
 export let alapConfig = {
+  settings: {
+    listType: "ol",
+    menuTimeout: 5000,
+  },
+
   allLinks: {
     bmwe36: {
       label: "BMW (E36) - Wikipedia",

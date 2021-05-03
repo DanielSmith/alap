@@ -5,6 +5,7 @@ export default class alap {
   curTimerID = 0;
   theBody = null;
   listType = "ol";
+  menuTimeout = 5000;
 
   constructor(config) {
     this.configure(config);
@@ -30,6 +31,7 @@ export default class alap {
     console.dir(this.alapConfig);
 
     this.listType = this.getSetting("listType", "ul");
+    this.menuTimeout = +this.getSetting("menuTimeout", 5000);
 
     // any element with the class of 'alap'... does not have to be an
     // anchor ("a")
@@ -94,7 +96,7 @@ export default class alap {
     if (this.curTimerID) {
       clearTimeout(this.curTimerID);
     }
-    this.curTimerID = setTimeout(this.removeMenu.bind(this), 3000);
+    this.curTimerID = setTimeout(this.removeMenu.bind(this), this.menuTimeout);
   }
 
   stopTimer() {
