@@ -8,5 +8,3 @@ import Alap from "../src/index.js";
 // pass the config objecty
 // alap(alapConfig);
 const alap = new Alap(alapConfig);
-
-alap.fun1("fun 1");

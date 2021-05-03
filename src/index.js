@@ -16,14 +16,14 @@ export default class alap {
 
     // function init(config = {}) {
     // is there an existing alap elenent?
-    this.alapElem = document.getElementById("alap");
+    this.alapElem = document.getElementById("alapelem");
     if (this.alapElem) {
       document.removeChild(this.alapElem);
     }
 
     // start fresh
     this.alapElem = document.createElement("div");
-    this.alapElem.setAttribute("id", "alap");
+    this.alapElem.setAttribute("id", "alapelem");
 
     document.body.append(this.alapElem);
     this.alapConfig = Object.assign({}, config);
@@ -48,14 +48,14 @@ export default class alap {
   }
 
   removeMenu() {
-    this.alapElem = document.getElementById("alap");
+    this.alapElem = document.getElementById("alapelem");
     this.alapElem.style.display = "none";
     this.stopTimer();
   }
 
   bodyClickHandler(event) {
     // event.preventDefault();
-    let inMenu = event.target.closest("#alap");
+    let inMenu = event.target.closest("#alapelem");
 
     if (!inMenu) {
       this.removeMenu();
@@ -280,13 +280,20 @@ export default class alap {
     event.preventDefault();
     event.stopPropagation();
 
+    // console.dir(getComputedStyle(event.target));
+    console.dir(event.target.className);
+
     let allDataElem;
     let theData = event.target.getAttribute("data-alap-linkitems");
 
     let theCSSClass = event.target.getAttribute("data-alap-cssclass") || null;
     let cssAttr = "";
     let theTargets = [];
-    let anchorCSS = getComputedStyle(event.target, ":hover");
+    // let anchorCSS = getComputedStyle(event.target, ":hover");
+    // let anchorCSS = getComputedStyle(event.target);
+    let anchorCSS = getComputedStyle(event.target, ":link");
+    let anchorCSSNormal = getComputedStyle(event.target);
+    console.log(anchorCSSNormal.backgroundColor);
 
     // may not be needed
     this.refNames = {};
@@ -315,23 +322,17 @@ export default class alap {
       divCSS.zIndex = anchorCSS.zIndex + 10;
     }
 
-    divCSS.background = this.forceColorOpaque(anchorCSS.backgroundColor);
+    divCSS.backgroundColor = "red"; // this.forceColorOpaque(anchorCSS.backgroundColor);
 
     // alapElem.style.top = 10;
     // alapElem.style.left = myOffset.left;
     this.alapElem.style.display = "block";
-
-    // redo this...
-    // alapElem.style.cssText = `
-    // top: 10px;
-    // position: absolute;
-    // border: 2px solid black;
-    // zIndex: ${divCSS.zIndex};
-    // left: ${myOffset.left}px;
-    // top: ${myOffset.top}px;
-    // opacity: 1;
-    // background: ${divCSS.background};
-    // `;
+    this.alapElem.style.opacity = 1;
+    this.alapElem.style.backgroundColor = "red"; // this.forceColorOpaque(
+    //   anchorCSS.backgroundColor
+    // );
+    //   anchorCSS.backgroundColor
+    // );
 
     // redo this...
     this.alapElem.style.cssText = `
@@ -340,19 +341,18 @@ export default class alap {
       zIndex: 10;
       left: ${myOffset.left}px;
       top: ${myOffset.top}px;
-      width: 200px;
-      opacity: 1;
-      background: #ffffff;
+      width: auto;
+
+      background-color: ${anchorCSSNormal.backgroundColor};
+      opacity: 1.0;
       `;
 
+    // backgroundColor: anchorCSSNormal.backgroundColor;
     allDataElem = this.parseLine(theData);
 
     for (const curElem of allDataElem) {
       theTargets = [...theTargets, ...this.parseElem(curElem)];
     }
-
-    // console.dir(theTargets);
-    // console.dir(alapConfig);
 
     let menuHTML = `<ol ${cssAttr}>`;
     theTargets.map((curTarget) => {
