@@ -4,9 +4,10 @@
   <title>Multilink 3 Demo</title>
 
   <!-- <script type="module" src="example.js"></script> -->
-  <script defer="" src="/example.438d3af2.js"></script>
+  <script defer="" src="/example.js"></script>
 
-  <style>a {
+  <style>
+    a {
       text-decoration: underline;
       border: 1px dashed rgb(153, 238, 153);
       border-radius: 3px;
@@ -31,7 +32,8 @@
     #alapelem a {
       text-decoration: underline;
       border: 0px;
-    }</style>
+    }
+  </style>
 
 </head>
 
@@ -46,7 +48,8 @@
 
     <p>
       Hello! This is the third demo for MultiLink, which gives you more than one place to go when you click a link. A
-      bit like an in-place menu...but more flexible and powerful. Check out the <a id="mlblofgposts" class="alap" data-alap-linkitems=".alap">blog posts</a> I've written about it.
+      bit like an in-place menu...but more flexible and powerful. Check out the <a id="mlblofgposts" class="alap"
+        data-alap-linkitems=".alap">blog posts</a> I've written about it.
     </p>
 
     <p>I'll repeat just a bit of the second demo here, just to go over the basics ...</p>
@@ -71,7 +74,8 @@
         <li>a label (what you see on the page)</li>
         <li>a url (where it should go)</li>
         <li>a list of tags (such as
-          <a id="nyctags" class="alap" data-alap-linkitems=".nyc">"nyc"</a> or <a id="bridgetags" class="alap" data-alap-linkitems=".bridge">"bridge"</a>)</li>
+          <a id="nyctags" class="alap" data-alap-linkitems=".nyc">"nyc"</a> or <a id="bridgetags" class="alap"
+            data-alap-linkitems=".bridge">"bridge"</a>)</li>
 
       </ul>
     </p>
@@ -97,7 +101,8 @@
     </p>
 
     <p>
-      ... yeah, I could. But I could just say this: <a id="carcity1" class="alap" data-alap-linkitems="#cars1, #cities1">#cars1, #cities1</a>, and be done with it. If the definition changes in
+      ... yeah, I could. But I could just say this: <a id="carcity1" class="alap"
+        data-alap-linkitems="#cars1, #cities1">#cars1, #cities1</a>, and be done with it. If the definition changes in
       those
       IDs (someone adds a car or city), I would pick that up here for free.
     </p>
@@ -128,13 +133,15 @@
     <p></p>
 
     <p>
-      Ok, so we can refer to a few of them, and build up quite a list. Let's try <a id="nycsydlon" class="alap" data-alap-linkitems=".sydney, .nyc, .london">Sydney, NYC, and London</a>. (that element is "#nycsydlon")
+      Ok, so we can refer to a few of them, and build up quite a list. Let's try <a id="nycsydlon" class="alap"
+        data-alap-linkitems=".sydney, .nyc, .london">Sydney, NYC, and London</a>. (that element is "#nycsydlon")
     </p>
 
     <p>
       So far, I've shown a bit about referring to items in the data known to the page, and that we can go grab the items
       from elsewhere, and do so recursively. I've also shown the basic bit about tags: that you use them to build up
-      quite a list. I suppose I can also show that I can get tags from elsewhere, such as that big <a id="checknsl" class="alap" data-alap-linkitems="#nycsydlon">"nycsydlondon one..."</a> (I'm picking up the contents of
+      quite a list. I suppose I can also show that I can get tags from elsewhere, such as that big <a id="checknsl"
+        class="alap" data-alap-linkitems="#nycsydlon">"nycsydlondon one..."</a> (I'm picking up the contents of
       "#nycsydlon")
     </p>
 
@@ -198,4 +205,3 @@
 
   <div id="linkdiv" class="hideme">I get replaced with the listing of links...</div>
 </body>
-
