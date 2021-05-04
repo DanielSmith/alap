@@ -41,7 +41,7 @@ export let alapConfig = {
 
     casey_yt: {
       label: "Casey Neistat",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      url: "http://somecaseylink",
       tags: [
         "caseyneistat",
         "nycpeople",
