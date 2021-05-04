@@ -1,0 +1,21 @@
+body {
+  background-color: rgb(250, 250, 248);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin: 20px;
+}
+
+a {
+  text-decoration: underline;
+}
+
+a:hover {
+  background-color: #ffffff;
+}
+
+#alapelem {
+  background-color: #ffffff;
+  padding-right: 20px;
+  border: 0px solid white;
+  border-radius: 7px;
+  box-shadow: rgba(0, 0, 0, 0.25) 5px 5px 9px;
+}

@@ -1,4 +1,7 @@
 node_modules/
 *.log
 src/saveindex.js
+src/index-orig.js
 examples/dist/
+note.txt
+

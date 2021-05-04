@@ -300,9 +300,6 @@ export default class alap {
     event.preventDefault();
     event.stopPropagation();
 
-    // console.dir(getComputedStyle(event.target));
-    console.dir(event.target.className);
-
     let allDataElem;
     let theData = event.target.getAttribute("data-alap-linkitems");
 
@@ -347,20 +344,14 @@ export default class alap {
     this.alapElem.style.display = "block";
     this.alapElem.style.opacity = 1;
     this.alapElem.style.backgroundColor = "red"; // this.forceColorOpaque(
-    //   anchorCSS.backgroundColor
-    // );
-    //   anchorCSS.backgroundColor
-    // );
 
     // redo this...
     this.alapElem.style.cssText = `
       position: absolute;
-      border: 2px solid black;
       zIndex: 10;
       left: ${myOffset.left}px;
       top: ${myOffset.top}px;
       width: auto;
-
       background-color: ${anchorCSSNormal.backgroundColor};
       opacity: 1.0;
       `;
@@ -370,6 +361,11 @@ export default class alap {
 
     for (const curElem of allDataElem) {
       theTargets = [...theTargets, ...this.parseElem(curElem)];
+    }
+
+    // remove duplicates
+    if (theTargets.length) {
+      theTargets = [...new Set([...theTargets])];
     }
 
     let menuHTML = `<${this.listType} ${cssAttr}>`;

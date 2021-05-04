@@ -4,7 +4,7 @@
 
 export let alapConfig = {
   settings: {
-    listType: "ol",
+    listType: "ul",
     menuTimeout: 5000,
   },
 
@@ -13,6 +13,71 @@ export let alapConfig = {
       label: "BMW (E36) - Wikipedia",
       url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
       tags: ["e36m3", "bmw", "car", "germany"],
+    },
+
+    kittyatola_yt: {
+      label: "BMW (E36) - Wikipedia",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: ["e36m3", "bmw", "car", "germany"],
+    },
+
+    mkbhd_tw: {
+      label: "BMW (E36) - Wikipedia",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: ["e36m3", "bmw", "car", "germany"],
+    },
+
+    mkbhd_yt: {
+      label: "BMW (E36) - Wikipedia",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: ["e36m3", "bmw", "car", "germany"],
+    },
+
+    casey_tw: {
+      label: "BMW (E36) - Wikipedia",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: ["caseyneistat", "bmw", "car", "germany"],
+    },
+
+    casey_yt: {
+      label: "Casey Neistat",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: [
+        "caseyneistat",
+        "nycpeople",
+        "lapeople",
+        "cinematography",
+        "video",
+        "photography",
+        "youtube",
+      ],
+    },
+
+    makeartnow_yt: {
+      label: "Make. Art. Now. (youtube)",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: [
+        "makeartnow",
+        "joshyeo",
+        "cinematography",
+        "video",
+        "photography",
+        "lapeople",
+        "youtube",
+      ],
+    },
+
+    danmace_yt: {
+      label: "Dan Mace (YouTube)",
+      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      tags: [
+        "danmace",
+        "cinematography",
+        "video",
+        "photography",
+        "sapeople",
+        "youtube",
+      ],
     },
 
     vwbug: {
