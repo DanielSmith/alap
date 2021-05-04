@@ -1,5 +1,5 @@
 /*
- **	Config.json
+ **	Config
  */
 
 export let alapConfig = {
