@@ -1,2 +1,5 @@
-src/
 node_modules/
+examples/dist/
+dist/
+*.log
+note.txt
