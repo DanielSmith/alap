@@ -171,7 +171,11 @@ If I point at `#my_nice_menu`, and `my_nice_menu` has ".bridge, .city" defined, 
 
 You can combine these, such as `#my_favorite_cars, #fave_cities, #fave_airports` to build up a menu - all taken from definitions elsewhere on the page.
 
+### Reserved for future use
 
+Along with bare words, '.', and '#', the '@' symbol will be used in the future.  The intended functionality is to refer a Macro.  A Macro will be like defining `data-alap-linkitems`, except it will be in the JSON Config object. It will also provide the ability to override settings for the anchors where it used.
+
+"image" is reserved for future use in an item object.
 ### Combining things
 
 As you may have guessed, you can combine different types of specifiers, in order to build up a menu item list:
@@ -183,10 +187,52 @@ I like <a id="combo_example" class="alap"
 
 You can use DOM IDs ('#'), tags ('.'), and specfic list item IDs.
 
+### Expressions
 
+Within the `data-alap-linkitems` attribute, you can use simple expressions to build up a list, and filter items out. We can use list item IDs and tags, along with AND, OR, and WITHOUT.
+### Expressions: AND
 
+The '+' operator means we want to match something in TWO places.  Here is a sample from the demo:
 
+```
+<a id="nycandbridge" class="alap"
+  data-alap-linkitems=".nyc + .bridge">"nyc AND bridge (+)"</a>
+```
 
+It means: find items that have the tag of "nyc" AND the tag of "bridge"
+### Expressions: OR
+
+The '|' operator means we want to match something in EITHER place.  Here is a sample from the demo:
+
+```
+<a id="nycorbridge" class="alap"
+  data-alap-linkitems=".nyc | .bridge">"nyc OR bridge (|)"</a>
+```
+
+It means: find items that have the tag of "nyc" OR the tag of "bridge"
+### Expressions: WITHOUT
+
+The '-' operator means we want to EXCLUDE items that match something.  Here is a sample from the demo:
+
+```
+<a id="nycwobridge" class="alap"
+  data-alap-linkitems=".nyc - .bridge">"nyc WITHOUT bridge (-)"</a>
+```
+
+It means: find items that have the tag of "nyc", and toss the items that match the tag of "bridge"
+
+### Expressions: More Possibilities
+
+You can chain together a more complex expression:
+
+```
+<a id="nycorbridgenolon" class="alap"
+  data-alap-linkitems=".nyc | .bridge - .london">nyc OR bridge, without London (| and -)</a>
+```
+
+It means: I want items that match the tag of "nyc" or "bridge", but toss out anything that includes the tag of "london".
+
+Trying to use #DOM_IDs in an expression will fail at this time. It is a known bug.
 
 ## History, and the alap name
 
@@ -208,6 +254,10 @@ This fits the spirit :)  Alap is a means of dynamically creating a menu (especia
 * better looking example using Tailwind CSS
 * example with Vue 3
 * example with React
+* images in menu
+* Macros
+* fix #ID in expresssion bug
+
 
 
 
