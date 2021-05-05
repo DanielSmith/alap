@@ -28,7 +28,7 @@ export default class alap {
 
     document.body.append(this.alapElem);
     this.alapConfig = Object.assign({}, config);
-    console.dir(this.alapConfig);
+    // console.dir(this.alapConfig);
 
     this.listType = this.getSetting("listType", "ul");
     this.menuTimeout = +this.getSetting("menuTimeout", 5000);
@@ -36,7 +36,7 @@ export default class alap {
     // any element with the class of 'alap'... does not have to be an
     // anchor ("a")
     let myLinks = Array.from(document.getElementsByClassName("alap"));
-    console.dir(myLinks);
+    // console.dir(myLinks);
 
     for (const curLink of myLinks) {
       // dont allow more than one listener for a given signature
@@ -310,14 +310,12 @@ export default class alap {
     // let anchorCSS = getComputedStyle(event.target);
     let anchorCSS = getComputedStyle(event.target, ":link");
     let anchorCSSNormal = getComputedStyle(event.target);
-    console.log(anchorCSSNormal.backgroundColor);
 
     // may not be needed
     this.refNames = {};
 
     if (theCSSClass) {
       cssAttr = `class="${theCSSClass}"`;
-      // alert(cssAttr);
     }
 
     // in case we have any strays...
@@ -348,7 +346,7 @@ export default class alap {
     // redo this...
     this.alapElem.style.cssText = `
       position: absolute;
-      zIndex: 10;
+      z-index: 10;
       left: ${myOffset.left}px;
       top: ${myOffset.top}px;
       width: auto;

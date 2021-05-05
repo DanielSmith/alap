@@ -2,7 +2,7 @@
  **	Config
  */
 
-export let alapConfig = {
+export const alapConfig = {
   settings: {
     listType: "ul",
     menuTimeout: 5000,
@@ -16,32 +16,73 @@ export let alapConfig = {
     },
 
     kittyatola_yt: {
-      label: "BMW (E36) - Wikipedia",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
-      tags: ["e36m3", "bmw", "car", "germany"],
+      label: "Kitty - Atola Visuals (YouTube)",
+      url: "https://www.youtube.com/c/atolavisuals/videos",
+      tags: [
+        "atolavisuals",
+        "lapeople",
+        "cinematography",
+        "video",
+        "photography",
+        "techreview",
+        "youtube",
+      ],
+    },
+
+    davelee_yt: {
+      label: "Dave2D - Dave Lee (YouTube)",
+      url: "https://www.youtube.com/c/Dave2D/videos",
+      tags: ["dave2d", "video", "techreview", "photography", "youtube"],
     },
 
     mkbhd_tw: {
-      label: "BMW (E36) - Wikipedia",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
-      tags: ["e36m3", "bmw", "car", "germany"],
+      label: "MKBHD - Marques Brownlee (Twitter)",
+      url: "https://twitter.com/MKBHD",
+      tags: [
+        "mkbhd",
+        "nycpeople",
+        "njpeople",
+        "cinematography",
+        "techreview",
+        "video",
+        "photography",
+        "twitter",
+        "youtube",
+      ],
     },
 
     mkbhd_yt: {
-      label: "BMW (E36) - Wikipedia",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
-      tags: ["e36m3", "bmw", "car", "germany"],
+      label: "MKBHD - Marques Brownlee (YouTube)",
+      url: "https://twitter.com/MKBHD",
+      tags: [
+        "mkbhd",
+        "nycpeople",
+        "njpeople",
+        "cinematography",
+        "techreview",
+        "video",
+        "photography",
+        "youtube",
+      ],
     },
 
     casey_tw: {
-      label: "BMW (E36) - Wikipedia",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
-      tags: ["caseyneistat", "bmw", "car", "germany"],
+      label: "Casey Neistat (Twitter)",
+      url: "https://twitter.com/Casey",
+      tags: [
+        "caseyneistat",
+        "nycpeople",
+        "lapeople",
+        "cinematography",
+        "video",
+        "photography",
+        "youtube",
+      ],
     },
 
     casey_yt: {
-      label: "Casey Neistat",
-      url: "http://somecaseylink",
+      label: "Casey Neistat (YouTube)",
+      url: "https://www.youtube.com/c/Caseyneistatofficial/videos",
       tags: [
         "caseyneistat",
         "nycpeople",
@@ -54,14 +95,16 @@ export let alapConfig = {
     },
 
     makeartnow_yt: {
-      label: "Make. Art. Now. (youtube)",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      label: "Make. Art. Now. (YouTube)",
+      url: "https://www.youtube.com/c/MAKEARTNOWCHANNEL/videos",
       tags: [
         "makeartnow",
+        "diy",
         "joshyeo",
         "cinematography",
         "video",
         "photography",
+        "techreview",
         "lapeople",
         "youtube",
       ],
@@ -69,7 +112,7 @@ export let alapConfig = {
 
     danmace_yt: {
       label: "Dan Mace (YouTube)",
-      url: "http://en.wikipedia.org/wiki/BMW_3_Series_(E36)",
+      url: "https://www.youtube.com/c/DanMace/videos",
       tags: [
         "danmace",
         "cinematography",
@@ -98,10 +141,10 @@ export let alapConfig = {
       tags: ["australia", "beer", "lager"],
     },
 
-    pilsnerurquell: {
-      label: "Pilsner Urquell",
-      url: "http://www.pilsnerurquell.com/us-home",
-      tags: ["beer", "pilsner"],
+    lagunitas: {
+      label: "Lagunitas Brewing Company",
+      url: "https://lagunitas.com",
+      tags: ["beer", "pilsner", "ale"],
     },
 
     radeberger: {
@@ -126,18 +169,6 @@ export let alapConfig = {
       label: "Aqus Cafe",
       url: "http://aquscafe.com/",
       tags: ["cafe", "petaluma", "beer", "community", "coffee"],
-    },
-
-    jodiefoster: {
-      label: "Jodie Foster",
-      url: "http://en.wikipedia.org/wiki/Jodie_Foster",
-      tags: ["actress"],
-    },
-
-    gracehopper: {
-      label: "Grace Hopper",
-      url: "http://en.wikipedia.org/wiki/Grace_Hopper",
-      tags: ["navy", "computerscientist", "innovator"],
     },
 
     nychighline: {
@@ -227,7 +258,7 @@ export let alapConfig = {
     melbourneapoz: {
       label: "Melbourne - Albert Park / F1",
       url: "http://en.wikipedia.org/wiki/Melbourne_Grand_Prix_Circuit",
-      tags: ["australia", "melbourne", "city", "park"],
+      tags: ["australia", "melbourne", "city", "park", "formula1"],
     },
 
     ggbridge: {
