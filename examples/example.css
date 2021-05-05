@@ -10,6 +10,7 @@ a {
 
 a:hover {
   background-color: #ffffff;
+  cursor: pointer;
 }
 
 #alapelem {

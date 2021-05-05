@@ -45,6 +45,12 @@ This fits the spirit :)  Alap is a means of dynamically creating a menu (especia
 ****
 ## Next Steps
 
+* better looking example using Tailwind CSS
+* example with Vue 3
+* example with React
+
+
+
 
 
 
