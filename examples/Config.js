@@ -210,7 +210,7 @@ export const alapConfig = {
 
     visitbrooklyn: {
       label: "Visit Brooklyn",
-      url: "http://www.visitbrooklyn.org/",
+      url: "https://www.brooklynbridgepark.org",
       tags: ["nyc", "brooklyn", "city"],
     },
 
