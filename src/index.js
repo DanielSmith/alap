@@ -44,6 +44,10 @@ export default class alap {
       // ok, now we're good to bind
       curLink.addEventListener("click", this.doClick.bind(this), false);
     }
+
+    // in case of a stray one
+    this.theBody.removeEventListener("click", this.bodyClickHandler);
+    this.theBody.addEventListener("click", this.bodyClickHandler.bind(this));
   }
 
   getSetting(settingName, defaultValue = "") {
@@ -65,7 +69,6 @@ export default class alap {
   }
 
   bodyClickHandler(event) {
-    // event.preventDefault();
     let inMenu = event.target.closest("#alapelem");
 
     if (!inMenu) {
@@ -80,6 +83,7 @@ export default class alap {
   }
 
   menuMouseLeaveHandler() {
+    console.log("      this.menuMouseLeaveHandler");
     this.startTimer();
   }
 
@@ -313,12 +317,7 @@ export default class alap {
     }
 
     // in case we have any strays...
-    this.theBody.removeEventListener("click", this.bodyClickHandler);
     this.theBody.removeEventListener("keydown", this.bodyKeyHandler);
-
-    this.theBody.addEventListener("click", this.bodyClickHandler.bind(this), {
-      once: true,
-    });
     this.theBody.addEventListener("keydown", this.bodyKeyHandler.bind(this));
 
     let myOffset = this.offset(event.target);
