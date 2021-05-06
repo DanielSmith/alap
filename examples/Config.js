@@ -18,6 +18,7 @@ export const alapConfig = {
     kittyatola_yt: {
       label: "Kitty - Atola Visuals (YouTube)",
       url: "https://www.youtube.com/c/atolavisuals/videos",
+      cssClass: "violetclass",
       tags: [
         "atolavisuals",
         "lapeople",

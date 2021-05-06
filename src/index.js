@@ -15,7 +15,6 @@ export default class alap {
   configure(config) {
     this.theBody = document.querySelector("body");
 
-    // function init(config = {}) {
     // is there an existing alap elenent?
     this.alapElem = document.getElementById("alapelem");
     if (this.alapElem) {
@@ -28,7 +27,6 @@ export default class alap {
 
     document.body.append(this.alapElem);
     this.alapConfig = Object.assign({}, config);
-    // console.dir(this.alapConfig);
 
     this.listType = this.getSetting("listType", "ul");
     this.menuTimeout = +this.getSetting("menuTimeout", 5000);
@@ -43,9 +41,6 @@ export default class alap {
       // init may be called more than once (when elements are dynamically added
       // or updated). It's safe to call this when there is no listener bound
       curLink.removeEventListener("click", this.doClick);
-
-      // console.log(curLink);
-
       // ok, now we're good to bind
       curLink.addEventListener("click", this.doClick.bind(this), false);
     }
@@ -271,7 +266,6 @@ export default class alap {
       }
     }
 
-    // console.dir(resultSet);
     return resultSet;
   }
 
@@ -370,10 +364,13 @@ export default class alap {
     theTargets.map((curTarget) => {
       let curInfo = this.alapConfig.allLinks[curTarget];
 
-      // alert(curTarget);
+      let cssClass = "alapListElem";
+      if (curInfo.cssClass) {
+        cssClass += ` ${curInfo.cssClass}`;
+      }
 
       menuHTML += `
-          <li><a target="alapwindow"
+          <li class="${cssClass}"><a target="alapwindow"
           href=${curInfo.url}>${curInfo.label}</a></li>
           `;
     });
