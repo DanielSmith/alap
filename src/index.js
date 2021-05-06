@@ -145,10 +145,12 @@ export default class alap {
     // for future use, '@' for macro...
     myData = myData.replace(/\@{1,}/g, "@");
 
-    let dataElem = myData.split(",");
+    // let dataElem = myData.split(/[,\|\-\+]/);
+    let dataElem = myData.split(/[,]/);
 
     for (const curDataElem of dataElem) {
       let curWord = curDataElem.toString();
+      curWord = curWord.trim();
 
       // too short? dont bother
       if (curWord.length < 2) {
@@ -159,16 +161,16 @@ export default class alap {
         // console.log("already have seen");
         // console.log(curWord);
       } else {
+        // recursing # with expressions is broken
         if (curWord.charAt(0) == "#") {
           this.refNames[curWord] = 1;
 
           // go find a list of items elsewhere and bundle them in with
           // our current line...oh, and do it recursively...
-
           // get the #element....
           let theId = curWord.slice(1);
-          recurseIdElement = document.getElementById(theId);
 
+          recurseIdElement = document.getElementById(theId);
           checkline = recurseIdElement.getAttribute("data-alap-linkitems");
           knownWords.push.apply(knownWords, this.parseLine(checkline));
         } else {
