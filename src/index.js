@@ -48,6 +48,24 @@ export default class alap {
     // in case of a stray one
     this.theBody.removeEventListener("click", this.bodyClickHandler);
     this.theBody.addEventListener("click", this.bodyClickHandler.bind(this));
+
+    // in case we have any strays...
+    this.theBody.removeEventListener("keydown", this.bodyKeyHandler);
+    this.theBody.addEventListener("keydown", this.bodyKeyHandler.bind(this));
+
+    // strays?
+    this.alapElem.removeEventListener("mouseleave", this.menuMouseLeaveHandler);
+    this.alapElem.removeEventListener("mouseenter", this.menuMouseEnterHandler);
+
+    // add event handler on our menu for mouseouts...
+    this.alapElem.addEventListener(
+      "mouseleave",
+      this.menuMouseLeaveHandler.bind(this)
+    );
+    this.alapElem.addEventListener(
+      "mouseenter",
+      this.menuMouseEnterHandler.bind(this)
+    );
   }
 
   getSetting(settingName, defaultValue = "") {
@@ -69,6 +87,8 @@ export default class alap {
   }
 
   bodyClickHandler(event) {
+    console.log("body click");
+
     let inMenu = event.target.closest("#alapelem");
 
     if (!inMenu) {
@@ -316,10 +336,6 @@ export default class alap {
       cssAttr = `alap_${anchorID}`;
     }
 
-    // in case we have any strays...
-    this.theBody.removeEventListener("keydown", this.bodyKeyHandler);
-    this.theBody.addEventListener("keydown", this.bodyKeyHandler.bind(this));
-
     let myOffset = this.offset(event.target);
 
     myOffset.top += 20;
@@ -387,21 +403,8 @@ export default class alap {
 
     this.alapElem.innerHTML = menuHTML;
 
-    // strays?
-    this.alapElem.removeEventListener("mouseleave", this.menuMouseLeaveHandler);
-    this.alapElem.removeEventListener("mouseenter", this.menuMouseEnterHandler);
-
     // exit any existing timer...
     this.stopTimer();
     this.startTimer();
-    // add event handler on our menu for mouseouts...
-    this.alapElem.addEventListener(
-      "mouseleave",
-      this.menuMouseLeaveHandler.bind(this)
-    );
-    this.alapElem.addEventListener(
-      "mouseenter",
-      this.menuMouseEnterHandler.bind(this)
-    );
   }
 }
