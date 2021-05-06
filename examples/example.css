@@ -12,7 +12,7 @@ a:hover {
   cursor: pointer;
 }
 
-#alapelem {
+.alapelem {
   background-color: #ffffff;
   padding-right: 5px;
   padding-left: 0px;
@@ -22,7 +22,7 @@ a:hover {
   width: 100px;
 }
 
-#alapelem ul {
+.alapelem ul {
   margin: 5px;
   padding: 0;
 }
@@ -35,6 +35,10 @@ a:hover {
   width: auto;
 }
 
+.alap_faveyt {
+  border: 3px solid rgba(0, 0, 0, 0.25);
+}
+
 .alapListElem a {
   text-decoration: none;
   color: black;
@@ -42,4 +46,12 @@ a:hover {
 
 .violetclass {
   background-color: violet;
+}
+
+.alap_bridgetags {
+  box-shadow: rgba(0, 0, 0, 0.5) 15px 15px 19px;
+}
+
+.alap_bridgetags li {
+  background-color: seagreen;
 }

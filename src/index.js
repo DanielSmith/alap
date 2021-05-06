@@ -297,8 +297,8 @@ export default class alap {
     let allDataElem;
     let theData = event.target.getAttribute("data-alap-linkitems");
 
-    let theCSSClass = event.target.getAttribute("data-alap-cssclass") || null;
     let cssAttr = "";
+    let anchorID = event.target.id || "";
     let theTargets = [];
     // let anchorCSS = getComputedStyle(event.target, ":hover");
     // let anchorCSS = getComputedStyle(event.target);
@@ -308,8 +308,8 @@ export default class alap {
     // may not be needed
     this.refNames = {};
 
-    if (theCSSClass) {
-      cssAttr = `class="${theCSSClass}"`;
+    if (anchorID) {
+      cssAttr = `alap_${anchorID}`;
     }
 
     // in case we have any strays...
@@ -360,7 +360,17 @@ export default class alap {
       theTargets = [...new Set([...theTargets])];
     }
 
-    let menuHTML = `<${this.listType} ${cssAttr}>`;
+    // clear out any classes from our existing alapElem
+    this.alapElem.removeAttribute("class");
+
+    // ...and, if we have a specific css attribute to add,
+    // the element is ready for a fresh class specifier
+    this.alapElem.classList.add("alapelem");
+    if (cssAttr) {
+      this.alapElem.classList.add(cssAttr);
+    }
+
+    let menuHTML = `<${this.listType}>`;
     theTargets.map((curTarget) => {
       let curInfo = this.alapConfig.allLinks[curTarget];
 
