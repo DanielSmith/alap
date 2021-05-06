@@ -15,19 +15,19 @@ Alap also lets you build up menu items in more powerful ways (treating tags like
 
 ## Installation
 
-```
+```sh
 npm i alap
 ```
 
 In your `index.html`:
 
-```
+```html
   <script defer src="example.js"></script>
 ```
 
 and then in your `example.js`, import your config object, alap, and initialize:
 
-```
+```js
 import { alapConfig } from "./Config.js";
 
 // our lib, locally...
@@ -43,7 +43,7 @@ const alap = new Alap(alapConfig);
 ## Demo
 
 There is an example within the package itself:
-```
+```sh
 % cd examples
 % parcel serve index.html   --no-cache
 Server running at http://localhost:1234 
@@ -63,7 +63,7 @@ See `examples/Config.js` for a fully fleshed out example object.
 
 Here is a small sample:
 
-```
+```js
 export const alapConfig = {
   settings: {
     listType: "ul",
@@ -108,7 +108,7 @@ represents a possible menu list item.
 
 Sample Entry:
 
-```
+```js
 a_menu_item: {
   label: "Some Item",
   url: "https://example.org",
@@ -133,13 +133,13 @@ Give each anchor a unique id. Alap has some optional functionality where you can
 
 Sample:
 
-```
+```html
 <a id="nyctag1" class="alap" data-alap-linkitems=".nyc"</a> 
 ```
 
 ### Referring to list item IDs
 
-```
+```html
 <a id="my_nice_menu" class="alap"
   data-alap-linkitems="item1, item2, item3"</a> 
 ```
@@ -149,7 +149,7 @@ This would look for these entries in the Config Object: item1, item2, and item3
 It is the simplest case. You're looking for specific items.
 ### Referring to tags by using a class specifier
 
-```
+```html
 <a id="my_nice_menu" class="alap"
   data-alap-linkitems=".bridge, .city"</a> 
 ```
@@ -158,7 +158,7 @@ This can be thought of much like a CSS Class (looking through all items, and fin
 This would look for entries in the Config Object that have tags that match. In our example, we're looking for all entries that have a tag of "bridge" or "city".
 
 ### Referring to DOM IDs elsewhere
-```
+```html
 <a id="my_other_menu" class="alap"
   data-alap-linkitems="#my_nice_menu"</a> 
 ```
@@ -180,7 +180,7 @@ Along with bare words, '.', and '#', the '@' symbol will be used in the future. 
 
 As you may have guessed, you can combine different types of specifiers, in order to build up a menu item list:
 
-```
+```html
 I like <a id="combo_example" class="alap"
   data-alap-linkitems="bmwe36, vwbug, #beer1, .youtube">a lot of things</a>
 ```
@@ -194,7 +194,7 @@ Within the `data-alap-linkitems` attribute, you can use simple expressions to bu
 
 The '+' operator means we want to match something in TWO places.  Here is a sample from the demo:
 
-```
+```html
 <a id="nycandbridge" class="alap"
   data-alap-linkitems=".nyc + .bridge">"nyc AND bridge (+)"</a>
 ```
@@ -204,7 +204,7 @@ It means: find items that have the tag of "nyc" AND the tag of "bridge"
 
 The '|' operator means we want to match something in EITHER place.  Here is a sample from the demo:
 
-```
+```html
 <a id="nycorbridge" class="alap"
   data-alap-linkitems=".nyc | .bridge">"nyc OR bridge (|)"</a>
 ```
@@ -214,7 +214,7 @@ It means: find items that have the tag of "nyc" OR the tag of "bridge"
 
 The '-' operator means we want to EXCLUDE items that match something.  Here is a sample from the demo:
 
-```
+```html
 <a id="nycwobridge" class="alap"
   data-alap-linkitems=".nyc - .bridge">"nyc WITHOUT bridge (-)"</a>
 ```
@@ -225,7 +225,7 @@ It means: find items that have the tag of "nyc", and toss the items that match t
 
 You can chain together a more complex expression:
 
-```
+```html
 <a id="nycorbridgenolon" class="alap"
   data-alap-linkitems=".nyc | .bridge - .london">nyc OR bridge, without London (| and -)</a>
 ```
