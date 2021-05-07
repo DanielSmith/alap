@@ -8,6 +8,15 @@ export const alapConfig = {
     menuTimeout: 5000,
   },
 
+  macros: {
+    cars1: {
+      linkItems: "vwbug, bmwe36",
+      config: {
+        somekey: "somevalue",
+      },
+    },
+  },
+
   allLinks: {
     bmwe36: {
       label: "BMW (E36) - Wikipedia",
@@ -33,7 +42,7 @@ export const alapConfig = {
     davelee_yt: {
       label: "Dave2D - Dave Lee (YouTube)",
       url: "https://www.youtube.com/c/Dave2D/videos",
-      tags: ["dave2d", "video", "techreview", "photography", "youtube"],
+      tags: ["dave2d", "video", "techreview", "youtube"],
     },
 
     mkbhd_tw: {

@@ -1,5 +1,4 @@
 node_modules/
-examples/dist/
-dist/
+**/dist
 *.log
 note.txt

@@ -45,7 +45,7 @@ const alap = new Alap(alapConfig);
 
 There is an example within the package itself:
 ```sh
-% cd examples
+% cd examples/overview
 % parcel serve index.html   --no-cache
 Server running at http://localhost:1234 
 ✨  Built in 1.94s.
@@ -58,7 +58,7 @@ Configuration is done in two places:
 * data for all elements, via a JavaScript object.
 * per-anchor config in the `data-alap-linkitems` attribute
 
-See `examples/Config.js` for a fully fleshed out example object.
+See `examples/overview/Config.js` for a fully fleshed out example object.
 
 ### Config Object
 
