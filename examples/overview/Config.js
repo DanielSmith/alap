@@ -8,6 +8,15 @@ export const alapConfig = {
     menuTimeout: 5000,
   },
 
+  macros: {
+    cars1: {
+      linkItems: "vwbug, bmwe36",
+      config: {
+        somekey: "somevalue",
+      },
+    },
+  },
+
   allLinks: {
     bmwe36: {
       label: "BMW (E36) - Wikipedia",
@@ -33,12 +42,13 @@ export const alapConfig = {
     davelee_yt: {
       label: "Dave2D - Dave Lee (YouTube)",
       url: "https://www.youtube.com/c/Dave2D/videos",
-      tags: ["dave2d", "video", "techreview", "photography", "youtube"],
+      tags: ["dave2d", "video", "techreview", "youtube"],
     },
 
     mkbhd_tw: {
       label: "MKBHD - Marques Brownlee (Twitter)",
       url: "https://twitter.com/MKBHD",
+      cssClass: "violetclass",
       tags: [
         "mkbhd",
         "nycpeople",
@@ -288,22 +298,60 @@ export const alapConfig = {
 
     mlblog1: {
       label: "One Link, Many Paths, Clicking Choice! (MultiLink, Part 1)",
-      url:
-        "http://daniel.org/cafebucky/2012/02/26/one-link-many-paths-clicking-choice-multilink-part-1/",
+      url: "http://daniel.org/cafebucky/2012/02/26/one-link-many-paths-clicking-choice-multilink-part-1/",
       tags: ["alap", "blog"],
     },
 
     mlblog2: {
       label: "(MultiLink, Part 2) - where I introduce tags...",
-      url:
-        "http://daniel.org/cafebucky/2012/02/27/one-link-many-paths-clicking-choice-multilink-part-2/",
+      url: "http://daniel.org/cafebucky/2012/02/27/one-link-many-paths-clicking-choice-multilink-part-2/",
       tags: ["alap", "blog"],
     },
 
     mlblog3: {
       label: "(MultiLink, Part 3) - ID Includes and Tag Expressions...",
-      url:
-        "http://daniel.org/cafebucky/2012/03/01/one-link-many-paths-clicking-choice-multilink-part-3/",
+      url: "http://daniel.org/cafebucky/2012/03/01/one-link-many-paths-clicking-choice-multilink-part-3/",
+      tags: ["alap", "blog"],
+    },
+
+    sanfrancisco: {
+      label: "San Francisco (Wikipedia)",
+      url: "https://en.wikipedia.org/wiki/San_Francisco",
+      tags: ["sf"],
+    },
+
+    ferrybuilding: {
+      label: "SF Ferry Building",
+      url: "https://www.ferrybuildingmarketplace.com/",
+      tags: ["alap", "blog"],
+    },
+
+    acmebread: {
+      label: "Acme Bread",
+      url: "http://acmebread.com/locations",
+      tags: ["alap", "blog"],
+    },
+
+    sfchinatown: {
+      label: "SF Chinatown",
+      url: "http://www.sanfranciscochinatown.com/",
+      tags: ["alap", "blog"],
+    },
+    gbpizza: {
+      label: "Golden Boy Pizza",
+      url: "http://www.goldenboypizza.com/sanfrancisco.php",
+      tags: ["sf"],
+    },
+
+    gbpizza_photos: {
+      label: "Golden Boy Pizza (Photos)",
+      url: "http://www.goldenboypizza.com/gallery.php",
+      tags: ["sf"],
+    },
+
+    parkchalet: {
+      label: "Park Chalet",
+      url: "http://www.parkchalet.com/",
       tags: ["alap", "blog"],
     },
   },

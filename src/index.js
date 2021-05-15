@@ -9,7 +9,6 @@ export default class alap {
 
   constructor(config) {
     this.configure(config);
-    this.boundDoClick = () => this.doClick();
   }
 
   configure(config) {
@@ -331,6 +330,8 @@ export default class alap {
     let anchorCSS = getComputedStyle(event.target, ":link");
     let anchorCSSNormal = getComputedStyle(event.target);
 
+    // console.dir(anchorCSSNormal);
+
     // may not be needed
     this.refNames = {};
 
@@ -338,9 +339,34 @@ export default class alap {
       cssAttr = `alap_${anchorID}`;
     }
 
-    let myOffset = this.offset(event.target);
+    // do we have a macro?
+    if (theData.charAt(0) === "@") {
+      let checkMacroName = null;
 
-    myOffset.top += 20;
+      // a bare '@'? Ok, we will use the DOM ID
+      if (theData.length === 1) {
+        if (anchorID) {
+          checkMacroName = anchorID;
+        }
+      } else {
+        checkMacroName = theData.slice(1);
+      }
+
+      if (
+        checkMacroName &&
+        this.alapConfig.macros &&
+        this.alapConfig.macros[checkMacroName] &&
+        this.alapConfig.macros[checkMacroName].linkItems
+      ) {
+        theData = this.alapConfig.macros[checkMacroName].linkItems;
+      }
+    }
+
+    // we use an absolute offset here, but in our css rules,
+    // we should define in .alapelem:
+    // margin-top: 1.5rem;
+    // this gives a consistent offset based on rem
+    let myOffset = this.offset(event.target);
     let divCSS = {};
 
     divCSS.zIndex = 10;
@@ -348,24 +374,17 @@ export default class alap {
       divCSS.zIndex = anchorCSS.zIndex + 10;
     }
 
-    // alapElem.style.top = 10;
-    // alapElem.style.left = myOffset.left;
     this.alapElem.style.display = "block";
-    this.alapElem.style.opacity = 1;
-    this.alapElem.style.backgroundColor = "red"; // this.forceColorOpaque(
 
-    // redo this...
+    // our offset is fixed here, you can set margin-top
+    // and margin-left in .alapelem to adjust as you wish
     this.alapElem.style.cssText = `
       position: absolute;
       z-index: 10;
       left: ${myOffset.left}px;
       top: ${myOffset.top}px;
-      width: auto;
-      background-color: ${anchorCSSNormal.backgroundColor};
-      opacity: 1.0;
       `;
 
-    // backgroundColor: anchorCSSNormal.backgroundColor;
     allDataElem = this.parseLine(theData);
 
     for (const curElem of allDataElem) {
@@ -396,9 +415,17 @@ export default class alap {
         cssClass += ` ${curInfo.cssClass}`;
       }
 
+      let listItemContent = curInfo.label;
+      // however .. if we have an image...
+      if (curInfo.image) {
+        listItemContent = `
+        <img src="${curInfo.image}">
+        `;
+      }
+
       menuHTML += `
           <li class="${cssClass}"><a target="alapwindow"
-          href=${curInfo.url}>${curInfo.label}</a></li>
+          href=${curInfo.url}>${listItemContent}</a></li>
           `;
     });
     menuHTML += `</${this.listType}>`;

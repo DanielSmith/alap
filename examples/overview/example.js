@@ -3,11 +3,10 @@
 import { alapConfig } from "./Config.js";
 
 // our lib, locally...
-import Alap from "../src/index.js";
+import Alap from "../../src/index.js";
 
 // ...or, if you are using npm, this would be:
 // import Alap from "alap";
-
 
 // pass the config object
 const alap = new Alap(alapConfig);
