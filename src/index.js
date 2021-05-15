@@ -360,6 +360,8 @@ export default class alap {
       ) {
         theData = this.alapConfig.macros[checkMacroName].linkItems;
       }
+
+      // tk - check macro for settings overrides
     }
 
     // we use an absolute offset here, but in our css rules,

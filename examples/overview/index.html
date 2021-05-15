@@ -71,6 +71,16 @@
 
 
     <p>
+      example: here are some <a id="sfactivities" class="alap"
+        data-alap-linkitems="sanfrancisco, ferrybuilding, acmebread, sfchinatown, gbpizza, gbpizza_photos, parkchalet">things
+        you should
+        check out</a> in San Francisco
+    </p>
+
+
+
+
+    <p>
       So far, so good. We can build up a list of links by using the ids of properties that are available in our JSON
       configuration object. I use a "data-alap-linkitems" attribute to store the references for what I want from the
       JSON data:
@@ -83,34 +93,7 @@
       </pre>
 
     <p>
-      To be clear, one can think of the properties in the JSON object as IDs for each possible target. There is another
-      sense of IDs, and that is over on the DOM/HTML side... we can refer to elsewhere in our document, and grab the
-      same
-      list of targets that they use.
-    </p>
-
-    <p>
-      <strong>Grabbing info from other HTML link IDs</strong>
-    </p>
-
-    <p>
-      My first example mentioned cars and cities. Their DOM IDs on this page are #cars1 and #cities1. If I wanted to
-      have
-      a link that showed everything they list, I could certainly list out all of the individual items: (bmwe36, vwbug,
-      visitbrooklyn, sydneyoz, melbournepz) ...
-    </p>
-
-    <p>
-      ... yeah, I could. But I could just say this: <a id="carcity1" class="alap"
-        data-alap-linkitems="#cars1, #cities1">#cars1, #cities1</a>, and be done with it. If the definition changes in
-      those
-      IDs (someone adds a car or city), I would pick that up here for free.
-    </p>
-
-    <p>
-      I can also pick up definitions recursively. If I were bringing in the contents of #cars1, and it referred to
-      #germancars, I would get those definitions as well (and so on). Alap keeps track of what it has seen, and
-      wont get into any endless loops while gathering info.
+      To be clear, one can think of the properties in the JSON object as IDs for each possible target.
     </p>
 
     <p>
@@ -118,8 +101,8 @@
     </p>
 
     <p>
-      Referring to items is a good start. Referring to other IDs and grabbing all of the items that they know about
-      improves things. If you know about CSS, you are familiar with classes. Same idea here: let's talk about Tags.
+      Referring to items is a good start. If you know about CSS, you are familiar with classes. Same idea here: let's
+      talk about Tags.
     </p>
 
     <p>
@@ -138,15 +121,6 @@
     </p>
 
     <p>
-      So far, I've shown a bit about referring to items in the data known to the page, and that we can go grab the
-      items
-      from elsewhere, and do so recursively. I've also shown the basic bit about tags: that you use them to build up
-      quite a list. I suppose I can also show that I can get tags from elsewhere, such as that big <a id="checknsl"
-        class="alap" data-alap-linkitems="#nycsydlon">"nycsydlondon one..."</a> (I'm picking up the contents of
-      "#nycsydlon")
-    </p>
-
-    <p>
       <strong>
         What we know so far...
       </strong>
@@ -156,9 +130,7 @@
         <li>in our JSON object, each definition might have some tags, such as "cafe, coffee", in our data attribute, we
           use the '.' (think of CSS Classes) to refer to a class. If we say ".coffee", we pick up all of the entries
           that contain a tag of "coffee".</li>
-        <li>using an #id (with '#') means "go to some other DOM element on the page, grab the data attribute from there,
-          and use it here".</li>
-        <li>these can all be combined in a data attribute. "#cities1 #bridges1 acrecoffee .beer" would be valid. It all
+        <li>these can be combined in a data attribute. "acrecoffee, .beer" would be valid. It all
           goes towards building up a list for a menu.</li>
       </ul>
 
@@ -169,8 +141,8 @@
     </p>
 
     <p>
-      If we stopped with the combinations of using item ids, tags, and picking up more definitions from other DOM
-      elements, that would be a lot of functionality. It gets better though, with simple expressions that let us do AND,
+      If we stopped with the combinations of using item ids and tags, that would be a lot of functionality. It gets
+      better though, with simple expressions that let us do AND,
       OR, and WITHOUT operations. (I need to confirm that this works outside of tags.. I think it does, but am trying to
       get this written at the moment)
     </p>

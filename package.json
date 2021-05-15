@@ -1,6 +1,6 @@
 {
   "name": "alap",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "alap - Any link, all places. Enhance links with multiple targets.",
   "main": "src/index.js",
   "scripts": {

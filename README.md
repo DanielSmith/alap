@@ -130,7 +130,7 @@ tags | an array of strings. These can be referred to from the `data-alap-linkite
 
 Wherever you want to use alap on a page, you need to configure the anchor element. This is so that a) alap will recognize it (`class="alap"`) and b) alap will know what to look up (the `data-alap-linkitems` attribute)
 
-Give each anchor a unique id. Alap has some optional functionality where you can grab definitions from anchors elsewhere on the page, by referring to their ID (yes, really!)
+Give each anchor a unique id. Alap uses it to generate CSS Class names, and it also can be helpful with Macros (more on that in the Macro section).
 
 Sample:
 
@@ -156,37 +156,51 @@ It is the simplest case. You're looking for specific items.
 ```
 This can be thought of much like a CSS Class (looking through all items, and finding matches for a certain class)
 
-This would look for entries in the Config Object that have tags that match. In our example, we're looking for all entries that have a tag of "bridge" or "city".
+### Macros
 
-### Referring to DOM IDs elsewhere
-```html
-<a id="my_other_menu" class="alap"
-  data-alap-linkitems="#my_nice_menu"</a> 
+One main area of the Config can be `macros`.
+
+Here is a sample:
+
+```javascript
+cars1: {
+  linkItems: "vwbug, bmwe36",
+  config: {
+    somekey: "somevalue",
+  }
+}
 ```
 
-Think of the "#" here as an ID specifier.
+For the moment, the `config` section within a macro is not being used.
 
-We're not defining a new search for items with this, we're grabbing them from some place else.
+A macro is referred to in an anchor definition via the `@` character.  Example:
 
-If I point at `#my_nice_menu`, and `my_nice_menu` has ".bridge, .city" defined, then that's what I will get here as well.
+```html
+ <a id="cars1" class="alap" data-alap-linkitems="@cars1">cars</a>
+```
 
-You can combine these, such as `#my_favorite_cars, #fave_cities, #fave_airports` to build up a menu - all taken from definitions elsewhere on the page.
+What is the benefit of using a macro?
 
+A macro lets you say "in my HTML, don't hardwire specifics about the menu I want.  Go look it in up in the Config.  Grab it from the `linkItems` field there".
+
+As a convenience, if you just specify "@", the macro will get its name from the id of the anchor tag. Example: `id="germanbeer" data-alap-linkitems="@"` would be like specifying the macro as "@germanbeer"
 ### Reserved for future use
 
-Along with bare words, '.', and '#', the '@' symbol will be used in the future.  The intended functionality is to refer a Macro.  A Macro will be like defining `data-alap-linkitems`, except it will be in the JSON Config object. It will also provide the ability to override settings for the anchors where it used.
+Bare words (a list item identifier), '.', and '@' are currently used.
+
+The '*', '%', and '#' symbols may be used in the future.
+* '#' would have the functionality of getting definitions from **other** DOM IDs. I don't intend to support it, until I can fix the parsing so that it will work with expressions
+* '%' and '*' may involve searching through URL, Labels, and Descriptions. I would want to build an alap-editor first (as in, drag and drop links to a target, and extract relevant data from the metadata found in the HEAD of that page)
 
 "image" is reserved for future use in an item object.
 ### Combining things
 
-As you may have guessed, you can combine different types of specifiers, in order to build up a menu item list:
+As you may have guessed, you can combine different types of specifiers, in order to build up a menu item list. You can use tags ('.'), and specfic list item IDs:
 
 ```html
 I like <a id="combo_example" class="alap"
-  data-alap-linkitems="bmwe36, vwbug, #beer1, .youtube">a lot of things</a>
+  data-alap-linkitems="bmwe36, vwbug, .youtube">a lot of things</a>
 ```
-
-You can use DOM IDs ('#'), tags ('.'), and specfic list item IDs.
 
 ### Expressions
 
@@ -233,8 +247,6 @@ You can chain together a more complex expression:
 
 It means: I want items that match the tag of "nyc" or "bridge", but toss out anything that includes the tag of "london".
 
-Trying to use #DOM_IDs in an expression will fail at this time. It is a known bug.
-
 ## History, and the alap name
 
 Alap is a plain vanilla JS rewrite of my 2012 MultiLinks package. That was done in jQuery.
@@ -247,17 +259,13 @@ Alap keeps it simple, and you can think of it as whatever acronym that seems mem
 
 This fits the spirit :)  Alap is a means of dynamically creating a menu (especially if we think of run-time bits of JSON), which introduce other web pages.
 
-
-
 ****
 ## Next Steps
 
-* better looking example using Tailwind CSS
+* better looking example using Tailwind CSS (in progress)
 * example with Vue 3
 * example with React
 * images in menu
-* Macros
-* fix #ID in expresssion bug
 
 
 
