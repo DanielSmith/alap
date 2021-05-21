@@ -71,14 +71,17 @@
 
 
     <p>
+      <img id="sfactivities2" class="alap"
+        data-alap-linkitems="sanfrancisco, ferrybuilding, acmebread, sfchinatown, gbpizza, gbpizza_photos, parkchalet"
+        src="https://www.visittheusa.com/sites/default/files/styles/hero_l_x2/public/images/hero_media_image/2017-05/23b0b0b9caaa07ee409b693da9bf9003.jpeg?itok=wcs97iyf">
+    </p>
+
+    <p>
       example: here are some <a id="sfactivities" class="alap"
         data-alap-linkitems="sanfrancisco, ferrybuilding, acmebread, sfchinatown, gbpizza, gbpizza_photos, parkchalet">things
         you should
         check out</a> in San Francisco
     </p>
-
-
-
 
     <p>
       So far, so good. We can build up a list of links by using the ids of properties that are available in our JSON
@@ -106,7 +109,7 @@
     </p>
 
     <p>
-      Here is a basic tag: <a id="nyctag1" class="alap" data-alap-linkitems=".nyc">"NYC"</a>. It simply gathers all of
+      Here is a basic tag: <a id="nyctag1" class="alap" data-alap-linkitems=".nyc">"NYC"</a>. It gathers all of
       the links that have a tag that matches "nyc". It looks like this:
     </p>
 
@@ -117,7 +120,7 @@
 
     <p>
       Ok, so we can refer to a few of them, and build up quite a list. Let's try <a id="nycsydlon" class="alap"
-        data-alap-linkitems=".sydney, .nyc, .london">Sydney, NYC, and London</a>. (that element is "#nycsydlon")
+        data-alap-linkitems=".sydney, .nyc, .london">Sydney, NYC, and London</a>.
     </p>
 
     <p>
@@ -143,13 +146,12 @@
     <p>
       If we stopped with the combinations of using item ids and tags, that would be a lot of functionality. It gets
       better though, with simple expressions that let us do AND,
-      OR, and WITHOUT operations. (I need to confirm that this works outside of tags.. I think it does, but am trying to
-      get this written at the moment)
+      OR, and WITHOUT operations.
     </p>
 
     <p>
-      As you can guess, building up groups of tags can yield some pretty large lists. We really want more
-      control. Let's go for that!
+      As you may guess, building up groups of tags can yield some pretty large lists. We really want more
+      control. Let's see how to do that!
     </p>
 
     <p>

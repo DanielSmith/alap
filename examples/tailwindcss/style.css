@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .sectionheading {
+    @apply text-lg bg-gray-400;
+  }
+}

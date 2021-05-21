@@ -4,4 +4,8 @@ src/saveindex.js
 src/index-orig.js
 **/dist
 note.txt
+.DS_Store
+**/.cache
+**/.vite
+*.local
 

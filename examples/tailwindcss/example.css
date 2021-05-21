@@ -11,6 +11,10 @@ a {
   text-decoration: underline;
 }
 
+.alap {
+  text-decoration: underline;
+}
+
 a:hover {
   background-color: #ffffff;
   cursor: pointer;
@@ -25,14 +29,6 @@ a:hover {
   border-radius: 7px;
   box-shadow: rgba(0, 0, 0, 0.25) 5px 5px 9px;
   width: auto;
-}
-
-.alap_sfactivities2 {
-  margin-top: 0;
-}
-
-#sfactivities2 {
-  max-width: 500px;
 }
 
 .alapelem:hover {
@@ -62,7 +58,7 @@ a:hover {
 }
 
 .alapListElem img {
-  max-height: 2rem;
+  max-height: 6rem;
   background-size: cover;
   border: 0;
 }
@@ -77,4 +73,8 @@ a:hover {
 
 .alap_bridgetags li {
   background-color: rgb(128, 209, 163);
+}
+
+#sfactivities2 {
+  max-width: 500px;
 }

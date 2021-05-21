@@ -6,12 +6,13 @@ export default class alap {
   theBody = null;
   listType = "ol";
   menuTimeout = 5000;
+  ESC_KEYCODE = 27;
 
   constructor(config) {
     this.configure(config);
   }
 
-  configure(config) {
+  resetAlapElem() {
     this.theBody = document.querySelector("body");
 
     // is there an existing alap elenent?
@@ -25,26 +26,10 @@ export default class alap {
     this.alapElem.setAttribute("id", "alapelem");
 
     document.body.append(this.alapElem);
-    this.alapConfig = Object.assign({}, config);
+  }
 
-    this.listType = this.getSetting("listType", "ul");
-    this.menuTimeout = +this.getSetting("menuTimeout", 5000);
-
-    // any element with the class of 'alap'... does not have to be an
-    // anchor ("a")
-    let myLinks = Array.from(document.getElementsByClassName("alap"));
-    // console.dir(myLinks);
-
-    for (const curLink of myLinks) {
-      // dont allow more than one listener for a given signature
-      // init may be called more than once (when elements are dynamically added
-      // or updated). It's safe to call this when there is no listener bound
-      curLink.removeEventListener("click", this.doClick);
-      // ok, now we're good to bind
-      curLink.addEventListener("click", this.doClick.bind(this), false);
-    }
-
-    // in case of a stray one
+  resetEvents() {
+    // in case of a stray
     this.theBody.removeEventListener("click", this.bodyClickHandler);
     this.theBody.addEventListener("click", this.bodyClickHandler.bind(this));
 
@@ -67,6 +52,32 @@ export default class alap {
     );
   }
 
+  configure(config = {}) {
+    if (Object.keys(config).length === 0) {
+      return;
+    }
+
+    this.resetAlapElem();
+
+    this.alapConfig = Object.assign({}, config);
+    this.listType = this.getSetting("listType", "ul");
+    this.menuTimeout = +this.getSetting("menuTimeout", 5000);
+
+    // any element with the class of 'alap'... does not have to be an anchor element
+    let myLinks = Array.from(document.getElementsByClassName("alap"));
+
+    for (const curLink of myLinks) {
+      // dont allow more than one listener for a given signature
+      // init may be called more than once (when elements are dynamically added
+      // or updated). It's safe to call this when there is no listener bound
+      curLink.removeEventListener("click", this.doClick);
+      // ok, now we're good to bind
+      curLink.addEventListener("click", this.doClick.bind(this), false);
+    }
+
+    this.resetEvents();
+  }
+
   getSetting(settingName, defaultValue = "") {
     let retVal = defaultValue;
 
@@ -79,6 +90,12 @@ export default class alap {
     return retVal;
   }
 
+  setSetting(settingName, value) {
+    if (this.alapConfig && this.alapConfig.settings) {
+      this.alapConfig.settings[settingName] = value;
+    }
+  }
+
   removeMenu() {
     this.alapElem = document.getElementById("alapelem");
     this.alapElem.style.display = "none";
@@ -86,8 +103,6 @@ export default class alap {
   }
 
   bodyClickHandler(event) {
-    console.log("body click");
-
     let inMenu = event.target.closest("#alapelem");
 
     if (!inMenu) {
@@ -96,13 +111,12 @@ export default class alap {
   }
 
   bodyKeyHandler(event) {
-    if (event.keyCode == 27) {
+    if (event.keyCode == this.ESC_KEYCODE) {
       this.removeMenu();
     }
   }
 
   menuMouseLeaveHandler() {
-    console.log("      this.menuMouseLeaveHandler");
     this.startTimer();
   }
 
@@ -122,13 +136,8 @@ export default class alap {
     this.curTimerID = 0;
   }
 
-  parseLine(theStr) {
-    let knownWords = [];
+  cleanMyData(theStr) {
     let myData = "";
-    let recurseIdElement;
-    let checkline;
-
-    if (!theStr) return [];
 
     // if we need to split for tag intersections and diffs later,
     // we provide a consistent space separated string
@@ -139,12 +148,23 @@ export default class alap {
 
     myData = myData.replace(/,{1,}/g, ",");
     myData = myData.replace(/\.{1,}/g, ".");
-    myData = myData.replace(/\#{1,}/g, "#");
-
-    // for future use, '@' for macro...
     myData = myData.replace(/\@{1,}/g, "@");
 
-    // let dataElem = myData.split(/[,\|\-\+]/);
+    // future use
+    myData = myData.replace(/\#{1,}/g, "#");
+    myData = myData.replace(/\*{1,}/g, "*");
+    myData = myData.replace(/\%{1,}/g, "%");
+
+    return myData;
+  }
+
+  parseLine(theStr) {
+    let knownWords = [];
+    let myData = "";
+
+    if (!theStr) return [];
+
+    myData = this.cleanMyData(theStr);
     let dataElem = myData.split(/[,]/);
 
     for (const curDataElem of dataElem) {
@@ -156,33 +176,21 @@ export default class alap {
         continue;
       }
 
-      if (this.refNames.hasOwnProperty(curWord)) {
-        // console.log("already have seen");
-        // console.log(curWord);
-      } else {
-        // recursing # with expressions is broken
-        if (curWord.charAt(0) == "#") {
-          this.refNames[curWord] = 1;
+      knownWords.push(curWord);
 
-          // go find a list of items elsewhere and bundle them in with
-          // our current line...oh, and do it recursively...
-          // get the #element....
-          let theId = curWord.slice(1);
+      // do we still need refNames??
 
-          recurseIdElement = document.getElementById(theId);
-          checkline = recurseIdElement.getAttribute("data-alap-linkitems");
-          knownWords.push.apply(knownWords, this.parseLine(checkline));
-        } else {
-          knownWords.push(curWord);
-        }
-      }
+      // if (this.refNames.hasOwnProperty(curWord)) {
+      //   // console.log("already have seen");
+      //   // console.log(curWord);
+      // } else {
+      // }
     }
 
     return knownWords;
   }
 
   searchTags(searchStr) {
-    // let theConfig = alapConfig.allLinks;
     let resultSet = [];
 
     if (searchStr.charAt(0) == ".") {
@@ -206,7 +214,7 @@ export default class alap {
     return resultSet;
   }
 
-  cleanArgList(aList) {
+  cleanArgList(aList = []) {
     const allElems = [];
 
     // may need to test here for an object...
@@ -223,7 +231,6 @@ export default class alap {
     // alert(theElem);
     let resultSet = [];
     let curResultSet = [];
-    let myIDsWithTag = [];
 
     let tokens = theElem.split(" ");
 
@@ -322,15 +329,16 @@ export default class alap {
     let allDataElem;
     let theData = event.target.getAttribute("data-alap-linkitems");
 
+    // nothing to do...
+    if (!theData) return;
+
+    let tagType = event.target.tagName.toLowerCase();
+
     let cssAttr = "";
     let anchorID = event.target.id || "";
     let theTargets = [];
-    // let anchorCSS = getComputedStyle(event.target, ":hover");
-    // let anchorCSS = getComputedStyle(event.target);
     let anchorCSS = getComputedStyle(event.target, ":link");
     let anchorCSSNormal = getComputedStyle(event.target);
-
-    // console.dir(anchorCSSNormal);
 
     // may not be needed
     this.refNames = {};
@@ -380,11 +388,20 @@ export default class alap {
 
     // our offset is fixed here, you can set margin-top
     // and margin-left in .alapelem to adjust as you wish
+    // position: fixed;
+
+    let left = myOffset.left;
+    let top = myOffset.top;
+    if (tagType === "img") {
+      left = event.pageX;
+      top = event.pageY;
+    }
+
     this.alapElem.style.cssText = `
       position: absolute;
       z-index: 10;
-      left: ${myOffset.left}px;
-      top: ${myOffset.top}px;
+      left: ${left}px;
+      top: ${top}px;
       `;
 
     allDataElem = this.parseLine(theData);
@@ -420,22 +437,34 @@ export default class alap {
       let listItemContent = curInfo.label;
       // however .. if we have an image...
       if (curInfo.image) {
+        let altText = `image for ${curTarget}`;
+        if (curInfo.altText) {
+          altText = curInfo.altText;
+        }
+
         listItemContent = `
-        <img src="${curInfo.image}">
+        <img alt="${altText}" src="${curInfo.image}">
         `;
       }
 
+      let targetWindow = "fromAlap";
+      // however .. if we have a specific target
+      if (curInfo.targetWindow) {
+        targetWindow = curInfo.targetWindow;
+      }
+
       menuHTML += `
-          <li class="${cssClass}"><a target="alapwindow"
+          <li class="${cssClass}"><a target="${targetWindow}"
           href=${curInfo.url}>${listItemContent}</a></li>
           `;
     });
     menuHTML += `</${this.listType}>`;
 
     this.alapElem.innerHTML = menuHTML;
-
-    // exit any existing timer...
-    this.stopTimer();
+    -(
+      // exit any existing timer...
+      this.stopTimer()
+    );
     this.startTimer();
   }
 }

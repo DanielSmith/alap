@@ -2,3 +2,8 @@ node_modules/
 **/dist
 *.log
 note.txt
+src/saveindex.js
+src/index-orig.js
+.DS_Store
+**/.cache
+**/.vite

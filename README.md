@@ -238,7 +238,7 @@ It means: find items that have the tag of "nyc", and toss the items that match t
 
 ### Expressions: More Possibilities
 
-You can chain together a more complex expression:
+You can chain them together for a more complex expression:
 
 ```html
 <a id="nycorbridgenolon" class="alap"
@@ -249,7 +249,7 @@ It means: I want items that match the tag of "nyc" or "bridge", but toss out any
 
 ## History, and the alap name
 
-Alap is a plain vanilla JS rewrite of my 2012 MultiLinks package. That was done in jQuery.
+Alap is an ES6 rewrite of my 2012 MultiLinks package (which had depended on jQuery.
 
 I pondered using MultiLink, ManyLinks, or MenuLinks.  The names are pretty much taken, and there is always the question of singular vs plural (link? links?).
 

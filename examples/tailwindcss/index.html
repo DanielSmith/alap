@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- <link rel="stylesheet" href="/style.css"> -->
+  <link rel="stylesheet" href="/example.css">
+  <link rel="stylesheet" href="/prism.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- <link rel="preconnect" href="https://fonts.gstatic.com"> -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <title>Alap Demo w/Tailwind CSS</title>
+</head>
+
+
+<body id="top" class="bg-gray-200">
+
+  <article id="mainContent" class="max-w-screen-xl  mx-auto  bg-gray-200  text-gray-600
+      text-left shadow-2xl rounded-lg">
+    <div class="bg-fixed bg-cover object-cover mb-8 bg-blend-soft-light brightness-200" style="background-image:linear-gradient(rgba(227, 240, 240, 0.9), rgba(80, 138, 156, 0.9)),
+        url(img/joshua-hoehne-xhNBw5x63mw-unsplash.jpg)">
+
+      <h3 class="text-4xl filter drop-shadow-xl  text-gray-400 text-center tracking-widest text-gray-800 font-bold mb-4
+        pt-4" style="filter: drop-shadow(5px 15px 12px #051113);">
+        Alap Demo</h3>
+
+      <p class="text-center text-gray-800 font-extrabold pb-8">Daniel Smith - JavaJoint@gmail.com<br />
+        21 May 2021</p>
+    </div>
+
+    <div class="prose prose-lg px-8">
+
+      <p>
+        Hello! This is a quick demo page for alap. Alap enables attaching menus to links. It is traditional to point at
+        links, one at a time. I can say "Here is the <a href="https://github.com/DanielSmith/alap">Github Repo for
+          Alap</a>, and I wrote an article on dev.to: <a
+          href="https://dev.to/danielsmith/alap-menus-for-links-5e95">alap - Menus For
+          Links</a>"
+      </p>
+
+      <p>
+        With alap, I can say (click on the next link...) "Here is where to <a href="#" class="alap"
+          data-alap-linkitems="alapgithub, alapdevto">find out more</a>".
+      </p>
+
+      <pre>
+background image w/image menu
+text with image menu 
+      </pre>
+
+      <p>
+        We can say "here are some of my <a id="faveyt" class="alap" href="https://www.youtube.com/user/caseyneistat"
+          data-alap-linkitems=".youtube">favorite YouTube creators</a>"
+      </p>
+      <p>
+        Alap gives you a flexible, powerful way to attach menus to HTML anchors - and more, as I'll show you.
+      </p>
+
+      <p>
+        I like <a id="cars1" class="alap" data-alap-linkitems="bmwe36, vwbug">cars</a>,
+        <a id="beer1" class="alap" data-alap-linkitems="sierranevada, fosters, lagunitas">beer</a>, and
+        <a id="cities1" class="alap city" data-alap-linkitems="visitbrooklyn, sydneyoz, melbournepz">cities.</a>
+        There is so much to say about any of those topics, but where to put all of the links for them? ...
+      </p>
+
+      <p>
+        Imagine I have a chunk of data (a JSON file that gets converted to a JavaScript object) about links. Each bit of
+        it
+        contains:
+
+        <ul>
+          <li>a link id (the property name, how we refer to it)</li>
+          <li>a label (what you see on the menu item)</li>
+          <li>a url (where it should go)</li>
+          <li>a list of tags (such as
+            <a id="nyctags" class="alap" data-alap-linkitems=".nyc">"nyc"</a> or <a id="bridgetags" class="alap"
+              data-alap-linkitems=".bridge">"bridge"</a>)</li>
+        </ul>
+      </p>
+
+      <div>
+        <p>Here is a an example of a couple of entries:</p>
+        <pre>
+            <code class="language-javascript"> 
+vwbug: {
+  label: "VW Bug",
+  url: "http://en.wikipedia.org/wiki/Volkswagen_Beetle",
+  tags: ["vw", "car", "germany"]
+},
+
+sierranevada: {
+  label: "Sierra Nevada",
+  url: "http://www.sierranevada.com/",
+  tags: ["beer", "ale"]
+}
+            </code>
+          </pre>
+      </div>
+
+      <p>
+        another example: here are some <a id="sfactivities" class="alap"
+          data-alap-linkitems="sanfrancisco, ferrybuilding, acmebread, sfchinatown, gbpizza, gbpizza_photos, parkchalet">things
+          you should
+          check out</a> in San Francisco
+      </p>
+
+      <div class="flex flex-row justify-center">
+        <p>
+          Did I just say San Francisco? ... I can attach a menu to this image...
+
+          <img id="sfactivities2" class="alap"
+            data-alap-linkitems="sanfrancisco, ferrybuilding, acmebread, sfchinatown, gbpizza, gbpizza_photos, parkchalet"
+            src="img/andreas-selter-4ToKk_UAQm0-unsplash.jpg">
+        </p>
+      </div>
+
+      <p>We can make <a id="skyline_images" class="alap" data-alap-linkitems=".city_images">menus that are images</a>,
+        as well</p>
+
+      <p>
+        So far, so good. We can build up a list of links by using the ids of properties that are available in our JSON
+        configuration object. I use a "data-alap-linkitems" attribute to store the references for what I want from the
+        JSON data:
+      </p>
+
+      <pre><code class="language-html">&lt;a id="cars1" class="alap" data-alap-linkitems="bmwe36, vwbug"&gt;cars&lt;/a&gt;</code></pre>
+
+      <p>
+        To be clear, one can think of the properties in the JSON object as IDs for each possible target.
+      </p>
+
+      <h3 class="sectionheading">Tags, and combining them</h3>
+
+      <p>
+        Referring to items is a good start. If you know about CSS, you are familiar with classes. Same idea here:
+        let's
+        talk about Tags.
+      </p>
+
+      <p>
+        Here is a basic tag: <a id="nyctag1" class="alap" data-alap-linkitems=".nyc">"NYC"</a>. It simply gathers all
+        of
+        the links that have a tag that matches "nyc". It looks like this:
+      </p>
+
+      <pre class="px-0"><code class="language-html">&lt;a id="nyctag1" class="alap" data-alap-linkitems=".nyc"&gt;nyc&lt;/a&gt;
+</code></pre>
+
+      <p>
+        Ok, so we can refer to a few of them, and build up quite a list. Let's try <a id="nycsydlon" class="alap"
+          data-alap-linkitems=".sydney, .nyc, .london">Sydney, NYC, and London</a>. (that element is "#nycsydlon")
+      </p>
+
+      <h3 class="sectionheading">What we know so far...</h3>
+
+      <ul>
+        <li>properties in JSON are an id for defining an individual target, such as "acrecoffee"</li>
+        <li>in our JSON object, each definition might have some tags, such as "cafe, coffee", in our data attribute,
+          we
+          use the '.' (think of CSS Classes) to refer to a class. If we say ".coffee", we pick up all of the entries
+          that contain a tag of "coffee".</li>
+        <li>these can be combined in a data attribute. "acrecoffee, .beer" would be valid. It
+          all
+          goes towards building up a list for a menu.</li>
+      </ul>
+
+      <h3 class="sectionheading">Expressions with Tags: And, OR, and Without</h3>
+
+      <p>
+        If we stopped with the combinations of using item ids and tags, that would be a lot of functionality. It gets
+        better though, with simple expressions that let us do
+        AND,
+        OR, and WITHOUT operations.
+      </p>
+
+      <p>
+        As you can guess, building up groups of tags can yield some pretty large lists. We really want more
+        control. Let's go for that!
+      </p>
+
+      <p>
+        <ul>
+          <li>Here is <a id="nyctag" class="alap" data-alap-linkitems=".nyc">"nyc"</a></li>
+          <li>Here is <a id="nycpark" class="alap" data-alap-linkitems=".park">"park"</a></li>
+          <li>Here is <a id="nycbrooklyn" class="alap" data-alap-linkitems=".brooklyn">"brooklyn"</a></li>
+          <li>and ... <a id="bridgetags" class="alap" data-alap-linkitems=".bridge">"bridge"</a></li>
+
+          <li>... now it gets fun...</li>
+          <li><a id="nycandbridge" class="alap" data-alap-linkitems=".nyc + .bridge">"nyc AND bridge (+)"</a></li>
+          <li><a id="nycwobridge" class="alap" data-alap-linkitems=".nyc - .bridge">"nyc WITHOUT bridge (-)"</a></li>
+          <li><a id="nycorbridge" class="alap" data-alap-linkitems=".nyc | .bridge">"nyc OR bridge (|)"</a></li>
+
+          <li><a id="nycorbridgenolon" class="alap" data-alap-linkitems=".nyc | .bridge - .london">"nyc OR bridge,
+              without
+              London (| and -)"</a></li>
+        </ul>
+      </p>
+
+
+      <h3 class="sectionheading">Expression Recap</h3>
+
+      <p id="bottom">
+        You can say:
+        <ul>
+          <li>I want the list of what matches "this" tag AND "that" tag. (".nyc + .bridge")</li>
+          <li>I want whatever matches "this" OR "that" (".nyc | .bridge")</li>
+          <li>I want the list of "this", and get rid of the items that match "that" (".nyc - .bridge")</li>
+        </ul>
+
+        Alap will look through these expressions from left to right. So you could say something like "Show me the
+        links for all of the bridges you know of, but toss out the ones from NYC and London":<br />
+        <a id="bridgenonycnolon" class="alap" data-alap-linkitems=".bridge - .nyc - .london">".bridges - .nyc -
+          .london"</a>
+      </p>
+      <hr>
+      <h4 class="font-bold">Photo Credits</h4>
+      <p>
+        Photo by <a
+          href="https://unsplash.com/@aselter?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Andreas
+          Selter</a> on <a
+          href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+
+        <br>
+
+        Photo by <a
+          href="https://unsplash.com/@weristhari?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Hannes
+          Richter</a> on <a
+          href="https://unsplash.com/s/photos/city-skyline.-nyc?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+
+        <br>
+        Photo by <a
+          href="https://unsplash.com/@mrthetrain?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Joshua
+          Hoehne</a> on <a
+          href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a>
+
+
+        <br>
+        Photo by <a
+          href="https://unsplash.com/@rossjoyner?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Ross
+          Joyner</a> on <a
+          href="https://unsplash.com/s/photos/city-skyline.--san-francisco?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+      </p>
+    </div>
+  </article>
+
+
+  <script defer type="module" src="/example.js"></script>
+  <script defer type="module" src="/prism.js"></script>
+</body>
+
+</html>
