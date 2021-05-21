@@ -461,10 +461,8 @@ export default class alap {
     menuHTML += `</${this.listType}>`;
 
     this.alapElem.innerHTML = menuHTML;
-    -(
-      // exit any existing timer...
-      this.stopTimer()
-    );
+    // exit any existing timer...
+    this.stopTimer();
     this.startTimer();
   }
 }
