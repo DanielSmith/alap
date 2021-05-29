@@ -312,25 +312,77 @@ export default class alap {
     return { top: rect.top + scrollTop, left: rect.left + scrollLeft };
   }
 
-  forceColorOpaque(color) {
-    let m = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
-    if (m) {
-      return "rgba(" + [m[1], m[2], m[3], "1.0"].join(",") + ")";
-    }
-
-    m = color.match(
-      /^rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*((0.)?\d+)\s*\)$/i
-    );
-    if (m) {
-      return "rgba(" + [m[1], m[2], m[3], "1.0"].join(",") + ")";
-    }
-  }
-
   // this is used when we have an event in vue, react, or some
   // other framework.. we just come here to gather info, and
   // bundle it up in an object.  It is up to the framework to
   // handle the Render and Event side of the menu
-  processEvent(event) {}
+  processEvent(eventTarget) {
+    const myEventData = {
+      valid: false,
+
+      theData: null,
+      theTargets: [],
+
+      listType: this.listType,
+      menuTimeout: this.menuTimeout,
+
+      tagType: null,
+      anchorID: "",
+      cssAttr: "",
+      anchorCSS: "",
+      anchorCSSNormal: "",
+      offset: {},
+      left: 0,
+      top: 0,
+
+      // pointers
+      config: this.alapConfig,
+      allLinks: this.alapConfig.allLinks
+    };
+
+    myEventData.theData = eventTarget.getAttribute("data-alap-linkitems");
+    if (!myEventData.theData) {
+      return myEventData;
+    }
+
+    // check for a macro expansion...
+    myEventData.theData = this.checkMacro(myEventData.theData);
+    if (!myEventData.theData) {
+      return myEventData;
+    }
+
+    myEventData.theTargets = this.getTargets(myEventData.theData);
+
+    myEventData.tagType = eventTarget.tagName.toLowerCase();
+    myEventData.anchorID = eventTarget.id || "";
+
+    myEventData.anchorCSS = getComputedStyle(eventTarget, ":link");
+    myEventData.anchorCSSNormal = getComputedStyle(eventTarget);
+
+    if (myEventData.anchorID) {
+      myEventData.cssAttr = `alap_${myEventData.anchorID}`;
+    }
+
+    // we use an absolute offset here, but in our css rules,
+    // we should define in .alapelem:
+    // margin-top: 1.5rem;
+    // this gives a consistent offset based on rem
+    myEventData.offset = this.offset(eventTarget);
+
+    // our offset is fixed here, you can set margin-top
+    // and margin-left in .alapelem to adjust as you wish
+    // position: fixed;
+    myEventData.left = myEventData.offset.left;
+    myEventData.top = myEventData.offset.top;
+    if (myEventData.tagType === "img") {
+      myEventData.left = eventTarget.pageX;
+      myEventData.top = eventTarget.pageY;
+    }
+
+    myEventData.valid = true;
+
+    return myEventData;
+  }
 
   // do we have a macro?
   checkMacro(theData) {
@@ -377,58 +429,24 @@ export default class alap {
     event.preventDefault();
     event.stopPropagation();
 
-    let theData = event.target.getAttribute("data-alap-linkitems");
+    const eventData = this.processEvent(event.target);
 
-    // nothing to do...
-    if (!theData) return;
-
-    let tagType = event.target.tagName.toLowerCase();
-
-    let cssAttr = "";
-    let anchorID = event.target.id || "";
-    let theTargets = [];
-    let anchorCSS = getComputedStyle(event.target, ":link");
-    let anchorCSSNormal = getComputedStyle(event.target);
-
-    if (anchorID) {
-      cssAttr = `alap_${anchorID}`;
-    }
-
-    theData = this.checkMacro(theData);
-
-    // we use an absolute offset here, but in our css rules,
-    // we should define in .alapelem:
-    // margin-top: 1.5rem;
-    // this gives a consistent offset based on rem
-    let myOffset = this.offset(event.target);
+    if (!eventData.valid) return;
     let divCSS = {};
 
     divCSS.zIndex = 10;
-    if (anchorCSS.zIndex && anchorCSS.zIndex !== "auto") {
-      divCSS.zIndex = anchorCSS.zIndex + 10;
+    if (eventData.anchorCSS.zIndex && eventData.anchorCSS.zIndex !== "auto") {
+      divCSS.zIndex = eventData.anchorCSS.zIndex + 10;
     }
 
     this.alapElem.style.display = "block";
 
-    // our offset is fixed here, you can set margin-top
-    // and margin-left in .alapelem to adjust as you wish
-    // position: fixed;
-
-    let left = myOffset.left;
-    let top = myOffset.top;
-    if (tagType === "img") {
-      left = event.pageX;
-      top = event.pageY;
-    }
-
     this.alapElem.style.cssText = `
       position: absolute;
       z-index: 10;
-      left: ${left}px;
-      top: ${top}px;
+      left: ${eventData.left}px;
+      top: ${eventData.top}px;
       `;
-
-    theTargets = this.getTargets(theData);
 
     // clear out any classes from our existing alapElem
     this.alapElem.removeAttribute("class");
@@ -436,12 +454,12 @@ export default class alap {
     // ...and, if we have a specific css attribute to add,
     // the element is ready for a fresh class specifier
     this.alapElem.classList.add("alapelem");
-    if (cssAttr) {
-      this.alapElem.classList.add(cssAttr);
+    if (eventData.cssAttr) {
+      this.alapElem.classList.add(eventData.cssAttr);
     }
 
     let menuHTML = `<${this.listType}>`;
-    theTargets.map((curTarget) => {
+    eventData.theTargets.map((curTarget) => {
       let curInfo = this.alapConfig.allLinks[curTarget];
 
       let cssClass = "alapListElem";
