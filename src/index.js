@@ -316,7 +316,9 @@ export default class alap {
   // other framework.. we just come here to gather info, and
   // bundle it up in an object.  It is up to the framework to
   // handle the Render and Event side of the menu
-  processEvent(eventTarget, config = null) {
+  processEvent(event, config = null) {
+    const eventTarget = event.target;
+
     // in case the wrapper needs to override config..
     if (config != null) {
       this.alapConfig = config;
@@ -380,8 +382,8 @@ export default class alap {
     myEventData.left = myEventData.offset.left;
     myEventData.top = myEventData.offset.top;
     if (myEventData.tagType === "img") {
-      myEventData.left = eventTarget.pageX;
-      myEventData.top = eventTarget.pageY;
+      myEventData.left = event.pageX;
+      myEventData.top = event.pageY;
     }
 
     myEventData.valid = true;
@@ -434,7 +436,7 @@ export default class alap {
     event.preventDefault();
     event.stopPropagation();
 
-    const eventData = this.processEvent(event.target);
+    const eventData = this.processEvent(event);
 
     console.dir(eventData);
 
