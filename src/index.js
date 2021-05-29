@@ -1,15 +1,17 @@
 export default class alap {
-  refNames = {};
   alapConfig;
   alapElem = null;
   curTimerID = 0;
   theBody = null;
   listType = "ol";
+  mode = "vanilla"; // vanilla, vue, react, etc
   menuTimeout = 5000;
   ESC_KEYCODE = 27;
 
-  constructor(config) {
-    this.configure(config);
+  constructor(config = undefined, mode = "vanilla") {
+    if (config && Object.keys(config).length) {
+      this.configure(config, mode);
+    }
   }
 
   resetAlapElem() {
@@ -52,30 +54,36 @@ export default class alap {
     );
   }
 
-  configure(config = {}) {
+  configure(config = {}, mode = "vanilla") {
     if (Object.keys(config).length === 0) {
       return;
     }
 
-    this.resetAlapElem();
+    this.mode = mode;
 
     this.alapConfig = Object.assign({}, config);
     this.listType = this.getSetting("listType", "ul");
     this.menuTimeout = +this.getSetting("menuTimeout", 5000);
 
-    // any element with the class of 'alap'... does not have to be an anchor element
-    let myLinks = Array.from(document.getElementsByClassName("alap"));
+    // if we are calling alap from plain js, we do some extra
+    // setup.. otherwise, we leave it to the calling wrapper
+    // to handle events (such as Vue and React)
+    if (mode === "vanilla") {
+      this.resetAlapElem();
+      // any element with the class of 'alap'... does not have to be an anchor element
+      let myLinks = Array.from(document.getElementsByClassName("alap"));
 
-    for (const curLink of myLinks) {
-      // dont allow more than one listener for a given signature
-      // init may be called more than once (when elements are dynamically added
-      // or updated). It's safe to call this when there is no listener bound
-      curLink.removeEventListener("click", this.doClick);
-      // ok, now we're good to bind
-      curLink.addEventListener("click", this.doClick.bind(this), false);
+      for (const curLink of myLinks) {
+        // dont allow more than one listener for a given signature
+        // init may be called more than once (when elements are dynamically added
+        // or updated). It's safe to call this when there is no listener bound
+        curLink.removeEventListener("click", this.doClick);
+        // ok, now we're good to bind
+        curLink.addEventListener("click", this.doClick.bind(this), false);
+      }
+
+      this.resetEvents();
     }
-
-    this.resetEvents();
   }
 
   getSetting(settingName, defaultValue = "") {
@@ -94,6 +102,10 @@ export default class alap {
     if (this.alapConfig && this.alapConfig.settings) {
       this.alapConfig.settings[settingName] = value;
     }
+  }
+
+  dumpConfig() {
+    console.dir(this.alapConfig);
   }
 
   removeMenu() {
@@ -177,14 +189,6 @@ export default class alap {
       }
 
       knownWords.push(curWord);
-
-      // do we still need refNames??
-
-      // if (this.refNames.hasOwnProperty(curWord)) {
-      //   // console.log("already have seen");
-      //   // console.log(curWord);
-      // } else {
-      // }
     }
 
     return knownWords;
@@ -322,32 +326,14 @@ export default class alap {
     }
   }
 
-  doClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  // this is used when we have an event in vue, react, or some
+  // other framework.. we just come here to gather info, and
+  // bundle it up in an object.  It is up to the framework to
+  // handle the Render and Event side of the menu
+  processEvent(event) {}
 
-    let allDataElem;
-    let theData = event.target.getAttribute("data-alap-linkitems");
-
-    // nothing to do...
-    if (!theData) return;
-
-    let tagType = event.target.tagName.toLowerCase();
-
-    let cssAttr = "";
-    let anchorID = event.target.id || "";
-    let theTargets = [];
-    let anchorCSS = getComputedStyle(event.target, ":link");
-    let anchorCSSNormal = getComputedStyle(event.target);
-
-    // may not be needed
-    this.refNames = {};
-
-    if (anchorID) {
-      cssAttr = `alap_${anchorID}`;
-    }
-
-    // do we have a macro?
+  // do we have a macro?
+  checkMacro(theData) {
     if (theData.charAt(0) === "@") {
       let checkMacroName = null;
 
@@ -368,9 +354,47 @@ export default class alap {
       ) {
         theData = this.alapConfig.macros[checkMacroName].linkItems;
       }
-
-      // tk - check macro for settings overrides
     }
+    return theData;
+  }
+
+  getTargets(theData) {
+    let allDataElem = this.parseLine(theData);
+    let localTargets = [];
+
+    for (const curElem of allDataElem) {
+      localTargets = [...localTargets, ...this.parseElem(curElem)];
+    }
+    // remove duplicates
+    if (localTargets.length) {
+      localTargets = [...new Set([...localTargets])];
+    }
+
+    return localTargets;
+  }
+
+  doClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    let theData = event.target.getAttribute("data-alap-linkitems");
+
+    // nothing to do...
+    if (!theData) return;
+
+    let tagType = event.target.tagName.toLowerCase();
+
+    let cssAttr = "";
+    let anchorID = event.target.id || "";
+    let theTargets = [];
+    let anchorCSS = getComputedStyle(event.target, ":link");
+    let anchorCSSNormal = getComputedStyle(event.target);
+
+    if (anchorID) {
+      cssAttr = `alap_${anchorID}`;
+    }
+
+    theData = this.checkMacro(theData);
 
     // we use an absolute offset here, but in our css rules,
     // we should define in .alapelem:
@@ -404,16 +428,7 @@ export default class alap {
       top: ${top}px;
       `;
 
-    allDataElem = this.parseLine(theData);
-
-    for (const curElem of allDataElem) {
-      theTargets = [...theTargets, ...this.parseElem(curElem)];
-    }
-
-    // remove duplicates
-    if (theTargets.length) {
-      theTargets = [...new Set([...theTargets])];
-    }
+    theTargets = this.getTargets(theData);
 
     // clear out any classes from our existing alapElem
     this.alapElem.removeAttribute("class");

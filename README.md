@@ -236,7 +236,10 @@ The '-' operator means we want to EXCLUDE items that match something.  Here is a
 
 It means: find items that have the tag of "nyc", and toss the items that match the tag of "bridge"
 
+
+
 ### Expressions: More Possibilities
+
 
 You can chain them together for a more complex expression:
 
