@@ -316,7 +316,12 @@ export default class alap {
   // other framework.. we just come here to gather info, and
   // bundle it up in an object.  It is up to the framework to
   // handle the Render and Event side of the menu
-  processEvent(eventTarget) {
+  processEvent(eventTarget, config = null) {
+    // in case the wrapper needs to override config..
+    if (config != null) {
+      this.alapConfig = config;
+    }
+
     const myEventData = {
       valid: false,
 
@@ -430,6 +435,8 @@ export default class alap {
     event.stopPropagation();
 
     const eventData = this.processEvent(event.target);
+
+    console.dir(eventData);
 
     if (!eventData.valid) return;
     let divCSS = {};
