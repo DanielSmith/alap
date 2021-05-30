@@ -13,6 +13,27 @@ The traditional approach with an HTML anchor has been "each anchor, one target".
 
 Alap also lets you build up menu items in more powerful ways (treating tags like CSS Classes, using expressions to group or exclude items, and more).
 
+## Features
+
+* specify link items directly, or by tags
+* use macros so that link specifications are completely on the JSON side
+* simple expressions may be used to build up menus (AND, OR, WITHOUT)
+* menu link items may be text or images
+* menus may be attached to anchors or images
+* control CSS on a per menu and per link item basis
+* API - use as plain JavaScript, or create a wrapper from some other framework (such as Vue or React)
+* control list type (ordered or unordered)
+* menu dismissed by clicking outside, timeout, or ESC key
+
+## Demo
+
+There is an example within the package itself:
+```sh
+% cd examples/overview
+% parcel serve index.html   --no-cache
+Server running at http://localhost:1234 
+✨  Built in 1.94s.
+```
 
 ## Installation
 
@@ -32,7 +53,7 @@ and then in your `example.js`, import your config object, alap, and initialize:
 import { alapConfig } from "./Config.js";
 
 // our lib, locally...
-import Alap from "../src/index.js";
+import Alap from "../../src/index.js";
 
 // ...or, if you are using npm, this would be:
 // import Alap from "alap";
@@ -41,15 +62,7 @@ import Alap from "../src/index.js";
 const alap = new Alap(alapConfig);
 ```
 
-## Demo
 
-There is an example within the package itself:
-```sh
-% cd examples/overview
-% parcel serve index.html   --no-cache
-Server running at http://localhost:1234 
-✨  Built in 1.94s.
-```
 
 ## Configuration
 
@@ -58,7 +71,7 @@ Configuration is done in two places:
 * data for all elements, via a JavaScript object.
 * per-anchor config in the `data-alap-linkitems` attribute
 
-See `examples/overview/Config.js` for a fully fleshed out example object.
+See `examples/overview/Config.js` and `examples/tailwindcss/Config.js` for fully fleshed example objects.
 
 ### Config Object
 
@@ -69,6 +82,12 @@ export const alapConfig = {
   settings: {
     listType: "ul",
     menuTimeout: 5000,
+  },
+
+  macros: {
+    cars1: {
+      linkItems: "vwbug, bmwe36",
+    }
   },
 
   allLinks: {
@@ -101,29 +120,51 @@ menuTimeout | if you mouse away from the menu, time in milliseconds before menu 
 
 _Note: menu will also dismiss itself if you click outside of it, or hit the ESCape key_
 
+### The `macros` property
+
+There is a whole section later in this document about Macros. The gist of it is that it gives you a way to decouple your menu specification from the HTML side (example: the HTML side basically says "use whatever is in the `@cars1` macro")
 
 ### The `allLinks` property
 
 Most of the configuration resides in this nested object. Each entry 
 represents a possible menu list item.
 
-Sample Entry:
+Sample Entries:
 
 ```js
 a_menu_item: {
   label: "Some Item",
   url: "https://example.org",
+  cssClass: "violetclass",
   tags: ["photography", "techreview", "youtube"]
-}
+},
+
+sf_skyline_img: {
+  url: "https://unsplash.com/s/photos/san-francisco-skyline",
+  image: "img/ross-joyner-TX6dBiMwBV0-unsplash.jpg",
+  altText: "SF Painted Ladies",
+  tags: ["sf_image", "city_images"],
+},
+
+navtop: {
+  label: "top of document",
+  url: "#top",
+  targetWindow: "_self",
+},
 ```
 
-The ID for a menu item (such as "a_menu_item") must be unique.
+The ID for a menu item (such as "a_menu_item") must be unique to the object in use.
 
 |  Setting | Values |
 ------| -----
 label | the label that appears in the menu list item
 url | the target URL to go to when clicked on. The default is to open it up in another tab.
 tags | an array of strings. These can be referred to from the `data-alap-linkitems` like a CSS Class.  Example: in the data attribute, ".photography" would match all entries that have a tag of "photography"
+image | can be used instead of a label, with a relative or absolute URL pointing at an image
+altText | ALT text to be used with images, for accessibility
+targetWindow | combine this with #relative links, for in-page navigation (default: `fromAlap`)
+-----------
+
 
 
 ### HTML Anchor Configuration
@@ -192,7 +233,6 @@ The '*', '%', and '#' symbols may be used in the future.
 * '#' would have the functionality of getting definitions from **other** DOM IDs. I don't intend to support it, until I can fix the parsing so that it will work with expressions
 * '%' and '*' may involve searching through URL, Labels, and Descriptions. I would want to build an alap-editor first (as in, drag and drop links to a target, and extract relevant data from the metadata found in the HEAD of that page)
 
-"image" is reserved for future use in an item object.
 ### Combining things
 
 As you may have guessed, you can combine different types of specifiers, in order to build up a menu item list. You can use tags ('.'), and specfic list item IDs:
@@ -250,6 +290,58 @@ You can chain them together for a more complex expression:
 
 It means: I want items that match the tag of "nyc" or "bridge", but toss out anything that includes the tag of "london".
 
+## The API
+
+_Documentation in progress - this is just a quick note for now_
+
+### Constructor & Configure
+
+```javascript
+const alap = new Alap();
+
+// pass the config object
+alap.configure(alapConfig);
+```
+
+```configure(config = {}, mode = "vanilla")```
+
+The config object is documented earlier in this README.
+
+`mode` is optional. By default, it is "vanilla", which flags Alap to handle DOM and Events. I'm working on a Vue wrapper.
+
+------
+```processEvent(eventProperties, config = null)```
+
+This is rough for now. A Vue example would handle a click:
+
+```javascript
+  const mev = reactive({ count: 1, theEventProperties: {} });
+  provide('mev', mev);
+
+  const alapClick = ((theevent) => {
+    mev.theEventProperties = {
+      target: theevent.target,
+      pageX: theevent.pageX,
+      pageY: theevent.pageY
+    };
+    mev.count++;
+  });
+```
+
+In the Vue wrapper:
+```javascript
+const myattr = { ...mev };
+
+myAlap.processEvent(myattr.theEventProperties);
+```
+More TK - is just a quick peek at what I am working on with Vue3.
+
+
+------
+
+
+By default, the 
+
 ## History, and the alap name
 
 Alap is an ES6 rewrite of my 2012 MultiLinks package (which had depended on jQuery.
@@ -262,13 +354,13 @@ Alap keeps it simple, and you can think of it as whatever acronym that seems mem
 
 This fits the spirit :)  Alap is a means of dynamically creating a menu (especially if we think of run-time bits of JSON), which introduce other web pages.
 
+Version 2.0: Introduces an API, so that Alap can be accessed from Frameworks such as Vue and React. The idea is for Alap to handle the data aspect, but not get involved in DOM and Event operations (that will be the job of per-Framework wrappers).
+
 ****
 ## Next Steps
 
-* better looking example using Tailwind CSS (in progress)
 * example with Vue 3
 * example with React
-* images in menu
 
 
 

@@ -14,6 +14,9 @@ export default class alap {
     }
   }
 
+  // only use this with plain vanilla js
+  // wrappers such as vue, react, svelte, etc
+  // should manage <div id="alapelem">
   resetAlapElem() {
     this.theBody = document.querySelector("body");
 
@@ -232,7 +235,6 @@ export default class alap {
   }
 
   parseElem(theElem) {
-    // alert(theElem);
     let resultSet = [];
     let curResultSet = [];
 
@@ -316,8 +318,8 @@ export default class alap {
   // other framework.. we just come here to gather info, and
   // bundle it up in an object.  It is up to the framework to
   // handle the Render and Event side of the menu
-  processEvent(event, config = null) {
-    const eventTarget = event.target;
+  processEvent(eventProperties, config = null) {
+    const eventTarget = eventProperties.target;
 
     // in case the wrapper needs to override config..
     if (config != null) {
@@ -382,8 +384,8 @@ export default class alap {
     myEventData.left = myEventData.offset.left;
     myEventData.top = myEventData.offset.top;
     if (myEventData.tagType === "img") {
-      myEventData.left = event.pageX;
-      myEventData.top = event.pageY;
+      myEventData.left = eventProperties.pageX;
+      myEventData.top = eventProperties.pageY;
     }
 
     myEventData.valid = true;
@@ -432,13 +434,18 @@ export default class alap {
     return localTargets;
   }
 
+  // the event and DOM portions of this still need to be
+  // split out, so that all of the functionality can be
+  // accessed from the API.
   doClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const eventData = this.processEvent(event);
-
-    console.dir(eventData);
+    const eventData = this.processEvent({
+      target: event.target,
+      pageX: event.pageX,
+      pageY: event.pageY
+    });
 
     if (!eventData.valid) return;
     let divCSS = {};
