@@ -434,6 +434,14 @@ export default class alap {
     return localTargets;
   }
 
+  getEntryByID(id) {
+    if (this.alapConfig.allLinks && this.alapConfig.allLinks[id]) {
+      return this.alapConfig.allLinks[id];
+    } else {
+      return null;
+    }
+  }
+
   // the event and DOM portions of this still need to be
   // split out, so that all of the functionality can be
   // accessed from the API.
