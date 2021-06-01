@@ -438,7 +438,7 @@ export default class alap {
     if (this.alapConfig.allLinks && this.alapConfig.allLinks[id]) {
       return this.alapConfig.allLinks[id];
     } else {
-      return null;
+      return null; //test
     }
   }
 
