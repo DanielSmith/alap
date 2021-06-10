@@ -4,7 +4,7 @@
 ____
 ## Overview
 
-Alap enables attaching menus to links.
+Alap enables attaching menus to links and images.
 
 The traditional approach with an HTML anchor has been "each anchor, one target". Alap gives a flexible way to turn that into "each anchor, many targets". It can be used in a very simple mode ("I want this item, another item, and another, and that's it").
 
