@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Alap — Astro Integration">
+  <h1>Alap — Astro Integration</h1>
+  <p>
+    This example uses a local Astro integration to auto-inject Alap's web component
+    and config into every page. No <code>&lt;script&gt;</code> tags, no imports —
+    just use <code>&lt;alap-link&gt;</code> anywhere.
+  </p>
+
+  <h2>How it works</h2>
+  <ol>
+    <li><code>integrations/alap.mjs</code> defines a 15-line Astro integration</li>
+    <li><code>astro.config.mjs</code> registers it with a path to the config file</li>
+    <li>Every page gets <code>defineAlapLink()</code> and <code>registerConfig()</code> injected automatically</li>
+    <li>Pages just use <code>&lt;alap-link query="..."&gt;</code> — zero boilerplate</li>
+  </ol>
+
+  <h2>Try it</h2>
+  <p>
+    Browse <alap-link query=".coffee">coffee spots</alap-link>,
+    check out <alap-link query="@favorites" id="favorites">my favorites</alap-link>,
+    or explore <alap-link query=".nyc | .sf">both cities</alap-link>.
+  </p>
+
+  <h2>Why an integration?</h2>
+  <p class="note">
+    You <em>can</em> use the web component directly with a manual
+    <code>&lt;script&gt;</code> block — that works fine for single pages.
+    This integration approach scales better — add Alap links to any page without
+    repeating setup code.
+  </p>
+</Base>

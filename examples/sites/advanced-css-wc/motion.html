@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Motion &amp; Interaction</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./motion.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Motion &amp; Interaction</h1>
+  <p>Transitions, transforms, hover effects, menu open animations, cursor, and reduced-motion support.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html" class="current">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== ITEM TRANSITIONS ===== -->
+
+  <h2>Item Hover Transitions</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>No transition (default)</h3>
+      <div class="example no-transition">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Smooth (0.4s ease)</h3>
+      <div class="example smooth-transition">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>/* Instant hover (default) — no --alap-transition set */
+
+/* Smooth color + background transition */
+--alap-transition: background 0.4s ease, color 0.4s ease;</pre>
+
+  <!-- ===== HOVER TRANSFORM: SLIDE ===== -->
+
+  <h2>Hover Transform: Slide</h2>
+  <div class="example slide-right">
+    <p>Items slide right on hover:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+  </div>
+  <pre>--alap-hover-transform: translateX(6px);
+--alap-transition: transform 0.4s ease, background 0.4s ease, color 0.4s ease;</pre>
+
+  <!-- ===== HOVER TRANSFORM: SCALE ===== -->
+
+  <h2>Hover Transform: Scale</h2>
+  <div class="example scale-up">
+    <p>Items grow slightly on hover:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+  </div>
+  <pre>--alap-hover-transform: scale(1.03);
+--alap-transition: transform 0.12s ease;</pre>
+
+  <!-- ===== HOVER OPACITY ===== -->
+
+  <h2>Hover Opacity</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Dim hovered</h3>
+      <div class="example hover-opacity-self">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>--alap-hover-opacity</code>
+    </div>
+    <div class="compare-item">
+      <h3>Dim all others</h3>
+      <div class="example hover-opacity-siblings">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>--alap-dim-unhovered</code>
+    </div>
+  </div>
+  <pre>/* Dim the hovered item itself */
+--alap-hover-opacity: 0.4;
+
+/* Dim everything except the hovered item */
+--alap-dim-unhovered: 0.4;</pre>
+
+  <!-- ===== HOVER BORDER ===== -->
+
+  <h2>Hover Border (Accent Bar)</h2>
+  <div class="example hover-accent">
+    <p>Left accent appears on hover:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Uses <code>--alap-hover-shadow: inset 3px 0 0 color</code> instead of a real border to avoid layout shift.</p>
+  </div>
+  <pre>/* Using inset box-shadow (no layout shift) */
+--alap-hover-shadow: inset 3px 0 0 #3b82f6;
+--alap-transition: box-shadow 0.1s ease, background 0.4s ease;</pre>
+
+  <!-- ===== MENU TRANSITIONS ===== -->
+
+  <h2>Menu Container Transitions</h2>
+  <div class="example menu-transition">
+    <p>Menu shadow deepens smoothly on hover:
+      <alap-link query=".coffee">coffee</alap-link>
+    </p>
+    <p class="note"><code>--alap-menu-transition</code> transitions menu-level properties like shadow and opacity.</p>
+  </div>
+  <pre>--alap-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+--alap-menu-hover-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+--alap-menu-transition: box-shadow 0.3s ease;</pre>
+
+  <!-- ===== MENU OPEN ANIMATION ===== -->
+
+  <h2>Menu Open Animation</h2>
+  <p class="note">The web component uses <code>display: none/block</code> (not animatable). To enable open/close transitions, override with <code>opacity</code> + <code>visibility</code> via <code>::part(menu)</code>. This is a consumer-side opt-in.</p>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Fade + Slide Up</h3>
+      <div class="example">
+        <alap-link query=".bridge" class="fade-slide">bridges</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Fade + Scale</h3>
+      <div class="example">
+        <alap-link query="@cars" class="fade-scale">cars</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>/* Fade + slide — override display with opacity/visibility */
+.fade-slide::part(menu) {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, visibility 0.2s,
+              transform 0.2s ease;
+}
+.fade-slide[aria-expanded="true"]::part(menu) {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}</pre>
+
+  <!-- ===== CURSOR ===== -->
+
+  <h2>Cursor</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>pointer (default)</h3>
+      <div class="example cursor-pointer">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>default (arrow)</h3>
+      <div class="example cursor-default">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-cursor: pointer;   /* hand — default */
+--alap-cursor: default;   /* arrow */</pre>
+
+  <!-- ===== REDUCED MOTION ===== -->
+
+  <h2>Reduced Motion</h2>
+  <div class="example">
+    <p class="note">Always respect <code>prefers-reduced-motion</code>. Wrap any transition properties in a media query:</p>
+  </div>
+  <pre>alap-link {
+  --alap-transition: background 0.4s ease, color 0.4s ease,
+                     transform 0.4s ease;
+  --alap-hover-transform: translateX(4px);
+  --alap-menu-transition: box-shadow 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  alap-link {
+    --alap-transition: none;
+    --alap-hover-transform: none;
+    --alap-menu-transition: none;
+  }
+}</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

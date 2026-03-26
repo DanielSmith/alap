@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alap — Alpine.js Example</title>
+  <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+  <h1>Alap — Alpine.js Example</h1>
+  <p>
+    The <code>x-alap</code> directive turns any element into an Alap menu trigger.
+    No build step needed — just Alpine + Alap.
+  </p>
+
+  <div x-data="alapDemo">
+    <h2>Tag-based queries</h2>
+    <p>
+      Explore
+      <span x-alap="{ query: '.coffee', config }">coffee shops</span>,
+      <span x-alap="{ query: '.nyc', config }">NYC spots</span>, or
+      <span x-alap="{ query: '.coffee + .nyc', config }">coffee in NYC</span>.
+    </p>
+
+    <h2>Macro reference</h2>
+    <p>
+      Check out <span x-alap="{ query: '@cars', config }">our cars</span>.
+    </p>
+
+    <h2>Complex expression</h2>
+    <p>
+      <span x-alap="{ query: '.nyc | .sf - .landmark', config }">Cities (no landmarks)</span>
+    </p>
+
+    <h2>Ordered list</h2>
+    <p>
+      <span x-alap="{ query: '.bridge', config, listType: 'ol' }">Bridges (ordered)</span>
+    </p>
+  </div>
+
+  <script type="module">
+    import Alpine from 'https://esm.sh/alpinejs@3';
+    import { alapPlugin } from 'alap/alpine';
+
+    Alpine.plugin(alapPlugin);
+
+    Alpine.data('alapDemo', () => ({
+      config: {
+        settings: { listType: 'ul', menuTimeout: 5000 },
+        macros: {
+          cars: { linkItems: 'vwbug, bmwe36' },
+        },
+        allLinks: {
+          bluebottle: {
+            label: 'Blue Bottle Coffee',
+            url: 'https://bluebottlecoffee.com',
+            tags: ['coffee', 'sf'],
+          },
+          stumptownchelseanyc: {
+            label: 'Stumptown Chelsea',
+            url: 'https://stumptowncoffee.com',
+            tags: ['coffee', 'nyc'],
+          },
+          doughnutplantnyc: {
+            label: 'Doughnut Plant NYC',
+            url: 'https://doughnutplant.com',
+            tags: ['nyc', 'bakery'],
+          },
+          brooklynbridge: {
+            label: 'Brooklyn Bridge',
+            url: 'https://en.wikipedia.org/wiki/Brooklyn_Bridge',
+            tags: ['nyc', 'bridge', 'landmark'],
+          },
+          goldengate: {
+            label: 'Golden Gate Bridge',
+            url: 'https://en.wikipedia.org/wiki/Golden_Gate_Bridge',
+            tags: ['sf', 'bridge', 'landmark'],
+          },
+          highline: {
+            label: 'The High Line',
+            url: 'https://thehighline.org',
+            tags: ['nyc'],
+          },
+          vwbug: {
+            label: 'VW Bug',
+            url: 'https://en.wikipedia.org/wiki/Volkswagen_Beetle',
+            tags: ['car'],
+            targetWindow: 'fromAlap',
+          },
+          bmwe36: {
+            label: 'BMW E36',
+            url: 'https://en.wikipedia.org/wiki/BMW_3_Series_(E36)',
+            tags: ['car'],
+            targetWindow: 'fromAlap',
+          },
+        },
+      },
+    }));
+
+    Alpine.start();
+  </script>
+
+  <style>
+    [x-alap] {
+      color: #2563eb;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    [x-alap]:hover {
+      color: #1d4ed8;
+    }
+  </style>
+</body>
+</html>

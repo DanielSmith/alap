@@ -1,0 +1,57 @@
+<!--
+  Copyright 2026 Daniel Smith
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+---
+/**
+ * <AlapLink> — Astro component for Alap menus.
+ *
+ * Renders an `<alap-link>` web component with typed props.
+ * The web component hydrates client-side to handle clicks,
+ * keyboard navigation, and menu dismissal.
+ *
+ * Requires AlapSetup to be included once (in <head> or layout)
+ * to register the config and define the custom element.
+ *
+ * @example
+ * <AlapLink query=".coffee">Favorite cafes</AlapLink>
+ * <AlapLink query=".nyc + .bridge" id="nyc_bridges">NYC Bridges</AlapLink>
+ */
+
+interface Props {
+  /** Alap expression (e.g. ".coffee", "item1, item2", ".nyc + .bridge") */
+  query: string;
+  /** Element ID — also used for @macro self-reference */
+  id?: string;
+  /** Named config to use (default: '_default') */
+  config?: string;
+  /** Additional CSS class on the trigger */
+  class?: string;
+  /** Any other HTML attributes */
+  [key: string]: unknown;
+}
+
+const { query, id, config, class: className, ...rest } = Astro.props;
+---
+
+<alap-link
+  query={query}
+  id={id}
+  config={config}
+  class={className}
+  {...rest}
+>
+  <slot />
+</alap-link>

@@ -1,0 +1,60 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* --- Font weight --- */
+
+.alap_ty-light a { font-weight: 300; }
+.alap_ty-bold a  { font-weight: 600; }
+
+/* --- Letter spacing --- */
+
+.alap_ty-tight a { letter-spacing: -0.02em; }
+.alap_ty-wide a  { letter-spacing: 0.08em; }
+
+/* --- Text transform --- */
+
+.alap_ty-upper a {
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+.alap_ty-lower a {
+  text-transform: lowercase;
+}
+
+/* --- Hover underline --- */
+
+.alap_ty-underline a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Text overflow --- */
+
+.alap_ty-ellipsis a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+/* --- Compact --- */
+
+.alap_ty-compact a {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}

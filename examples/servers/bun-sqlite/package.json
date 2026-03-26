@@ -1,0 +1,15 @@
+{
+  "name": "alap-server-bun-sqlite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Alap config server \u2014 Bun + SQLite (zero dependencies)",
+  "scripts": {
+    "start": "bun run server.ts",
+    "seed": "bun run seed.ts"
+  },
+  "dependencies": {
+    "alap": "file:../../.."
+  },
+  "author": "Daniel Smith",
+  "license": "Apache-2.0"
+}

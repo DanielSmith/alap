@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Motion &amp; Interaction (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./motion.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Motion &amp; Interaction (DOM)</h1>
+  <p>Transitions, transforms, hover effects, and cursor styling via light DOM CSS.</p>
+  <p class="note">All CSS on this page applies equally to <strong>popover mode</strong> — the menu renders as the same <code>.alapelem</code> element whether using DOM or popover.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html" class="current">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== ITEM TRANSITIONS ===== -->
+
+  <h2>Item Hover Transitions</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>No transition (default)</h3>
+      <div class="example">
+        <a id="mo-none" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Smooth (0.4s ease)</h3>
+      <div class="example">
+        <a id="mo-smooth" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>/* Instant hover (default) — no transition set */
+
+/* Smooth color + background */
+.alap_mo-smooth a {
+  transition: background 0.4s ease, color 0.4s ease;
+}</pre>
+
+  <!-- ===== HOVER TRANSFORM: SLIDE ===== -->
+
+  <h2>Hover Transform: Slide</h2>
+  <div class="example">
+    <p>Items slide right on hover:
+      <a id="mo-slide" class="alap" data-alap-linkitems=".bridge">bridges</a>
+    </p>
+  </div>
+  <pre>.alap_mo-slide {
+  overflow: hidden;  /* clip translated item to menu bounds */
+}
+.alap_mo-slide a {
+  transition: transform 0.4s ease, background 0.4s ease, color 0.4s ease;
+}
+.alap_mo-slide a:hover {
+  transform: translateX(6px);
+}</pre>
+
+  <!-- ===== HOVER TRANSFORM: SCALE ===== -->
+
+  <h2>Hover Transform: Scale</h2>
+  <div class="example">
+    <p>Items grow slightly on hover:
+      <a id="mo-scale" class="alap" data-alap-linkitems=".bridge">bridges</a>
+    </p>
+  </div>
+  <pre>.alap_mo-scale {
+  overflow: hidden;  /* clip scaled item to menu bounds */
+}
+.alap_mo-scale a {
+  transition: transform 0.12s ease;
+}
+.alap_mo-scale a:hover {
+  transform: scale(1.03);
+}</pre>
+
+  <!-- ===== HOVER ACCENT BAR ===== -->
+
+  <h2>Hover Border (Accent Bar)</h2>
+  <div class="example">
+    <p>Left accent appears on hover:
+      <a id="mo-accent" class="alap" data-alap-linkitems=".bridge">bridges</a>
+    </p>
+    <p class="note">Uses <code>inset box-shadow</code> to avoid layout shift.</p>
+  </div>
+  <pre>.alap_mo-accent a {
+  transition: box-shadow 0.1s ease, background 0.4s ease;
+}
+.alap_mo-accent a:hover {
+  box-shadow: inset 3px 0 0 #3b82f6;
+}</pre>
+
+  <!-- ===== CURSOR ===== -->
+
+  <h2>Cursor</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>pointer (default)</h3>
+      <div class="example">
+        <a id="mo-pointer" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>default (arrow)</h3>
+      <div class="example">
+        <a id="mo-arrow" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_mo-pointer a { cursor: pointer; }  /* default */
+.alap_mo-arrow a   { cursor: default; }</pre>
+
+  <!-- ===== REDUCED MOTION ===== -->
+
+  <h2>Reduced Motion</h2>
+  <div class="example">
+    <p class="note">Always wrap transitions in a <code>prefers-reduced-motion</code> media query:</p>
+  </div>
+  <pre>.alap_mo-smooth a,
+.alap_mo-slide a,
+.alap_mo-scale a {
+  transition: background 0.4s ease, color 0.4s ease,
+              transform 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alap_mo-smooth a,
+  .alap_mo-slide a,
+  .alap_mo-scale a {
+    transition: none;
+  }
+  .alap_mo-slide a:hover,
+  .alap_mo-scale a:hover {
+    transform: none;
+  }
+}</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Advanced CSS</title>
+  <link rel="stylesheet" href="./shared.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Advanced CSS — Web Component Theming</h1>
+  <p>55+ CSS custom properties on <code>&lt;alap-link&gt;</code> give full DOM parity. Every visual property you can set in regular CSS has a <code>--alap-*</code> equivalent.</p>
+
+  <div id="support-banner" class="banner">Detecting browser support...</div>
+
+  <nav class="page-nav">
+    <a href="./" class="current">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== DEFAULT ===== -->
+
+  <h2>Default (no overrides)</h2>
+  <div class="example">
+    <p>Out-of-the-box styling:
+      <alap-link query=".coffee">coffee shops</alap-link> and
+      <alap-link query=".bridge">bridges</alap-link>.
+    </p>
+    <p class="note">White background, subtle shadow, 6px radius, blue hover. This is the baseline that all browsers render identically.</p>
+  </div>
+
+  <!-- ===== PROPERTY REFERENCE ===== -->
+
+  <h2>All CSS Custom Properties</h2>
+  <p class="note">Properties marked <em>(unset)</em> are off by default — set them to activate. Properties with fallback chains inherit from their base when unset.</p>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Menu Container</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-bg</code></td><td><code>#ffffff</code></td><td>Menu background</td></tr>
+      <tr><td><code>--alap-border</code></td><td><code>#e5e7eb</code></td><td>Border color</td></tr>
+      <tr><td><code>--alap-border-width</code></td><td><code>1px</code></td><td>Border width (0 for borderless)</td></tr>
+      <tr><td><code>--alap-radius</code></td><td><code>6px</code></td><td>Border radius</td></tr>
+      <tr><td><code>--alap-corner-shape</code></td><td><code>round</code></td><td>Corner geometry (1–4 values)</td></tr>
+      <tr><td><code>--alap-shadow</code></td><td><code>0 4px 12px ...</code></td><td>Box shadow</td></tr>
+      <tr><td><code>--alap-drop-shadow</code></td><td><em>(unset)</em></td><td>filter: drop-shadow() — respects corner shapes</td></tr>
+      <tr><td><code>--alap-menu-hover-shadow</code></td><td><em>(→ shadow)</em></td><td>Box shadow on menu hover</td></tr>
+      <tr><td><code>--alap-menu-hover-drop-shadow</code></td><td><em>(→ drop-shadow)</em></td><td>Drop shadow on menu hover</td></tr>
+      <tr><td><code>--alap-opacity</code></td><td><code>1</code></td><td>Menu opacity</td></tr>
+      <tr><td><code>--alap-backdrop</code></td><td><em>(unset)</em></td><td>backdrop-filter (blur, saturate)</td></tr>
+      <tr><td><code>--alap-menu-transition</code></td><td><em>(unset)</em></td><td>Transition for menu properties</td></tr>
+      <tr><td><code>--alap-menu-padding</code></td><td><code>0.25rem 0</code></td><td>List padding inside menu</td></tr>
+      <tr><td><code>--alap-min-width</code></td><td><code>200px</code></td><td>Minimum width</td></tr>
+      <tr><td><code>--alap-max-width</code></td><td><code>none</code></td><td>Maximum width</td></tr>
+      <tr><td><code>--alap-z-index</code></td><td><code>10</code></td><td>Stacking order</td></tr>
+      <tr><td><code>--alap-gap</code></td><td><code>0.5rem</code></td><td>Trigger-to-menu spacing</td></tr>
+      <tr><td><code>--alap-font</code></td><td><code>inherit</code></td><td>Font family</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Per-Corner Shape (via <code>::part(menu)</code>)</h3>
+  <p class="note">Per-corner longhands can't be exposed as custom properties (CSS longhands override shorthands in the same block). Use <code>::part(menu)</code> for per-corner control:</p>
+  <pre>alap-link::part(menu) {
+  corner-top-right-shape: bevel;       /* physical */
+  corner-start-end-shape: bevel;       /* logical */
+  corner-right-shape: bevel;           /* side shorthand */
+}</pre>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Items</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-item-border</code></td><td><em>(unset)</em></td><td>Border on each li</td></tr>
+      <tr><td><code>--alap-item-border-radius</code></td><td><em>(unset)</em></td><td>Border radius on each li</td></tr>
+      <tr><td><code>--alap-item-gap</code></td><td><code>0</code></td><td>Vertical spacing between items</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Link Text</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-text</code></td><td><code>#1a1a1a</code></td><td>Text color</td></tr>
+      <tr><td><code>--alap-font-size</code></td><td><code>0.9rem</code></td><td>Font size</td></tr>
+      <tr><td><code>--alap-font-weight</code></td><td><em>(inherits)</em></td><td>Font weight</td></tr>
+      <tr><td><code>--alap-letter-spacing</code></td><td><em>(unset)</em></td><td>Letter spacing</td></tr>
+      <tr><td><code>--alap-line-height</code></td><td><em>(inherits)</em></td><td>Line height</td></tr>
+      <tr><td><code>--alap-text-decoration</code></td><td><code>none</code></td><td>Text decoration</td></tr>
+      <tr><td><code>--alap-text-transform</code></td><td><em>(unset)</em></td><td>Text transform</td></tr>
+      <tr><td><code>--alap-text-align</code></td><td><em>(unset)</em></td><td>Text alignment</td></tr>
+      <tr><td><code>--alap-text-shadow</code></td><td><em>(unset)</em></td><td>Text shadow</td></tr>
+      <tr><td><code>--alap-text-overflow</code></td><td><em>(unset)</em></td><td>Text overflow (needs overflow + white-space)</td></tr>
+      <tr><td><code>--alap-overflow</code></td><td><em>(unset)</em></td><td>Overflow (companion to text-overflow)</td></tr>
+      <tr><td><code>--alap-white-space</code></td><td><em>(unset)</em></td><td>White-space (companion to text-overflow)</td></tr>
+      <tr><td><code>--alap-padding</code></td><td><code>0.5rem 1rem</code></td><td>Link padding</td></tr>
+      <tr><td><code>--alap-cursor</code></td><td><code>pointer</code></td><td>Cursor style</td></tr>
+      <tr><td><code>--alap-transition</code></td><td><em>(unset)</em></td><td>Transition for hover/focus effects</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Hover State</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-hover-bg</code></td><td><code>#eff6ff</code></td><td>Background</td></tr>
+      <tr><td><code>--alap-hover-text</code></td><td><code>#2563eb</code></td><td>Text color</td></tr>
+      <tr><td><code>--alap-hover-shadow</code></td><td><em>(unset)</em></td><td>Box shadow</td></tr>
+      <tr><td><code>--alap-hover-text-shadow</code></td><td><em>(→ text-shadow)</em></td><td>Text shadow</td></tr>
+      <tr><td><code>--alap-hover-text-decoration</code></td><td><em>(→ text-decoration)</em></td><td>Text decoration</td></tr>
+      <tr><td><code>--alap-hover-font-weight</code></td><td><em>(→ font-weight)</em></td><td>Font weight</td></tr>
+      <tr><td><code>--alap-hover-opacity</code></td><td><em>(unset)</em></td><td>Opacity</td></tr>
+      <tr><td><code>--alap-hover-transform</code></td><td><em>(unset)</em></td><td>Transform (translateX, scale, etc.)</td></tr>
+      <tr><td><code>--alap-hover-border</code></td><td><em>(unset)</em></td><td>Border</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Focus State</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-focus-ring</code></td><td><code>#2563eb</code></td><td>Focus outline color</td></tr>
+      <tr><td><code>--alap-focus-bg</code></td><td><em>(→ hover-bg)</em></td><td>Background</td></tr>
+      <tr><td><code>--alap-focus-text</code></td><td><em>(→ hover-text)</em></td><td>Text color</td></tr>
+      <tr><td><code>--alap-focus-shadow</code></td><td><em>(unset)</em></td><td>Box shadow</td></tr>
+      <tr><td><code>--alap-focus-text-shadow</code></td><td><em>(→ text-shadow)</em></td><td>Text shadow</td></tr>
+      <tr><td><code>--alap-focus-border</code></td><td><em>(unset)</em></td><td>Border</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem; margin-top: 1.5rem;">Images</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>Default</th><th>What it controls</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--alap-img-max-height</code></td><td><code>4rem</code></td><td>Max image height</td></tr>
+      <tr><td><code>--alap-img-radius</code></td><td><code>3px</code></td><td>Image border radius</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">All properties use standard CSS — supported everywhere. <code>corner-shape</code> properties use CSS Borders Level 4 (Chrome/Edge 134+) with graceful <code>border-radius</code> fallback.</p>
+
+  <!-- ===== FEATURE DETECTION ===== -->
+
+  <h2>Feature Detection</h2>
+  <div class="example">
+    <p>Use <code>@supports</code> to conditionally enhance:</p>
+  </div>
+  <pre>/* Base — works everywhere */
+alap-link {
+  --alap-radius: 12px;
+}
+
+/* Enhanced — only in browsers with corner-shape */
+@supports (corner-shape: squircle) {
+  alap-link {
+    --alap-corner-shape: squircle;
+    --alap-radius: 20px;
+  }
+}</pre>
+  <pre>// JavaScript detection
+if (CSS.supports('corner-shape', 'squircle')) {
+  document.documentElement.classList.add('has-corner-shape');
+}</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

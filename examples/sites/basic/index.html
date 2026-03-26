@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 Demo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Alap v3 Demo</h1>
+  <p>Click any blue link to see a multi-destination menu.</p>
+
+  <h2>Item IDs</h2>
+  <div class="example">
+    <p>I like the
+      <a id="twoitems" class="alap" data-alap-linkitems="vwbug, bmwe36">VW Bug and the BMW E36</a>.
+    </p>
+    <p><code>vwbug, bmwe36</code></p>
+  </div>
+
+  <h2>Class Queries</h2>
+  <div class="example">
+    <p>Check out some
+      <a id="coffeetag" class="alap" data-alap-linkitems=".coffee">coffee spots</a>
+      or famous
+      <a id="bridgetag" class="alap" data-alap-linkitems=".bridge">bridges</a>.
+    </p>
+    <p><code>.coffee</code> &nbsp; <code>.bridge</code></p>
+  </div>
+
+  <h2>Operators</h2>
+  <div class="example">
+    <p>
+      <a id="nycbridge" class="alap" data-alap-linkitems=".nyc + .bridge">NYC bridges</a>
+      (AND) &mdash;
+      <a id="nycorsf" class="alap" data-alap-linkitems=".nyc | .sf">NYC or SF</a>
+      (OR) &mdash;
+      <a id="nycnobridge" class="alap" data-alap-linkitems=".nyc - .bridge">NYC without bridges</a>
+      (WITHOUT)
+    </p>
+    <p><code>.nyc + .bridge</code> &nbsp; <code>.nyc | .sf</code> &nbsp; <code>.nyc - .bridge</code></p>
+  </div>
+
+  <h2>Parentheses</h2>
+  <div class="example">
+    <p>
+      <a id="parens" class="alap" data-alap-linkitems="(.nyc + .bridge) | (.sf + .bridge)">NYC or SF bridges</a>
+      &mdash; groups two intersections, then unions the results.
+    </p>
+    <p><code>(.nyc + .bridge) | (.sf + .bridge)</code></p>
+  </div>
+
+  <h2>Mixed: IDs + Classes</h2>
+  <div class="example">
+    <p>I enjoy
+      <a id="mixed" class="alap" data-alap-linkitems="aqus | .car">Aqus Cafe and cars</a>.
+    </p>
+    <p><code>aqus | .car</code></p>
+  </div>
+
+  <h2>Macros</h2>
+  <div class="example">
+    <p>My favorite
+      <a id="cars" class="alap" data-alap-linkitems="@cars">cars (macro)</a>
+      &mdash; or use a bare @:
+      <a id="nycbridges" class="alap" data-alap-linkitems="@">NYC bridges (bare @)</a>.
+    </p>
+    <p><code>@cars</code> &nbsp; <code>@</code> on <code>&lt;a id="nycbridges" data-alap-linkitems="@"&gt;</code> expands <code>@nycbridges</code></p>
+  </div>
+
+  <h2>Existing URL</h2>
+  <div class="example">
+    <p>This link has an <code>href</code> &mdash; the original URL becomes the first menu item:
+      <a id="existing" class="alap" href="https://en.wikipedia.org/wiki/Brooklyn_Bridge"
+         data-alap-linkitems=".nyc + .bridge">Brooklyn Bridge and more</a>.
+    </p>
+    <p>Same, but appended:
+      <a id="existingappend" class="alap" href="https://en.wikipedia.org/wiki/Brooklyn_Bridge"
+         data-alap-linkitems=".nyc + .bridge"
+         data-alap-existing="append">Brooklyn Bridge (last)</a>.
+    </p>
+    <p>Ignored (original URL discarded):
+      <a id="existingignore" class="alap" href="https://en.wikipedia.org/wiki/Brooklyn_Bridge"
+         data-alap-linkitems=".nyc + .bridge"
+         data-alap-existing="ignore">Brooklyn Bridge (ignored)</a>.
+    </p>
+    <p><code>.nyc + .bridge</code> with <code>href</code> preserved (prepend / append / ignore)</p>
+  </div>
+
+  <h2>Chained</h2>
+  <div class="example">
+    <p>
+      <a id="chained" class="alap" data-alap-linkitems=".nyc | .sf - .landmark">NYC or SF, without landmarks</a>
+      &mdash; left-to-right: <code>(.nyc | .sf) - .landmark</code>
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

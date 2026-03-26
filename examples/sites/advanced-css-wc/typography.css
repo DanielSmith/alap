@@ -1,0 +1,127 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* --- Font weight --- */
+
+.weight-light alap-link {
+  --alap-font-weight: 300;
+}
+
+.weight-bold alap-link {
+  --alap-font-weight: 700;
+}
+
+/* --- Hover font weight --- */
+
+.weight-hover alap-link {
+  --alap-font-weight: 400;
+  --alap-hover-font-weight: 600;
+  --alap-transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* --- Letter spacing --- */
+
+.spacing-tight alap-link {
+  --alap-letter-spacing: -0.02em;
+}
+
+.spacing-wide alap-link {
+  --alap-letter-spacing: 0.08em;
+  --alap-text-transform: uppercase;
+  --alap-font-size: 0.8rem;
+}
+
+/* --- Line height --- */
+
+.lh-compact alap-link {
+  --alap-line-height: 1.2;
+  --alap-padding: 0.3rem 1rem;
+}
+
+.lh-spacious alap-link {
+  --alap-line-height: 2.0;
+}
+
+/* --- Text transform --- */
+
+.transform-upper alap-link {
+  --alap-text-transform: uppercase;
+  --alap-letter-spacing: 0.04em;
+  --alap-font-size: 0.8rem;
+}
+
+.transform-cap alap-link {
+  --alap-text-transform: capitalize;
+}
+
+.transform-lower alap-link {
+  --alap-text-transform: lowercase;
+}
+
+/* --- Text decoration --- */
+
+.deco-hover alap-link {
+  --alap-text-decoration: none;
+  --alap-hover-text-decoration: underline;
+  --alap-transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* --- Text alignment --- */
+
+.align-center alap-link {
+  --alap-text-align: center;
+}
+
+.align-right alap-link {
+  --alap-text-align: right;
+}
+
+/* --- Ellipsis --- */
+
+.ellipsis-section alap-link {
+  --alap-text-overflow: ellipsis;
+  --alap-overflow: hidden;
+  --alap-white-space: nowrap;
+  --alap-max-width: 200px;
+}
+
+/* --- Monospace / terminal --- */
+
+.mono-section {
+  background: #0d1117;
+  border-color: #30363d;
+}
+
+.mono-section alap-link {
+  color: #58a6ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.mono-section alap-link {
+  --alap-font: 'JetBrains Mono', 'SF Mono', monospace;
+  --alap-font-size: 0.8rem;
+  --alap-padding: 0.4rem 0.8rem;
+  --alap-bg: #0d1117;
+  --alap-border: #30363d;
+  --alap-text: #c9d1d9;
+  --alap-hover-bg: #161b22;
+  --alap-hover-text: #58a6ff;
+  --alap-focus-ring: #58a6ff;
+  --alap-radius: 6px;
+  --alap-corner-shape: notch;
+  --alap-letter-spacing: 0.02em;
+  --alap-text-transform: uppercase;
+}

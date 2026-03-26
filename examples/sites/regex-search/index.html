@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Regex Search</title>
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Alap v3 — Regex Search</h1>
+  <p>
+    Patterns are stored in <code>config.searchPatterns</code> and referenced with
+    <code>/key/</code> syntax. No inline regex in HTML — safe by design.
+  </p>
+
+  <h2>Basic: <code>/key/</code></h2>
+  <div class="example">
+    <p>
+      All <a class="alap" data-alap-linkitems="/bridges/">bridges</a> (string shorthand, searches all fields)
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/german/">German cars</a> (pattern: <code>VW|BMW|Mercedes</code>, label only)
+    </p>
+  </div>
+  <pre><code>searchPatterns: {
+  bridges: 'bridge',                           // string shorthand
+  german: { pattern: 'VW|BMW|Mercedes', options: { fields: 'l' } },
+}
+
+data-alap-linkitems="/bridges/"
+data-alap-linkitems="/german/"</code></pre>
+
+  <h2>Field Options: <code>/key/opts</code></h2>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="/scenic/">Scenic spots</a>
+      (searches descriptions: <code>fields: 'd'</code>)
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/landmarks/">Landmarks</a>
+      (searches tags: <code>fields: 't'</code>)
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/wikipedia/">Wikipedia links</a>
+      (searches URLs: <code>fields: 'u'</code>)
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/german/t">German (override to tags)</a>
+      — expression <code>/t</code> overrides config's <code>fields: 'l'</code>
+    </p>
+  </div>
+  <pre><code>/scenic/     — config default: fields: 'd' (description)
+/landmarks/  — config default: fields: 't' (tags)
+/german/t    — expression overrides config to search tags instead of labels</code></pre>
+
+  <h2>Sorting &amp; Limits</h2>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="/alphaBridges/">Bridges (A-Z)</a>
+      — sorted alphabetically by ID
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/topBridges/">Top 2 Bridges</a>
+      — <code>limit: 2</code>, sorted alpha
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/recent/">Recent (30 days)</a>
+      — items with <code>createdAt</code> within 30 days, newest first
+    </p>
+  </div>
+  <pre><code>alphaBridges: { pattern: 'bridge', options: { fields: 'l', sort: 'alpha' } }
+topBridges:   { pattern: 'bridge', options: { fields: 'l', limit: 2, sort: 'alpha' } }
+recent:       { pattern: '.', options: { age: '30d', sort: 'newest' } }</code></pre>
+
+  <h2>Composition with Operators</h2>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="/bridges/ + .nyc">NYC bridges</a>
+      — regex AND class
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/bridges/ - .nyc">Non-NYC bridges</a>
+      — regex WITHOUT class
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/german/ | .japan">German or Japanese</a>
+      — regex OR class
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="/german/, .coffee">German cars, then coffee</a>
+      — regex comma-separated with class
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(/bridges/ + .nyc) | .coffee">NYC bridges or coffee</a>
+      — regex in parentheses
+    </p>
+  </div>
+  <pre><code>/bridges/ + .nyc          — AND: items matching "bridge" AND tagged "nyc"
+/bridges/ - .nyc          — WITHOUT: "bridge" matches excluding "nyc"
+/german/ | .japan         — OR: german regex results merged with .japan class
+(/bridges/ + .nyc) | .coffee  — parenthesized grouping</code></pre>
+
+  <h2>Security</h2>
+  <p>
+    Patterns live in config, never in HTML attributes. The parser enforces:
+    max 5 regex atoms per expression, 100 result cap, 20ms timeout.
+    Invalid patterns return empty results silently.
+  </p>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

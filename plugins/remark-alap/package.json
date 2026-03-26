@@ -1,0 +1,45 @@
+{
+  "name": "remark-alap",
+  "version": "1.0.0",
+  "description": "Remark plugin: transform [text](alap:query) links into <alap-link> web components",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "remark",
+    "remark-plugin",
+    "alap",
+    "markdown",
+    "web-component"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "unist-util-visit": "^5.0.0"
+  },
+  "peerDependencies": {
+    "unified": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.0",
+    "remark-html": "^16.0.0",
+    "remark-parse": "^11.0.0",
+    "typescript": "^5.7.0",
+    "unified": "^11.0.0",
+    "vitest": "^3.0.0"
+  },
+  "author": "Daniel Smith"
+}

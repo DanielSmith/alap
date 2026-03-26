@@ -1,0 +1,152 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly on Monday at 9am UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit
+        run: pnpm audit --audit-level=high
+
+      - name: Security tests
+        run: |
+          pnpm exec vitest run tests/core/sanitize-url.test.ts --reporter=verbose
+          pnpm exec vitest run tests/core/validate-regex.test.ts --reporter=verbose
+          pnpm exec vitest run tests/core/validate-config.test.ts --reporter=verbose
+          pnpm exec vitest run tests/core/tier24-web-protocol.test.ts --reporter=verbose
+
+      - name: Dangerous pattern scan
+        run: |
+          echo "Scanning src/ for dangerous patterns..."
+          echo "(Excluding: other-languages/, vendor/, *.min.js)"
+          FOUND=0
+          EXCLUDES="--exclude-dir=other-languages --exclude-dir=vendor --exclude=*.min.js"
+
+          for pattern in '[^.]eval\s*\(' 'new\s+Function\s*\(' 'dangerouslySetInnerHTML' 'document\.write\s*\(' 'insertAdjacentHTML'; do
+            matches=$(grep -rE "$pattern" src/ --include="*.ts" --include="*.js" $EXCLUDES -l 2>/dev/null || true)
+            if [ -n "$matches" ]; then
+              echo "::warning::Pattern '$pattern' found in: $matches"
+              FOUND=$((FOUND + 1))
+            fi
+          done
+
+          # innerHTML — flag for manual review, don't fail
+          innerHTML=$(grep -rn 'innerHTML' src/ --include="*.ts" --include="*.js" $EXCLUDES 2>/dev/null || true)
+          if [ -n "$innerHTML" ]; then
+            echo "::notice::innerHTML usage found (verify these are safe):"
+            echo "$innerHTML"
+          fi
+
+          if [ $FOUND -gt 0 ]; then
+            echo "::error::Dangerous patterns detected — review before merging"
+            exit 1
+          fi
+
+          echo "✓ No dangerous patterns found"
+
+      - name: Lockfile integrity
+        run: pnpm install --frozen-lockfile
+
+      - name: Production dependency count
+        run: |
+          count=$(node -e "const p=require('./package.json'); console.log(Object.keys(p.dependencies||{}).length)")
+          echo "Runtime dependencies: $count"
+          if [ "$count" -gt 3 ]; then
+            echo "::warning::Runtime dependency count is $count — review for supply chain risk"
+          fi
+
+  # ── Cross-language security tests ───────────────────────────────────
+
+  rust:
+    name: Rust Security Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/other-languages/rust
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Setup Rust
+        run: rustup update stable && rustup default stable
+      - name: Cargo audit
+        run: cargo install cargo-audit && cargo audit
+        continue-on-error: true
+      - name: Security tests
+        run: cargo test --test validate_config_test --test ssrf_guard_test --verbose
+
+  python:
+    name: Python Security Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/other-languages/python
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: pip install pytest
+      - name: Security tests
+        run: python -m pytest tests/test_validate_config.py tests/test_validate_regex.py tests/test_ssrf_guard.py -v
+
+  php:
+    name: PHP Security Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/other-languages/php
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401  # v2
+        with:
+          php-version: '8.3'
+      - name: Install dependencies
+        run: composer install --no-interaction
+      - name: Composer audit
+        run: composer audit
+        continue-on-error: true
+      - name: Security tests
+        run: vendor/bin/phpunit tests/ValidateConfigTest.php tests/ValidateRegexTest.php tests/SsrfGuardTest.php
+
+  go:
+    name: Go Security Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/other-languages/go
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Setup Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5  # v5
+        with:
+          go-version: '1.22'
+      - name: Security tests
+        run: go test -run 'ValidateConfig|IsPrivateHost' -v

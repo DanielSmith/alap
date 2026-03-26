@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Shapes &amp; Borders</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./shapes.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Shapes &amp; Borders</h1>
+  <p>Corner geometry, per-corner overrides, item dividers, and border customization.</p>
+
+  <div id="support-banner" class="banner">Detecting browser support...</div>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html" class="current">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== CORNER SHAPE GALLERY ===== -->
+
+  <h2>Corner Shape Gallery</h2>
+  <p class="note">All six <code>corner-shape</code> values. Each uses <code>--alap-radius: 24px</code> to make the shape obvious.</p>
+
+  <div class="gallery">
+    <div class="gallery-item">
+      <h3>round</h3>
+      <div class="example round-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>border-radius only</code>
+    </div>
+
+    <div class="gallery-item">
+      <h3>squircle</h3>
+      <div class="example squircle-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>iOS superellipse</code>
+    </div>
+
+    <div class="gallery-item">
+      <h3>scoop</h3>
+      <div class="example scoop-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>concave cutout</code>
+    </div>
+
+    <div class="gallery-item">
+      <h3>notch</h3>
+      <div class="example notch-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>straight cut</code>
+    </div>
+
+    <div class="gallery-item">
+      <h3>bevel</h3>
+      <div class="example bevel-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>angled chamfer</code>
+    </div>
+
+    <div class="gallery-item">
+      <h3>straight</h3>
+      <div class="example straight-demo">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+      <code>sharp corners</code>
+    </div>
+  </div>
+
+  <pre>/* Each uses the same radius — the shape changes the geometry */
+alap-link { --alap-radius: 24px; }
+
+--alap-corner-shape: round;     /* default circular arc */
+--alap-corner-shape: squircle;  /* iOS superellipse */
+--alap-corner-shape: scoop;     /* concave inward */
+--alap-corner-shape: notch;     /* straight diagonal cut */
+--alap-corner-shape: bevel;     /* angled chamfer */
+--alap-corner-shape: straight;  /* sharp 90° corners (ignores radius) */</pre>
+
+  <!-- ===== SQUIRCLE ===== -->
+
+  <h2>Squircle (themed)</h2>
+  <div class="example squircle-section">
+    <p>iOS-style superellipse corners:
+      <alap-link query=".coffee">coffee</alap-link> and
+      <alap-link query="@cars">cars</alap-link>.
+    </p>
+    <p class="note"><code>--alap-corner-shape: squircle</code> with <code>--alap-radius: 16px</code>.
+      Browsers without <code>corner-shape</code> show standard 16px rounded corners — equally polished.</p>
+  </div>
+  <pre>.squircle-section alap-link {
+  --alap-corner-shape: squircle;
+  --alap-radius: 16px;
+}</pre>
+
+  <!-- ===== SCOOP ===== -->
+
+  <h2>Scoop with Colored Border</h2>
+  <div class="example scoop-section">
+    <p>Concave cutout with a colored border:
+      <alap-link query=".nyc">NYC spots</alap-link>.
+    </p>
+    <p class="note"><code>corner-shape: scoop</code> with <code>--alap-border-width: 2px</code>. Fallback: standard rounded corners.</p>
+  </div>
+  <pre>.scoop-section alap-link {
+  --alap-corner-shape: scoop;
+  --alap-radius: 16px;
+  --alap-border-width: 2px;
+  --alap-border: #6366f1;
+}</pre>
+
+  <!-- ===== ASYMMETRIC / SALE TAG ===== -->
+
+  <h2>Asymmetric Corners (Sale Tag)</h2>
+  <div class="example sale-section">
+    <p>Price-tag style — mixed corner shapes:
+      <alap-link query="@cars">cars on sale</alap-link>
+    </p>
+    <p class="note"><code>--alap-corner-shape: round bevel bevel round</code> bevels the right side while keeping the left rounded. Combine with a bold color and the shape speaks for itself.</p>
+  </div>
+  <pre>/* Using the 4-value shorthand */
+.sale-section alap-link {
+  --alap-corner-shape: round bevel bevel round;
+  --alap-radius: 8px 20px 20px 8px;
+}</pre>
+
+  <!-- ===== PER-CORNER LONGHANDS ===== -->
+
+  <h2>Per-Corner Longhands</h2>
+  <div class="example longhands-section">
+    <p>Each corner set independently:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Physical longhands via <code>::part(menu)</code> override the shorthand for specific corners.</p>
+  </div>
+  <pre>.longhands-section alap-link::part(menu) {
+  corner-shape: round;                    /* base: all round */
+  corner-top-right-shape: bevel;          /* override one corner */
+  corner-bottom-left-shape: scoop;
+  border-radius: 20px;
+}</pre>
+
+  <!-- ===== SIDE SHORTHANDS ===== -->
+
+  <h2>Side Shorthands</h2>
+  <div class="example sides-section">
+    <p>Set two corners at once:
+      <alap-link query=".coffee">coffee</alap-link>
+    </p>
+    <p class="note"><code>corner-right-shape</code> via <code>::part(menu)</code> sets both top-right and bottom-right.</p>
+  </div>
+  <pre>.sides-section alap-link::part(menu) {
+  corner-shape: round;
+  corner-right-shape: bevel;  /* both right corners */
+  border-radius: 16px;
+}</pre>
+
+  <!-- ===== SNIPPED CORNERS ===== -->
+
+  <h2>Snipped Corners (Brutalist)</h2>
+  <div class="example snipped-section">
+    <p>Brutalist aesthetic — beveled corners:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Uses <code>::part(menu)</code> for direct CSS access to combine bevel with custom colors.</p>
+  </div>
+  <pre>.snipped-section alap-link::part(menu) {
+  corner-shape: bevel;
+  border-radius: 4px 4px 20px 4px;
+  background: #0f172a;
+  border: 2px solid #475569;
+}</pre>
+
+  <!-- ===== ITEM BORDERS ===== -->
+
+  <h2>Item Borders &amp; Spacing</h2>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem;">Dividers</h3>
+  <div class="example dividers-section">
+    <p>Subtle dividers between items:
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+  </div>
+  <pre>.dividers-section alap-link::part(item) {
+  border-bottom: 1px solid #e5e7eb;
+}
+.dividers-section alap-link::part(item):last-child {
+  border-bottom: none;
+}</pre>
+
+  <h3 style="color: #fde68a; font-size: 0.95rem;">Pill-Style Items</h3>
+  <div class="example pills-section">
+    <p>Spaced, rounded items:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+  </div>
+  <pre>.pills-section alap-link {
+  --alap-item-gap: 4px;
+  --alap-item-border-radius: 6px;
+  --alap-item-border: 1px solid #e2e8f0;
+  --alap-menu-padding: 0.5rem;
+  --alap-bg: #f8fafc;
+}</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

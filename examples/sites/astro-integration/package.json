@@ -1,0 +1,16 @@
+{
+  "name": "alap-astro-integration-example",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.15.9"
+  },
+  "author": "Daniel Smith",
+  "license": "Apache-2.0"
+}

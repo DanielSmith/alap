@@ -1,0 +1,146 @@
+/**
+ * Copyright 2026 Daniel Smith — Apache 2.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; margin-bottom: 0.25rem; color: #ffd666; }
+h2 { font-size: 1.1rem; margin-top: 1.5rem; color: #ffe8a0; }
+
+code {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Two-column layout */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .columns { grid-template-columns: 1fr; }
+}
+
+.column h2 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7888b8;
+  border-bottom: 1px solid #2e48a0;
+  padding-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.rendered {
+  line-height: 1.8;
+}
+
+.rendered h1 { font-size: 1.3rem; }
+.rendered h2 { font-size: 1rem; color: #ffe8a0; }
+.rendered hr { border: none; border-top: 1px solid #2e48a0; margin: 1.5rem 0; }
+.rendered em { color: #b8c4e8; }
+
+.source {
+  background: #1a2870;
+  border: 1px solid #2e48a0;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #b8c4e8;
+}
+
+/* Style the alap-link web components in the rendered output */
+alap-link {
+  color: #88bbff;
+  text-decoration: underline;
+  text-decoration-color: #4470cc;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: text-decoration-color 0.15s, color 0.15s;
+}
+
+alap-link:hover {
+  color: #ffd666;
+  text-decoration-color: #ffd666;
+}
+
+/* Web component menu styling via ::part() (Shadow DOM) */
+alap-link::part(menu) {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0;
+  min-width: 180px;
+}
+
+alap-link::part(link) {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+alap-link::part(link):hover,
+alap-link::part(link):focus-visible {
+  background: #3366d6;
+  color: #ffd666;
+}
+
+/* DOM adapter menu styling */
+.alapelem {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0;
+  min-width: 180px;
+  z-index: 100;
+}
+
+.alapelem ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.alapelem li {
+  margin: 0;
+}
+
+.alapelem a {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.alapelem a:hover {
+  background: #3366d6;
+  color: #ffd666;
+}

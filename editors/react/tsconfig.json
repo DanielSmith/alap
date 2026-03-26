@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "alap/react": ["../../src/ui/react/index.ts"],
+      "alap/storage": ["../../src/storage/index.ts"],
+      "alap/core": ["../../src/core/index.ts"],
+      "alap": ["../../src/index.ts"]
+    }
+  },
+  "include": ["src", "../shared"]
+}

@@ -1,0 +1,408 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+@import "tailwindcss";
+
+/* --- Design tokens --- */
+:root {
+  --alap-deep: #1a2f8a;
+  --alap-mid: #2240a8;
+  --alap-surface: #2952c0;
+  --alap-hover: #3366d6;
+  --alap-item-bg: #2a50b8;
+  --alap-item-hover: #3360d0;
+  --alap-item-selected: #4070e0;
+  --alap-accent: #ffd666;
+  --alap-accent-soft: #ffe8a0;
+  --alap-text: #f0f2ff;
+  --alap-text-muted: #b8c4e8;
+  --alap-text-dim: #7888b8;
+  --alap-border: #4470cc;
+  --alap-border-subtle: #2e48a0;
+  --alap-input-bg: #1a2870;
+  --alap-input-border: #3a5cc0;
+  --alap-danger: #ff5555;
+  --alap-success: #44dd77;
+  --alap-cancel-bg: #6b7280;
+  --alap-cancel-text: #1a1a2e;
+  --alap-tag-bg: #1e3090;
+  --alap-tag-text: #88bbff;
+  --alap-transition: 0.15s ease;
+
+  /* Macro mode palette — deeper blue, subtle shift from items */
+  --alap-macro-deep: #141e6a;
+  --alap-macro-mid: #1c2a82;
+  --alap-macro-item-bg: #223098;
+  --alap-macro-item-hover: #2a3cb0;
+  --alap-macro-item-selected: #3248c4;
+  --alap-macro-accent: #ffd666;
+  --alap-macro-accent-soft: #ffe8a0;
+
+  /* Shadows & overlays */
+  --alap-shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+  --alap-shadow-md: 0 2px 8px rgba(0,0,0,0.3);
+  --alap-shadow-panel: 8px 0 24px rgba(0,0,0,0.3);
+  --alap-shadow-panel-right: -8px 0 24px rgba(0,0,0,0.3);
+  --alap-overlay-bg: rgba(10, 15, 40, 0.7);
+  --alap-drop-overlay-bg: rgba(30, 58, 95, 0.9);
+
+  /* Hover tints */
+  --alap-tint-danger: rgba(255, 85, 85, 0.15);
+  --alap-tint-success: rgba(68, 221, 119, 0.15);
+  --alap-tint-pattern: rgba(168, 130, 255, 0.12);
+  --alap-tint-pattern-hover: rgba(168, 130, 255, 0.25);
+  --alap-pattern-border: rgba(168, 130, 255, 0.25);
+}
+
+/* --- Scrollbar styling — hidden until hover over scrollable area --- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--alap-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--alap-border-subtle);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--alap-border);
+}
+
+/* Scrollable panels: hide scrollbar until hovered, reserve gutter so content doesn't shift */
+.scroll-fade {
+  scrollbar-gutter: stable;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.5s ease-in;
+}
+
+.scroll-fade:hover {
+  scrollbar-color: var(--alap-border) transparent;
+  transition: scrollbar-color 0.15s ease-out;
+}
+
+.scroll-fade::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Base --- */
+body {
+  margin: 0;
+  background: var(--alap-deep);
+  color: var(--alap-text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* --- Alpine: hide until initialized --- */
+[x-cloak] { display: none !important; }
+
+/* --- Slide panels --- */
+.slide-panel {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-panel-enter {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-panel-exit {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-left-enter {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-left-exit {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* --- Input focus --- */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--alap-accent) !important;
+  box-shadow: 0 0 0 1px var(--alap-accent);
+}
+
+/* --- Subtle animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* --- Color utility classes --- */
+.text-accent { color: var(--alap-accent); }
+.text-muted { color: var(--alap-text-muted); }
+.text-dim { color: var(--alap-text-dim); }
+.text-macro-accent { color: var(--alap-macro-accent); }
+.text-danger { color: var(--alap-danger); }
+.text-success { color: var(--alap-success); }
+.text-accent-soft { color: var(--alap-accent-soft); }
+.bg-card { background: var(--alap-mid); border: 1px solid var(--alap-border-subtle); }
+.bg-input { background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); }
+.border-subtle { border-color: var(--alap-border-subtle); }
+
+/* --- Alap menu styling (editor context) --- */
+.alapelem {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  margin-top: 0.25rem;
+  min-width: 200px;
+  background: var(--alap-mid);
+  border: 1px solid var(--alap-border);
+  border-radius: var(--alap-radius, 6px);
+  box-shadow: var(--alap-shadow-md);
+  padding: 0.25rem 0;
+}
+
+.alapelem ul, .alapelem ol {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.5s ease-in;
+}
+
+.alapelem ul:hover, .alapelem ol:hover {
+  scrollbar-color: var(--alap-border) transparent;
+  transition: scrollbar-color 0.15s ease-out;
+}
+
+.alapelem ul::-webkit-scrollbar, .alapelem ol::-webkit-scrollbar {
+  display: none;
+}
+
+.alapelem li {
+  margin: 0;
+  padding: 0;
+}
+
+.alapelem a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--alap-text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: var(--alap-item-bg);
+  border-radius: 6px;
+  transition: background var(--alap-transition), color var(--alap-transition), box-shadow var(--alap-transition);
+}
+
+.alapelem a:hover, .alapelem a:focus-visible {
+  background: var(--alap-item-hover);
+  color: var(--alap-accent);
+  box-shadow: var(--alap-shadow-md);
+  outline: none;
+}
+
+.alapelem a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* --- Tag pills --- */
+.tag-pill {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--alap-tag-bg);
+  color: var(--alap-tag-text);
+  border: 1px solid var(--alap-border-subtle);
+  transition: all var(--alap-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-pill:hover {
+  background: var(--alap-hover);
+  border-color: var(--alap-border);
+}
+
+.tag-pill .tag-remove {
+  opacity: 0.15;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 4px 2px 6px;
+  margin: -2px -6px -2px 0;
+  border-radius: 0 10px 10px 0;
+  transition: opacity var(--alap-transition), background var(--alap-transition), color var(--alap-transition);
+}
+
+.tag-pill:hover .tag-remove {
+  opacity: 0.5;
+}
+
+.tag-pill .tag-remove:hover {
+  opacity: 1;
+  color: var(--alap-text);
+  background: var(--alap-danger);
+}
+
+/* --- Hover behaviors (replaces inline onMouseEnter/Leave handlers) --- */
+
+.hover-bg-surface { transition: background var(--alap-transition); }
+.hover-bg-surface:hover { background: var(--alap-surface) !important; }
+
+.hover-bg-hover { transition: background var(--alap-transition); }
+.hover-bg-hover:hover { background: var(--alap-hover) !important; }
+
+.hover-bg-input { transition: background var(--alap-transition); background: var(--alap-input-bg); }
+.hover-bg-input:hover { background: var(--alap-hover) !important; }
+
+.hover-bg-danger { transition: background var(--alap-transition); }
+.hover-bg-danger:hover { background: var(--alap-tint-danger) !important; }
+
+.hover-bg-success { transition: background var(--alap-transition); }
+.hover-bg-success:hover { background: var(--alap-tint-success) !important; }
+
+/* Reveal icons — fade in over 500ms on group hover */
+.reveal-icon {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  cursor: pointer;
+}
+.group:hover .reveal-icon {
+  opacity: 1;
+}
+
+.hover-bg-pattern { transition: background var(--alap-transition); background: var(--alap-tint-pattern); }
+.hover-bg-pattern:hover { background: var(--alap-tint-pattern-hover) !important; }
+
+.hover-opacity { transition: opacity var(--alap-transition), transform var(--alap-transition); }
+.hover-opacity:hover { opacity: 0.9 !important; }
+
+.hover-lift { transition: opacity var(--alap-transition), transform var(--alap-transition); }
+.hover-lift:hover { opacity: 0.9 !important; transform: translateY(-1px); }
+
+.hover-text-danger { transition: color var(--alap-transition); }
+.hover-text-danger:hover { color: var(--alap-danger) !important; }
+
+/* --- Edit card border fade --- */
+.edit-card {
+  border: 2px solid var(--alap-border-subtle);
+  transition: border-color 1s ease-in-out;
+}
+
+.edit-card:hover {
+  border-color: var(--alap-border);
+}
+
+/* --- Item list card --- */
+.item-card {
+  transition: background var(--alap-transition), box-shadow var(--alap-transition), transform var(--alap-transition);
+  background: var(--alap-item-bg);
+  box-shadow: var(--alap-shadow-sm);
+}
+
+.item-card:hover:not(.editing) {
+  box-shadow: var(--alap-shadow-md);
+}
+
+.item-card.editing {
+  background: var(--alap-item-selected);
+  box-shadow: var(--alap-shadow-md);
+}
+
+.item-card .item-name { color: var(--alap-text); }
+.item-card.editing .item-name { color: var(--alap-accent); }
+
+.item-card .item-actions { background: inherit; }
+.item-card.editing .item-actions { background: inherit; }
+
+/* Macro mode overrides */
+.macro-mode .item-card {
+  background: var(--alap-macro-item-bg);
+}
+.macro-mode .item-card.editing {
+  background: var(--alap-macro-item-selected);
+}
+.macro-mode .item-card.hover-bg-hover:hover {
+  background: var(--alap-macro-item-hover) !important;
+}
+.macro-mode .item-card .item-name { color: var(--alap-macro-accent-soft); }
+.macro-mode .item-card.editing .item-name { color: var(--alap-macro-accent); }
+.macro-mode .item-card .item-actions { background: inherit; }
+.macro-mode .item-card.editing .item-actions { background: inherit; }
+
+/* Tab bar */
+.panel-tab {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--alap-transition);
+  color: var(--alap-text-dim);
+}
+.panel-tab:hover { color: var(--alap-text-muted); }
+.panel-tab.active { color: var(--alap-accent); border-bottom-color: var(--alap-accent); }
+.panel-tab.active-macro { color: var(--alap-accent); border-bottom-color: var(--alap-accent); }
+
+/* --- Toolbar button --- */
+@layer components {
+  .toolbar-btn {
+    @apply text-sm px-3 py-1.5 rounded-md transition-all duration-150;
+    color: var(--alap-text-muted);
+    background: transparent;
+  }
+  .toolbar-btn:hover {
+    color: var(--alap-text);
+    background: var(--alap-surface);
+  }
+}
+
+/* --- Inline SVG icon sizing --- */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon svg {
+  width: 100%;
+  height: 100%;
+}

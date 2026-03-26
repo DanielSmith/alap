@@ -1,0 +1,25 @@
+# Server builds use repo root as context.
+# Node/Bun servers build from source (multi-stage).
+# Go/Rust servers need src/other-languages/ for their parser crates.
+# Exclude everything that no server build needs.
+
+node_modules
+.git
+.github
+.vscode
+.claude
+
+docs
+tests
+plugins
+integrations
+coverage
+dist
+
+examples/sites
+examples/img
+
+*.md
+*.tgz
+*.log
+vitest.config*.ts

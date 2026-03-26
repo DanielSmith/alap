@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Bridges — Alap Astro Integration">
+  <h1>Bridges</h1>
+  <p>
+    A page about bridges — demonstrating that Alap works across multiple pages
+    with zero per-page setup.
+  </p>
+
+  <h2>All bridges</h2>
+  <p>
+    See all <alap-link query=".bridge">bridges</alap-link> in the config,
+    or use the <alap-link query="@bridges">bridges macro</alap-link>.
+  </p>
+
+  <h2>By city</h2>
+  <p>
+    <alap-link query=".nyc + .bridge">NYC bridges</alap-link> vs.
+    <alap-link query=".sf + .bridge">SF bridges</alap-link>.
+  </p>
+
+  <h2>Landmarks</h2>
+  <p>
+    Bridges that are also landmarks:
+    <alap-link query=".bridge + .landmark">landmark bridges</alap-link>.
+  </p>
+</Base>

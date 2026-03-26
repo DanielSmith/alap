@@ -1,0 +1,70 @@
+<!--
+  Copyright 2026 Daniel Smith
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+---
+/**
+ * <AlapSetup> — Include once per page (typically in your layout's <head>).
+ *
+ * Registers the Alap config and defines the <alap-link> custom element.
+ * Must run before any <AlapLink> components on the page.
+ *
+ * @example
+ * ---
+ * import { AlapSetup } from 'alap/astro';
+ * import myConfig from '../data/alap-config.json';
+ * ---
+ * <html>
+ *   <head>
+ *     <AlapSetup config={myConfig} />
+ *   </head>
+ *   <body>...</body>
+ * </html>
+ *
+ * For multiple named configs:
+ * <AlapSetup config={primaryConfig} name="primary" />
+ * <AlapSetup config={secondaryConfig} name="secondary" />
+ */
+
+import type { AlapConfig } from '../../core/types';
+
+interface Props {
+  /** The Alap config object */
+  config: AlapConfig;
+  /** Config name (default: '_default') */
+  name?: string;
+}
+
+const { config, name = '_default' } = Astro.props;
+const configJson = JSON.stringify(config);
+---
+
+<alap-setup
+  data-config={configJson}
+  data-name={name}
+  style="display:none"
+></alap-setup>
+
+<script>
+  import { registerConfig, defineAlapLink } from 'alap';
+
+  defineAlapLink();
+
+  document.querySelectorAll('alap-setup').forEach((el) => {
+    const config = JSON.parse(el.getAttribute('data-config')!);
+    const name = el.getAttribute('data-name') || '_default';
+    registerConfig(config, name);
+  });
+</script>

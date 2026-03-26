@@ -1,0 +1,19 @@
+{
+  "name": "alap-server-express-sqlite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Alap config server — Express + SQLite",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "alap": "file:../../..",
+    "better-sqlite3": "^11.10.0",
+    "cors": "^2.8.6",
+    "express": "^4.22.1"
+  },
+  "author": "Daniel Smith",
+  "license": "Apache-2.0"
+}

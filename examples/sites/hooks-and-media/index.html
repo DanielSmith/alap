@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Hooks &amp; Media</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Alap v3 — Hooks &amp; Media</h1>
+  <p>Event hooks, image triggers, image menu items, hover previews, and context popups.</p>
+
+  <!-- ===== 1. IMAGE TRIGGER ===== -->
+
+  <h2>1. Image as Trigger</h2>
+  <div class="example">
+    <p>Click the photo to open a menu. The menu appears at the click coordinates.</p>
+    <img id="ggbridge" class="alap trigger-img"
+         data-alap-linkitems=".sf"
+         src="../../img/golden-gate.jpg"
+         alt="Golden Gate Bridge"
+         width="320">
+  </div>
+
+  <!-- ===== 2. DIV TRIGGER ===== -->
+
+  <h2>2. Div as Trigger</h2>
+  <div class="example">
+    <p>Any element can be an Alap trigger — not just <code>&lt;a&gt;</code> tags.</p>
+    <div class="card-row">
+      <div id="bridgecard" class="alap trigger-card" data-alap-linkitems=".bridge">
+        <img src="../../img/brooklyn-bridge.jpg" alt="Brooklyn Bridge" width="200">
+        <strong>Bridges</strong>
+        <span>3 destinations</span>
+      </div>
+      <div id="sfcard" class="alap trigger-card" data-alap-linkitems=".sf">
+        <img src="../../img/sf-victorians.jpg" alt="SF Victorian houses" width="200">
+        <strong>San Francisco</strong>
+        <span>4 destinations</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3. IMAGE MENU ITEMS ===== -->
+
+  <h2>3. Images as Menu Items</h2>
+  <div class="example">
+    <p>When a link has an <code>image</code> field, the menu item shows the image instead of a text label.
+      Click <a id="photos" class="alap" data-alap-linkitems=".photo">photo gallery</a>.
+    </p>
+  </div>
+
+  <!-- ===== 4. HOVER PREVIEW ===== -->
+
+  <h2>4. Hover Preview (item-hover hook)</h2>
+  <div class="example">
+    <p>Open a menu and hover over items. The <code>onItemHover</code> callback reads the item's
+      <code>description</code> and <code>thumbnail</code> to populate a preview panel.</p>
+    <p>Try: <a id="bridgehover" class="alap" data-alap-linkitems=".bridge">bridges</a>
+      &mdash; hover over each item to see its description and photo.</p>
+  </div>
+
+  <!-- ===== 5. CONTEXT POPUP ===== -->
+
+  <h2>5. Context Popup (item-context hook)</h2>
+  <div class="example">
+    <p>Right-click a menu item (or press <kbd>ArrowRight</kbd> while focused) to open a detail popup
+      with the item's thumbnail, description, and a direct link.</p>
+    <p>Try: <a id="bridgecontext" class="alap" data-alap-linkitems="goldengate, brooklyn">bridges with context</a>
+      &mdash; right-click an item.</p>
+  </div>
+
+  <!-- ===== 6. COMBINED ===== -->
+
+  <h2>6. Everything Together</h2>
+  <div class="example">
+    <p>Image trigger + image menu items + hover preview + context popup:</p>
+    <img id="chainimg" class="alap trigger-img"
+         data-alap-linkitems="goldengate, brooklyn, paintedladies"
+         src="../../img/chain-links.jpg"
+         alt="Chain links"
+         width="280">
+    <p class="note">Click the image, hover items for preview, right-click for detail.</p>
+  </div>
+
+  <!-- ===== HOVER PREVIEW PANEL ===== -->
+
+  <div id="hover-panel" class="hover-panel">
+    <img class="hover-img" src="" alt="">
+    <div class="hover-label"></div>
+    <div class="hover-desc"></div>
+  </div>
+
+  <!-- ===== CONTEXT POPUP ===== -->
+
+  <div id="context-popup" class="context-popup">
+    <img class="context-img" src="" alt="">
+    <div class="context-label"></div>
+    <div class="context-desc"></div>
+    <a class="context-link" href="#" target="fromAlap">Open &rarr;</a>
+  </div>
+
+  <!-- ===== EVENT LOG ===== -->
+
+  <h2>Event Log</h2>
+  <div class="log-container">
+    <ul id="log-list"></ul>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

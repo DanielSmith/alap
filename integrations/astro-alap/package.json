@@ -1,0 +1,43 @@
+{
+  "name": "astro-alap",
+  "version": "0.1.0",
+  "description": "Astro integration for Alap \u2014 zero-config multi-target link menus",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "alap",
+    "links",
+    "menus",
+    "web-component",
+    "markdown"
+  ],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "alap": "^3.0.0",
+    "astro": "^4.0.0 || ^5.0.0 || ^6.0.0"
+  },
+  "devDependencies": {
+    "alap": "workspace:*",
+    "astro": "^5.9.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "author": "Daniel Smith"
+}

@@ -1,0 +1,117 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* --- Dark theme --- */
+
+.alap_th-dark {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+}
+.alap_th-dark ul {
+  border-radius: inherit;
+  overflow: hidden;
+}
+.alap_th-dark a {
+  color: #e2e8f0;
+}
+.alap_th-dark a:hover,
+.alap_th-dark a:focus-visible {
+  background: #334155;
+  color: #93c5fd;
+}
+
+/* --- Neon --- */
+
+.alap_th-neon {
+  background: #0f172a;
+  border-color: #1e3a5f;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
+  border-radius: 10px;
+}
+.alap_th-neon a {
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
+}
+.alap_th-neon a:hover,
+.alap_th-neon a:focus-visible {
+  background: #1e293b;
+  color: #7dd3fc;
+}
+
+/* --- Glassmorphism --- */
+
+.glass-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.alap_th-glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+}
+.alap_th-glass a {
+  color: #ffffff;
+}
+.alap_th-glass a:hover,
+.alap_th-glass a:focus-visible {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* --- Brutalist --- */
+
+.alap_th-brutal {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  box-shadow: 6px 6px 0 #000000;
+}
+.alap_th-brutal a {
+  color: #000000;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+.alap_th-brutal a:last-child {
+  border-bottom: none;
+}
+.alap_th-brutal a:hover,
+.alap_th-brutal a:focus-visible {
+  background: #fbbf24;
+  color: #000000;
+}
+
+/* --- Warm / Editorial --- */
+
+.alap_th-warm {
+  background: #fffbeb;
+  border-color: #d97706;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
+  border-radius: 8px;
+}
+.alap_th-warm a {
+  color: #92400e;
+}
+.alap_th-warm a:hover,
+.alap_th-warm a:focus-visible {
+  background: #fef3c7;
+  color: #b45309;
+}

@@ -1,0 +1,279 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Alap Server API Demo — shared styles */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0e1a4a;
+  color: #e0e8ff;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ---- layout ---- */
+
+.page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  min-height: 100vh;
+}
+
+.page-header {
+  grid-column: 1 / -1;
+}
+
+.col-ops {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+
+.col-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  max-height: calc(100vh - 3rem);
+}
+
+@media (max-width: 860px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+  .col-log {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* ---- typography ---- */
+
+h1 {
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.subtitle {
+  color: #8899cc;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.subtitle code {
+  color: #88bbff;
+}
+
+h2 {
+  font-size: 0.95rem;
+  color: #fff;
+  margin-bottom: 0.4rem;
+}
+
+.panel-desc {
+  font-size: 0.8rem;
+  color: #8899cc;
+  margin-bottom: 0.5rem;
+}
+
+/* ---- panels ---- */
+
+.panel {
+  background: #1a2f8a;
+  border: 1px solid #2e48a0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+/* ---- forms ---- */
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: #8899cc;
+  margin-bottom: 0.2rem;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #3a5cc0;
+  border-radius: 4px;
+  background: #1a2870;
+  color: #e0e8ff;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #88bbff;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #556699;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.row > *:first-child { flex: 1; }
+
+/* ---- buttons ---- */
+
+button {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #3a5cc0;
+  border-radius: 4px;
+  background: #2952c0;
+  color: #e0e8ff;
+  cursor: pointer;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+button:hover {
+  background: #3366d6;
+}
+
+button.primary {
+  background: #4070e0;
+  border-color: #4070e0;
+  color: #fff;
+}
+
+button.primary:hover {
+  background: #5080f0;
+}
+
+button.danger {
+  color: #ff8888;
+  border-color: #883333;
+  background: #2a1a1a;
+}
+
+button.danger:hover {
+  background: #3a2020;
+}
+
+/* ---- config list chips ---- */
+
+.config-list {
+  list-style: none;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.config-list li {
+  padding: 0.2rem 0.55rem;
+  background: #2240a8;
+  border: 1px solid #3a5cc0;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: #88bbff;
+  transition: background 0.15s;
+}
+
+.config-list li:hover {
+  background: #3360d0;
+}
+
+/* ---- response log ---- */
+
+.log-panel {
+  display: flex;
+  flex-direction: column;
+  height: 75vh;
+}
+
+.log-panel h2 {
+  margin-bottom: 0.5rem;
+}
+
+.log-panel button {
+  margin-top: 0.5rem;
+  align-self: flex-end;
+}
+
+.log {
+  background: #141e6a;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.78rem;
+  overflow-y: auto;
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log:empty::before {
+  content: 'Responses will appear here...';
+  color: #556699;
+}
+
+.log-entry {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #2e48a0;
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.log-method {
+  font-weight: 600;
+  color: #88bbff;
+}
+
+.log-status {
+  margin-left: 0.5rem;
+}
+
+.log-status.ok { color: #66dd88; }
+.log-status.err { color: #ff6666; }
+
+.log-body {
+  margin-top: 0.25rem;
+  color: #8899cc;
+}

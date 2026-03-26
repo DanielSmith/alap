@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "alap": ["./src/index.ts"],
+      "alap/core": ["./src/core/index.ts"],
+      "alap/react": ["./src/ui/react/index.ts"],
+      "alap/vue": ["./src/ui/vue/index.ts"],
+      "alap/svelte": ["./src/ui/svelte/index.ts"],
+      "alap/solid": ["./src/ui/solid/index.ts"],
+      "alap/alpine": ["./src/ui/alpine/index.ts"],
+      "alap/astro": ["./src/ui/astro/index.ts"],
+      "alap/storage": ["./src/storage/index.ts"]
+    },
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "tests", "src/ui/solid"]
+}

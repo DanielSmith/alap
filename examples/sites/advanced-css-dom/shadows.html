@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Shadows &amp; Depth (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./shadows.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Shadows &amp; Depth (DOM)</h1>
+  <p>The same shadow effects as the web component version, achieved with light DOM CSS on <code>.alapelem</code>.</p>
+  <p class="note">All CSS on this page applies equally to <strong>popover mode</strong> — the menu renders as the same <code>.alapelem</code> element whether using DOM or popover.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html" class="current">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== CONTAINER SHADOW ===== -->
+
+  <h2>Container Shadow</h2>
+  <p>Apply <code>box-shadow</code> to the menu container for subtle elevation, glowing auras, or hard graphic offsets.</p>
+
+  <div class="gallery">
+    <div class="gallery-item">
+      <h3>Subtle</h3>
+      <div class="example">
+        <a id="sh-subtle" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <code>.alap_sh-subtle</code>
+    </div>
+    <div class="gallery-item">
+      <h3>Purple Glow</h3>
+      <div class="example">
+        <a id="sh-glow" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <code>.alap_sh-glow</code>
+    </div>
+    <div class="gallery-item">
+      <h3>Hard Offset</h3>
+      <div class="example">
+        <a id="sh-hard" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <code>.alap_sh-hard</code>
+    </div>
+  </div>
+
+  <pre>.alap_sh-subtle {
+  box-shadow: 0 2px 8px #6366f1;
+}
+
+.alap_sh-glow {
+  box-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.5);
+}
+
+.alap_sh-hard {
+  box-shadow: 8px 8px 0 #fbbf24;
+  border-color: #fbbf24;
+}</pre>
+  <p class="note">Container shadows affect the entire menu box. Use subtle shadows for
+    clean elevation, glows for focus effects, and hard offsets for a graphic or retro look.</p>
+
+  <!-- ===== PER-ITEM HOVER SHADOW ===== -->
+
+  <h2>Per-Item Hover Shadow</h2>
+  <p>Remove the container shadow entirely and add a glow only to the hovered item.</p>
+
+  <div class="example">
+    <a id="sh-item-hover" class="alap" data-alap-linkitems=".coffee">coffee</a>
+  </div>
+
+  <pre>.alap_sh-item-hover {
+  box-shadow: none;
+}
+
+.alap_sh-item-hover a:hover {
+  box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.5);
+}</pre>
+  <p class="note">Setting <code>box-shadow: none</code> on the container removes the
+    default shadow. The hover shadow on individual items creates a spotlight effect
+    that follows the cursor.</p>
+
+  <!-- ===== CONTAINER + PER-ITEM SHADOW ===== -->
+
+  <h2>Container + Per-Item Shadow</h2>
+  <p>Combine a container-level shadow with per-item hover effects for layered depth.</p>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Glow + Hover Lift</h3>
+      <div class="example">
+        <a id="sh-both" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <pre>.alap_sh-both {
+  box-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.5);
+}
+
+.alap_sh-both a:hover {
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}</pre>
+    </div>
+    <div class="compare-item">
+      <h3>Hard Offset + Hover Inset</h3>
+      <div class="example">
+        <a id="sh-both-hard" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <pre>.alap_sh-both-hard {
+  box-shadow: 8px 8px 0 #fbbf24;
+  border-color: #fbbf24;
+}
+
+.alap_sh-both-hard a:hover {
+  box-shadow: inset 0 0 0 2px #fbbf24;
+}</pre>
+    </div>
+  </div>
+
+  <p class="note">Layering container and item shadows creates visual hierarchy.
+    The lift effect uses <code>transform: translateY</code> alongside a softened shadow,
+    while the inset variant keeps items grounded with an inner border glow.</p>
+
+  <!-- ===== TEXT SHADOW ===== -->
+
+  <h2>Text Shadow</h2>
+  <p>Apply <code>text-shadow</code> to menu items for embossed or glowing text effects.</p>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Subtle Emboss</h3>
+      <div class="example">
+        <a id="sh-text-emboss" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <pre>.alap_sh-text-emboss {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.alap_sh-text-emboss a {
+  color: #e2e8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}</pre>
+    </div>
+    <div class="compare-item">
+      <h3>Neon Glow</h3>
+      <div class="example">
+        <a id="sh-text-neon" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+      <pre>.alap_sh-text-neon {
+  background: #0f172a;
+  border-color: #0ea5e9;
+}
+
+.alap_sh-text-neon a {
+  color: #22d3ee;
+  text-shadow:
+    0 0 7px #22d3ee,
+    0 0 20px rgba(34, 211, 238, 0.5);
+}</pre>
+    </div>
+  </div>
+
+  <p class="note">Text shadows work best on dark backgrounds where the glow or
+    emboss is visible. Set <code>background</code> and <code>color</code> on the
+    container to create the right contrast for the effect.</p>
+
+  <!-- ===== GLASSMORPHISM ===== -->
+
+  <h2>Glassmorphism</h2>
+  <p>A frosted-glass effect using <code>backdrop-filter</code> with a semi-transparent background.</p>
+
+  <div class="example">
+    <a id="sh-glass" class="alap" data-alap-linkitems=".coffee">coffee</a>
+  </div>
+
+  <pre>.alap_sh-glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}</pre>
+  <p class="note">Glassmorphism relies on <code>backdrop-filter</code> to blur
+    the content behind the menu. The semi-transparent background and subtle border
+    complete the frosted-glass illusion. Works best over colorful or image backgrounds.</p>
+
+  <!-- ===== MENU OPACITY ===== -->
+
+  <h2>Menu Opacity</h2>
+  <p>Reduce the overall menu opacity for a translucent, understated appearance.</p>
+
+  <div class="example">
+    <a id="sh-opacity" class="alap" data-alap-linkitems=".coffee">coffee</a>
+  </div>
+
+  <pre>.alap_sh-opacity {
+  opacity: 0.85;
+}</pre>
+  <p class="note">Unlike glassmorphism, plain <code>opacity</code> affects everything
+    in the menu — background, text, and borders all become translucent together. Use
+    sparingly to avoid readability issues.</p>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

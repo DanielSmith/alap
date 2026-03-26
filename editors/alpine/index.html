@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2026 Daniel Smith — Apache 2.0 License
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>[x-cloak] { display: none !important; } body { background: #1a2f8a; }</style>
+</head>
+<body>
+
+<!-- ================================================================
+     ALPINE EDITOR — Full layout with x-data sections
+     ================================================================ -->
+
+<div x-data="appDragDrop" x-cloak
+     class="flex flex-col h-screen overflow-hidden"
+     style="background: var(--alap-deep)"
+     @drop="handleDrop($event)"
+     @dragover="handleDragOver($event)"
+     @dragleave="handleDragLeave()">
+
+  <!-- ===================== DRAG OVERLAY ===================== -->
+  <div x-show="$store.editor.dragOver"
+       class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+    <div class="rounded-2xl border-2 border-dashed px-12 py-8 text-lg"
+         style="border-color: var(--alap-accent); color: var(--alap-accent); background: var(--alap-drop-overlay-bg)">
+      Drop links, images, or JSON configs
+    </div>
+  </div>
+
+  <!-- ===================== MODALS ===================== -->
+
+  <!-- Load Panel -->
+  <template x-if="$store.editor.showLoad">
+    <div x-data="loadPanel"
+         class="fixed inset-0 z-50 flex items-center justify-center"
+         style="background: var(--alap-overlay-bg)"
+         @click.self="$store.editor.showLoad = false">
+      <div class="rounded-xl p-6 w-[480px] max-h-[70vh] flex flex-col shadow-2xl fade-in"
+           style="background: var(--alap-mid); border: 1px solid var(--alap-border)">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-accent">Load Config</h2>
+          <div class="flex items-center gap-3">
+            <div class="flex rounded-md overflow-hidden text-[10px]" style="border: 1px solid var(--alap-border-subtle)">
+              <button @click="loadMode = 'replace'" class="px-2.5 py-1"
+                      :style="loadMode === 'replace' ? 'background: var(--alap-accent); color: var(--alap-deep)' : 'background: transparent; color: var(--alap-text-dim)'">Replace</button>
+              <button @click="loadMode = 'merge'" class="px-2.5 py-1"
+                      :style="loadMode === 'merge' ? 'background: var(--alap-accent); color: var(--alap-deep)' : 'background: transparent; color: var(--alap-text-dim)'">Merge</button>
+            </div>
+            <button @click="$store.editor.showLoad = false" class="toolbar-btn text-xs">Close</button>
+          </div>
+        </div>
+        <input type="text" x-model="filter" placeholder="Search configs..."
+               class="w-full text-sm rounded-lg px-3 py-2 mb-4 bg-input" autofocus>
+        <div class="flex-1 overflow-y-auto flex flex-col gap-1.5">
+          <template x-if="filteredNames.length > 0">
+            <template x-for="name in filteredNames" :key="name">
+              <button @click="name !== $store.editor.configName && handleLoad(name)"
+                      class="w-full text-left text-sm flex items-center justify-between rounded-lg px-4 py-3"
+                      :class="name === $store.editor.configName ? 'item-card editing' : 'item-card hover-bg-hover cursor-pointer'"
+                      :disabled="name === $store.editor.configName">
+                <span :class="name === $store.editor.configName ? 'text-accent' : ''" x-text="name"></span>
+                <span class="text-[10px] text-dim" x-text="name === $store.editor.configName ? 'current' : actionLabel"></span>
+              </button>
+            </template>
+          </template>
+          <template x-if="filteredNames.length === 0">
+            <p class="text-sm text-center py-6 text-dim">
+              <span x-show="filter">No configs match filter</span>
+              <span x-show="!filter">No saved configs</span>
+            </p>
+          </template>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Settings Dialog -->
+  <template x-if="$store.editor.showSettings">
+    <div class="fixed inset-0 z-50 flex items-center justify-center"
+         style="background: var(--alap-overlay-bg)"
+         @click.self="$store.editor.showSettings = false">
+      <div class="rounded-xl p-6 w-[480px] shadow-2xl fade-in"
+           style="background: var(--alap-mid); border: 1px solid var(--alap-border)"
+           @click.stop>
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-sm font-semibold text-accent">Settings</h2>
+          <button @click="$store.editor.showSettings = false" class="toolbar-btn text-xs">Close</button>
+        </div>
+        <div class="grid gap-4">
+          <div>
+            <label class="block text-xs mb-1 text-muted">List Type</label>
+            <select :value="$store.editor.config.settings?.listType ?? 'ul'"
+                    @change="$store.editor.updateSettings('listType', $event.target.value)"
+                    class="w-full rounded-md px-3 py-2 text-sm"
+                    style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+              <option value="ul">Unordered (ul)</option>
+              <option value="ol">Ordered (ol)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-muted">Menu Timeout (ms)</label>
+            <input type="number" :value="$store.editor.config.settings?.menuTimeout ?? 5000"
+                   @input="$store.editor.updateSettings('menuTimeout', Number($event.target.value))"
+                   class="w-full rounded-md px-3 py-2 text-sm"
+                   style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-muted">Max Visible Items</label>
+            <input type="number" :value="$store.editor.config.settings?.maxVisibleItems ?? 10"
+                   @input="$store.editor.updateSettings('maxVisibleItems', Number($event.target.value))"
+                   class="w-full rounded-md px-3 py-2 text-sm"
+                   style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+            <p class="text-[10px] mt-1 text-dim">Menu scrolls after this many items. 0 = no limit.</p>
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-muted">Viewport Adjust</label>
+            <select :value="$store.editor.config.settings?.viewportAdjust !== false ? 'true' : 'false'"
+                    @change="$store.editor.updateSettings('viewportAdjust', $event.target.value === 'true')"
+                    class="w-full rounded-md px-3 py-2 text-sm"
+                    style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+              <option value="true">Enabled — menus flip to stay on-screen</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-muted">Existing URL Handling</label>
+            <select :value="$store.editor.config.settings?.existingUrl ?? 'prepend'"
+                    @change="$store.editor.updateSettings('existingUrl', $event.target.value)"
+                    class="w-full rounded-md px-3 py-2 text-sm"
+                    style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+              <option value="prepend">Prepend — original URL is first menu item</option>
+              <option value="append">Append — original URL is last menu item</option>
+              <option value="ignore">Ignore — discard original URL</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-muted">Remote API URL</label>
+            <input type="text"
+                   :value="$store.editor.apiUrl"
+                   @input="$store.editor.setApiUrl($event.target.value)"
+                   class="w-full rounded-md px-3 py-2 text-sm"
+                   style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+            <p class="text-[10px] mt-1 text-dim">Used by Remote and Hybrid storage modes. Changes take effect on next store initialization.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Help Dialog -->
+  <template x-if="$store.editor.showHelp">
+    <div class="fixed inset-0 z-50 flex items-center justify-center"
+         style="background: var(--alap-overlay-bg)"
+         @click.self="$store.editor.showHelp = false">
+      <div class="rounded-xl p-6 w-[560px] max-h-[80vh] overflow-y-auto shadow-2xl fade-in"
+           style="background: var(--alap-mid); border: 1px solid var(--alap-border)"
+           @click.stop>
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-sm font-semibold text-accent">Alap Editor — Help</h2>
+          <button @click="$store.editor.showHelp = false" class="toolbar-btn text-xs">Close</button>
+        </div>
+        <div class="flex flex-col gap-4 text-sm">
+
+          <div class="rounded-lg p-3" style="background: var(--alap-input-bg); border: 1px solid var(--alap-border-subtle)">
+            <h3 class="text-xs font-semibold text-accent mb-2">Getting Started</h3>
+            <div class="text-xs text-muted leading-relaxed">
+              <p>Use the <strong>Items</strong> and <strong>Macros</strong> tabs on the left to manage your link library. Click an item to edit it in the center panel. Multiple items can be open at once.</p>
+              <p class="mt-2">Drag a URL from your browser onto the editor to create a new item automatically.</p>
+            </div>
+          </div>
+
+          <div class="rounded-lg p-3" style="background: var(--alap-input-bg); border: 1px solid var(--alap-border-subtle)">
+            <h3 class="text-xs font-semibold text-accent mb-2">Items</h3>
+            <div class="text-xs text-muted leading-relaxed">
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">+ Add</code><span class="text-dim">Create a new blank item</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Click item</code><span class="text-dim">Open for editing (toggle)</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Hover icons</code><span class="text-dim">Clone or delete an item</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Enter key</code><span class="text-dim">Save the current form</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Drag &amp; drop</code><span class="text-dim">Drop a URL to create, drop an image to set thumbnail</span></div>
+            </div>
+          </div>
+
+          <div class="rounded-lg p-3" style="background: var(--alap-input-bg); border: 1px solid var(--alap-border-subtle)">
+            <h3 class="text-xs font-semibold text-accent mb-2">Macros</h3>
+            <div class="text-xs text-muted leading-relaxed">
+              <p>Macros are saved expressions. Define them once, use <code class="text-accent-soft">@macroName</code> in any expression.</p>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">+ Add</code><span class="text-dim">Create a new macro</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Live resolution</code><span class="text-dim">See which items a macro expression resolves to as you type</span></div>
+            </div>
+          </div>
+
+          <div class="rounded-lg p-3" style="background: var(--alap-input-bg); border: 1px solid var(--alap-border-subtle)">
+            <h3 class="text-xs font-semibold text-accent mb-2">Expression Grammar</h3>
+            <div class="text-xs text-muted leading-relaxed">
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">.tag</code><span class="text-dim">All items with this tag</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">itemId</code><span class="text-dim">One specific item by ID</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">@macro</code><span class="text-dim">Expand a saved macro</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">.a + .b</code><span class="text-dim">AND — items with both tags</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">.a | .b</code><span class="text-dim">OR — items with either tag</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">.a - .b</code><span class="text-dim">WITHOUT — subtract matches</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">(.a + .b) | .c</code><span class="text-dim">Parentheses for grouping</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">/pattern/</code><span class="text-dim">Regex search</span></div>
+            </div>
+          </div>
+
+          <div class="rounded-lg p-3" style="background: var(--alap-input-bg); border: 1px solid var(--alap-border-subtle)">
+            <h3 class="text-xs font-semibold text-accent mb-2">Keyboard</h3>
+            <div class="text-xs text-muted leading-relaxed">
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Enter</code><span class="text-dim">Save current item or macro form</span></div>
+              <div class="flex gap-3 py-0.5"><code class="text-accent-soft text-[11px] w-28 flex-shrink-0 font-mono">Escape</code><span class="text-dim">Close topmost dialog or drawer</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===================== TOOLBAR ===================== -->
+  <div class="relative flex items-center px-4 py-2.5 flex-shrink-0"
+       style="background: var(--alap-mid); border-bottom: 1px solid var(--alap-border-subtle)">
+    <div class="flex items-center gap-2 z-10">
+      <button @click="$store.editor.showDrawer = !$store.editor.showDrawer"
+              class="toolbar-btn p-1.5 text-accent" title="Config management">
+        <span x-html="$store.icons.menu" class="inline-flex" style="width:18px;height:18px"></span>
+      </button>
+      <button @click="$store.editor.showTester = !$store.editor.showTester"
+              class="toolbar-btn flex items-center gap-1.5 px-2.5 py-1.5"
+              :style="$store.editor.showTester ? 'color: var(--alap-accent); background: var(--alap-surface)' : 'color: var(--alap-accent)'"
+              title="Toggle query tester">
+        <span x-html="$store.icons.search" class="inline-flex" style="width:14px;height:14px"></span>
+        <span class="text-xs">Query Tester</span>
+      </button>
+      <button @click="$store.editor.showHelp = true"
+              class="toolbar-btn p-1.5 text-accent" title="Help">
+        <span x-html="$store.icons.help" class="inline-flex" style="width:16px;height:16px"></span>
+      </button>
+    </div>
+    <span class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <span class="text-sm font-semibold tracking-wide text-accent">
+        alap editor — alpine <span class="text-muted font-normal">(<span x-text="$store.editor.configName"></span><span x-show="$store.editor.isDirty"> *</span>)</span>
+      </span>
+    </span>
+  </div>
+
+  <!-- ===================== MAIN LAYOUT ===================== -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- LEFT PANEL -->
+    <div class="w-72 flex-shrink-0 flex flex-col overflow-hidden"
+         :class="$store.editor.panelMode === 'macros' ? 'macro-mode' : ''"
+         :style="'border-right: 1px solid var(--alap-border-subtle); transition: background var(--alap-transition); background: ' + ($store.editor.panelMode === 'macros' ? 'var(--alap-macro-mid)' : 'var(--alap-mid)')">
+
+      <!-- Tabs -->
+      <div class="flex" style="border-bottom: 1px solid var(--alap-border-subtle)">
+        <button @click="$store.editor.setPanelMode('items')"
+                class="panel-tab flex-1"
+                :class="$store.editor.panelMode === 'items' ? 'active' : ''">Items</button>
+        <button @click="$store.editor.setPanelMode('macros')"
+                class="panel-tab flex-1"
+                :class="$store.editor.panelMode === 'macros' ? 'active-macro' : ''">Macros</button>
+      </div>
+
+      <!-- ITEMS LIST -->
+      <div x-show="$store.editor.panelMode === 'items'" x-data="itemList" class="flex flex-col flex-1 overflow-hidden">
+
+        <!-- Confirm delete dialog -->
+        <template x-if="pendingDeleteId">
+          <div class="fixed inset-0 z-50 flex items-center justify-center"
+               style="background: var(--alap-overlay-bg)" @click.self="pendingDeleteId = null">
+            <div class="rounded-xl p-8 w-96 shadow-2xl fade-in"
+                 style="background: var(--alap-mid); border: 1px solid var(--alap-border)" @click.stop>
+              <p class="text-center text-lg mb-8">Remove item "<span x-text="pendingDeleteId"></span>"?</p>
+              <div class="flex justify-between gap-4">
+                <button @click="pendingDeleteId = null"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-opacity"
+                        style="background: var(--alap-cancel-bg); color: var(--alap-cancel-text)">Cancel</button>
+                <button @click="confirmDelete()"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-lift shadow-lg"
+                        style="background: var(--alap-danger); color: #fff">Remove</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="p-3" style="border-bottom: 1px solid var(--alap-border-subtle)">
+          <input type="text" x-model="$store.editor.filter" placeholder="Filter items..."
+                 class="w-full text-sm rounded-lg px-3 py-2 bg-input">
+        </div>
+        <div class="px-4 py-1.5 text-xs flex justify-between items-center text-dim">
+          <span>
+            <span x-text="filteredItems.length"></span> item<span x-show="filteredItems.length !== 1">s</span>
+            <span x-show="$store.editor.filter" class="text-muted"> matching "<span x-text="$store.editor.filter"></span>"</span>
+          </span>
+          <button @click="$store.editor.addItem()" class="text-xs hover-bg-hover rounded px-1.5 py-0.5 text-accent">+ Add</button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-2 scroll-fade">
+          <template x-for="[id, item] in filteredItems" :key="id">
+            <div @click="$store.editor.toggleEditItem(id)"
+                 class="item-card rounded-lg px-4 py-2.5 cursor-pointer group relative"
+                 :class="$store.editor.editingItemIds.includes(id) ? 'editing' : 'hover-bg-hover'">
+              <div class="flex items-center justify-between relative">
+                <span class="text-sm font-medium truncate item-name" x-text="id"></span>
+                <div class="absolute right-0 top-0 flex gap-1.5 items-center item-actions">
+                  <button @click.stop="pendingDeleteId = id" class="reveal-icon p-1 text-danger" title="Delete">
+                    <span x-html="$store.icons.x" class="inline-flex" style="width:14px;height:14px"></span>
+                  </button>
+                  <button @click.stop="$store.editor.cloneItem(id)" class="reveal-icon p-1 text-success" title="Clone">
+                    <span x-html="$store.icons.clone" class="inline-flex" style="width:14px;height:14px"></span>
+                  </button>
+                </div>
+              </div>
+              <div x-show="item.label" class="text-xs truncate mt-0.5 text-muted" x-text="item.label"></div>
+              <div x-show="item.tags && item.tags.length > 0" class="flex gap-1 mt-1.5 flex-wrap">
+                <template x-for="tag in (item.tags ?? [])" :key="tag">
+                  <span class="tag-pill">
+                    <span x-text="tag"></span>
+                    <span class="tag-remove" @click.stop="handleRemoveTag(id, tag)">&times;</span>
+                  </span>
+                </template>
+              </div>
+            </div>
+          </template>
+          <div x-show="filteredItems.length === 0"
+               class="p-6 text-sm text-center rounded-lg text-dim"
+               style="background: var(--alap-item-bg)">
+            <span x-show="$store.editor.filter">No items match filter</span>
+            <span x-show="!$store.editor.filter">No items yet</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACROS LIST -->
+      <div x-show="$store.editor.panelMode === 'macros'" x-data="macroList" class="flex flex-col flex-1 overflow-hidden">
+
+        <!-- Confirm delete dialog -->
+        <template x-if="pendingDeleteName">
+          <div class="fixed inset-0 z-50 flex items-center justify-center"
+               style="background: var(--alap-overlay-bg)" @click.self="pendingDeleteName = null">
+            <div class="rounded-xl p-8 w-96 shadow-2xl fade-in"
+                 style="background: var(--alap-mid); border: 1px solid var(--alap-border)" @click.stop>
+              <p class="text-center text-lg mb-8">Remove macro "@<span x-text="pendingDeleteName"></span>"?</p>
+              <div class="flex justify-between gap-4">
+                <button @click="pendingDeleteName = null"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-opacity"
+                        style="background: var(--alap-cancel-bg); color: var(--alap-cancel-text)">Cancel</button>
+                <button @click="confirmDelete()"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-lift shadow-lg"
+                        style="background: var(--alap-danger); color: #fff">Remove</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="p-3" style="border-bottom: 1px solid var(--alap-border-subtle)">
+          <input type="text" x-model="$store.editor.filter" placeholder="Filter macros..."
+                 class="w-full text-sm rounded-lg px-3 py-2 bg-input">
+        </div>
+        <div class="px-4 py-1.5 text-xs flex justify-between items-center text-dim">
+          <span>
+            <span x-text="filteredMacros.length"></span> macro<span x-show="filteredMacros.length !== 1">s</span>
+            <span x-show="$store.editor.filter" class="text-muted"> matching "<span x-text="$store.editor.filter"></span>"</span>
+          </span>
+          <button @click="handleAdd()" class="text-xs hover-bg-hover rounded px-1.5 py-0.5 text-accent">+ Add</button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-2 scroll-fade">
+          <template x-for="[name, macro] in filteredMacros" :key="name">
+            <div @click="$store.editor.toggleEditMacro(name)"
+                 class="item-card rounded-lg px-4 py-2.5 cursor-pointer group relative"
+                 :class="$store.editor.editingMacroNames.includes(name) ? 'editing' : 'hover-bg-hover'">
+              <div class="flex items-center justify-between relative">
+                <span class="text-sm font-medium truncate item-name">@<span x-text="name"></span></span>
+                <div class="absolute right-0 top-0 flex gap-1.5 items-center item-actions">
+                  <button @click.stop="pendingDeleteName = name" class="reveal-icon p-1 text-danger" title="Delete">
+                    <span x-html="$store.icons.x" class="inline-flex" style="width:14px;height:14px"></span>
+                  </button>
+                  <button @click.stop="handleClone(name)" class="reveal-icon p-1 text-success" title="Clone">
+                    <span x-html="$store.icons.clone" class="inline-flex" style="width:14px;height:14px"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="text-xs truncate mt-0.5 text-muted" style="font-family: 'JetBrains Mono', monospace" x-text="macro.linkItems"></div>
+            </div>
+          </template>
+          <div x-show="filteredMacros.length === 0"
+               class="p-6 text-sm text-center rounded-lg text-dim"
+               style="background: var(--alap-macro-item-bg)">
+            No macros yet
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER COLUMN -->
+    <div class="flex-1 flex flex-col overflow-hidden"
+         @click="$store.editor.showDrawer && ($store.editor.showDrawer = false)">
+
+      <!-- Query Tester (slides down) -->
+      <div :style="'background: var(--alap-mid); border-bottom: 1px solid var(--alap-border-subtle); max-height: ' + ($store.editor.showTester ? '40vh' : '0') + '; opacity: ' + ($store.editor.showTester ? '1' : '0') + '; overflow: ' + ($store.editor.testerOverflow ? 'visible' : 'hidden') + '; transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease'">
+        <div x-show="$store.editor.showTester" x-data="queryTester" class="p-5 scroll-fade" :class="$store.editor.testerOverflow ? 'overflow-visible' : 'overflow-y-auto'" :style="$store.editor.testerOverflow ? '' : 'max-height: 40vh'">
+          <div class="flex flex-col gap-5 fade-in">
+            <div>
+              <h2 class="text-sm font-semibold mb-2 text-accent">Query Tester</h2>
+              <input type="text" x-model="$store.editor.testQuery"
+                     placeholder=".coffee + .nyc  or  /patternKey/"
+                     class="w-full rounded-md px-3 py-1.5 text-sm"
+                     style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+            </div>
+            <template x-if="$store.editor.testQuery && testIds.length > 0">
+              <div class="relative" x-data="{ menuOpen: false }">
+                <p class="text-xs mb-1.5 text-dim">Click to test menu:</p>
+                <button @click="menuOpen = !menuOpen"
+                        @click.outside="menuOpen = false"
+                        @keydown.escape.window="menuOpen = false"
+                        class="cursor-pointer text-sm underline text-accent bg-transparent border-0 p-0 font-inherit"
+                        x-text="$store.editor.testQuery"></button>
+                <div x-show="menuOpen" x-transition class="alapelem">
+                  <ul>
+                    <template x-for="link in testLinks" :key="link.id">
+                      <li>
+                        <a :href="link.url" target="_blank" x-text="link.label ?? link.id"></a>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </div>
+            </template>
+
+            <div>
+              <p class="text-xs mb-1.5 text-dim"><span x-text="testIds.length"></span> result<span x-show="testIds.length !== 1">s</span></p>
+              <template x-if="testIds.length > 0">
+                <ul class="text-xs space-y-1.5">
+                  <template x-for="link in testLinks" :key="link.id">
+                    <li class="flex items-center gap-2">
+                      <code class="text-xs font-mono text-accent-soft" x-text="link.id"></code>
+                      <span class="text-dim">—</span>
+                      <span class="truncate text-muted" x-text="link.label ?? link.url"></span>
+                    </li>
+                  </template>
+                </ul>
+              </template>
+              <p x-show="testIds.length === 0 && $store.editor.testQuery" class="text-xs text-dim">No matches</p>
+            </div>
+            <div>
+              <h3 class="text-xs font-medium mb-1.5 text-dim">Tags</h3>
+              <template x-if="tagCounts.length > 0">
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="[tag, count] in tagCounts" :key="tag">
+                    <button @click="$store.editor.setTestQuery('.' + tag)" class="tag-pill cursor-pointer">
+                      .<span x-text="tag"></span> <span class="text-dim ml-0.5" x-text="count"></span>
+                    </button>
+                  </template>
+                </div>
+              </template>
+              <p x-show="tagCounts.length === 0" class="text-xs text-dim">No tags yet</p>
+            </div>
+            <template x-if="patternKeys.length > 0">
+              <div>
+                <h3 class="text-xs font-medium mb-1.5 text-dim">Search Patterns</h3>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="key in patternKeys" :key="key">
+                    <button @click="$store.editor.setTestQuery('/' + key + '/')"
+                            class="text-xs px-2 py-0.5 rounded-full cursor-pointer hover-bg-pattern"
+                            style="border: 1px solid var(--alap-pattern-border)"
+                            :title="getPatternTitle(key)">
+                      /<span x-text="key"></span>/
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Area -->
+      <div class="flex-1 overflow-y-auto p-6 scroll-fade"
+           :style="'transition: background var(--alap-transition), scrollbar-color 0.5s ease-in; background: ' + ($store.editor.panelMode === 'macros' ? 'var(--alap-macro-deep)' : 'var(--alap-deep)')">
+
+        <!-- ITEMS edit forms -->
+        <div x-show="$store.editor.panelMode === 'items'">
+          <!-- Empty state -->
+          <div x-show="$store.editor.editingItemIds.length === 0" class="flex items-center justify-center h-full">
+            <div class="text-center max-w-md">
+              <p class="text-lg mb-2 text-muted">Select an item to edit</p>
+              <p class="text-sm text-dim">Click an item in the list, or drag a link from your browser onto this window.</p>
+            </div>
+          </div>
+          <!-- Edit forms -->
+          <div x-show="$store.editor.editingItemIds.length > 0" class="max-w-2xl mx-auto flex flex-col gap-4">
+            <template x-for="itemId in $store.editor.editingItemIds" :key="itemId">
+              <div x-data="editItemForm(itemId)" class="rounded-xl fade-in edit-card"
+                   style="background: var(--alap-mid)">
+                <div class="flex items-center justify-between px-6 py-4 cursor-pointer select-none hover-bg-hover rounded-t-xl"
+                     @click="expanded = !expanded">
+                  <h2 class="text-sm font-semibold text-accent flex-shrink-0">Edit Item</h2>
+                  <span class="text-xs font-mono text-dim truncate ml-3" x-text="summaryLabel"></span>
+                </div>
+                <div x-show="expanded" class="px-6 pb-6">
+                  <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">Item ID</label>
+                      <input type="text" x-model="localId" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">Label</label>
+                      <input type="text" x-model="label" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">URL</label>
+                      <input type="text" x-model="url" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">Tags</label>
+                      <input type="text" x-model="tags" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             placeholder="comma-separated"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                    </div>
+                  </div>
+                  <details class="mt-2 mb-4">
+                    <summary class="text-xs cursor-pointer select-none py-1 text-dim">Advanced fields</summary>
+                    <div class="grid grid-cols-2 gap-4 mt-3 fade-in">
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">Description</label>
+                        <input type="text" x-model="description" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">CSS Class</label>
+                        <input type="text" x-model="cssClass" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">Target Window</label>
+                        <input type="text" x-model="targetWindow" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               placeholder="_self, _blank, fromAlap"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">Thumbnail URL</label>
+                        <input type="text" x-model="thumbnail" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">Image URL (renders in menu)</label>
+                        <input type="text" x-model="image" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                      </div>
+                      <div>
+                        <label class="block text-xs mb-1 font-semibold text-accent">Alt Text</label>
+                        <input type="text" x-model="altText" @input="markDirty()" @keydown="handleKeyDown($event)"
+                               class="w-full rounded-md px-3 py-1.5 text-sm"
+                               style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)">
+                      </div>
+                    </div>
+                    <!-- Image previews -->
+                    <div x-show="thumbnail || image" class="flex gap-3 mt-3">
+                      <div x-show="thumbnail">
+                        <p class="text-[10px] text-dim mb-1">Thumbnail</p>
+                        <img :src="thumbnail" alt="thumbnail preview"
+                             class="rounded-md max-h-20 max-w-32 object-cover cursor-pointer hover-opacity"
+                             style="border: 1px solid var(--alap-border-subtle)"
+                             @click="lightboxSrc = thumbnail">
+                      </div>
+                      <div x-show="image">
+                        <p class="text-[10px] text-dim mb-1">Menu image</p>
+                        <img :src="image" alt="menu image preview"
+                             class="rounded-md max-h-20 max-w-32 object-cover cursor-pointer hover-opacity"
+                             style="border: 1px solid var(--alap-border-subtle)"
+                             @click="lightboxSrc = image">
+                      </div>
+                    </div>
+                    <!-- Lightbox -->
+                    <template x-if="lightboxSrc">
+                      <div class="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
+                           style="background: var(--alap-overlay-bg)" @click="lightboxSrc = null"
+                           @keydown.escape.window="lightboxSrc = null">
+                        <img :src="lightboxSrc" alt="Full size preview"
+                             class="max-w-[90vw] max-h-[85vh] rounded-lg shadow-2xl fade-in object-contain"
+                             @click.stop>
+                      </div>
+                    </template>
+                  </details>
+                  <div class="flex justify-between items-center pt-4" style="border-top: 1px solid var(--alap-border-subtle)">
+                    <button @click="$store.editor.closeEditItem(itemId)"
+                            class="text-sm px-6 py-2 rounded-2xl font-medium hover-opacity"
+                            style="background: var(--alap-cancel-bg); color: var(--alap-cancel-text)">Cancel</button>
+                    <button @click="handleSave()" :disabled="!isDirty"
+                            class="text-sm px-6 py-2 rounded-2xl font-medium shadow-lg min-w-[140px]"
+                            :style="'background: ' + saveBtnBg + '; color: ' + saveBtnColor + '; cursor: ' + saveBtnCursor"
+                            x-text="saveLabel"></button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- MACROS edit forms -->
+        <div x-show="$store.editor.panelMode === 'macros'">
+          <!-- Empty state -->
+          <div x-show="$store.editor.editingMacroNames.length === 0" class="flex items-center justify-center h-full">
+            <div class="text-center max-w-md">
+              <p class="text-lg mb-2 text-muted">Select a macro to edit</p>
+              <p class="text-sm text-dim">Click a macro in the list, or use "+ Add" to create one.</p>
+            </div>
+          </div>
+          <!-- Edit forms -->
+          <div x-show="$store.editor.editingMacroNames.length > 0" class="max-w-2xl mx-auto flex flex-col gap-4">
+            <template x-for="macroName in $store.editor.editingMacroNames" :key="macroName">
+              <div x-data="editMacroForm(macroName)" class="rounded-xl fade-in edit-card"
+                   style="background: var(--alap-macro-mid)">
+                <div class="flex items-center justify-between px-6 py-4 cursor-pointer select-none hover-bg-hover rounded-t-xl"
+                     @click="expanded = !expanded">
+                  <h2 class="text-sm font-semibold text-macro-accent flex-shrink-0">Edit Macro</h2>
+                  <span class="text-xs font-mono text-dim truncate ml-3" x-text="summaryLabel"></span>
+                </div>
+                <div x-show="expanded" class="px-6 pb-6">
+                  <div class="space-y-4 mb-4">
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">Name</label>
+                      <input type="text" x-model="editName" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 font-semibold text-accent">Expression</label>
+                      <input type="text" x-model="editExpr" @input="markDirty()" @keydown="handleKeyDown($event)"
+                             class="w-full rounded-md px-3 py-1.5 text-sm"
+                             style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text); font-family: 'JetBrains Mono', monospace">
+                    </div>
+                  </div>
+                  <div class="mb-4 p-3 rounded-lg" style="background: var(--alap-macro-deep)">
+                    <p class="text-xs mb-2 text-dim">
+                      Resolves to <span x-text="resolvedLinks.length"></span> item<span x-show="resolvedLinks.length !== 1">s</span>
+                    </p>
+                    <div x-show="resolvedLinks.length > 0" class="flex flex-wrap gap-1.5">
+                      <template x-for="link in resolvedLinks" :key="link.id">
+                        <span class="tag-pill">
+                          <span x-text="link.id"></span>
+                          <span x-show="link.label" class="ml-1 text-dim" x-text="link.label"></span>
+                        </span>
+                      </template>
+                    </div>
+                    <p x-show="resolvedLinks.length === 0 && editExpr" class="text-xs text-dim">No matches</p>
+                  </div>
+                  <div class="flex justify-between items-center pt-4" style="border-top: 1px solid var(--alap-border-subtle)">
+                    <button @click="$store.editor.closeEditMacro(macroName)"
+                            class="text-sm px-6 py-2 rounded-2xl font-medium hover-opacity"
+                            style="background: var(--alap-cancel-bg); color: var(--alap-cancel-text)">Cancel</button>
+                    <button @click="handleSave()" :disabled="!isDirty"
+                            class="text-sm px-6 py-2 rounded-2xl font-medium shadow-lg min-w-[140px]"
+                            :style="'background: ' + saveBtnBg + '; color: ' + saveBtnColor + '; cursor: ' + saveBtnCursor"
+                            x-text="saveLabel"></button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONFIG DRAWER (slides from left) -->
+    <div class="slide-panel absolute left-0 top-0 bottom-0 w-80 overflow-y-auto p-5 z-30 scroll-fade"
+         :style="'background: var(--alap-surface); border-right: ' + ($store.editor.showDrawer ? '1px solid var(--alap-border-subtle)' : 'none') + '; transform: ' + ($store.editor.showDrawer ? 'translateX(0)' : 'translateX(-100%)') + '; opacity: ' + ($store.editor.showDrawer ? '1' : '0') + '; box-shadow: ' + ($store.editor.showDrawer ? 'var(--alap-shadow-panel)' : 'none')">
+      <div x-show="$store.editor.showDrawer" x-data="configDrawer" class="flex flex-col gap-4 fade-in">
+
+        <!-- Delete confirm -->
+        <template x-if="deletePrompt">
+          <div class="fixed inset-0 z-50 flex items-center justify-center"
+               style="background: var(--alap-overlay-bg)" @click.self="deletePrompt = false">
+            <div class="rounded-xl p-8 w-96 shadow-2xl fade-in"
+                 style="background: var(--alap-mid); border: 1px solid var(--alap-border)" @click.stop>
+              <p class="text-center text-lg mb-8">Delete "<span x-text="$store.editor.configName"></span>" from storage?</p>
+              <div class="flex justify-between gap-4">
+                <button @click="deletePrompt = false"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-opacity"
+                        style="background: var(--alap-cancel-bg); color: var(--alap-cancel-text)">Cancel</button>
+                <button @click="handleDelete()"
+                        class="flex-1 text-sm px-4 py-2.5 rounded-2xl font-medium hover-lift shadow-lg"
+                        style="background: var(--alap-danger); color: #fff">Remove</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-accent">
+            Config: <span class="text-muted" x-text="$store.editor.configName"></span>
+            <span x-show="$store.editor.isDirty" class="text-dim"> *</span>
+          </h2>
+          <button @click="$store.editor.showDrawer = false" class="toolbar-btn text-xs">Close</button>
+        </div>
+
+        <!-- Settings -->
+        <button @click="$store.editor.showSettings = true"
+                class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+          <span x-html="$store.icons.gear" class="inline-flex opacity-70" style="width:14px;height:14px"></span> Settings
+        </button>
+
+        <div class="flex flex-col gap-1.5">
+          <!-- Load -->
+          <button @click="$store.editor.showLoad = true; $store.editor.showDrawer = false"
+                  class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                  style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+            <span x-html="$store.icons.folderOpen" class="inline-flex opacity-70" style="width:14px;height:14px"></span> Load
+          </button>
+          <!-- Save -->
+          <button @click="$store.editor.saveConfig()"
+                  class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                  style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+            <span x-html="$store.icons.save" class="inline-flex opacity-70" style="width:14px;height:14px"></span> Save
+          </button>
+          <!-- Save As -->
+          <template x-if="showSaveAs">
+            <div class="flex gap-2 fade-in">
+              <input type="text" x-model="saveAsName"
+                     @keydown.enter="handleSaveAs()" @keydown.escape="showSaveAs = false"
+                     placeholder="New name" class="flex-1 text-sm rounded-md px-2 py-1.5"
+                     style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)"
+                     autofocus>
+              <button @click="handleSaveAs()" class="text-xs px-3 rounded-md"
+                      style="background: var(--alap-accent); color: var(--alap-deep)">Save</button>
+              <button @click="showSaveAs = false" class="text-xs px-2 text-muted">Cancel</button>
+            </div>
+          </template>
+          <template x-if="!showSaveAs">
+            <button @click="saveAsName = $store.editor.configName; showSaveAs = true"
+                    class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                    style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+              <span x-html="$store.icons.save" class="inline-flex opacity-70" style="width:14px;height:14px"></span> Save As
+            </button>
+          </template>
+          <!-- New -->
+          <template x-if="showNewInput">
+            <div class="flex gap-2 fade-in">
+              <input type="text" x-model="newName"
+                     @keydown.enter="handleNew()" @keydown.escape="showNewInput = false"
+                     placeholder="Config name" class="flex-1 text-sm rounded-md px-2 py-1.5"
+                     style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)"
+                     autofocus>
+              <button @click="handleNew()" class="text-xs px-3 rounded-md"
+                      style="background: var(--alap-accent); color: var(--alap-deep)">Create</button>
+              <button @click="showNewInput = false" class="text-xs px-2 text-muted">Cancel</button>
+            </div>
+          </template>
+          <template x-if="!showNewInput">
+            <button @click="showNewInput = true"
+                    class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                    style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+              <span x-html="$store.icons.plus" class="inline-flex opacity-70" style="width:14px;height:14px"></span> New Config
+            </button>
+          </template>
+          <!-- Delete -->
+          <button @click="deletePrompt = true"
+                  class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                  style="border: 1px solid var(--alap-border-subtle); color: var(--alap-danger)">
+            <span x-html="$store.icons.trash" class="inline-flex opacity-70" style="width:14px;height:14px"></span> Delete from Storage
+          </button>
+        </div>
+
+        <hr style="border-color: var(--alap-border-subtle); margin: 0">
+
+        <!-- Storage mode -->
+        <div>
+          <label class="block text-xs mb-1 text-muted">Storage mode</label>
+          <select class="w-full text-sm rounded-md px-2 py-1.5"
+                  style="background: var(--alap-input-bg); border: 1px solid var(--alap-input-border); color: var(--alap-text)"
+                  :value="$store.editor.storageMode"
+                  @change="$store.editor.setStorageMode($event.target.value)">
+            <option value="local">Local (IndexedDB)</option>
+            <option value="remote">Remote (API)</option>
+            <option value="hybrid">Local + Remote</option>
+          </select>
+        </div>
+
+        <hr style="border-color: var(--alap-border-subtle); margin: 0">
+
+        <!-- JSON Files -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-muted">JSON Files</span>
+            <div class="flex rounded-md overflow-hidden text-[10px]" style="border: 1px solid var(--alap-border-subtle)">
+              <button @click="importMode = 'replace'" class="px-2 py-0.5"
+                      :style="importMode === 'replace' ? 'background: var(--alap-accent); color: var(--alap-deep)' : 'background: transparent; color: var(--alap-text-dim)'">Replace</button>
+              <button @click="importMode = 'merge'" class="px-2 py-0.5"
+                      :style="importMode === 'merge' ? 'background: var(--alap-accent); color: var(--alap-deep)' : 'background: transparent; color: var(--alap-text-dim)'">Merge</button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <button @click="handleImport()"
+                    class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                    style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+              <span x-html="$store.icons.import" class="inline-flex opacity-70" style="width:14px;height:14px"></span>
+              <span x-text="hasFileSystemAccess ? 'Open File' : 'Import JSON'"></span>
+            </button>
+            <button @click="handleExport()"
+                    class="w-full text-left text-sm px-3 py-2.5 rounded-lg hover-bg-input flex items-center gap-2.5"
+                    style="border: 1px solid var(--alap-border-subtle); color: var(--alap-text)">
+              <span x-html="$store.icons.export" class="inline-flex opacity-70" style="width:14px;height:14px"></span>
+              <span x-text="hasFileSystemAccess ? 'Save to File' : 'Export JSON'"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== STATUS BAR ===================== -->
+  <div class="px-5 py-1.5 flex items-center text-xs flex-shrink-0"
+       style="background: var(--alap-mid); border-top: 1px solid var(--alap-border-subtle); color: var(--alap-text-dim)">
+    <span class="font-medium text-muted" x-text="$store.editor.configName"></span>
+    <span x-show="$store.editor.isDirty" class="ml-1.5 text-accent">unsaved</span>
+    <span class="mx-2 border-subtle">|</span>
+    <span x-text="$store.editor.storageMode"></span>
+    <div class="flex-1"></div>
+    <span x-show="$store.editor.statusMessage" class="fade-in text-muted" x-text="$store.editor.statusMessage"></span>
+  </div>
+
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

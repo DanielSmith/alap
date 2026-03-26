@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Food &amp; Coffee — Alap Astro Integration">
+  <h1>Food &amp; Coffee</h1>
+  <p>
+    Another page, same config, zero setup. The integration handles everything.
+  </p>
+
+  <h2>Coffee</h2>
+  <p>
+    All <alap-link query=".coffee">coffee shops</alap-link>,
+    or just <alap-link query=".coffee + .sf">SF coffee</alap-link>.
+  </p>
+
+  <h2>Bakeries</h2>
+  <p>
+    <alap-link query=".bakery">Bakeries</alap-link> — because coffee needs pastries.
+  </p>
+
+  <h2>NYC food &amp; drink</h2>
+  <p>
+    Everything in <alap-link query=".nyc - .bridge">NYC (not bridges)</alap-link>.
+  </p>
+
+  <h2>Parks for a post-coffee walk</h2>
+  <p>
+    <alap-link query=".park">Parks</alap-link> in both cities.
+  </p>
+</Base>

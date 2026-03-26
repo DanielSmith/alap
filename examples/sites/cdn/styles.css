@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400&display=swap');
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; color: #ffd666; }
+h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+
+pre {
+  background: #1a2870;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: #b8c4e8;
+  line-height: 1.5;
+}
+
+.example {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #2240a8;
+  border-radius: 6px;
+  border: 1px solid #2e48a0;
+}
+
+a:not(alap-link) { color: #ffe8a0; }
+a:not(alap-link):hover { color: #ffd666; }
+
+/* --- Alap menu styling --- */
+alap-link { color: #88bbff; text-decoration: underline; cursor: pointer; }
+alap-link:hover { color: #ffd666; }
+
+alap-link::part(menu) {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0;
+  min-width: 200px;
+}
+
+alap-link::part(link) {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+alap-link::part(link):hover,
+alap-link::part(link):focus-visible {
+  background: #3366d6;
+  color: #ffd666;
+}

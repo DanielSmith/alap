@@ -1,0 +1,166 @@
+<!--
+  Copyright 2026 Daniel Smith
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Config Server (laravel-sqlite) — API Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1>Alap Config Server (laravel-sqlite) — API Demo</h1>
+      <p class="subtitle">
+        Interactive test page for the REST API. Server running at
+        <code id="baseUrl">http://localhost:3000</code>.
+      </p>
+    </header>
+
+    <!-- Left column: operations -->
+    <main class="col-ops">
+
+      <!-- List Configs -->
+      <div class="panel">
+        <h2>GET /configs</h2>
+        <p class="panel-desc">List all saved config names.</p>
+        <button id="btnList">List Configs</button>
+        <ul class="config-list" id="configList"></ul>
+      </div>
+
+      <!-- Load Config -->
+      <div class="panel">
+        <h2>GET /configs/:name</h2>
+        <div class="row">
+          <div>
+            <label for="loadName">Config name</label>
+            <input type="text" id="loadName" value="demo" placeholder="e.g. demo">
+          </div>
+          <button id="btnLoad">Load</button>
+        </div>
+      </div>
+
+      <!-- Save Config -->
+      <div class="panel">
+        <h2>PUT /configs/:name</h2>
+        <div class="row">
+          <div>
+            <label for="saveName">Config name</label>
+            <input type="text" id="saveName" value="" placeholder="e.g. myconfig">
+          </div>
+          <button class="primary" id="btnSave">Save</button>
+        </div>
+        <label for="saveBody">Config JSON (AlapConfig)</label>
+        <textarea id="saveBody">{
+  "settings": { "listType": "ul", "menuTimeout": 5000 },
+  "allLinks": {
+    "example1": {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org",
+      "tags": ["reference", "wiki"]
+    },
+    "example2": {
+      "label": "MDN Web Docs",
+      "url": "https://developer.mozilla.org",
+      "tags": ["reference", "docs"]
+    }
+  }
+}</textarea>
+      </div>
+
+      <!-- Delete Config -->
+      <div class="panel">
+        <h2>DELETE /configs/:name</h2>
+        <div class="row">
+          <div>
+            <label for="deleteName">Config name</label>
+            <input type="text" id="deleteName" value="" placeholder="e.g. myconfig">
+          </div>
+          <button class="danger" id="btnDelete">Delete</button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="panel">
+        <h2>GET /search</h2>
+        <p class="panel-desc">Search across all configs by tag, text, or regex.</p>
+        <div class="row">
+          <div>
+            <label for="searchTag">Tag</label>
+            <input type="text" id="searchTag" value="" placeholder="e.g. coffee">
+          </div>
+          <div>
+            <label for="searchQ">Text</label>
+            <input type="text" id="searchQ" value="" placeholder="e.g. bridge">
+          </div>
+          <div>
+            <label for="searchRegex">Regex</label>
+            <input type="text" id="searchRegex" value="" placeholder="e.g. wiki.*bridge">
+          </div>
+          <button id="btnSearch">Search</button>
+        </div>
+      </div>
+
+      <!-- Cherry-Pick -->
+      <div class="panel">
+        <h2>POST /cherry-pick</h2>
+        <p class="panel-desc">Resolve an expression against a config, return only matching links.</p>
+        <div class="row">
+          <div>
+            <label for="cherrySource">Source config</label>
+            <input type="text" id="cherrySource" value="demo" placeholder="e.g. demo">
+          </div>
+          <div>
+            <label for="cherryExpr">Expression</label>
+            <input type="text" id="cherryExpr" value=".coffee + .nyc" placeholder="e.g. .coffee + .nyc">
+          </div>
+          <button class="primary" id="btnCherry">Cherry-Pick</button>
+        </div>
+      </div>
+
+      <!-- Query -->
+      <div class="panel">
+        <h2>POST /query</h2>
+        <p class="panel-desc">Server-side expression resolution. Optionally merge multiple configs.</p>
+        <div class="row">
+          <div>
+            <label for="queryExpr">Expression</label>
+            <input type="text" id="queryExpr" value=".bridge" placeholder="e.g. .bridge">
+          </div>
+          <div>
+            <label for="queryConfig">Config name</label>
+            <input type="text" id="queryConfig" value="demo" placeholder="e.g. demo">
+          </div>
+          <button class="primary" id="btnQuery">Query</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right column: response log -->
+    <aside class="col-log">
+      <div class="panel log-panel">
+        <h2>Response Log</h2>
+        <div class="log" id="log"></div>
+        <button id="btnClear">Clear</button>
+      </div>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

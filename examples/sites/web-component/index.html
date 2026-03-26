@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alap v3 — Web Component</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <p><a href="../../">&larr; All Examples</a></p>
+    <h1>Alap v3 — Web Component</h1>
+    <p>
+      Uses the <code>&lt;alap-link&gt;</code> custom element with Shadow DOM.
+      Each element is self-contained &mdash; no global menu container.
+    </p>
+
+    <!-- ===== BASIC ===== -->
+
+    <h2>Basic Usage</h2>
+    <div class="example">
+      <p>
+        My favorite
+        <alap-link query="@cars">cars</alap-link>
+      </p>
+    </div>
+    <pre>&lt;alap-link query="@cars"&gt;cars&lt;/alap-link&gt;</pre>
+
+    <!-- ===== CLASS QUERIES ===== -->
+
+    <h2>Class Queries</h2>
+    <div class="example">
+      <p>
+        Check out some
+        <alap-link id="coffee" query=".coffee">coffee spots</alap-link>
+        or famous
+        <alap-link query=".bridge">bridges</alap-link>.
+      </p>
+    </div>
+    <pre>
+&lt;alap-link query=".coffee"&gt;coffee spots&lt;/alap-link&gt;
+&lt;alap-link query=".bridge"&gt;bridges&lt;/alap-link&gt;</pre
+    >
+
+    <!-- ===== OPERATORS ===== -->
+
+    <h2>Operators</h2>
+    <div class="example">
+      <p>
+        <alap-link query=".nyc + .bridge">NYC bridges</alap-link> (AND) &mdash;
+        <alap-link query=".nyc | .sf">NYC or SF</alap-link> (OR) &mdash;
+        <alap-link query=".nyc - .bridge">NYC without bridges</alap-link>
+        (WITHOUT)
+      </p>
+    </div>
+    <pre>
+&lt;alap-link query=".nyc + .bridge"&gt;NYC bridges&lt;/alap-link&gt;
+&lt;alap-link query=".nyc | .sf"&gt;NYC or SF&lt;/alap-link&gt;
+&lt;alap-link query=".nyc - .bridge"&gt;NYC without bridges&lt;/alap-link&gt;</pre
+    >
+
+    <!-- ===== PARENTHESES ===== -->
+
+    <h2>Parentheses</h2>
+    <div class="example">
+      <p>
+        <alap-link query="(.nyc + .bridge) | (.sf + .bridge)"
+          >NYC or SF bridges</alap-link
+        >
+        &mdash; groups two intersections, then unions.
+      </p>
+    </div>
+    <pre>
+&lt;alap-link query="(.nyc + .bridge) | (.sf + .bridge)"&gt;
+  NYC or SF bridges
+&lt;/alap-link&gt;</pre
+    >
+
+    <!-- ===== THEMING WITH ::part() ===== -->
+
+    <h2>Theming with <code>::part()</code></h2>
+    <div class="example">
+      <p>
+        Shadow DOM isolates menu styles, but <code>::part()</code> lets you
+        customize from outside.
+        <alap-link id="nycspots" query=".nyc">NYC spots (dark theme)</alap-link>
+      </p>
+    </div>
+    <pre>
+/* The menu exposes five parts: menu, list, item, link, image */
+#nycspots::part(menu) {
+  background: #1e293b;
+  border-color: #334155;
+}
+#nycspots::part(link) {
+  color: #e2e8f0;
+}</pre
+    >
+
+    <!-- ===== SETUP ===== -->
+
+    <h2>Setup</h2>
+    <pre>
+import { registerConfig, defineAlapLink } from 'alap';
+import { myConfig } from './config';
+
+// 1. Register config so elements can find it
+registerConfig(myConfig);
+
+// 2. Define the &lt;alap-link&gt; custom element
+defineAlapLink();</pre
+    >
+    <p class="note">
+      That's it. No class instantiation, no DOM scanning. Each
+      <code>&lt;alap-link&gt;</code> is self-contained.
+    </p>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

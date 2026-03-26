@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Themes &amp; Composition</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./themes.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Themes &amp; Composition</h1>
+  <p>Complete themes combining multiple properties. Dark mode, glassmorphism, neon, brutalist, and more.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html" class="current">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== DARK THEME ===== -->
+
+  <h2>Dark Theme</h2>
+  <div class="example dark-section">
+    <p>Full dark mode:
+      <alap-link query=".park">parks</alap-link> and
+      <alap-link query=".landmark">landmarks</alap-link>.
+    </p>
+    <p class="note">All colors, focus ring, and shadow customized. Same HTML, completely different look.</p>
+  </div>
+  <pre>.dark-section alap-link {
+  --alap-bg: #1e1e2e;
+  --alap-border: #313244;
+  --alap-text: #cdd6f4;
+  --alap-hover-bg: #313244;
+  --alap-hover-text: #89b4fa;
+  --alap-focus-ring: #89b4fa;
+  --alap-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --alap-radius: 12px;
+  --alap-corner-shape: squircle;
+}</pre>
+
+  <!-- ===== AUTO DARK MODE ===== -->
+
+  <h2>Auto Dark Mode</h2>
+  <div class="example auto-dark-section">
+    <p>Menus follow your OS light/dark setting:
+      <alap-link query=".coffee">coffee</alap-link> and
+      <alap-link query=".bridge">bridges</alap-link>.
+    </p>
+    <p class="note">Uses <code>@media (prefers-color-scheme: dark)</code> to swap all custom properties at once.</p>
+  </div>
+  <pre>/* Light mode (default) */
+alap-link {
+  --alap-bg: #ffffff;
+  --alap-text: #1a1a1a;
+  --alap-hover-bg: #eff6ff;
+  --alap-hover-text: #2563eb;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  alap-link {
+    --alap-bg: #1e1e2e;
+    --alap-text: #cdd6f4;
+    --alap-hover-bg: #313244;
+    --alap-hover-text: #89b4fa;
+  }
+}</pre>
+
+  <!-- ===== BORDERLESS FLOATING ===== -->
+
+  <h2>Borderless Floating</h2>
+  <div class="example floating-section">
+    <p>No border, large shadow, wide radius:
+      <alap-link query="@everything">everything</alap-link>.
+    </p>
+    <p class="note">A modern "card-style" dropdown with max-width constraint.</p>
+  </div>
+  <pre>--alap-border-width: 0;
+--alap-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+--alap-radius: 20px;
+--alap-max-width: 280px;
+--alap-corner-shape: squircle;</pre>
+
+  <!-- ===== NEON ===== -->
+
+  <h2>Neon</h2>
+  <div class="example neon-section">
+    <p>Neon glow with text shadow + colored shadow:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Combines <code>--alap-text-shadow</code>, <code>--alap-shadow</code>, <code>--alap-hover-text-shadow</code>, and transitions for a full neon effect.</p>
+  </div>
+  <pre>.neon alap-link {
+  --alap-bg: #0a0a0a;
+  --alap-border: #1a1a2e;
+  --alap-text: #38bdf8;
+  --alap-text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+  --alap-hover-bg: #0f172a;
+  --alap-hover-text: #7dd3fc;
+  --alap-hover-text-shadow: 0 0 12px rgba(56, 189, 248, 0.8),
+                             0 0 30px rgba(56, 189, 248, 0.4);
+  --alap-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+  --alap-transition: text-shadow 0.2s, background 0.15s, color 0.15s;
+}</pre>
+
+  <!-- ===== GLASSMORPHISM ===== -->
+
+  <h2>Glassmorphism</h2>
+  <div class="example glass-section">
+    <div class="glass-bg">
+      <p>Frosted glass with backdrop blur:
+        <alap-link query=".coffee">coffee spots</alap-link>
+      </p>
+    </div>
+    <p class="note">Semi-transparent background + <code>--alap-backdrop</code> for <code>backdrop-filter</code>. The gradient behind shows through the frosted glass.</p>
+  </div>
+  <pre>--alap-bg: rgba(255, 255, 255, 0.12);
+--alap-backdrop: blur(12px) saturate(180%);
+--alap-border: rgba(255, 255, 255, 0.2);
+--alap-text: #ffffff;
+--alap-hover-bg: rgba(255, 255, 255, 0.25);
+--alap-radius: 16px;
+--alap-corner-shape: squircle;</pre>
+
+  <!-- ===== BRUTALIST ===== -->
+
+  <h2>Brutalist</h2>
+  <div class="example brutalist-section">
+    <p>Raw, heavy, industrial:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Thick borders, uppercase, wide spacing, sharp corners, heavy shadow. No subtlety.</p>
+  </div>
+  <pre>.brutalist alap-link {
+  --alap-bg: #000000;
+  --alap-border: #ffffff;
+  --alap-border-width: 3px;
+  --alap-text: #ffffff;
+  --alap-hover-bg: #ffffff;
+  --alap-hover-text: #000000;
+  --alap-corner-shape: straight;
+  --alap-radius: 0;
+  --alap-text-transform: uppercase;
+  --alap-letter-spacing: 0.1em;
+  --alap-font-weight: 700;
+  --alap-shadow: 8px 8px 0 #ffffff;
+}</pre>
+
+  <!-- ===== FOCUS CUSTOMIZATION ===== -->
+
+  <h2>Focus Customization</h2>
+  <div class="example focus-custom">
+    <p>Distinct focus vs hover styling (tab into the menu):
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+    <p class="note">Hover is blue, focus is orange. <code>--alap-focus-bg</code> and <code>--alap-focus-text</code> override hover defaults for keyboard users.</p>
+  </div>
+  <pre>--alap-hover-bg: #eff6ff;
+--alap-hover-text: #2563eb;
+--alap-focus-bg: #fff7ed;
+--alap-focus-text: #c2410c;
+--alap-focus-ring: #ea580c;
+--alap-focus-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2);</pre>
+
+  <!-- ===== Z-INDEX FIX ===== -->
+
+  <h2>Z-Index (Sticky Header)</h2>
+  <div class="example zindex-section">
+    <div class="fake-sticky-header">Sticky Header (z-index: 50)</div>
+    <p style="margin-top: 3rem;">Menu appears above the sticky header:
+      <alap-link query=".bridge">bridges</alap-link>.
+    </p>
+    <p class="note"><code>--alap-z-index: 100</code> ensures the menu stacks above.</p>
+  </div>
+  <pre>--alap-z-index: 100;</pre>
+
+  <!-- ===== WILD COMBO ===== -->
+
+  <h2>Wild Combo: Everything at Once</h2>
+  <div class="example wild-section">
+    <p>Squircle + neon + transitions + transform + item spacing + backdrop:
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+    <p class="note">This uses 20+ properties simultaneously. It's intentionally over-the-top to show that all properties compose cleanly.</p>
+  </div>
+  <pre>.wild alap-link {
+  --alap-bg: rgba(15, 23, 42, 0.85);
+  --alap-backdrop: blur(8px);
+  --alap-border: rgba(56, 189, 248, 0.3);
+  --alap-radius: 20px;
+  --alap-corner-shape: squircle;
+  --alap-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+  --alap-text: #7dd3fc;
+  --alap-text-shadow: 0 0 6px rgba(56, 189, 248, 0.3);
+  --alap-font-weight: 500;
+  --alap-letter-spacing: 0.03em;
+  --alap-text-transform: uppercase;
+  --alap-font-size: 0.8rem;
+  --alap-item-gap: 3px;
+  --alap-item-border-radius: 8px;
+  --alap-menu-padding: 0.5rem;
+  --alap-hover-bg: rgba(56, 189, 248, 0.15);
+  --alap-hover-text: #ffffff;
+  --alap-hover-text-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+  --alap-hover-shadow: inset 3px 0 0 #38bdf8;
+  --alap-hover-transform: translateX(4px);
+  --alap-transition: all 0.2s ease;
+  --alap-focus-ring: #38bdf8;
+  --alap-focus-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+  --alap-menu-hover-shadow: 0 0 40px rgba(56, 189, 248, 0.25);
+  --alap-menu-transition: box-shadow 0.3s ease;
+}</pre>
+
+  <!-- ===== CUSTOM GAP + SCROLLING ===== -->
+
+  <h2>Custom Gap &amp; Scrolling</h2>
+  <div class="example gap-scroll-section">
+    <p>Generous gap + scrollable long list:
+      <alap-link query=".coffee | .bridge | .park">all places</alap-link>
+    </p>
+  </div>
+  <pre>--alap-gap: 1rem;
+--alap-max-width: 260px;</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

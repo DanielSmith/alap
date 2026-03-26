@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — CDN / Script Tag Demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>CDN / Script Tag Demo</h1>
+  <p>This page uses Alap with zero npm, zero build step — just a <code>&lt;script&gt;</code> tag.</p>
+
+  <h2>Web Component</h2>
+  <div class="example">
+    <p>Check out some <alap-link query=".coffee">coffee shops</alap-link>
+      or famous <alap-link query=".bridge">bridges</alap-link>.</p>
+    <p>NYC bridges only: <alap-link query=".nyc + .bridge">NYC bridges</alap-link></p>
+    <p>A macro: <alap-link query="@cars">favorite cars</alap-link></p>
+  </div>
+
+  <h2>DOM Adapter</h2>
+  <div class="example">
+    <p>Same config, class-based binding:
+      <a id="dom-coffee" class="alap" data-alap-linkitems=".coffee" style="color:#88bbff;text-decoration:underline;cursor:pointer">coffee (DOM)</a>
+    </p>
+  </div>
+
+  <h2>Programmatic</h2>
+  <div class="example" id="programmatic">
+    <p>Engine resolves expressions without rendering anything:</p>
+    <pre id="engine-output"></pre>
+  </div>
+
+  <h2>How It Works</h2>
+  <pre>&lt;script src="https://cdn.jsdelivr.net/npm/alap@3/dist/alap.iife.js"&gt;&lt;/script&gt;
+&lt;script src="config.js"&gt;&lt;/script&gt;
+&lt;script src="app.js"&gt;&lt;/script&gt;
+
+&lt;alap-link query=".coffee"&gt;cafes&lt;/alap-link&gt;</pre>
+
+  <!-- Load Alap from the local IIFE build (in production, use the CDN URL above) -->
+  <script src="alap.iife.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+/**
+ * Copyright 2026 Daniel Smith — Apache 2.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+/* --- Base layout --- */
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  line-height: 1.6;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; margin-bottom: 0.25rem; color: #ffd666; }
+h2 { font-size: 1.15rem; margin-top: 2rem; color: #ffe8a0; }
+
+.example {
+  background: #2240a8;
+  border: 1px solid #2e48a0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.note { font-size: 0.85rem; color: #7888b8; margin-top: 0.5rem; }
+
+code, kbd {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+kbd {
+  border: 1px solid #4470cc;
+  box-shadow: 0 1px 0 #2e48a0;
+}
+
+/* --- Alap trigger links --- */
+
+a.alap {
+  color: #88bbff;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+a.alap:hover {
+  color: #ffd666;
+}
+
+/* --- Image trigger --- */
+
+.trigger-img {
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  display: block;
+}
+
+.trigger-img:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* --- Card (div) triggers --- */
+
+.card-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.trigger-card {
+  border: 1px solid #2e48a0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  text-align: center;
+  max-width: 220px;
+  background: #2952c0;
+}
+
+.trigger-card:hover {
+  border-color: #4470cc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.trigger-card img {
+  width: 100%;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.trigger-card strong {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #f0f2ff;
+  pointer-events: none;
+}
+
+.trigger-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: #7888b8;
+  pointer-events: none;
+}
+
+/* --- Alap menu base styles --- */
+
+.alapelem {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  margin-top: 0.5rem;
+}
+
+.alapelem ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.alapelem a[role="menuitem"] {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+  outline: none;
+}
+
+.alapelem a[role="menuitem"]:hover,
+.alapelem a[role="menuitem"]:focus {
+  background: #3366d6;
+  color: #ffd666;
+}
+
+/* Image menu items */
+.alapelem a[role="menuitem"] img {
+  max-width: 200px;
+  border-radius: 4px;
+  display: block;
+}
+
+/* Image trigger menus: no offset */
+.alap_ggbridge,
+.alap_chainimg {
+  margin-top: 0;
+}
+
+/* --- Hover preview panel --- */
+
+.hover-panel {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 260px;
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  padding: 0.75rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.hover-panel.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.hover-img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.hover-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #ffd666;
+}
+
+.hover-desc {
+  font-size: 0.82rem;
+  color: #b8c4e8;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* --- Context popup --- */
+
+.context-popup {
+  position: absolute;
+  width: 280px;
+  background: #141e6a;
+  color: #f0f2ff;
+  border: 1px solid #2e48a0;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  padding: 0.75rem;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.15s, transform 0.15s;
+  pointer-events: none;
+  z-index: 200;
+}
+
+.context-popup.visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.context-img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.context-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #ffd666;
+}
+
+.context-desc {
+  font-size: 0.82rem;
+  color: #b8c4e8;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.context-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #88bbff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.context-link:hover {
+  color: #ffd666;
+  text-decoration: underline;
+}
+
+/* --- Event log --- */
+
+.log-container {
+  background: #141e6a;
+  border: 1px solid #2e48a0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+}
+
+#log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.78rem;
+  color: #b8c4e8;
+}
+
+#log-list li {
+  padding: 0.2rem 0;
+  border-bottom: 1px solid #1c2a82;
+}
+
+.log-type {
+  display: inline-block;
+  min-width: 110px;
+  color: #ffd666;
+  font-weight: 600;
+}

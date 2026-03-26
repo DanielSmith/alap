@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Advanced CSS (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Advanced CSS — DOM Mode</h1>
+  <p>This example set demonstrates the same visual effects as the
+    <a href="../advanced-css-wc/">Web Component version</a>, but using
+    Alap's light DOM mode. Triggers are standard <code>&lt;a class="alap"&gt;</code>
+    elements and the menu renders into a global <code>#alapelem</code> container
+    in the document body. All styling uses plain CSS selectors — no Shadow DOM,
+    no custom properties required.</p>
+
+  <nav class="page-nav">
+    <a href="./" class="current">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== COMPARISON ===== -->
+
+  <h2>Web Component vs DOM Mode</h2>
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th>Web Component</th><th>DOM Mode</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Trigger</td>
+        <td><code>&lt;alap-link query="..."&gt;</code></td>
+        <td><code>&lt;a class="alap" data-alap-linkitems="..."&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Menu location</td>
+        <td>Shadow DOM inside element</td>
+        <td>Global <code>#alapelem</code> in body</td>
+      </tr>
+      <tr>
+        <td>Styling</td>
+        <td>CSS custom properties (<code>--alap-*</code>)</td>
+        <td>Direct CSS on <code>.alapelem</code></td>
+      </tr>
+      <tr>
+        <td>Per-trigger</td>
+        <td>Ancestor selectors</td>
+        <td><code>.alap_${anchorId}</code> class</td>
+      </tr>
+      <tr>
+        <td>Encapsulation</td>
+        <td>Shadow DOM isolation</td>
+        <td>None — page CSS applies</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="note">DOM mode gives you full control with familiar CSS selectors.
+    The trade-off is that styles are global — you manage specificity yourself.
+    The Web Component version isolates each menu automatically via Shadow DOM.</p>
+
+  <!-- ===== BASIC EXAMPLE ===== -->
+
+  <h2>Basic Example</h2>
+  <div class="example">
+    <p>A minimal trigger with no extra styling:
+      <a id="basic-demo" class="alap" data-alap-linkitems=".coffee">coffee</a>
+    </p>
+  </div>
+  <pre>&lt;a id="basic-demo" class="alap"
+   data-alap-linkitems=".coffee"&gt;coffee&lt;/a&gt;</pre>
+  <p class="note">Click the link above to see the default menu appearance.
+    The remaining pages in this section show how to reshape, shadow, animate,
+    and theme the menu using ordinary CSS.</p>
+
+  <!-- ===== STYLING APPROACH ===== -->
+
+  <h2>Styling Approach</h2>
+  <p>In DOM mode, the menu lives in a <code>&lt;div id="alapelem"&gt;</code>
+    appended to the body. Target it directly:</p>
+  <pre>/* Menu container */
+#alapelem { ... }
+
+/* List inside the menu */
+#alapelem ul { ... }
+
+/* Individual items */
+#alapelem .alapListElem { ... }
+
+/* Per-trigger: when opened from anchor "my-link" */
+#alapelem.alap_my-link { ... }</pre>
+
+  <!-- ===== POPOVER MODE ===== -->
+
+  <h2>Popover Mode</h2>
+  <p>Popover mode is available through the framework adapters (React, Vue, Svelte). The browser's native
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Popover_API" target="_blank">Popover API</a>
+    handles show/hide, click-outside, and Escape — no JavaScript dismissal logic needed.</p>
+
+  <p class="note">The menu still renders as <code>.alapelem</code>. All CSS from this example set works unchanged in popover mode.</p>
+
+  <h3 style="font-size:0.9rem; color:#fde68a; margin-top:1.5rem;">Setup difference</h3>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>DOM mode</h3>
+      <pre style="margin:0">// JS
+new AlapUI(config, { selector: '.alap' });
+
+&lt;!-- HTML --&gt;
+&lt;a class="alap"
+   data-alap-linkitems=".coffee"&gt;
+  coffee
+&lt;/a&gt;
+
+&lt;!-- Menu injected into body --&gt;
+&lt;div id="alapelem"
+     class="alapelem alap_my-link"&gt;
+  &lt;ul&gt;...&lt;/ul&gt;
+&lt;/div&gt;</pre>
+    </div>
+    <div class="compare-item">
+      <h3>Popover mode (React)</h3>
+      <pre style="margin:0">// JSX
+&lt;AlapProvider config={config}
+              mode="popover"&gt;
+  &lt;AlapLink query=".coffee"&gt;
+    coffee
+  &lt;/AlapLink&gt;
+&lt;/AlapProvider&gt;
+
+&lt;!-- Rendered HTML --&gt;
+&lt;span popoverTarget="alap-1"&gt;
+  coffee
+&lt;/span&gt;
+&lt;div id="alap-1" popover="auto"
+     class="alapelem"&gt;
+  &lt;ul&gt;...&lt;/ul&gt;
+&lt;/div&gt;</pre>
+    </div>
+  </div>
+
+  <p class="note">The trigger changes (from <code>&lt;a&gt;</code> to <code>&lt;span popoverTarget&gt;</code>),
+    but the menu element is the same <code>.alapelem</code> div. Your CSS requires no changes.</p>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <style is:global>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      max-width: 640px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      line-height: 1.7;
+      color: #f0f2ff;
+      background: #1a2f8a;
+    }
+    h1 { font-size: 1.5rem; color: #ffd666; }
+    h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+    nav { margin: 1.5rem 0; padding: 0.75rem 1rem; background: #1a2870; border-radius: 8px; }
+    nav a { margin-right: 1rem; color: #88bbff; text-decoration: none; }
+    nav a:hover { text-decoration: underline; color: #ffd666; }
+    code { background: #1a2870; color: #88bbff; padding: 0.15rem 0.35rem; border-radius: 3px; font-size: 0.9em; }
+    .note { font-size: 0.85rem; color: #7888b8; }
+
+    /* Style the trigger text */
+    alap-link {
+      color: #88bbff;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+    alap-link:hover {
+      color: #ffd666;
+    }
+
+    /* Style the web component menus via ::part() */
+    alap-link::part(menu) {
+      background: #2240a8;
+      border: 1px solid #4470cc;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    alap-link::part(link) {
+      padding: 0.5rem 1rem;
+      color: #f0f2ff;
+    }
+    alap-link::part(link):hover {
+      background: #3366d6;
+      color: #ffd666;
+    }
+  </style>
+  <!-- IIFE build for local dev. In production: npm install alap + use the integration. -->
+  <script is:inline src="/alap.iife.js"></script>
+  <script is:inline src="/alap-config.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/bridges/">Bridges</a>
+    <a href="/food/">Food</a>
+  </nav>
+  <slot />
+</body>
+</html>

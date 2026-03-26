@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 Examples</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    ul { list-style: none; padding: 0; margin: 1rem 0; }
+    li { margin: 0.75rem 0; }
+    a {
+      display: inline-block;
+      padding: 0.4rem 0.9rem;
+      color: #88bbff;
+      text-decoration: none;
+      border: 1px solid #4470cc;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    a:hover { background: #2240a8; color: #ffd666; }
+    .desc { color: #7888b8; font-size: 0.85rem; margin-left: 0.5rem; }
+    .start-here a { border-color: #ffd666; background: #2240a8; color: #ffd666; font-weight: 500; }
+    .start-here a:hover { background: #3366d6; }
+    .note { font-size: 0.8rem; color: #7888b8; margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1>Alap v3 Examples</h1>
+  <p>Self-contained demos showing off the library.</p>
+
+  <h2>Start Here</h2>
+  <p>New to Alap? Go through these three in order.</p>
+  <ul>
+    <li class="start-here">
+      <a href="./sites/basic/">1. Basic</a>
+      <span class="desc">Item IDs, class queries, operators, parentheses, macros — the fundamentals</span>
+    </li>
+    <li class="start-here">
+      <a href="./sites/react/">2. React Adapter</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — framework integration pattern</span>
+    </li>
+    <li class="start-here">
+      <a href="./sites/web-component/">3. Web Component</a>
+      <span class="desc">&lt;alap-link&gt; custom element — zero-framework, works everywhere</span>
+    </li>
+  </ul>
+
+  <h2>Theming</h2>
+  <ul>
+    <li>
+      <a href="./sites/styling/">Styling</a>
+      <span class="desc">Offsets, per-anchor themes, custom item classes, image triggers</span>
+    </li>
+    <li>
+      <a href="./sites/tailwind/">Tailwind CSS</a>
+      <span class="desc">Menu styled entirely with Tailwind utilities</span>
+    </li>
+  </ul>
+
+  <h2>Framework Adapters</h2>
+  <ul>
+    <li>
+      <a href="./sites/react/">React</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() hook — all rendering modes</span>
+    </li>
+    <li>
+      <a href="./sites/vue/">Vue</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() composable — SFC templates</span>
+    </li>
+    <li>
+      <a href="./sites/svelte/">Svelte</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — Svelte 5 runes</span>
+    </li>
+    <li>
+      <a href="./sites/solid/">SolidJS</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — fine-grained reactivity</span>
+    </li>
+    <li>
+      <a href="./sites/alpine/">Alpine.js</a>
+      <span class="desc">x-alap directive — no build step, sprinkle onto HTML</span>
+    </li>
+    <li>
+      <a href="http://localhost:9010/">Astro Integration</a>
+      <span class="desc">Separate server — run <code>examples/sites/astro-integration/serve.sh</code> first (port 9010)</span>
+    </li>
+  </ul>
+
+  <h2>Advanced</h2>
+  <ul>
+    <li>
+      <a href="./sites/hooks-and-media/">Hooks &amp; Media</a>
+      <span class="desc">Image triggers, div triggers, image menu items, hover preview, context popup, event log</span>
+    </li>
+    <li>
+      <a href="./sites/regex-search/">Regex Search</a>
+      <span class="desc">/key/opts syntax — field filtering, sorting, age limits, composition with operators</span>
+    </li>
+    <li>
+      <a href="./sites/markdown/">Markdown (remark-alap)</a>
+      <span class="desc">[text](alap:@macro) in Markdown → &lt;alap-link&gt; via remark plugin</span>
+    </li>
+  </ul>
+</body>
+</html>

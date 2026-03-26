@@ -1,0 +1,209 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; color: #ffd666; }
+h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+
+.example {
+  padding: 0.5rem 0;
+}
+
+/* --- Trigger styling --- */
+
+[role="button"] {
+  color: #88bbff;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+[role="button"]:hover {
+  color: #ffd666;
+}
+
+[role="button"]:focus-visible {
+  outline: 2px solid #ffd666;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* --- Menu base --- */
+
+.alapelem {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.alapelem ul,
+.alapelem ol {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.alapListElem a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.alapListElem a:hover,
+.alapListElem a:focus {
+  background: #3366d6;
+  color: #ffd666;
+  outline: none;
+}
+
+/* --- Per-section theme overrides --- */
+
+.dark-menu {
+  background: #141e6a;
+  border-color: #2e48a0;
+}
+
+.dark-menu .alapListElem a {
+  color: #b8c4e8;
+}
+
+.dark-menu .alapListElem a:hover,
+.dark-menu .alapListElem a:focus {
+  background: #1c2a82;
+  color: #ffd666;
+}
+
+.warm-menu {
+  background: #2952c0;
+  border-color: #ffd666;
+}
+
+.warm-menu .alapListElem a:hover,
+.warm-menu .alapListElem a:focus {
+  background: #3366d6;
+  color: #ffe8a0;
+}
+
+/* --- Code snippets --- */
+
+pre {
+  background: #1a2870;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.8rem;
+  color: #b8c4e8;
+  overflow-x: auto;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85em;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.section-note {
+  font-size: 0.85rem;
+  color: #7888b8;
+  margin-bottom: 0.25rem;
+}
+
+/* --- Interactive elements --- */
+
+.hook-input {
+  padding: 0.3rem 0.5rem;
+  width: 200px;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85rem;
+  background: #1a2870;
+  color: #f0f2ff;
+  border: 1px solid #4470cc;
+  border-radius: 4px;
+}
+
+.hook-input:focus {
+  outline: 2px solid #ffd666;
+  outline-offset: 1px;
+  border-color: #ffd666;
+}
+
+.hook-results {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.hook-results a {
+  color: #88bbff;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.hook-results a:hover {
+  color: #ffd666;
+}
+
+.demo-button {
+  padding: 0.3rem 0.75rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+  background: #2240a8;
+  color: #f0f2ff;
+  border: 1px solid #4470cc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.demo-button:hover:not(:disabled) {
+  background: #3366d6;
+  border-color: #ffd666;
+  color: #ffd666;
+}
+
+.demo-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

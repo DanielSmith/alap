@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — remark-alap Markdown Example</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>remark-alap</h1>
+  <p>
+    Markdown content is processed through
+    <code>remark-alap</code>, which transforms
+    <code>[text](alap:@macro)</code> links into
+    <code>&lt;alap-link&gt;</code> web components.
+    Click any link below to see the menu.
+  </p>
+
+  <div class="columns">
+    <div class="column">
+      <h2>Rendered Output</h2>
+      <div id="content" class="rendered"></div>
+    </div>
+    <div class="column">
+      <h2>Markdown Source</h2>
+      <pre id="source" class="source"></pre>
+    </div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

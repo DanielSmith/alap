@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Shadows &amp; Depth</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./shadows.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Shadows &amp; Depth</h1>
+  <p>Box shadow, drop shadow, text shadow, glassmorphism, and hover/focus shadow effects.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html" class="current">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== CONTAINER SHADOW ===== -->
+
+  <h2>Container Shadow</h2>
+  <p class="note"><code>--alap-shadow</code> sets the box-shadow on the whole menu. Use bold, colored shadows on dark backgrounds — subtle <code>rgba(0,0,0,...)</code> shadows are invisible on dark.</p>
+
+  <div class="gallery" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="gallery-item">
+      <h3>Subtle</h3>
+      <div class="example shadow-subtle">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>Purple glow</h3>
+      <div class="example shadow-dramatic">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>Hard offset</h3>
+      <div class="example shadow-hard">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>/* Subtle tint */
+--alap-shadow: 0 2px 8px #6366f1;
+
+/* Purple glow */
+--alap-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.5);
+
+/* Hard offset (brutalist) */
+--alap-shadow: 8px 8px 0 #fbbf24;</pre>
+
+  <!-- ===== PER-ITEM SHADOW ===== -->
+
+  <h2>Per-Item Shadow (hover)</h2>
+  <p class="note"><code>--alap-hover-shadow</code> adds a box-shadow to the individual menu item on hover.</p>
+
+  <div class="example shadow-item-only">
+    <p>No container shadow — only hovered item gets a glow:
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+  </div>
+  <pre>--alap-shadow: none;          /* remove container shadow */
+--alap-hover-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.5);
+--alap-transition: box-shadow 0.2s ease;</pre>
+
+  <!-- ===== BOTH ===== -->
+
+  <h2>Container + Per-Item Shadow</h2>
+  <p class="note">Combine container glow with per-item hover lift for a layered depth effect.</p>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Glow + hover lift</h3>
+      <div class="example shadow-both">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Hard offset + hover inset</h3>
+      <div class="example shadow-both-hard">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>/* Glow + hover lift */
+--alap-shadow: 0 0 30px 5px rgba(99, 102, 241, 0.3);
+--alap-hover-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+
+/* Hard offset + subtle item drop shadow */
+--alap-shadow: 6px 6px 0 #fbbf24;
+--alap-hover-shadow: 0 3px 8px rgba(251, 191, 36, 0.4);</pre>
+
+  <!-- ===== DROP SHADOW ===== -->
+
+  <h2>Drop Shadow (filter)</h2>
+  <p class="note"><code>--alap-drop-shadow</code> uses <code>filter: drop-shadow()</code> instead of <code>box-shadow</code>. Disable <code>--alap-shadow</code> so both don't render at once.</p>
+
+  <div class="example drop-filter">
+    <alap-link query=".coffee">coffee</alap-link>
+  </div>
+  <pre>--alap-drop-shadow: drop-shadow(0 4px 8px #06b6d4);
+--alap-shadow: none;  /* disable box-shadow */</pre>
+
+  <!-- ===== TEXT SHADOW ===== -->
+
+  <h2>Text Shadow</h2>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Subtle emboss</h3>
+      <div class="example text-emboss">
+        <alap-link query=".bridge">bridges</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Neon glow</h3>
+      <div class="example text-neon">
+        <alap-link query=".bridge">bridges</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>/* Subtle emboss — light text on dark background */
+--alap-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+/* Neon glow */
+--alap-text-shadow: 0 0 8px rgba(56, 189, 248, 0.6),
+                    0 0 20px rgba(56, 189, 248, 0.3);</pre>
+
+  <!-- ===== HOVER TEXT SHADOW ===== -->
+
+  <h2>Hover Text Shadow</h2>
+  <div class="example hover-text-glow">
+    <p>Text glow appears only on hover:
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+    <p class="note">Base text has no shadow. Hover adds a glow effect.</p>
+  </div>
+  <pre>.hover-glow alap-link {
+  --alap-hover-text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+  --alap-transition: text-shadow 0.2s ease;
+}</pre>
+
+  <!-- ===== ITEM HOVER SHADOW ===== -->
+
+  <h2>Item Hover Shadow</h2>
+  <div class="example hover-item-shadow">
+    <p>Box shadow lifts the hovered item:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note"><code>--alap-hover-shadow</code> adds depth to the individual menu item on hover.</p>
+  </div>
+  <pre>--alap-hover-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+--alap-transition: box-shadow 0.2s ease, background 0.15s ease;</pre>
+
+  <!-- ===== MENU HOVER SHADOW ===== -->
+
+  <h2>Menu Hover Shadow</h2>
+  <div class="example menu-hover-shadow">
+    <p>The whole menu deepens on hover:
+      <alap-link query=".coffee">coffee</alap-link>
+    </p>
+    <p class="note">Off by default. <code>--alap-menu-hover-shadow</code> overrides <code>--alap-shadow</code> when the menu is hovered. Pair with <code>--alap-menu-transition</code>.</p>
+  </div>
+  <pre>--alap-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+--alap-menu-hover-shadow: 0 16px 40px rgba(99, 102, 241, 0.5);
+--alap-menu-transition: box-shadow 0.3s ease;</pre>
+
+  <!-- ===== FOCUS SHADOW ===== -->
+
+  <h2>Focus Shadow</h2>
+  <div class="example focus-shadow">
+    <p>Keyboard focus ring + shadow:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Tab into the menu and use arrow keys. <code>--alap-focus-shadow</code> adds a soft glow around the focused item beyond the outline ring.</p>
+  </div>
+  <pre>--alap-focus-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4);
+--alap-focus-ring: #6366f1;</pre>
+
+  <!-- ===== GLASSMORPHISM ===== -->
+
+  <h2>Glassmorphism</h2>
+  <div class="example glass-section">
+    <div class="glass-bg">
+      <p>Frosted glass menu:
+        <alap-link query=".coffee">coffee spots</alap-link>
+      </p>
+    </div>
+    <p class="note"><code>--alap-backdrop</code> applies <code>backdrop-filter</code> for frosted glass. Semi-transparent <code>--alap-bg</code> lets the background show through.</p>
+  </div>
+  <pre>--alap-bg: rgba(255, 255, 255, 0.12);
+--alap-backdrop: blur(12px) saturate(180%);
+--alap-border: rgba(255, 255, 255, 0.2);
+--alap-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+--alap-radius: 16px;
+--alap-corner-shape: squircle;</pre>
+
+  <!-- ===== OPACITY ===== -->
+
+  <h2>Menu Opacity</h2>
+  <div class="example opacity-section">
+    <p>Semi-transparent menu:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note"><code>--alap-opacity</code> affects the entire menu including text. For transparent backgrounds with opaque text, use <code>--alap-bg</code> with rgba() instead.</p>
+  </div>
+  <pre>--alap-opacity: 0.85;</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

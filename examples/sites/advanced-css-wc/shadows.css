@@ -1,0 +1,144 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* --- Container shadow --- */
+
+.shadow-subtle alap-link {
+  --alap-shadow: 0 2px 8px #6366f1;
+}
+
+.shadow-dramatic alap-link {
+  --alap-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.5);
+  --alap-radius: 12px;
+}
+
+.shadow-hard alap-link {
+  --alap-shadow: 8px 8px 0 #fbbf24;
+  --alap-border: #fbbf24;
+}
+
+/* --- Per-item shadow only --- */
+
+.shadow-item-only alap-link {
+  --alap-shadow: none;
+  --alap-hover-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.5);
+  --alap-transition: box-shadow 0.2s ease;
+}
+
+/* --- Both container + per-item --- */
+
+.shadow-both alap-link {
+  --alap-shadow: 0 0 30px 5px rgba(99, 102, 241, 0.3);
+  --alap-hover-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+  --alap-transition: box-shadow 0.2s ease;
+}
+
+.shadow-both-hard alap-link {
+  --alap-shadow: 6px 6px 0 #fbbf24;
+  --alap-border: #fbbf24;
+  --alap-hover-shadow: 0 3px 8px rgba(251, 191, 36, 0.4);
+  --alap-transition: box-shadow 0.2s ease;
+}
+
+/* --- Drop shadow vs box shadow --- */
+
+.drop-filter alap-link {
+  --alap-shadow: none;
+  --alap-drop-shadow: drop-shadow(0 4px 8px #06b6d4);
+}
+
+/* --- Text shadow --- */
+
+.text-emboss alap-link {
+  --alap-bg: #1e293b;
+  --alap-text: #e2e8f0;
+  --alap-hover-bg: #334155;
+  --alap-hover-text: #f8fafc;
+  --alap-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --alap-border: #334155;
+}
+
+.text-neon alap-link {
+  --alap-bg: #0f172a;
+  --alap-text: #38bdf8;
+  --alap-hover-bg: #1e293b;
+  --alap-hover-text: #7dd3fc;
+  --alap-text-shadow: 0 0 8px rgba(56, 189, 248, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
+  --alap-border: #1e3a5f;
+  --alap-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
+}
+
+/* --- Hover text glow --- */
+
+.hover-text-glow alap-link {
+  --alap-hover-text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+  --alap-hover-text: #fbbf24;
+  --alap-transition: text-shadow 0.2s ease, color 0.15s ease, background 0.15s ease;
+}
+
+/* --- Item hover shadow --- */
+
+.hover-item-shadow alap-link {
+  --alap-hover-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  --alap-transition: box-shadow 0.2s ease, background 0.15s ease, color 0.15s ease;
+}
+
+/* --- Menu hover shadow --- */
+
+.menu-hover-shadow alap-link {
+  --alap-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  --alap-menu-hover-shadow: 0 16px 40px rgba(99, 102, 241, 0.5);
+  --alap-menu-transition: box-shadow 0.3s ease;
+}
+
+/* --- Focus shadow --- */
+
+.focus-shadow alap-link {
+  --alap-focus-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4);
+  --alap-focus-ring: #6366f1;
+}
+
+/* --- Glassmorphism --- */
+
+.glass-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.glass-section alap-link {
+  color: #ffffff;
+  --alap-bg: rgba(255, 255, 255, 0.12);
+  --alap-backdrop: blur(12px) saturate(180%);
+  --alap-border: rgba(255, 255, 255, 0.2);
+  --alap-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --alap-radius: 16px;
+  --alap-corner-shape: squircle;
+  --alap-text: #ffffff;
+  --alap-hover-bg: rgba(255, 255, 255, 0.25);
+  --alap-hover-text: #ffffff;
+  --alap-focus-ring: rgba(255, 255, 255, 0.6);
+}
+
+.glass-section alap-link:hover {
+  color: #f0f0f0;
+}
+
+/* --- Opacity --- */
+
+.opacity-section alap-link {
+  --alap-opacity: 0.85;
+}

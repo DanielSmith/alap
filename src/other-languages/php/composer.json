@@ -1,0 +1,22 @@
+{
+    "name": "danielsmith/alap",
+    "description": "Alap expression parser — resolve tag-based link expressions server-side",
+    "type": "library",
+    "license": "Apache-2.0",
+    "keywords": ["alap", "expression-parser", "links", "menu"],
+    "homepage": "https://alap.info",
+    "authors": [
+        { "name": "Daniel Smith" }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alap\\": ""
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    }
+}

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "alap/solid": ["../../src/ui/solid/index.ts"],
+      "alap/storage": ["../../src/storage/index.ts"],
+      "alap/core": ["../../src/core/index.ts"],
+      "alap": ["../../src/index.ts"]
+    }
+  },
+  "include": ["src", "../shared"]
+}

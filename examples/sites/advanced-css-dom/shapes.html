@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Shapes &amp; Borders (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./shapes.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Shapes &amp; Borders (DOM)</h1>
+  <p>Border radius, corner-shape, and per-item borders via light DOM CSS on <code>.alapelem</code>.</p>
+  <p class="note">All CSS on this page applies equally to <strong>popover mode</strong> — the menu renders as the same <code>.alapelem</code> element whether using DOM or popover.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html" class="current">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== BORDER RADIUS ===== -->
+
+  <h2>Border Radius</h2>
+
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Default (6px)</h3>
+      <div class="example">
+        <a id="sp-default" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Rounded (12px)</h3>
+      <div class="example">
+        <a id="sp-rounded" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_sp-rounded { border-radius: 12px; }</pre>
+
+  <!-- ===== CORNER SHAPE ===== -->
+
+  <h2>Corner Shape</h2>
+  <p class="note"><code>corner-shape</code> is a standard CSS property — works on any element, not just web components.</p>
+
+  <div class="gallery" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="gallery-item">
+      <h3>Squircle</h3>
+      <div class="example">
+        <a id="sp-squircle" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>Scoop</h3>
+      <div class="example">
+        <a id="sp-scoop" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>Bevel</h3>
+      <div class="example">
+        <a id="sp-bevel" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_sp-squircle {
+  corner-shape: squircle;
+  border-radius: 20px;
+}
+.alap_sp-scoop {
+  corner-shape: scoop;
+  border-radius: 20px;
+}
+.alap_sp-bevel {
+  corner-shape: bevel;
+  border-radius: 16px;
+}</pre>
+
+  <!-- ===== PER-ITEM BORDERS ===== -->
+
+  <h2>Per-Item Borders</h2>
+  <div class="example">
+    <a id="sp-item-border" class="alap" data-alap-linkitems=".coffee">coffee spots</a>
+  </div>
+  <pre>.alap_sp-item-border li + li {
+  border-top: 1px solid #e2e8f0;
+}</pre>
+
+  <!-- ===== PILL ITEMS ===== -->
+
+  <h2>Pill Items</h2>
+  <div class="example">
+    <a id="sp-item-pill" class="alap" data-alap-linkitems=".coffee">coffee spots</a>
+  </div>
+  <pre>.alap_sp-item-pill {
+  background: #f8fafc;
+}
+.alap_sp-item-pill li {
+  margin: 0.15rem 0.25rem;
+}
+.alap_sp-item-pill a {
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+}</pre>
+
+  <!-- ===== SALE TAG ===== -->
+
+  <h2>Asymmetric Corners (Sale Tag)</h2>
+  <div class="example">
+    <a id="sp-sale" class="alap" data-alap-linkitems="@cars">cars</a>
+  </div>
+  <pre>.alap_sp-sale {
+  corner-shape: round bevel bevel round;
+  border-radius: 8px 20px 20px 8px;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+.alap_sp-sale a       { color: #ffffff; }
+.alap_sp-sale a:hover { background: #b91c1c; color: #fef08a; }</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

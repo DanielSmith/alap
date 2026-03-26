@@ -1,0 +1,104 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; color: #ffd666; }
+h2 { font-size: 1.2rem; margin-top: 2rem; color: #ffe8a0; }
+
+a.alap {
+  color: #88bbff;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+a.alap:hover {
+  color: #ffd666;
+}
+
+/* Menu container */
+.alapelem {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 0.5rem;
+  min-width: 200px;
+}
+
+.alapelem ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.alapelem li {
+  margin: 0;
+  padding: 0;
+}
+
+.alapelem a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.alapelem a:hover,
+.alapelem a:focus {
+  background: #3366d6;
+  color: #ffd666;
+  outline: none;
+}
+
+/* Non-alap links (e.g., "All Examples" nav) */
+a:not(.alap) {
+  color: #ffe8a0;
+}
+
+a:not(.alap):hover {
+  color: #ffd666;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+
+.example {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #2240a8;
+  border-radius: 6px;
+  border: 1px solid #2e48a0;
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Themes &amp; Composition (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./themes.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Themes &amp; Composition (DOM)</h1>
+  <p>Complete theme compositions — the same visuals as the web component version, driven by plain CSS on <code>.alap_${id}</code>.</p>
+  <p class="note">All CSS on this page applies equally to <strong>popover mode</strong> — the menu renders as the same <code>.alapelem</code> element whether using DOM or popover.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html" class="current">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== DARK ===== -->
+
+  <h2>Dark Theme</h2>
+  <div class="example">
+    <a id="th-dark" class="alap" data-alap-linkitems=".coffee">coffee</a>
+  </div>
+  <pre>.alap_th-dark {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+}
+.alap_th-dark a       { color: #e2e8f0; }
+.alap_th-dark a:hover { background: #334155; color: #93c5fd; }</pre>
+
+  <!-- ===== NEON ===== -->
+
+  <h2>Neon</h2>
+  <div class="example">
+    <a id="th-neon" class="alap" data-alap-linkitems=".bridge">bridges</a>
+  </div>
+  <pre>.alap_th-neon {
+  background: #0f172a;
+  border-color: #1e3a5f;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
+  border-radius: 10px;
+}
+.alap_th-neon a {
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+.alap_th-neon a:hover {
+  background: #1e293b;
+  color: #7dd3fc;
+}</pre>
+
+  <!-- ===== GLASSMORPHISM ===== -->
+
+  <h2>Glassmorphism</h2>
+  <div class="example">
+    <div class="glass-bg">
+      <p>Frosted glass menu:
+        <a id="th-glass" class="alap" data-alap-linkitems=".coffee">coffee spots</a>
+      </p>
+    </div>
+    <p class="note"><code>backdrop-filter</code> works on any element in the light DOM.</p>
+  </div>
+  <pre>.alap_th-glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+}
+.alap_th-glass a       { color: #ffffff; }
+.alap_th-glass a:hover { background: rgba(255, 255, 255, 0.25); color: #ffffff; }</pre>
+
+  <!-- ===== BRUTALIST ===== -->
+
+  <h2>Brutalist</h2>
+  <div class="example">
+    <a id="th-brutal" class="alap" data-alap-linkitems="@cars">cars</a>
+  </div>
+  <pre>.alap_th-brutal {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  box-shadow: 6px 6px 0 #000000;
+}
+.alap_th-brutal a {
+  color: #000000;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+.alap_th-brutal a:hover {
+  background: #fbbf24;
+  color: #000000;
+}</pre>
+
+  <!-- ===== WARM ===== -->
+
+  <h2>Warm / Editorial</h2>
+  <div class="example">
+    <a id="th-warm" class="alap" data-alap-linkitems=".coffee">coffee</a>
+  </div>
+  <pre>.alap_th-warm {
+  background: #fffbeb;
+  border-color: #d97706;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
+  border-radius: 8px;
+}
+.alap_th-warm a       { color: #92400e; }
+.alap_th-warm a:hover { background: #fef3c7; color: #b45309; }</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

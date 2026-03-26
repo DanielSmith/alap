@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Typography &amp; Text</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./typography.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Typography &amp; Text</h1>
+  <p>Font weight, letter spacing, line height, text transform, text decoration, text overflow, and text alignment.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html" class="current">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== FONT WEIGHT ===== -->
+
+  <h2>Font Weight</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Light (300)</h3>
+      <div class="example weight-light">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Bold (700)</h3>
+      <div class="example weight-bold">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-font-weight: 300;  /* light */
+--alap-font-weight: 700;  /* bold */</pre>
+
+  <!-- ===== HOVER FONT WEIGHT ===== -->
+
+  <h2>Weight Change on Hover</h2>
+  <div class="example weight-hover">
+    <p>Normal → semibold on hover:
+      <alap-link query=".bridge">bridges</alap-link>
+    </p>
+    <p class="note">Base weight 400, hover weight 600. The fallback chain ensures hover inherits the base if <code>--alap-hover-font-weight</code> is unset.</p>
+  </div>
+  <pre>--alap-font-weight: 400;
+--alap-hover-font-weight: 600;</pre>
+
+  <!-- ===== LETTER SPACING ===== -->
+
+  <h2>Letter Spacing</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Tight (-0.02em)</h3>
+      <div class="example spacing-tight">
+        <alap-link query=".coffee">coffee spots</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Wide (0.08em)</h3>
+      <div class="example spacing-wide">
+        <alap-link query=".coffee">coffee spots</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-letter-spacing: -0.02em;  /* tight */
+--alap-letter-spacing: 0.08em;   /* wide — pairs well with uppercase */</pre>
+
+  <!-- ===== LINE HEIGHT ===== -->
+
+  <h2>Line Height</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Compact (1.2)</h3>
+      <div class="example lh-compact">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Spacious (2.0)</h3>
+      <div class="example lh-spacious">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-line-height: 1.2;  /* compact */
+--alap-line-height: 2.0;  /* spacious */</pre>
+
+  <!-- ===== TEXT TRANSFORM ===== -->
+
+  <h2>Text Transform</h2>
+  <div class="gallery" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="gallery-item">
+      <h3>uppercase</h3>
+      <div class="example transform-upper">
+        <alap-link query=".bridge">bridges</alap-link>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>capitalize</h3>
+      <div class="example transform-cap">
+        <alap-link query=".bridge">bridges</alap-link>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <h3>lowercase</h3>
+      <div class="example transform-lower">
+        <alap-link query=".bridge">bridges</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-text-transform: uppercase;   /* BROOKLYN BRIDGE */
+--alap-text-transform: capitalize;  /* Brooklyn Bridge */
+--alap-text-transform: lowercase;   /* brooklyn bridge */</pre>
+
+  <!-- ===== TEXT DECORATION ===== -->
+
+  <h2>Text Decoration</h2>
+  <div class="example deco-hover">
+    <p>Underline appears on hover:
+      <alap-link query=".coffee">coffee spots</alap-link>
+    </p>
+    <p class="note">Base: no decoration. Hover: underline. A traditional link feel inside the menu.</p>
+  </div>
+  <pre>--alap-text-decoration: none;
+--alap-hover-text-decoration: underline;</pre>
+
+  <!-- ===== TEXT ALIGN ===== -->
+
+  <h2>Text Alignment</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>center</h3>
+      <div class="example align-center">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>right</h3>
+      <div class="example align-right">
+        <alap-link query=".coffee">coffee</alap-link>
+      </div>
+    </div>
+  </div>
+  <pre>--alap-text-align: center;
+--alap-text-align: right;</pre>
+
+  <!-- ===== TEXT OVERFLOW ===== -->
+
+  <h2>Text Overflow (Ellipsis)</h2>
+  <div class="example ellipsis-section">
+    <p>Long labels get truncated:
+      <alap-link query=".long">long-name coffee shops</alap-link>
+    </p>
+    <p class="note">Requires three companion properties. <code>text-overflow</code> alone does nothing without <code>overflow: hidden</code> and <code>white-space: nowrap</code>.</p>
+  </div>
+  <pre>--alap-text-overflow: ellipsis;
+--alap-overflow: hidden;
+--alap-white-space: nowrap;
+--alap-max-width: 200px;</pre>
+
+  <!-- ===== MONOSPACE / TERMINAL ===== -->
+
+  <h2>Monospace / Terminal</h2>
+  <div class="example mono-section">
+    <p>Developer-friendly look:
+      <alap-link query=".car">car lookup</alap-link>.
+    </p>
+    <p class="note">Combines custom font, tighter padding, smaller size, notch corners, and wide letter spacing.</p>
+  </div>
+  <pre>--alap-font: 'JetBrains Mono', 'SF Mono', monospace;
+--alap-font-size: 0.8rem;
+--alap-padding: 0.4rem 0.8rem;
+--alap-letter-spacing: 0.02em;
+--alap-text-transform: uppercase;
+--alap-corner-shape: notch;</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

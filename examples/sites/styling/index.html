@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Styling</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Alap v3 — Styling Guide</h1>
+  <p>Every Alap menu can be styled globally or per-anchor. This example shows how.</p>
+
+  <!-- ===== DEFAULT ===== -->
+
+  <h2>Default Menu</h2>
+  <div class="example">
+    <p>The base <code>.alapelem</code> styles apply to all menus:
+      <a id="cars" class="alap" data-alap-linkitems="@cars">browse cars</a>.
+    </p>
+    <p class="note">The BMW item has <code>cssClass: "highlight-blue"</code> and the Miata has <code>"highlight-red"</code>.</p>
+  </div>
+  <pre>.alapelem {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-top: 0.5rem;   /* vertical offset */
+  margin-left: 0;       /* horizontal offset */
+}</pre>
+
+  <!-- ===== OFFSET ===== -->
+
+  <h2>Adjusting Offset</h2>
+  <div class="example">
+    <p>This
+      <a id="bridges" class="alap" data-alap-linkitems=".bridge">bridges</a>
+      menu has <code>margin-top: 1.5rem</code> for a bigger gap below the trigger.
+    </p>
+  </div>
+  <pre>.alap_bridges {
+  margin-top: 1.5rem;   /* push menu further down */
+}</pre>
+
+  <div class="example">
+    <p>This
+      <a id="coffee" class="alap" data-alap-linkitems=".coffee">coffee spots</a>
+      menu has <code>margin-left: 2rem</code> to shift it right.
+    </p>
+  </div>
+  <pre>.alap_coffee {
+  margin-left: 2rem;    /* shift menu to the right */
+}</pre>
+
+  <!-- ===== PER-ANCHOR THEMING ===== -->
+
+  <h2>Per-Anchor Theming</h2>
+  <div class="example">
+    <p>Each anchor's menu gets a class of <code>alap_{id}</code>.
+      Click
+      <a id="nyc" class="alap" data-alap-linkitems=".nyc">NYC spots</a>
+      to see a dark-themed menu.
+    </p>
+  </div>
+  <pre>.alap_nyc {
+  background: #1e293b;
+  border-color: #334155;
+}
+.alap_nyc a { color: #e2e8f0; }
+.alap_nyc a:hover { background: #334155; color: #60a5fa; }</pre>
+
+  <!-- ===== COMPACT ===== -->
+
+  <h2>Compact Style</h2>
+  <div class="example">
+    <p>A
+      <a id="compact" class="alap" data-alap-linkitems=".sf">compact menu</a>
+      with narrower padding and smaller text.
+    </p>
+  </div>
+  <pre>.alap_compact {
+  min-width: 140px;
+  border-radius: 4px;
+}
+.alap_compact a {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+}</pre>
+
+  <!-- ===== ITEM-LEVEL CLASSES ===== -->
+
+  <h2>Custom Item Classes</h2>
+  <div class="example">
+    <p>Individual items can have a <code>cssClass</code> in the config.
+      Click <a id="itemstyles" class="alap" data-alap-linkitems="@cars">cars</a>
+      &mdash; the BMW has a blue left border, the Miata has red.
+    </p>
+  </div>
+  <pre>// In config:
+bmwe36: {
+  label: 'BMW E36',
+  cssClass: 'highlight-blue',  // applied to the &lt;li&gt;
+  ...
+}
+
+// In CSS:
+.highlight-blue { border-left: 3px solid #3b82f6; }
+.highlight-red  { border-left: 3px solid #ef4444; }</pre>
+
+  <!-- ===== IMAGE TRIGGER ===== -->
+
+  <h2>Image Trigger</h2>
+  <div class="example">
+    <p>Click the image. The menu appears at the click coordinates, not the element's top-left corner.</p>
+    <img id="cityphotos" class="alap"
+         data-alap-linkitems=".photo"
+         src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Golden_Gate_Bridge_20100906.jpg/320px-Golden_Gate_Bridge_20100906.jpg"
+         alt="Golden Gate Bridge"
+         width="280">
+    <p class="note"><code>.alap_cityphotos</code> sets <code>margin-top: 0</code> so it sits flush.</p>
+  </div>
+  <pre>.alap_cityphotos {
+  margin-top: 0;   /* no offset for image-triggered menus */
+  margin-left: 0;
+}</pre>
+
+  <!-- ===== SUMMARY ===== -->
+
+  <h2>CSS Cascade</h2>
+  <pre>/* 1. Base styles for all menus */
+.alapelem { ... }
+
+/* 2. Per-anchor overrides (menu gets alap_{anchorId}) */
+.alap_bridges { ... }
+.alap_nyc { ... }
+
+/* 3. Per-item overrides (li gets cssClass from config) */
+.highlight-blue { ... }</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

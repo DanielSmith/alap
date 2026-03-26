@@ -1,0 +1,265 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* --- Dark theme --- */
+
+.dark-section {
+  background: #11111b;
+  border-color: #313244;
+}
+
+.dark-section alap-link {
+  color: #cba6f7;
+}
+.dark-section alap-link:hover {
+  color: #f5c2e7;
+}
+
+.dark-section alap-link {
+  --alap-bg: #1e1e2e;
+  --alap-border: #313244;
+  --alap-text: #cdd6f4;
+  --alap-hover-bg: #313244;
+  --alap-hover-text: #89b4fa;
+  --alap-focus-ring: #89b4fa;
+  --alap-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --alap-radius: 12px;
+  --alap-corner-shape: squircle;
+}
+
+/* --- Auto dark mode --- */
+
+.auto-dark-section {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #1e293b;
+}
+.auto-dark-section .note { color: #64748b; }
+
+.auto-dark-section alap-link {
+  color: #2563eb;
+  --alap-bg: #ffffff;
+  --alap-border: #e5e7eb;
+  --alap-text: #1a1a1a;
+  --alap-hover-bg: #eff6ff;
+  --alap-hover-text: #2563eb;
+  --alap-focus-ring: #2563eb;
+  --alap-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --alap-radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auto-dark-section {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f0f2ff;
+  }
+  .auto-dark-section .note { color: #94a3b8; }
+
+  .auto-dark-section alap-link {
+    color: #93c5fd;
+    --alap-bg: #1e1e2e;
+    --alap-border: #313244;
+    --alap-text: #cdd6f4;
+    --alap-hover-bg: #313244;
+    --alap-hover-text: #89b4fa;
+    --alap-focus-ring: #89b4fa;
+    --alap-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.auto-dark-section::after {
+  content: 'Browser reports: light mode';
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  background: #dbeafe;
+  color: #1e40af;
+  width: fit-content;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auto-dark-section::after {
+    content: 'Browser reports: dark mode';
+    background: #312e81;
+    color: #c7d2fe;
+  }
+}
+
+/* --- Borderless floating --- */
+
+.floating-section alap-link {
+  --alap-border-width: 0;
+  --alap-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --alap-radius: 20px;
+  --alap-max-width: 280px;
+  --alap-corner-shape: squircle;
+  --alap-padding: 0.6rem 1.25rem;
+}
+
+/* --- Neon --- */
+
+.neon-section {
+  background: #0a0a0a;
+  border-color: #1a1a2e;
+}
+
+.neon-section alap-link {
+  color: #38bdf8;
+  --alap-bg: #0a0a0a;
+  --alap-border: #1a1a2e;
+  --alap-text: #38bdf8;
+  --alap-text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+  --alap-hover-bg: #0f172a;
+  --alap-hover-text: #7dd3fc;
+  --alap-hover-text-shadow: 0 0 12px rgba(56, 189, 248, 0.8), 0 0 30px rgba(56, 189, 248, 0.4);
+  --alap-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+  --alap-focus-ring: #38bdf8;
+  --alap-transition: text-shadow 0.2s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.neon-section alap-link:hover {
+  color: #7dd3fc;
+}
+
+/* --- Glassmorphism --- */
+
+.glass-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.glass-section alap-link {
+  color: #ffffff;
+  --alap-bg: rgba(255, 255, 255, 0.12);
+  --alap-backdrop: blur(12px) saturate(180%);
+  --alap-border: rgba(255, 255, 255, 0.2);
+  --alap-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --alap-radius: 16px;
+  --alap-corner-shape: squircle;
+  --alap-text: #ffffff;
+  --alap-hover-bg: rgba(255, 255, 255, 0.25);
+  --alap-hover-text: #ffffff;
+  --alap-focus-ring: rgba(255, 255, 255, 0.6);
+}
+.glass-section alap-link:hover { color: #f0f0f0; }
+
+/* --- Brutalist --- */
+
+.brutalist-section {
+  background: #000000;
+  border-color: #ffffff;
+}
+
+.brutalist-section alap-link {
+  color: #ffffff;
+  font-weight: 700;
+  --alap-bg: #000000;
+  --alap-border: #ffffff;
+  --alap-border-width: 3px;
+  --alap-text: #ffffff;
+  --alap-hover-bg: #ffffff;
+  --alap-hover-text: #000000;
+  --alap-corner-shape: straight;
+  --alap-radius: 0;
+  --alap-text-transform: uppercase;
+  --alap-letter-spacing: 0.1em;
+  --alap-font-weight: 700;
+  --alap-shadow: 8px 8px 0 #ffffff;
+  --alap-focus-ring: #ffffff;
+}
+
+.brutalist-section alap-link:hover { color: #999999; }
+
+/* --- Focus customization --- */
+
+.focus-custom alap-link {
+  --alap-hover-bg: #eff6ff;
+  --alap-hover-text: #2563eb;
+  --alap-focus-bg: #fff7ed;
+  --alap-focus-text: #c2410c;
+  --alap-focus-ring: #ea580c;
+  --alap-focus-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2);
+  --alap-transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* --- Z-index --- */
+
+.fake-sticky-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #dc2626;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  z-index: 50;
+  border-radius: 8px 8px 0 0;
+}
+
+.zindex-section alap-link {
+  --alap-z-index: 100;
+}
+
+/* --- Wild combo --- */
+
+.wild-section {
+  background: #0f172a;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.wild-section alap-link {
+  color: #7dd3fc;
+  --alap-bg: rgba(15, 23, 42, 0.85);
+  --alap-backdrop: blur(8px);
+  --alap-border: rgba(56, 189, 248, 0.3);
+  --alap-radius: 20px;
+  --alap-corner-shape: squircle;
+  --alap-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+  --alap-text: #7dd3fc;
+  --alap-text-shadow: 0 0 6px rgba(56, 189, 248, 0.3);
+  --alap-font-weight: 500;
+  --alap-letter-spacing: 0.03em;
+  --alap-text-transform: uppercase;
+  --alap-font-size: 0.8rem;
+  --alap-item-gap: 3px;
+  --alap-item-border-radius: 8px;
+  --alap-menu-padding: 0.5rem;
+  --alap-hover-bg: rgba(56, 189, 248, 0.15);
+  --alap-hover-text: #ffffff;
+  --alap-hover-text-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+  --alap-hover-shadow: inset 3px 0 0 #38bdf8;
+  --alap-hover-transform: translateX(4px);
+  --alap-transition: all 0.2s ease;
+  --alap-focus-ring: #38bdf8;
+  --alap-focus-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+  --alap-menu-hover-shadow: 0 0 40px rgba(56, 189, 248, 0.25);
+  --alap-menu-transition: box-shadow 0.3s ease;
+}
+
+.wild-section alap-link:hover { color: #ffffff; }
+
+/* --- Gap + scrolling --- */
+
+.gap-scroll-section alap-link {
+  --alap-gap: 1rem;
+  --alap-max-width: 260px;
+}

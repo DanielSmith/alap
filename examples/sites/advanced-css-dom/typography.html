@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Typography &amp; Text (DOM)</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="./typography.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Typography &amp; Text (DOM)</h1>
+  <p>Font weight, spacing, transform, decoration, and overflow via light DOM CSS.</p>
+  <p class="note">All CSS on this page applies equally to <strong>popover mode</strong> — the menu renders as the same <code>.alapelem</code> element whether using DOM or popover.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./shapes.html">Shapes &amp; Borders</a>
+    <a href="./shadows.html">Shadows &amp; Depth</a>
+    <a href="./typography.html" class="current">Typography &amp; Text</a>
+    <a href="./motion.html">Motion &amp; Interaction</a>
+    <a href="./themes.html">Themes &amp; Composition</a>
+  </nav>
+
+  <!-- ===== FONT WEIGHT ===== -->
+
+  <h2>Font Weight</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Light (300)</h3>
+      <div class="example">
+        <a id="ty-light" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Bold (600)</h3>
+      <div class="example">
+        <a id="ty-bold" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_ty-light a { font-weight: 300; }
+.alap_ty-bold  a { font-weight: 600; }</pre>
+
+  <!-- ===== LETTER SPACING ===== -->
+
+  <h2>Letter Spacing</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Tight (-0.02em)</h3>
+      <div class="example">
+        <a id="ty-tight" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Wide (0.08em)</h3>
+      <div class="example">
+        <a id="ty-wide" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_ty-tight a { letter-spacing: -0.02em; }
+.alap_ty-wide  a { letter-spacing: 0.08em; }</pre>
+
+  <!-- ===== TEXT TRANSFORM ===== -->
+
+  <h2>Text Transform</h2>
+  <div class="compare">
+    <div class="compare-item">
+      <h3>Uppercase</h3>
+      <div class="example">
+        <a id="ty-upper" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+    <div class="compare-item">
+      <h3>Lowercase</h3>
+      <div class="example">
+        <a id="ty-lower" class="alap" data-alap-linkitems=".coffee">coffee</a>
+      </div>
+    </div>
+  </div>
+  <pre>.alap_ty-upper a { text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.06em; }
+.alap_ty-lower a { text-transform: lowercase; }</pre>
+
+  <!-- ===== TEXT DECORATION ===== -->
+
+  <h2>Hover Underline</h2>
+  <div class="example">
+    <p>Items get an underline on hover:
+      <a id="ty-underline" class="alap" data-alap-linkitems=".bridge">bridges</a>
+    </p>
+  </div>
+  <pre>.alap_ty-underline a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}</pre>
+
+  <!-- ===== TEXT OVERFLOW ===== -->
+
+  <h2>Text Overflow (Ellipsis)</h2>
+  <div class="example">
+    <p>Long labels truncate with ellipsis:
+      <a id="ty-ellipsis" class="alap" data-alap-linkitems=".long">long labels</a>
+    </p>
+  </div>
+  <pre>.alap_ty-ellipsis a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}</pre>
+
+  <!-- ===== COMPACT ===== -->
+
+  <h2>Compact Size</h2>
+  <div class="example">
+    <p>Smaller text and padding:
+      <a id="ty-compact" class="alap" data-alap-linkitems=".coffee">coffee</a>
+    </p>
+  </div>
+  <pre>.alap_ty-compact a {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

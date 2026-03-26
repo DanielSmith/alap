@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — External Data</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    body:not(.loaded) .example { opacity: 0.5; }
+    body.loaded .example { opacity: 1; transition: opacity 0.3s; }
+    .note { color: #7888b8; font-size: 0.9em; }
+
+    /* Constrain menus — external data can have very long titles */
+    .alapelem { max-width: 400px; }
+    .alapListElem a {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Alap v3 — External Data</h1>
+  <p>
+    The <code>:web:</code> protocol fetches data from APIs and turns it into
+    Alap links. The config maps keys to endpoints — the handler does the rest.
+    Results cache locally, so menus open instantly after the first fetch.
+  </p>
+
+  <h2>Local Only</h2>
+  <p class="note">These use <code>allLinks</code> — no API calls.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".photography">Photography links</a>
+      — all items tagged <code>.photography</code>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="@my_bookmarks">My bookmarks</a>
+      — macro expanding to three saved photographers
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".nyc + .landmark + :time:7d:">Recent NYC landmarks</a>
+      — tags + time filter
+    </p>
+  </div>
+
+  <h2>External Only</h2>
+  <p class="note">These fetch from the Open Library API via <code>:web:</code>.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":web:books:photography:">Photography books</a>
+      — search alias: <code>"street photography film"</code>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:books:adams:">Douglas Adams books</a>
+      — search alias: <code>"douglas adams hitchhiker"</code>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:books:gardening:">Gardening books</a>
+      — search alias: <code>"vegetable garden organic"</code>
+    </p>
+  </div>
+  <pre><code>protocols: {
+  web: {
+    generate: webHandler,
+    keys: {
+      books: {
+        url: "https://openlibrary.org/search.json",
+        linkBase: "https://openlibrary.org",
+        searches: {
+          photography:  { q: "street photography film", limit: 8 },
+          adams:        { q: "douglas adams hitchhiker", limit: 8 },
+          gardening:    { q: "vegetable garden organic", limit: 8 },
+        },
+        map: { label: "title", url: "key", meta: { author: "author_name.0" } }
+      }
+    }
+  }
+}
+
+data-alap-linkitems=":web:books:photography:"
+data-alap-linkitems=":web:books:adams:"</code></pre>
+
+  <h2>Mixed: Local + External</h2>
+  <p class="note">Local bookmarks merged with API results. Refiners scoped by parentheses.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="@my_bookmarks | (:web:books:photography: *sort:label* *limit:3*)">Bookmarks + top 3 photography books</a>
+      — macro union with scoped external results
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.nyc + .landmark *sort:label*), (:web:books:architecture: *limit:5*)">NYC landmarks, then architecture books</a>
+      — comma-separated local and external, each with own scope
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".photography | :web:books:photography:">All photography</a>
+      — local photography links + photography books from the API
+    </p>
+  </div>
+  <pre><code>@my_bookmarks | (:web:books:photography: *sort:label* *limit:3*)
+(.nyc + .landmark *sort:label*), (:web:books:architecture: *limit:5*)
+.photography | :web:books:photography:</code></pre>
+
+  <h2>Scoping</h2>
+  <p class="note">Parentheses control where refiners apply.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="@my_bookmarks | :web:books:adams: *limit:10*">Bookmarks + Adams (limit 10 total)</a>
+      — limit applies to the whole result
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="@my_bookmarks | (:web:books:adams: *sort:label* *limit:3*)">Bookmarks + top 3 Adams books</a>
+      — sort and limit scoped to the books only
+    </p>
+  </div>
+  <pre><code>@my_bookmarks | :web:books:adams: *limit:10*               — limit the whole result
+@my_bookmarks | (:web:books:adams: *sort:label* *limit:3*) — only the books are sorted and limited</code></pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
