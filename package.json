@@ -128,6 +128,11 @@
     "node": ">=20"
   },
   "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "overrides": {
+      "picomatch": ">=4.0.4"
+    }
+  },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.10",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",
