@@ -2,12 +2,8 @@ name: Security Audit
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    # Weekly on Monday at 9am UTC
-    - cron: '0 9 * * 1'
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
