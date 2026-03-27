@@ -4,6 +4,52 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### Compass-Based Menu Placement Engine (2026-03-26)
+
+Menus now use a proper placement engine instead of ad-hoc flip logic. Preferred position with smart fallback, no page scroll, full viewport containment. Replaces the previous `viewportAdjust` flip behavior.
+
+**Core — `src/ui/shared/placement.ts` (new):**
+- Pure geometry module — takes rects and viewport, returns coordinates. Zero DOM access.
+- 9 compass placements: `N`, `NE`, `E`, `SE` (default), `S`, `SW`, `W`, `NW`, `C` (center)
+- Smart fallback: tries opposite side first, then adjacent positions, then best-fit with clamping
+- Height/width clamping with scroll when menu can't fit
+- `computePlacement()` exported for framework adapters and custom use
+- `FALLBACK_ORDER` map exported for transparency and testing
+
+**New config settings** (all optional, backward-compatible):
+- `placement` — preferred position, default `'SE'`
+- `placementGap` — pixel gap between trigger and menu edge, default `4`
+- `viewportPadding` — minimum distance from viewport edges, default `8`
+- `viewportAdjust: false` still disables all placement logic
+
+**DOM adapter (`AlapUI`):**
+- Off-screen measurement technique — renders menu with `visibility: hidden; position: fixed` to get natural size without causing scroll. Eliminates the `window.scrollTo(0, scrollY)` hack.
+- `overflow-x: clip` on the menu container — prevents horizontal page scroll without creating a scroll context (unlike `overflow: hidden` which can create unwanted scrollbars on the other axis)
+- Per-trigger override via `data-alap-placement` attribute
+- Image triggers use a synthetic 0x0 rect at click coordinates — same placement engine, same fallback
+- Scroll tracking re-runs `computePlacement()` on each scroll event (pure math, fast)
+
+**Web component (`<alap-link>`):**
+- Same placement engine, results converted to host-relative offsets
+- `placement` attribute for per-element override (added to observed attributes)
+- Reads `--alap-gap` CSS variable for gap (with config fallback)
+
+**Tests (27 new):**
+- `tests/ui/shared/placement.test.ts` — all 9 placements, fallback near each viewport edge, clamping (height/width/both), edge cases (zero-size trigger, menu larger than viewport), FALLBACK_ORDER completeness
+
+**Example:**
+- `examples/sites/placement/` (port 9170) — compass rose grids for DOM and web component, viewport fallback demo, center/popover-style placement, inline text placement
+
+**Docs:**
+- `docs/getting-started/configuration.md` — new placement settings table with compass diagram
+- `docs/api-reference/types.md` — `Placement` type, all 9 positions documented
+- `docs/framework-guides/vanilla-dom.md` — positioning section rewritten around compass model
+- `docs/framework-guides/web-component.md` — `placement` attribute, positioning section added
+- `docs/cookbook/placement.md` (new) — full guide: 9 positions, fallback behavior, Alap config vs. raw CSS boundary
+- `docs/cookbook/accessibility.md` — viewport containment section
+- `docs/cookbook/images-and-media.md` — image trigger placement behavior
+- `docs/FAQ.md` — mode comparison updated
+
 ### Generate Protocols and External Data (2026-03-24)
 
 Protocols can now fetch external data from APIs — not just filter local links. The new **generate** handler type brings in non-Alap data and transforms it into links that compose with everything the expression language already has.

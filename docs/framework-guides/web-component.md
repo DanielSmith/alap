@@ -30,11 +30,12 @@ registerConfig(config);     // feed config to the registry
 | `query` | `string` | Yes | Expression to evaluate |
 | `config` | `string` | No | Named config to use. Default: `'_default'` |
 | `href` | `string` | No | Existing URL — included in menu per `existingUrl` setting |
+| `placement` | `string` | No | Menu placement: `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`, `C`. Overrides config |
 
 ```html
 <alap-link query=".coffee">cafes</alap-link>
 <alap-link query=".nyc + .bridge">NYC bridges</alap-link>
-<alap-link query="@favorites">my picks</alap-link>
+<alap-link query="@favorites" placement="N">my picks (menu above)</alap-link>
 ```
 
 ### Multi-config
@@ -238,6 +239,21 @@ alap-link {
   transform: translateY(0);
 }
 ```
+
+## Positioning
+
+The web component uses the same compass-based placement engine as the DOM adapter. Set placement globally via `settings.placement` or per-element via the `placement` attribute:
+
+```html
+<alap-link query=".coffee" placement="S">centered below</alap-link>
+<alap-link query=".coffee" placement="N">above me</alap-link>
+<alap-link query=".coffee" placement="E">beside me</alap-link>
+<alap-link query=".coffee" placement="C">centered over me</alap-link>
+```
+
+The `--alap-gap` CSS custom property controls the gap between trigger and menu. The placement engine reads this value automatically. You can also set `placementGap` in config settings — the CSS variable takes priority when set.
+
+See [Configuration](../getting-started/configuration.md#placement) for the full placement reference.
 
 ## CDN / IIFE build
 

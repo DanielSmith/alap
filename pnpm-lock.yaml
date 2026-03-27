@@ -81,6 +81,9 @@ importers:
       unified:
         specifier: ^11.0.5
         version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.1.0
+        version: 5.1.0
       vite:
         specifier: ^6.2.0
         version: 6.4.1(@types/node@25.4.0)

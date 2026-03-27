@@ -31,7 +31,8 @@ import { useMenuDismiss } from './useMenuDismiss';
 import { createMenuKeyHandler } from './useMenuKeyboard';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
+import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -76,6 +77,15 @@ export interface AlapLinkProps {
 
   /** Fired on right-click of a menu item */
   onItemContext?: (detail: ItemContextDetail) => void;
+
+  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine instead of CSS-only positioning. */
+  placement?: Placement;
+
+  /** Pixel gap between trigger and menu edge. Default: 4. Only used when placement is set. */
+  gap?: number;
+
+  /** Minimum pixel distance from viewport edges. Default: 8. Only used when placement is set. */
+  padding?: number;
 }
 
 type ResolvedLink = { id: string } & AlapLinkType;
@@ -94,6 +104,9 @@ export function AlapLink({
   onTriggerContext,
   onItemHover,
   onItemContext,
+  placement,
+  gap,
+  padding,
 }: AlapLinkProps) {
   const { engine, config, menuTimeout, defaultMenuStyle, defaultMenuClassName, defaultListType, defaultMaxVisibleItems } =
     useAlapContext();
@@ -105,6 +118,7 @@ export function AlapLink({
   const menuId = useId();
   const triggerRef = useRef<HTMLSpanElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLSpanElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const resolvedListType = listType ?? defaultListType;
@@ -163,6 +177,44 @@ export function AlapLink({
       startTimer();
     }
   }, [isOpen, startTimer]);
+
+  // --- Compass placement ---
+
+  useEffect(() => {
+    if (!isOpen || !placement || mode === 'popover') return;
+    if (!triggerRef.current || !menuRef.current || !wrapperRef.current) return;
+
+    const triggerEl = triggerRef.current;
+    const menuEl = menuRef.current;
+    const wrapperEl = wrapperRef.current;
+
+    const apply = () => {
+      const state = calcPlacementState(triggerEl, menuEl, { placement, gap, padding });
+      applyPlacementToMenu(menuEl, wrapperEl, state);
+    };
+
+    // Initial placement
+    apply();
+
+    // Recompute on scroll
+    const onScroll = () => apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      clearPlacementClass(menuEl);
+    };
+  }, [isOpen, placement, gap, padding, mode]);
+
+  // --- Trigger scroll-away detection ---
+
+  useEffect(() => {
+    if (!isOpen || mode === 'popover') return;
+    if (!triggerRef.current) return;
+
+    const observer = observeTriggerOffscreen(triggerRef.current, closeMenu);
+    return () => observer.disconnect();
+  }, [isOpen, mode, closeMenu]);
 
   // --- Close on config change ---
 
@@ -291,7 +343,7 @@ export function AlapLink({
   // --- Render: DOM and Web Component modes ---
 
   return (
-    <span style={{ position: 'relative', display: 'inline' }}>
+    <span ref={wrapperRef} style={{ position: 'relative', display: 'inline' }}>
       <span {...triggerProps}>{children}</span>
       {isOpen && (
         <div {...menuContainerProps}>

@@ -19,7 +19,8 @@ import { Dynamic } from 'solid-js/web';
 import { useAlapContext } from './context';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
+import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -39,6 +40,12 @@ export interface AlapLinkProps {
   onTriggerContext?: (detail: TriggerContextDetail) => void;
   onItemHover?: (detail: ItemHoverDetail) => void;
   onItemContext?: (detail: ItemContextDetail) => void;
+  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
+  placement?: Placement;
+  /** Pixel gap between trigger and menu edge. Default: 4. */
+  gap?: number;
+  /** Minimum pixel distance from viewport edges. Default: 8. */
+  padding?: number;
 }
 
 type ResolvedLink = { id: string } & AlapLinkType;
@@ -59,6 +66,7 @@ export function AlapLink(props: AlapLinkProps) {
 
   let triggerEl: HTMLSpanElement | undefined;
   let menuEl: HTMLDivElement | undefined;
+  let wrapperEl: HTMLSpanElement | undefined;
   const itemEls: HTMLAnchorElement[] = [];
 
   let timerId = 0;
@@ -168,6 +176,47 @@ export function AlapLink(props: AlapLinkProps) {
     };
     el.addEventListener('toggle', onToggle);
     onCleanup(() => el.removeEventListener('toggle', onToggle));
+  });
+
+  // --- Compass placement ---
+
+  createEffect(() => {
+    if (!isOpen() || !props.placement || mode() === 'popover') return;
+    if (!triggerEl || !menuEl || !wrapperEl) return;
+
+    const tEl = triggerEl;
+    const mEl = menuEl;
+    const wEl = wrapperEl;
+    const p = props.placement;
+
+    const apply = () => {
+      const state = calcPlacementState(tEl, mEl, {
+        placement: p,
+        gap: props.gap,
+        padding: props.padding,
+      });
+      applyPlacementToMenu(mEl, wEl, state);
+    };
+
+    apply();
+
+    const onScroll = () => apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    onCleanup(() => {
+      window.removeEventListener('scroll', onScroll);
+      clearPlacementClass(mEl);
+    });
+  });
+
+  // --- Trigger scroll-away detection ---
+
+  createEffect(() => {
+    if (!isOpen() || mode() === 'popover') return;
+    if (!triggerEl) return;
+
+    const observer = observeTriggerOffscreen(triggerEl, closeMenu);
+    onCleanup(() => observer.disconnect());
   });
 
   // --- Cleanup timer on unmount ---
@@ -334,7 +383,7 @@ export function AlapLink(props: AlapLinkProps) {
   }
 
   return (
-    <span style={{ position: 'relative', display: 'inline' }}>
+    <span ref={(el) => { wrapperEl = el; }} style={{ position: 'relative', display: 'inline' }}>
       <span {...triggerProps}>{props.children}</span>
       <Show when={isOpen()}>
         <div {...menuContainerProps}>

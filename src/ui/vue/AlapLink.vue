@@ -22,7 +22,8 @@ import { createMenuKeyHandler } from './useMenuKeyboard';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
 import type { AlapLinkMode } from './providerKey';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
+import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 type ResolvedLink = { id: string } & AlapLinkType;
@@ -43,6 +44,12 @@ const props = withDefaults(defineProps<{
   menuStyle?: CSSProperties;
   listType?: 'ul' | 'ol';
   maxVisibleItems?: number;
+  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
+  placement?: Placement;
+  /** Pixel gap between trigger and menu edge. Default: 4. Only used when placement is set. */
+  gap?: number;
+  /** Minimum pixel distance from viewport edges. Default: 8. Only used when placement is set. */
+  padding?: number;
 }>(), {
   mode: 'dom',
 });
@@ -59,6 +66,7 @@ const menuId = `alap-menu-${uid}`;
 
 const triggerRef = ref<HTMLElement | null>(null);
 const menuRef = ref<HTMLElement | null>(null);
+const wrapperRef = ref<HTMLElement | null>(null);
 const itemEls: HTMLAnchorElement[] = [];
 
 const resolvedListType = computed(() => props.listType ?? ctx.defaultListType);
@@ -123,6 +131,56 @@ watch(isOpen, async (open) => {
     itemEls[0]?.focus();
     startTimer();
   }
+});
+
+// --- Compass placement ---
+
+let scrollHandler: (() => void) | null = null;
+
+watch(isOpen, async (open) => {
+  // Clean up previous scroll handler
+  if (scrollHandler) {
+    window.removeEventListener('scroll', scrollHandler);
+    scrollHandler = null;
+  }
+
+  if (!open || !props.placement || props.mode === 'popover') return;
+
+  await nextTick();
+  const triggerEl = triggerRef.value;
+  const menuEl = menuRef.value;
+  const wrapperEl = wrapperRef.value;
+  if (!triggerEl || !menuEl || !wrapperEl) return;
+
+  const apply = () => {
+    const state = calcPlacementState(triggerEl, menuEl, {
+      placement: props.placement!,
+      gap: props.gap,
+      padding: props.padding,
+    });
+    applyPlacementToMenu(menuEl, wrapperEl, state);
+  };
+
+  apply();
+
+  scrollHandler = () => apply();
+  window.addEventListener('scroll', scrollHandler, { passive: true });
+});
+
+// --- Trigger scroll-away detection ---
+
+let intersectionObserver: IntersectionObserver | null = null;
+
+watch(isOpen, (open) => {
+  if (intersectionObserver) {
+    intersectionObserver.disconnect();
+    intersectionObserver = null;
+  }
+
+  if (!open || props.mode === 'popover') return;
+  if (!triggerRef.value) return;
+
+  intersectionObserver = observeTriggerOffscreen(triggerRef.value, closeMenu);
 });
 
 // --- Close on config change ---
@@ -263,7 +321,7 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
 
   <!-- DOM and Web Component modes -->
   <template v-else>
-    <span style="position: relative; display: inline">
+    <span ref="wrapperRef" style="position: relative; display: inline">
     <span
       ref="triggerRef"
       :id="triggerId"

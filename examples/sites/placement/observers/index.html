@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alap — Scroll-Away Detection</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Scroll-Away Detection (IntersectionObserver)</h1>
+  <p class="intro">
+    When a menu is open and you scroll the trigger off-screen, the menu
+    automatically closes. This prevents "floating orphan" menus that
+    detach from their triggers.
+  </p>
+
+  <div class="spacer">
+    <p>Scroll down to find the triggers...</p>
+  </div>
+
+  <section class="trigger-zone">
+    <h2>Trigger Zone</h2>
+    <p>
+      Click a link to open its menu, then scroll this page. When the
+      trigger leaves the viewport, the menu will close automatically.
+    </p>
+    <p>
+      Try <a class="alap" data-alap-linkitems=".bridge" data-alap-placement="SE">bridges</a>,
+      <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE">coffee spots</a>, or
+      <a class="alap" data-alap-linkitems=".park" data-alap-placement="SE">parks</a>.
+    </p>
+    <p>
+      Web components too:
+      <alap-link query=".bridge" placement="SE">bridges</alap-link>,
+      <alap-link query=".coffee" placement="SE">coffee spots</alap-link>.
+    </p>
+  </section>
+
+  <div class="spacer">
+    <p>Keep scrolling — the menu should have closed when the trigger left the viewport.</p>
+  </div>
+
+  <section class="trigger-zone">
+    <h2>Second Trigger Zone</h2>
+    <p>
+      The observer is per-menu-open. Each time you click a trigger,
+      a new observer is created. When the menu closes (for any reason),
+      the observer is disconnected.
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".bridge | .coffee" data-alap-placement="S">all locations</a>
+    </p>
+  </section>
+
+  <div class="spacer">
+    <p>End of page.</p>
+  </div>
+
+  <script type="module" src="main.ts"></script>
+</body>
+</html>

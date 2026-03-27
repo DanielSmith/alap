@@ -88,9 +88,11 @@ See [Styling](core-concepts/styling.md) for the full guide, and [Web Component](
 
 | Mode | How it works | When to use |
 |------|-------------|-------------|
-| **DOM** | Single shared menu container, absolute positioning | Maximum compatibility, simplest CSS |
-| **Web Component** | Per-element Shadow DOM, `::part()` theming | Style isolation, third-party embedding |
+| **DOM** | Single shared menu container, compass-based placement with viewport containment | Maximum compatibility, simplest CSS |
+| **Web Component** | Per-element Shadow DOM, same placement engine, `::part()` theming | Style isolation, third-party embedding |
 | **Popover** | HTML Popover API, browser-managed stacking | Modern browsers, no z-index management |
+
+All modes support 9 placement positions (N, NE, E, SE, S, SW, W, NW, C) with automatic fallback when the preferred position doesn't fit in the viewport.
 
 ### Can I have multiple configs on one page?
 

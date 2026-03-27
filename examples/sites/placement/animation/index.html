@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alap — Direction-Aware Animations</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Direction-Aware Menu Animations</h1>
+  <p class="intro">
+    When the placement engine positions a menu, it applies a CSS class like
+    <code>alap-placed-se</code>. This lets you write animations that slide the
+    menu in from the direction it was placed. Try each trigger below.
+  </p>
+
+  <!-- Compass rose -->
+  <section>
+    <h2>Compass Rose (DOM adapter)</h2>
+    <div class="compass">
+      <div class="cell nw"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NW">NW</a></div>
+      <div class="cell n"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="N">N</a></div>
+      <div class="cell ne"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NE">NE</a></div>
+      <div class="cell w"><a class="alap" data-alap-linkitems=".coffee" data-alap-placement="W">W</a></div>
+      <div class="cell c"><a class="alap" data-alap-linkitems=".coffee" data-alap-placement="C">C</a></div>
+      <div class="cell e"><a class="alap" data-alap-linkitems=".coffee" data-alap-placement="E">E</a></div>
+      <div class="cell sw"><a class="alap" data-alap-linkitems=".park" data-alap-placement="SW">SW</a></div>
+      <div class="cell s"><a class="alap" data-alap-linkitems=".park" data-alap-placement="S">S</a></div>
+      <div class="cell se"><a class="alap" data-alap-linkitems=".park" data-alap-placement="SE">SE</a></div>
+    </div>
+    <p class="note">Each menu slides in from its placement direction.</p>
+  </section>
+
+  <!-- Web component compass rose -->
+  <section>
+    <h2>Compass Rose (Web Component)</h2>
+    <div class="compass">
+      <div class="cell nw"><alap-link query=".bridge" placement="NW">NW</alap-link></div>
+      <div class="cell n"><alap-link query=".bridge" placement="N">N</alap-link></div>
+      <div class="cell ne"><alap-link query=".bridge" placement="NE">NE</alap-link></div>
+      <div class="cell w"><alap-link query=".coffee" placement="W">W</alap-link></div>
+      <div class="cell c"><alap-link query=".coffee" placement="C">C</alap-link></div>
+      <div class="cell e"><alap-link query=".coffee" placement="E">E</alap-link></div>
+      <div class="cell sw"><alap-link query=".park" placement="SW">SW</alap-link></div>
+      <div class="cell s"><alap-link query=".park" placement="S">S</alap-link></div>
+      <div class="cell se"><alap-link query=".park" placement="SE">SE</alap-link></div>
+    </div>
+    <p class="note">Web component menus use shadow DOM — animations are applied via <code>::part(menu)</code>.</p>
+  </section>
+
+  <script type="module" src="main.ts"></script>
+</body>
+</html>

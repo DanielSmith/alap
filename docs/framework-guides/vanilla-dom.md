@@ -47,6 +47,7 @@ See [Events](../api-reference/events.md) for callback detail types.
 | `class="alap"` | Trigger | Default selector (configurable via `selector`) |
 | `data-alap-linkitems` | Trigger | Expression to evaluate |
 | `data-alap-existing` | Trigger | Per-anchor `existingUrl` override: `"prepend"`, `"append"`, `"ignore"` |
+| `data-alap-placement` | Trigger | Per-anchor placement override: `"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`, `"C"` |
 
 ```html
 <a class="alap" data-alap-linkitems=".coffee">cafes</a>
@@ -134,9 +135,44 @@ The `cssClass` field on an `AlapLink` is applied to the `<li>`:
 
 ## Positioning
 
-- **Anchor elements:** Menu positioned below the trigger's bottom edge, left-aligned
-- **Image triggers:** Menu positioned at click coordinates (`pageX`, `pageY`)
-- **Viewport adjustment** (`viewportAdjust: true`, default): Flips menu above trigger if it would overflow
+Alap uses a compass-based placement engine. The menu is positioned relative to the trigger, with automatic fallback when the preferred position doesn't fit in the viewport.
+
+### Placement directions
+
+```
+     NW    N    NE
+      ┌────┬────┐
+   W  │  trigger │  E
+      └────┴────┘
+     SW    S    SE
+         (C = centered over trigger)
+```
+
+Default: `SE` (below, left-aligned). Set globally via `settings.placement` or per-trigger via `data-alap-placement`:
+
+```html
+<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="N">above me</a>
+<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="E">beside me</a>
+<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="C">over me</a>
+```
+
+### Viewport containment
+
+When `viewportAdjust` is `true` (default):
+
+- If the preferred placement overflows the viewport, Alap tries the opposite side, then adjacent positions
+- If no placement fits fully, the menu is clamped to the available space with vertical scrolling
+- The menu never causes the page to scroll — uses `overflow: clip` to prevent layout shift
+- `placementGap` controls the pixel gap between trigger and menu (default: 4)
+- `viewportPadding` controls the minimum distance from viewport edges (default: 8)
+
+### Image triggers
+
+Image triggers use a point rect at the click coordinates. The placement engine positions the menu relative to the click point using the same compass logic and fallback behavior.
+
+### Static positioning
+
+Set `viewportAdjust: false` to disable the placement engine. The menu is positioned below the trigger with no viewport awareness — the legacy behavior.
 
 ## Examples
 

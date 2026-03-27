@@ -17,9 +17,9 @@
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink } from '../../core/types';
 import { warn } from '../../core/logger';
-import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl } from '../shared';
-import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement, PlacementResult, Size } from '../shared';
 
 export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
 
@@ -52,6 +52,10 @@ export class AlapUI {
   private handleMenuLeave: () => void;
   private handleMenuEnter: () => void;
   private handleMenuKeydown: (e: KeyboardEvent) => void;
+  private handleScroll: (() => void) | null = null;
+  private lastPlacement: PlacementResult | null = null;
+  private menuNaturalSize: Size | null = null;
+  private intersectionObserver: IntersectionObserver | null = null;
 
   constructor(config: AlapConfig, options: AlapUIOptions = {}) {
     this.config = config;
@@ -171,27 +175,29 @@ export class AlapUI {
     this.activeTrigger = trigger;
     trigger.setAttribute('aria-expanded', 'true');
 
-    const position = this.getPosition(trigger, event);
-    this.renderMenu(links, trigger, position);
+    this.renderMenu(links, trigger, event);
   }
 
   // --- Positioning ---
 
-  private getPosition(trigger: HTMLElement, event: MouseEvent): { top: number; left: number } {
-    const tag = trigger.tagName.toLowerCase();
-
-    // For images: position at click coordinates (feels natural for large visuals)
-    if (tag === 'img') {
-      return { top: event.pageY, left: event.pageX };
+  /** Build the trigger rect for the placement engine. Images use click coords as a point rect. */
+  private getTriggerRect(trigger: HTMLElement, event: MouseEvent): DOMRect | { top: number; left: number; bottom: number; right: number; width: number; height: number } {
+    if (trigger.tagName.toLowerCase() === 'img') {
+      // Synthetic 0×0 rect at click point for images
+      const x = event.clientX;
+      const y = event.clientY;
+      return { top: y, left: x, bottom: y, right: x, width: 0, height: 0 };
     }
+    return trigger.getBoundingClientRect();
+  }
 
-    // For inline elements (a, span) and block elements (div, etc.):
-    // position below the trigger element
-    const rect = trigger.getBoundingClientRect();
-    return {
-      top: rect.bottom + window.scrollY,
-      left: rect.left + window.scrollX,
-    };
+  /** Read the placement preference from the trigger element or config. */
+  private getPlacement(trigger: HTMLElement): Placement {
+    const attr = trigger.getAttribute('data-alap-placement');
+    if (attr && /^(N|NE|E|SE|S|SW|W|NW|C)$/.test(attr)) {
+      return attr as Placement;
+    }
+    return (this.config.settings?.placement as Placement) ?? DEFAULT_PLACEMENT;
   }
 
   // --- Rendering ---
@@ -199,20 +205,11 @@ export class AlapUI {
   private renderMenu(
     links: Array<{ id: string } & AlapLink>,
     trigger: HTMLElement,
-    position: { top: number; left: number },
+    event: MouseEvent,
   ): void {
     if (!this.container) return;
 
     const anchorId = trigger.id || '';
-
-    // Position
-    this.container.style.cssText = `
-      position: absolute;
-      display: block;
-      z-index: 10;
-      left: ${position.left}px;
-      top: ${position.top}px;
-    `;
 
     // CSS classes
     this.container.className = 'alapelem';
@@ -261,10 +258,91 @@ export class AlapUI {
     this.container.addEventListener('mouseenter', this.handleMenuEnter);
     this.container.addEventListener('keydown', this.handleMenuKeydown);
 
-    // Viewport adjustment: flip menu above trigger if it overflows the bottom
+    // --- Position the menu ---
     const viewportAdjust = this.config.settings?.viewportAdjust !== false;
+
     if (viewportAdjust) {
-      this.adjustForViewport(trigger, position);
+      // Measure off-screen to get natural size without causing scroll
+      this.container.style.cssText = `
+        position: fixed;
+        visibility: hidden;
+        top: -9999px;
+        left: -9999px;
+        z-index: 10;
+        display: block;
+        max-height: none;
+        overflow: visible;
+      `;
+
+      const menuRect = this.container.getBoundingClientRect();
+      this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
+
+      const triggerRect = this.getTriggerRect(trigger, event);
+      const placement = this.getPlacement(trigger);
+      const gap = (this.config.settings?.placementGap as number) ?? DEFAULT_PLACEMENT_GAP;
+      const padding = (this.config.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
+
+      const result = computePlacement({
+        triggerRect,
+        menuSize: this.menuNaturalSize,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        placement,
+        gap,
+        padding,
+      });
+
+      this.lastPlacement = result;
+      applyPlacementClass(this.container, result.placement);
+
+      // Convert viewport coords to page coords and apply
+      this.container.style.cssText = `
+        position: absolute;
+        display: block;
+        z-index: 10;
+        top: ${result.y + window.scrollY}px;
+        left: ${result.x + window.scrollX}px;
+        overflow-x: clip;
+      `;
+
+      if (result.maxHeight != null) {
+        this.container.style.maxHeight = `${result.maxHeight}px`;
+        this.container.style.overflowY = 'auto';
+
+        // Remove inner list scroll — container handles it now
+        const innerList = this.container.querySelector('ul, ol') as HTMLElement | null;
+        if (innerList) {
+          innerList.style.maxHeight = 'none';
+          innerList.style.overflowY = '';
+        }
+      }
+
+      if (result.maxWidth != null) {
+        this.container.style.maxWidth = `${result.maxWidth}px`;
+      }
+
+      // Track scroll to dynamically recompute placement
+      if (result.scrollY) {
+        this.startScrollTracking(trigger, event);
+      }
+    } else {
+      // viewportAdjust: false — static positioning (legacy behavior)
+      const triggerRect = this.getTriggerRect(trigger, event);
+      this.container.style.cssText = `
+        position: absolute;
+        display: block;
+        z-index: 10;
+        top: ${triggerRect.bottom + window.scrollY}px;
+        left: ${triggerRect.left + window.scrollX}px;
+      `;
+    }
+
+    // Observe trigger for scroll-away detection
+    this.stopIntersectionObserver();
+    if (this.activeTrigger) {
+      this.intersectionObserver = observeTriggerOffscreen(
+        this.activeTrigger,
+        () => this.closeMenu(),
+      );
     }
 
     // Focus first item
@@ -276,37 +354,55 @@ export class AlapUI {
     this.timer.start();
   }
 
-  // --- Viewport adjustment ---
+  // --- Scroll tracking ---
 
-  private adjustForViewport(
-    trigger: HTMLElement,
-    position: { top: number; left: number },
-  ): void {
-    if (!this.container) return;
+  private startScrollTracking(trigger: HTMLElement, event: MouseEvent): void {
+    this.stopScrollTracking();
+    const gap = (this.config.settings?.placementGap as number) ?? DEFAULT_PLACEMENT_GAP;
+    const padding = (this.config.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
+    const placement = this.getPlacement(trigger);
 
-    const menuRect = this.container.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
+    this.handleScroll = () => {
+      if (!this.container || this.container.style.display === 'none') return;
+      if (!this.menuNaturalSize) return;
 
-    // Flip vertically if menu overflows the bottom
-    if (menuRect.bottom > viewportHeight) {
-      const triggerRect = trigger.getBoundingClientRect();
-      const tag = trigger.tagName.toLowerCase();
+      const triggerRect = this.getTriggerRect(trigger, event);
+      const result = computePlacement({
+        triggerRect,
+        menuSize: this.menuNaturalSize,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        placement,
+        gap,
+        padding,
+      });
 
-      if (tag === 'img') {
-        // For image triggers: position above the click point
-        this.container.style.top = `${position.top - menuRect.height}px`;
+      this.lastPlacement = result;
+      applyPlacementClass(this.container, result.placement);
+      this.container.style.top = `${result.y + window.scrollY}px`;
+      this.container.style.left = `${result.x + window.scrollX}px`;
+
+      if (result.maxHeight != null) {
+        this.container.style.maxHeight = `${result.maxHeight}px`;
+        this.container.style.overflowY = 'auto';
       } else {
-        // For element triggers: position above the trigger
-        const above = triggerRect.top + window.scrollY - menuRect.height;
-        this.container.style.top = `${Math.max(0 + window.scrollY, above)}px`;
+        this.container.style.maxHeight = '';
+        this.container.style.overflowY = '';
       }
-    }
+    };
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
+  }
 
-    // Shift left if menu overflows the right edge
-    if (menuRect.right > viewportWidth) {
-      const overflow = menuRect.right - viewportWidth;
-      this.container.style.left = `${Math.max(0, position.left - overflow)}px`;
+  private stopScrollTracking(): void {
+    if (this.handleScroll) {
+      window.removeEventListener('scroll', this.handleScroll);
+      this.handleScroll = null;
+    }
+  }
+
+  private stopIntersectionObserver(): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
     }
   }
 
@@ -341,6 +437,15 @@ export class AlapUI {
   private closeMenu(): void {
     if (!this.container) return;
     this.container.style.display = 'none';
+    this.container.style.maxHeight = '';
+    this.container.style.maxWidth = '';
+    this.container.style.overflowY = '';
+    this.container.style.overflowX = '';
+    clearPlacementClass(this.container);
+    this.lastPlacement = null;
+    this.menuNaturalSize = null;
+    this.stopScrollTracking();
+    this.stopIntersectionObserver();
     this.timer.stop();
 
     if (this.activeTrigger) {

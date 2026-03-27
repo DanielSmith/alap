@@ -22,7 +22,7 @@ When the menu opens, `aria-expanded` flips to `true` and the screen reader annou
 
 ## Keyboard navigation
 
-**Opening:** `Enter` or `Space` on the trigger opens the menu. Focus moves to the first item automatically.
+**Opening:** `Enter` or `Space` on the trigger opens the menu. The placement engine positions the menu using the configured compass direction (default: `SE`), falling back to an alternative position if the preferred one overflows the viewport. Focus moves to the first item automatically.
 
 **Navigating:**
 
@@ -68,5 +68,9 @@ Menu items use `tabindex="-1"` so they're reachable by arrow keys but don't appe
 ## What you get for free
 
 All of this — ARIA roles, keyboard navigation, focus management, auto-dismiss — is built into every adapter: vanilla DOM, web component, React, Vue, Svelte, SolidJS, Alpine, and Astro. Render the component, and the accessibility is there.
+
+## Viewport containment
+
+The placement engine ensures menus stay within the viewport. When a menu would overflow, it repositions automatically — no content is hidden off-screen, and the page never scrolls to accommodate a menu. If the menu is taller than the available space, it's clamped with a scrollable region. Keyboard navigation (arrow keys, Home, End) works correctly within scrollable menus.
 
 The menus follow the WAI-ARIA menu button pattern. Formal WCAG 2.1 AA auditing is planned but not yet complete.

@@ -217,6 +217,44 @@ export interface AlapSettings {
    */
   viewportAdjust?: boolean;
 
+  /**
+   * Preferred menu placement relative to the trigger.
+   * 9 compass positions plus center:
+   * - N: above, centered horizontally
+   * - NE: above, left edge aligned with trigger left
+   * - E: right of trigger, vertically centered
+   * - SE: below, left edge aligned with trigger left (default)
+   * - S: below, centered horizontally
+   * - SW: below, right edge aligned with trigger right
+   * - W: left of trigger, vertically centered
+   * - NW: above, right edge aligned with trigger right
+   * - C: centered over trigger
+   *
+   * Falls back to the best-fit position if the preferred one doesn't fit.
+   * @default 'SE'
+   */
+  placement?: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
+
+  /**
+   * Pixel gap between the trigger edge and the menu edge.
+   * @default 4
+   */
+  placementGap?: number;
+
+  /**
+   * Minimum pixel distance the menu keeps from viewport edges.
+   * @default 8
+   */
+  viewportPadding?: number;
+
+  /**
+   * What to do when the trigger scrolls off-screen while the menu is open.
+   * - 'close': close the menu (default)
+   * - 'flip': recompute placement to keep menu visible
+   * @default 'close'
+   */
+  triggerOffscreen?: 'close' | 'flip';
+
   /** Extensible — additional settings */
   [key: string]: unknown;
 }

@@ -71,6 +71,9 @@ interface AlapSettings {
   maxVisibleItems?: number;
   hooks?: string[];
   existingUrl?: 'prepend' | 'append' | 'ignore';
+  placement?: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
+  placementGap?: number;
+  viewportPadding?: number;
   viewportAdjust?: boolean;
   targetWindow?: string;
 }
@@ -83,8 +86,31 @@ interface AlapSettings {
 | `maxVisibleItems` | `number` | `10` | Items before the menu scrolls. `0` = no limit |
 | `hooks` | `string[]` | — | Default hooks for all items |
 | `existingUrl` | `'prepend' \| 'append' \| 'ignore'` | `'prepend'` | How to handle an existing `href` on the trigger |
-| `viewportAdjust` | `boolean` | `true` | Flip menu position when it would overflow the viewport |
+| `placement` | `Placement` | `'SE'` | Preferred menu position: `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`, `C` |
+| `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
+| `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
+| `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment and fallback |
 | `targetWindow` | `string` | — | Global default for link targets |
+
+### Placement type
+
+```typescript
+type Placement = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
+```
+
+| Value | Position | Alignment |
+|-------|----------|-----------|
+| `N` | Above trigger | Centered horizontally |
+| `NE` | Above trigger | Left edge aligned with trigger left |
+| `E` | Right of trigger | Vertically centered |
+| `SE` | Below trigger | Left edge aligned with trigger left |
+| `S` | Below trigger | Centered horizontally |
+| `SW` | Below trigger | Right edge aligned with trigger right |
+| `W` | Left of trigger | Vertically centered |
+| `NW` | Above trigger | Right edge aligned with trigger right |
+| `C` | Centered over trigger | Both axes |
+
+When the preferred placement doesn't fit in the viewport, Alap tries the opposite side first, then adjacent positions, then picks the best available fit — clamping height and enabling scroll if needed. The menu never causes the page to scroll.
 
 ## `AlapMacro`
 

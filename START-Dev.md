@@ -32,7 +32,7 @@ Import only what you need — unused adapters are tree-shaken:
 <script src="https://cdn.jsdelivr.net/npm/alap@3/dist/alap.iife.js"></script>
 ```
 
-See [Script Tag / CDN](docs/installation.md#script-tag--cdn-no-bundler) for full details.
+See [Installation](docs/getting-started/installation.md) for full details.
 
 ---
 
@@ -243,6 +243,8 @@ const config = {
 | `hooks` | string[] | Event hooks this item participates in |
 | `createdAt` | string/number | For regex search age/sort filters |
 
+See [Configuration](docs/getting-started/configuration.md) for full details.
+
 ---
 
 ## Storage
@@ -265,7 +267,7 @@ await store.save('my-config', config);
 const loaded = await store.load('my-config');
 ```
 
-To use remote storage, run any [Alap config server](examples/servers/). See [docs/servers.md](docs/servers.md).
+To use remote storage, run any [Alap config server](examples/servers/). See [Servers](docs/api-reference/servers.md).
 
 ---
 
@@ -336,7 +338,7 @@ See [integrations/eleventy-alap/](integrations/eleventy-alap/).
 
 ```bash
 pnpm install
-pnpm test         # 550 tests
+pnpm test         # 751 tests across 39 files
 pnpm typecheck
 pnpm build
 ```
@@ -345,11 +347,9 @@ pnpm build
 
 | Doc | What |
 |-----|------|
-| [Architecture](docs/architecture.md) | Layered design, expression language, adapters, extension points |
-| [Installation](docs/installation.md) | Subpath exports, peer deps, per-framework setup |
-| [UI](docs/ui.md) | All 8 adapters, shared utilities, accessibility, event hooks |
-| [Core](docs/core.md) | Types, grammar, tokenizer, parser, regex search |
-| [Search](docs/search.md) | Multi-config search and composition |
-| [Servers](docs/servers.md) | REST contract, Docker/Podman, smoke tests |
-| [Cookbooks](docs/cookbooks/) | Role-based guides for developers, writers, designers, and editors |
-| [Tests](docs/tests.md) | 550 tests across 29 files |
+| [Getting Started](docs/getting-started/) | Installation, quick start, configuration |
+| [Core Concepts](docs/core-concepts/) | Expressions, macros, search patterns, refiners, styling |
+| [Framework Guides](docs/framework-guides/) | All 8 adapters — React, Vue, Svelte, Astro, Alpine, Solid, Web Component, Vanilla DOM |
+| [API Reference](docs/api-reference/) | Engine, types, events, storage, servers, security |
+| [Cookbooks](docs/cookbook/) | Accessibility, editors, existing URLs, images, markdown, language ports |
+| [FAQ](docs/FAQ.md) | Common questions |

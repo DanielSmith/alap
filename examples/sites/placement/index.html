@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — Placement Demo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Placement Demo</h1>
+  <p>Alap uses a compass-based placement engine. Click any link to see the menu appear in the specified direction. When a preferred placement doesn't fit, the engine falls back automatically.</p>
+
+  <!-- ===================================================================
+       TABLE OF CONTENTS
+       =================================================================== -->
+
+  <nav class="toc">
+    <div><strong>Jump to:</strong>
+    <a href="#dom-compass">DOM Compass</a>
+    <a href="#wc-compass">Web Component Compass</a>
+    <a href="#inline">Inline Text</a></div>
+    <div><strong>Stress Tests:</strong>
+    <a href="#h-flip">Horizontal Flips</a>
+    <a href="#v-flip">Vertical Flips</a>
+    <a href="#corners">Corners</a>
+    <a href="#long-menu">Long Menu</a>
+    <a href="#long-bottom">Long Menu Near Bottom</a>
+    <a href="#right-align">Right-Aligned Text</a></div>
+    <div><strong>Related:</strong>
+    <a href="./animation/">Animation Hooks</a>
+    <a href="./observers/">Scroll-Away Detection</a></div>
+  </nav>
+
+  <!-- ===================================================================
+       SECTION 1: DOM Compass Rose (happy path)
+       =================================================================== -->
+
+  <h2 id="dom-compass">1. DOM Adapter &mdash; Compass Rose</h2>
+  <p>Each link requests a specific direction. With the trigger centered on the page, every placement fits.</p>
+
+  <div class="compass-grid">
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NW">NW</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="N">N</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NE">NE</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="W">W</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="C">C</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="E">E</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="SW">SW</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="S">S</a></div>
+    <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="SE">SE</a></div>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 2: Web Component Compass Rose
+       =================================================================== -->
+
+  <h2 id="wc-compass">2. Web Component &mdash; Compass Rose</h2>
+  <p>Same compass grid using <code>&lt;alap-link&gt;</code> with the <code>placement</code> attribute.</p>
+
+  <div class="compass-grid">
+    <div class="compass-cell"><alap-link query=".bridge" placement="NW">NW</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="N">N</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="NE">NE</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="W">W</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="C">C</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="E">E</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="SW">SW</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="S">S</alap-link></div>
+    <div class="compass-cell"><alap-link query=".bridge" placement="SE">SE</alap-link></div>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 3: Inline text
+       =================================================================== -->
+
+  <h2 id="inline">3. Inline Text &mdash; Natural Flow</h2>
+  <p>Placement works with inline text. Here the menu opens
+    <a class="alap" data-alap-linkitems=".bridge" data-alap-placement="N">above (N)</a>,
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="S">below (S)</a>,
+    <a class="alap" data-alap-linkitems=".park" data-alap-placement="E">beside (E)</a>,
+    or <alap-link query=".bridge" placement="C">centered (C)</alap-link>
+    over the trigger word. Here's a long menu
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">inline with 20 items</a>
+    that should clamp without scrolling the page.
+  </p>
+
+  <!-- ===================================================================
+       STRESS TESTS
+       =================================================================== -->
+
+  <h1 class="section-divider">Stress Tests</h1>
+  <p>Edge cases that exercise the fallback and clamping logic. Each test has a <em>scroll to position</em> link that puts the trigger at the viewport edge so you can see the fallback in action.</p>
+
+  <!-- ===================================================================
+       SECTION 4: Horizontal edge flips
+       =================================================================== -->
+
+  <h2 id="h-flip">4. Horizontal Edge Flips</h2>
+  <p>Links at the viewport edges. <code>E</code> on the right should flip to <code>W</code>; <code>W</code> on the left should flip to <code>E</code>.</p>
+  <p class="scroll-hint"><a href="#h-flip-target">Scroll to test position &darr;</a></p>
+
+  <div id="h-flip-target" class="full-width-row">
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="W">W &larr; wants left, no room</a>
+    <a class="alap right-align" data-alap-linkitems=".coffee" data-alap-placement="E">wants right, no room &rarr; E</a>
+  </div>
+
+  <p>Same test with the web component:</p>
+  <div class="full-width-row">
+    <alap-link query=".coffee" placement="W">W &larr; should flip E</alap-link>
+    <alap-link query=".coffee" placement="E" class="right-align">should flip W &rarr; E</alap-link>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 5: Vertical edge flips — top of viewport
+       =================================================================== -->
+
+  <h2 id="v-flip">5. Vertical Edge Flips &mdash; Top of Viewport</h2>
+  <p>These links want to go above, but there's no room. Scroll so the row is at the very top of the viewport, then click.</p>
+  <p class="scroll-hint"><a href="#v-flip-target">Scroll to test position &darr;</a></p>
+
+  <div id="v-flip-target" class="top-row">
+    <a class="alap" data-alap-linkitems=".bridge" data-alap-placement="N">N &uarr; no room above</a>
+    &nbsp;&mdash;&nbsp;
+    <a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NW">NW no room above</a>
+    &nbsp;&mdash;&nbsp;
+    <a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NE">NE no room above</a>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 6: Corner stress tests
+       =================================================================== -->
+
+  <h2 id="corners">6. Corner Stress Tests</h2>
+  <p>Links pinned to each corner. Every placement requested is the worst possible for that corner.</p>
+  <p class="scroll-hint"><a href="#corner-target">Scroll to test position &darr;</a></p>
+
+  <div id="corner-target" class="corner-grid">
+    <a class="alap corner-tl" data-alap-linkitems=".bridge" data-alap-placement="NW">NW in top-left</a>
+    <a class="alap corner-tr" data-alap-linkitems=".bridge" data-alap-placement="NE">NE in top-right</a>
+    <a class="alap corner-bl" data-alap-linkitems=".bridge" data-alap-placement="SW">SW in bottom-left</a>
+    <a class="alap corner-br" data-alap-linkitems=".bridge" data-alap-placement="SE">SE in bottom-right</a>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 7: Long menu — height clamping
+       =================================================================== -->
+
+  <h2 id="long-menu">7. Long Menu &mdash; Height Clamping</h2>
+  <p>20 items. The menu can't fit fully &mdash; it should clamp to available space and scroll internally. No page scroll.</p>
+  <p class="scroll-hint"><a href="#long-menu-target">Scroll to test position &darr;</a></p>
+
+  <div id="long-menu-target" class="long-menu-row">
+    <div class="long-menu-cell">
+      <p><code>SE</code> (default below)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">20 items (SE)</a>
+    </div>
+    <div class="long-menu-cell">
+      <p><code>N</code> (above)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="N">20 items (N)</a>
+    </div>
+    <div class="long-menu-cell">
+      <p><code>C</code> (centered)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="C">20 items (C)</a>
+    </div>
+    <div class="long-menu-cell">
+      <p><code>E</code> (beside)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="E">20 items (E)</a>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SECTION 8: Long menu near bottom of viewport
+       =================================================================== -->
+
+  <h2 id="long-bottom">8. Long Menu Near Bottom of Viewport</h2>
+  <p>A long menu near the bottom. <code>SE</code> overflows massively &mdash; should flip above or clamp. Scroll so the links are near the bottom of your viewport, then click.</p>
+  <p class="scroll-hint"><a href="#long-bottom-target">Scroll to test position &darr;</a> &mdash; the links should be near the <strong>bottom</strong> of your viewport after scrolling.</p>
+
+  <div class="bottom-spacer"></div>
+
+  <div id="long-bottom-target" class="bottom-stress">
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">20 items, SE</a>
+    &nbsp;&mdash;&nbsp;
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="S">20 items, S</a>
+    &nbsp;&mdash;&nbsp;
+    <alap-link query=".long" placement="SE">20 items, SE (web component)</alap-link>
+    &nbsp;&mdash;&nbsp;
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="C">20 items, C</a>
+  </div>
+
+  <div class="bottom-spacer-after"></div>
+
+  <!-- ===================================================================
+       SECTION 9: Right-aligned text
+       =================================================================== -->
+
+  <h2 id="right-align">9. Right Edge &mdash; Forced Flips</h2>
+  <p>Links pinned flush against the right viewport edge. SE and E have no room to the right.</p>
+  <p class="scroll-hint"><a href="#right-align-target">Scroll to test position &darr;</a></p>
+
+  <div id="right-align-target" class="edge-right-col">
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE">SE flush right</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="E">E flush right (20 items)</a>
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="NE">NE flush right</a>
+    <alap-link query=".long" placement="E">E flush right (WC, 20 items)</alap-link>
+  </div>
+
+  <div class="end-spacer"></div>
+
+  <script type="module" src="./main.ts"></script>
+
+  <script>
+    // Make "scroll to position" links scroll the target to the appropriate
+    // viewport edge. For "bottom" tests, scroll so the target is near the
+    // bottom of the viewport. For everything else, scroll to the top.
+    document.querySelectorAll('.scroll-hint a[href^="#"]').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        const isBottomTest = id === 'long-bottom-target';
+        if (isBottomTest) {
+          // Scroll so the target is near the bottom of the viewport
+          const targetRect = target.getBoundingClientRect();
+          const scrollTo = window.scrollY + targetRect.bottom - window.innerHeight + 40;
+          window.scrollTo({ top: Math.max(0, scrollTo), behavior: 'smooth' });
+        } else {
+          // Scroll so the target is near the top of the viewport
+          const targetRect = target.getBoundingClientRect();
+          const scrollTo = window.scrollY + targetRect.top - 10;
+          window.scrollTo({ top: Math.max(0, scrollTo), behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

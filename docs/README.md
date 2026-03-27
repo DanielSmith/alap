@@ -58,3 +58,4 @@ Advanced topics and integrations.
 - [Accessibility](cookbook/accessibility.md) — ARIA, keyboard nav, focus management
 - [Existing URLs](cookbook/existing-urls.md) — progressive enhancement with `existingUrl`
 - [Images and Media](cookbook/images-and-media.md) — image items, thumbnails, hover previews
+- [Placement](cookbook/placement.md) — compass-based positioning, viewport containment, Alap vs. CSS

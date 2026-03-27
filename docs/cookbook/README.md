@@ -10,6 +10,7 @@ Advanced topics, integrations, and "how do I..." guides.
 | [Accessibility](accessibility.md) | ARIA roles, keyboard navigation, focus management, auto-dismiss |
 | [Existing URLs](existing-urls.md) | Progressive enhancement with `existingUrl`: prepend, append, ignore |
 | [Images and Media](images-and-media.md) | Image items, thumbnails, hover previews, context menus, the `meta` field |
+| [Placement](placement.md) | Compass-based positioning, viewport containment, Alap config vs. raw CSS |
 
 ## See also
 

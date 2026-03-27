@@ -74,7 +74,7 @@ When tags aren't enough, you can search across item IDs, labels, URLs, and descr
 /car_.*/                    matches item IDs like car_toyota, car_nissan, car_bmw
 ```
 
-Patterns are defined in the config — you reference them by name. See [docs/search.md](docs/search.md) for more.
+Patterns are defined in the config — you reference them by name. See [Search Patterns](docs/core-concepts/search-patterns.md) for more.
 
 ### Item IDs
 
@@ -138,14 +138,16 @@ Editors can store data locally (in the browser), on a remote server, or both:
 
 ## Cookbooks
 
-Each cookbook is written for a specific role:
+Each cookbook covers a specific topic:
 
-| Cookbook | For you if... |
-|---------|--------------|
-| [Writer's Cookbook](docs/cookbooks/cookbook-writer.md) | You write content with Alap links |
-| [Editor & Admin Cookbook](docs/cookbooks/cookbook-editor.md) | You manage the link library — items, tags, macros |
-| [Designer's Cookbook](docs/cookbooks/cookbook-designer.md) | You style the menus — CSS, theming, accessibility |
-| [Developer's Cookbook](docs/cookbooks/cookbook-dev.md) | You build the integration — adapters, hooks, storage |
+| Cookbook | What it covers |
+|---------|---------------|
+| [Accessibility](docs/cookbook/accessibility.md) | Keyboard navigation, ARIA, screen readers |
+| [Editors](docs/cookbook/editors.md) | Setting up and using the visual editors |
+| [Existing URLs](docs/cookbook/existing-urls.md) | Preserving `href` when Alap enhances a link |
+| [Images & Media](docs/cookbook/images-and-media.md) | Image items, thumbnails, media in menus |
+| [Markdown](docs/cookbook/markdown.md) | Using Alap expressions in markdown content |
+| [Language Ports](docs/cookbook/language-ports.md) | Server-side ports in Rust, Python, Go, PHP |
 
 ---
 

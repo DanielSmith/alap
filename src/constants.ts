@@ -55,3 +55,15 @@ export const WEB_FETCH_TIMEOUT_MS = 10_000;
 
 /** Maximum response body size in bytes for :web: protocol fetch requests (1 MB) */
 export const MAX_WEB_RESPONSE_BYTES = 1_048_576;
+
+/** Default menu placement relative to the trigger */
+export const DEFAULT_PLACEMENT = 'SE' as const;
+
+/** Default pixel gap between trigger edge and menu edge */
+export const DEFAULT_PLACEMENT_GAP = 4;
+
+/** Default minimum pixel distance the menu keeps from viewport edges */
+export const DEFAULT_VIEWPORT_PADDING = 8;
+
+/** Default behavior when trigger scrolls off-screen while menu is open */
+export const DEFAULT_TRIGGER_OFFSCREEN = 'close' as const;

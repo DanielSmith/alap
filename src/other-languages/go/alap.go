@@ -1366,11 +1366,38 @@ func filter(ids []string, keep func(string) bool) []string {
 	return result
 }
 
-// sortBy is a simple insertion sort for small result sets.
+// sortBy is a stable merge sort for small result sets.
+// O(n log n) guaranteed — no quicksort pivot degeneracy.
+// Stable: preserves original order of equal elements.
 func sortBy[T any](s []T, less func(a, b T) bool) {
-	for i := 1; i < len(s); i++ {
-		for j := i; j > 0 && less(s[j], s[j-1]); j-- {
-			s[j], s[j-1] = s[j-1], s[j]
+	if len(s) <= 1 {
+		return
+	}
+	mid := len(s) / 2
+	sortBy(s[:mid], less)
+	sortBy(s[mid:], less)
+
+	buf := make([]T, len(s))
+	copy(buf, s)
+	i, j, k := 0, mid, 0
+	for i < mid && j < len(s) {
+		if less(buf[i], buf[j]) {
+			s[k] = buf[i]
+			i++
+		} else {
+			s[k] = buf[j]
+			j++
 		}
+		k++
+	}
+	for i < mid {
+		s[k] = buf[i]
+		i++
+		k++
+	}
+	for j < len(s) {
+		s[k] = buf[j]
+		j++
+		k++
 	}
 }

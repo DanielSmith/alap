@@ -1,6 +1,6 @@
 # Styling
 
-CSS theming techniques — per-anchor classes, custom item classes, image triggers, and menu positioning.
+CSS theming techniques — per-anchor classes, custom item classes, image triggers, and menu placement.
 
 ## Run
 
@@ -17,7 +17,7 @@ pnpm dev                  # http://localhost:5173/sites/styling/
 
 - Click links to see different per-anchor styles (`alap_anchorId` CSS classes)
 - Click items with custom `cssClass` — individual menu items styled differently
-- Click an image to open a menu positioned at click coordinates
+- Click an image to open a menu placed at click coordinates (uses the placement engine with a point rect)
 - Notice menu z-index inherits from the anchor's context
 
 ## Key Files

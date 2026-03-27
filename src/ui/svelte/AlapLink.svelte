@@ -19,7 +19,8 @@
   import { getAlapContext, type AlapContextValue } from './context';
   import type { AlapLink as AlapLinkType } from '../../core/types';
   import { sanitizeUrl } from '../../core/sanitizeUrl';
-  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
+  import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
   import { REM_PER_MENU_ITEM } from '../../constants';
 
   type ResolvedLink = { id: string } & AlapLinkType;
@@ -38,6 +39,12 @@
     onTriggerContext?: (detail: TriggerContextDetail) => void;
     onItemHover?: (detail: ItemHoverDetail) => void;
     onItemContext?: (detail: ItemContextDetail) => void;
+    /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
+    placement?: Placement;
+    /** Pixel gap between trigger and menu edge. Default: 4. */
+    gap?: number;
+    /** Minimum pixel distance from viewport edges. Default: 8. */
+    padding?: number;
   }
 
   let {
@@ -54,6 +61,9 @@
     onTriggerContext,
     onItemHover,
     onItemContext,
+    placement,
+    gap: gapProp,
+    padding: paddingProp,
   }: Props = $props();
 
   const ctx: AlapContextValue = getAlapContext();
@@ -69,6 +79,7 @@
   // Element refs
   let triggerEl: HTMLElement | undefined = $state();
   let menuEl: HTMLElement | undefined = $state();
+  let wrapperEl: HTMLElement | undefined = $state();
   let itemEls: HTMLAnchorElement[] = $state([]);
 
   // Resolved props
@@ -142,6 +153,59 @@
         startTimer();
       });
     }
+  });
+
+  // --- Compass placement ---
+
+  let placementScrollHandler: (() => void) | null = null;
+
+  $effect(() => {
+    // Clean up previous
+    if (placementScrollHandler) {
+      window.removeEventListener('scroll', placementScrollHandler);
+      placementScrollHandler = null;
+    }
+
+    if (!isOpen || !placement || mode === 'popover') return;
+    if (!triggerEl || !menuEl || !wrapperEl) return;
+
+    const tEl = triggerEl;
+    const mEl = menuEl;
+    const wEl = wrapperEl;
+    const p = placement;
+
+    const apply = () => {
+      const state = calcPlacementState(tEl, mEl, {
+        placement: p,
+        gap: gapProp,
+        padding: paddingProp,
+      });
+      applyPlacementToMenu(mEl, wEl, state);
+    };
+
+    // Wait for DOM update then apply
+    requestAnimationFrame(() => apply());
+
+    placementScrollHandler = () => apply();
+    window.addEventListener('scroll', placementScrollHandler, { passive: true });
+
+    return () => {
+      if (placementScrollHandler) {
+        window.removeEventListener('scroll', placementScrollHandler);
+        placementScrollHandler = null;
+      }
+      clearPlacementClass(mEl);
+    };
+  });
+
+  // --- Trigger scroll-away detection ---
+
+  $effect(() => {
+    if (!isOpen || mode === 'popover') return;
+    if (!triggerEl) return;
+
+    const observer = observeTriggerOffscreen(triggerEl, closeMenu);
+    return () => observer.disconnect();
   });
 
   // --- Click outside + Escape (non-popover) ---
@@ -330,7 +394,7 @@
 
 {:else}
   <!-- DOM and Web Component modes -->
-  <span style="position: relative; display: inline">
+  <span bind:this={wrapperEl} style="position: relative; display: inline">
   <span
     bind:this={triggerEl}
     id={triggerId}

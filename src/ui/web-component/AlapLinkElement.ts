@@ -17,9 +17,9 @@
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { warn } from '../../core/logger';
-import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement, PlacementResult, Size } from '../shared';
 
 /**
  * Global registry of AlapEngine instances keyed by config name.
@@ -223,9 +223,13 @@ export class AlapLinkElement extends HTMLElement {
   private menu: HTMLElement | null = null;
   private timer: DismissTimer | null = null;
   private isOpen = false;
+  private scrollHandler: (() => void) | null = null;
+  private lastPlacement: PlacementResult | null = null;
+  private menuNaturalSize: Size | null = null;
+  private intersectionObserver: IntersectionObserver | null = null;
 
   static get observedAttributes(): string[] {
-    return ['query', 'config', 'href'];
+    return ['query', 'config', 'href', 'placement'];
   }
 
   constructor() {
@@ -384,6 +388,75 @@ export class AlapLinkElement extends HTMLElement {
     this.menu.appendChild(list);
   }
 
+  // --- Placement ---
+
+  /** Read placement preference from element attribute or config. */
+  private getPlacement(): Placement {
+    const attr = this.getAttribute('placement');
+    if (attr && /^(N|NE|E|SE|S|SW|W|NW|C)$/.test(attr)) {
+      return attr as Placement;
+    }
+    const config = this.getConfig();
+    return (config?.settings?.placement as Placement) ?? DEFAULT_PLACEMENT;
+  }
+
+  /** Read the gap value from --alap-gap CSS variable or config. */
+  private getGap(): number {
+    if (this.menu) {
+      const raw = getComputedStyle(this.menu).getPropertyValue('--alap-gap').trim();
+      if (raw) {
+        const parsed = parseFloat(raw);
+        if (!Number.isNaN(parsed)) {
+          // Convert rem to px if needed
+          if (raw.endsWith('rem')) {
+            return parsed * parseFloat(getComputedStyle(document.documentElement).fontSize);
+          }
+          return parsed;
+        }
+      }
+    }
+    const config = this.getConfig();
+    return (config?.settings?.placementGap as number) ?? DEFAULT_PLACEMENT_GAP;
+  }
+
+  /** Apply a PlacementResult to the menu element using host-relative offsets. */
+  private applyPlacement(result: PlacementResult): void {
+    if (!this.menu) return;
+
+    const hostRect = this.getBoundingClientRect();
+    const offsetX = result.x - hostRect.left;
+    const offsetY = result.y - hostRect.top;
+
+    this.menu.style.top = `${offsetY}px`;
+    this.menu.style.left = `${offsetX}px`;
+    this.menu.style.bottom = '';
+    this.menu.style.right = '';
+    this.menu.style.marginTop = '0';
+    this.menu.style.marginBottom = '0';
+    this.menu.style.overflowX = 'clip';
+
+    if (result.maxHeight != null) {
+      this.menu.style.maxHeight = `${result.maxHeight}px`;
+      this.menu.style.overflowY = 'auto';
+
+      // Remove inner list scroll — menu container handles it now
+      const innerList = this.menu.querySelector('ul, ol') as HTMLElement | null;
+      if (innerList) {
+        innerList.style.maxHeight = 'none';
+        innerList.style.overflowY = '';
+      }
+    } else {
+      this.menu.style.maxHeight = '';
+      this.menu.style.overflowY = '';
+    }
+
+    if (result.maxWidth != null) {
+      this.menu.style.maxWidth = `${result.maxWidth}px`;
+    } else {
+      this.menu.style.maxWidth = '';
+    }
+  }
+
   // --- Open / Close ---
 
   private openMenu(): void {
@@ -396,15 +469,48 @@ export class AlapLinkElement extends HTMLElement {
       }
     }
 
+    const config = this.getConfig();
+    const adjustViewport = config?.settings?.viewportAdjust !== false;
+
     this.isOpen = true;
     this.menu.setAttribute('aria-hidden', 'false');
     this.setAttribute('aria-expanded', 'true');
 
-    // Viewport adjustment: flip menu above trigger if it overflows the bottom
-    const config = this.getConfig();
-    if (config?.settings?.viewportAdjust !== false) {
-      this.adjustMenuForViewport();
+    if (adjustViewport) {
+      // Measure the menu's natural size
+      const menuRect = this.menu.getBoundingClientRect();
+      this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
+
+      const triggerRect = this.getBoundingClientRect();
+      const placement = this.getPlacement();
+      const gap = this.getGap();
+      const padding = (config?.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
+
+      const result = computePlacement({
+        triggerRect,
+        menuSize: this.menuNaturalSize,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        placement,
+        gap,
+        padding,
+      });
+
+      this.lastPlacement = result;
+      this.applyPlacement(result);
+      applyPlacementClass(this.menu, result.placement);
+
+      // Track scroll to dynamically recompute
+      if (result.scrollY) {
+        this.startScrollTracking();
+      }
     }
+
+    // Observe trigger for scroll-away detection
+    this.stopIntersectionObserver();
+    this.intersectionObserver = observeTriggerOffscreen(
+      this,
+      () => this.closeMenu(),
+    );
 
     const first = this.menu.querySelector<HTMLElement>('a[role="menuitem"]');
     if (first) first.focus();
@@ -412,31 +518,44 @@ export class AlapLinkElement extends HTMLElement {
     this.timer?.start();
   }
 
-  private adjustMenuForViewport(): void {
-    if (!this.menu) return;
+  private startScrollTracking(): void {
+    this.stopScrollTracking();
+    const config = this.getConfig();
+    const gap = this.getGap();
+    const padding = (config?.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
+    const placement = this.getPlacement();
 
-    // Reset to default position first
-    this.menu.style.top = '';
-    this.menu.style.bottom = '';
-    this.menu.style.left = '';
-    this.menu.style.right = '';
+    this.scrollHandler = () => {
+      if (!this.menu || !this.isOpen || !this.menuNaturalSize) return;
 
-    const menuRect = this.menu.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
+      const triggerRect = this.getBoundingClientRect();
+      const result = computePlacement({
+        triggerRect,
+        menuSize: this.menuNaturalSize,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        placement,
+        gap,
+        padding,
+      });
 
-    // Flip vertically if menu overflows the bottom
-    if (menuRect.bottom > viewportHeight) {
-      this.menu.style.top = 'auto';
-      this.menu.style.bottom = '100%';
-      this.menu.style.marginTop = '0';
-      this.menu.style.marginBottom = '0.5rem';
+      this.lastPlacement = result;
+      this.applyPlacement(result);
+      applyPlacementClass(this.menu, result.placement);
+    };
+    window.addEventListener('scroll', this.scrollHandler, { passive: true });
+  }
+
+  private stopScrollTracking(): void {
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler);
+      this.scrollHandler = null;
     }
+  }
 
-    // Shift left if menu overflows the right edge
-    if (menuRect.right > viewportWidth) {
-      this.menu.style.left = 'auto';
-      this.menu.style.right = '0';
+  private stopIntersectionObserver(): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
     }
   }
 
@@ -444,7 +563,22 @@ export class AlapLinkElement extends HTMLElement {
     if (!this.menu) return;
     this.isOpen = false;
     this.menu.setAttribute('aria-hidden', 'true');
+    this.menu.style.top = '';
+    this.menu.style.left = '';
+    this.menu.style.bottom = '';
+    this.menu.style.right = '';
+    this.menu.style.marginTop = '';
+    this.menu.style.marginBottom = '';
+    this.menu.style.maxHeight = '';
+    this.menu.style.maxWidth = '';
+    this.menu.style.overflowY = '';
+    this.menu.style.overflowX = '';
+    clearPlacementClass(this.menu);
+    this.lastPlacement = null;
+    this.menuNaturalSize = null;
     this.setAttribute('aria-expanded', 'false');
+    this.stopScrollTracking();
+    this.stopIntersectionObserver();
     this.timer?.stop();
     this.focus();
   }

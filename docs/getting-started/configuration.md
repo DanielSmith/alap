@@ -74,7 +74,8 @@ settings: {
   menuTimeout: 3000,
   maxVisibleItems: 6,
   existingUrl: 'prepend',
-  viewportAdjust: true,
+  placement: 'S',
+  placementGap: 8,
   hooks: ['item-hover'],
 }
 ```
@@ -85,8 +86,30 @@ settings: {
 | `menuTimeout` | `number` | `5000` | Auto-dismiss timeout (ms) after mouse leaves |
 | `maxVisibleItems` | `number` | `10` | Items before the menu scrolls. `0` = no limit |
 | `existingUrl` | `'prepend' \| 'append' \| 'ignore'` | `'prepend'` | How to handle an existing `href` on the trigger |
-| `viewportAdjust` | `boolean` | `true` | Flip menu position when it would overflow the viewport |
+| `placement` | `'N' \| 'NE' \| 'E' \| 'SE' \| 'S' \| 'SW' \| 'W' \| 'NW' \| 'C'` | `'SE'` | Preferred menu placement relative to the trigger |
+| `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
+| `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
+| `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment |
 | `hooks` | `string[]` | — | Default hooks for all items (per-link `hooks` overrides) |
+
+### Placement
+
+The `placement` setting controls where the menu appears relative to the trigger. Think of it as a compass:
+
+```
+     NW    N    NE
+      ┌────┬────┐
+   W  │  trigger │  E
+      └────┴────┘
+     SW    S    SE
+         (C = centered over trigger)
+```
+
+The default is `SE` — below the trigger, left edge aligned with the trigger's left edge. If the preferred placement doesn't fit in the viewport, Alap tries the opposite side, then adjacent positions, then the best available fit with height clamping and scrolling. The menu never causes the page to scroll.
+
+Per-element override: `data-alap-placement="N"` (DOM mode) or `placement="N"` (web component).
+
+See [Placement](../cookbook/placement.md) for the full guide on placement vs. CSS styling.
 
 ## `macros` — reusable expressions
 

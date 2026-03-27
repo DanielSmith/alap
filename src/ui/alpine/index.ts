@@ -40,8 +40,8 @@
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink as AlapLinkType } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementState, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
 
 // Re-export core types for convenience
 export type { AlapConfig, AlapLinkType as AlapLink };
@@ -52,6 +52,12 @@ export interface AlapDirectiveValue {
   listType?: 'ul' | 'ol';
   menuTimeout?: number;
   maxVisibleItems?: number;
+  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
+  placement?: Placement;
+  /** Pixel gap between trigger and menu edge. Default: 4. */
+  gap?: number;
+  /** Minimum pixel distance from viewport edges. Default: 8. */
+  padding?: number;
 }
 
 // --- Shared menu container ---
@@ -90,6 +96,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
     let timer: DismissTimer | null = null;
     let engine: AlapEngine | null = null;
     let currentConfig: AlapConfig | null = null;
+    let intersectionObserver: IntersectionObserver | null = null;
 
     // --- Helpers ---
 
@@ -159,14 +166,39 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         menu.classList.add(`alap_${el.id}`);
       }
 
-      // Position below trigger
-      const rect = el.getBoundingClientRect();
+      // Position the menu
       menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN;
-      menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
-      menu.style.left = `${rect.left + window.scrollX}px`;
+
+      if (opts.placement) {
+        const state = calcPlacementState(el, menu, {
+          placement: opts.placement,
+          gap: opts.gap,
+          padding: opts.padding,
+        });
+        const { result } = state;
+        menu.style.top = `${result.y + window.scrollY}px`;
+        menu.style.left = `${result.x + window.scrollX}px`;
+        if (result.maxHeight != null) {
+          menu.style.maxHeight = `${result.maxHeight}px`;
+          menu.style.overflowY = 'auto';
+        }
+        if (result.maxWidth != null) {
+          menu.style.maxWidth = `${result.maxWidth}px`;
+        }
+        applyPlacementClass(menu, result.placement);
+      } else {
+        const rect = el.getBoundingClientRect();
+        menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+        menu.style.left = `${rect.left + window.scrollX}px`;
+      }
+
       menu.setAttribute('aria-hidden', 'false');
       el.setAttribute('aria-expanded', 'true');
       isOpen = true;
+
+      // Observe trigger for scroll-away detection
+      if (intersectionObserver) intersectionObserver.disconnect();
+      intersectionObserver = observeTriggerOffscreen(el, closeMenu);
 
       // Focus first item
       const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
@@ -183,10 +215,15 @@ export function alapPlugin(Alpine: AlpineInstance): void {
     function closeMenu(): void {
       if (!menuEl) return;
       menuEl.style.cssText = MENU_STYLES;
+      clearPlacementClass(menuEl);
       menuEl.setAttribute('aria-hidden', 'true');
       el.setAttribute('aria-expanded', 'false');
       isOpen = false;
       timer?.stop();
+      if (intersectionObserver) {
+        intersectionObserver.disconnect();
+        intersectionObserver = null;
+      }
       el.focus();
     }
 
