@@ -53,8 +53,8 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **Regex search** — `/pattern/` syntax for content-aware filtering
 - **Security hardened** — URL sanitization, ReDoS protection, config validation
 - **Storage layer** — IndexedDB, REST API client, offline-resilient hybrid
-- **7 server examples** — Node, Bun, Python, PHP backends
-- **7 visual editors** — React, Vue, Svelte, Solid, Astro, Alpine builds
+- **9 server examples** — Node, Bun, Python, Go, Rust, PHP backends
+- **8 visual editors** — React, Vue, Svelte, Solid, Astro, Alpine builds
 - **Markdown support** — `[text](alap:query)` via remark plugin
 - **Astro & Eleventy integrations** — zero-config framework packages
 - **CDN / IIFE build** — `<script>` tag usage for WordPress, static sites, and zero-build setups (30.4 KB / 9.1 KB gzip)
@@ -63,10 +63,10 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 
 | Where to go | What you'll find |
 |-------------|-----------------|
-| **[Cookbooks](docs/cookbooks/)** | Role-based guides for developers, writers, designers, and editors |
-| **[Examples](examples/)** | 17 demo sites + 7 server backends |
-| **[Architecture](docs/architecture.md)** | Layered design, expression language, extension points |
-| **[API Reference](docs/api.md)** | Every type, function, component, attribute, CSS hook, and event |
+| **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
+| **[Examples](examples/)** | 20 demo sites + 9 server backends |
+| **[Framework Guides](docs/framework-guides/)** | React, Vue, Svelte, Solid, Astro, Alpine, Eleventy, Web Component, DOM |
+| **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |
 | **[FAQ](docs/FAQ.md)** | Common questions and answers |
 | **[alap.info](https://alap.info)** | Project website |

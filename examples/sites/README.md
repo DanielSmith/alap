@@ -1,6 +1,6 @@
 # Site Examples
 
-14 browser demos showing Alap in action across different adapters, theming approaches, and features.
+15 browser demos showing Alap in action across different adapters, theming approaches, and features.
 
 Each example is self-contained with its own `serve.sh` for standalone running. Ports are unique so you can run multiple examples simultaneously.
 
@@ -33,6 +33,7 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [solid](solid/) | 9070 | SolidJS | Fine-grained signals, `Dynamic` component |
 | [alpine](alpine/) | 9000 | Alpine.js | `x-alap` directive, no build step, CDN-loadable |
 | [astro-integration](astro-integration/) | 9010 | Astro | Real Astro project with auto-inject integration |
+| [hugo](hugo/) | 9170 | Hugo | Shortcode + web component (in active development) |
 
 **Note:** The Astro example uses its own dev server (`npx astro dev`), not the shared Vite config.
 

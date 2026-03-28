@@ -1,0 +1,6 @@
+alap.iife.js
+
+# SQLite database files created at runtime (Option B).
+# The demo seed database (demo/seed/.ht.sqlite) is tracked intentionally.
+*.sqlite
+!demo/seed/.ht.sqlite

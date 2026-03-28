@@ -1,0 +1,18 @@
+{{/* alap shortcode — emits <alap-link> web component. See README for usage. */}}
+
+{{- $query := "" -}}
+{{- $config := "" -}}
+{{- if .IsNamedParams -}}
+  {{- $query = .Get "query" -}}
+  {{- with .Get "config" }}{{ $config = . }}{{ end -}}
+{{- else -}}
+  {{- $query = .Get 0 -}}
+{{- end -}}
+
+{{- if $query -}}
+<alap-link query="{{ $query }}"
+  {{- with $config }} config="{{ . }}"{{ end -}}
+>{{ .Inner | safeHTML }}</alap-link>
+{{- else -}}
+{{ .Inner | safeHTML }}
+{{- end -}}

@@ -28,18 +28,23 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.1.0"
   },
   "peerDependencies": {
     "unified": "^11.0.0"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.0",
-    "remark-html": "^16.0.0",
+    "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
     "typescript": "^5.7.0",
-    "unified": "^11.0.0",
+    "unified": "^11.0.5",
     "vitest": "^3.0.0"
   },
-  "author": "Daniel Smith"
+  "author": "Daniel Smith",
+  "pnpm": {
+    "overrides": {
+      "picomatch": ">=4.0.4"
+    }
+  }
 }

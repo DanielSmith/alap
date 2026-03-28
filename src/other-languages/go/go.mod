@@ -1,3 +1,3 @@
 module github.com/DanielSmith/alap-go
 
-go 1.22
+go 1.25.8

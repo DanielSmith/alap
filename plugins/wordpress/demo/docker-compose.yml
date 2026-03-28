@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Alap instant demo — single container, pre-seeded WordPress + SQLite.
+# Build context is the parent directory so the Dockerfile can reach
+# the shared plugin files (alap.php, alap-config.js, alap.iife.js).
+services:
+  wordpress:
+    build:
+      context: ..
+      dockerfile: demo/Dockerfile
+    ports:
+      - "8090:80"

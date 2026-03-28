@@ -1,0 +1,21 @@
+{{/*
+  alap-head partial — include in your <head> or before </body>.
+  Loads the IIFE build, registers config, defines the web component.
+
+  Usage in baseof.html:
+    {{ partial "alap-head.html" . }}
+
+  Expects:
+    static/js/alap.iife.js   — the Alap IIFE build
+    static/js/alap-config.js — your link library (sets window.alapConfig)
+*/}}
+<script src="{{ "js/alap.iife.js" | relURL }}" defer></script>
+<script src="{{ "js/alap-config.js" | relURL }}" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Alap !== 'undefined' && typeof alapConfig !== 'undefined') {
+      Alap.registerConfig(alapConfig);
+      Alap.defineAlapLink();
+    }
+  });
+</script>

@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Alap + Hugo example.
+services:
+  hugo:
+    build: .
+    ports:
+      - "9170:1313"

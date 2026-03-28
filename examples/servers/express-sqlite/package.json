@@ -12,7 +12,7 @@
     "alap": "file:../../..",
     "better-sqlite3": "^11.10.0",
     "cors": "^2.8.6",
-    "express": "^4.22.1"
+    "express": "^5.0.0"
   },
   "author": "Daniel Smith",
   "license": "Apache-2.0"

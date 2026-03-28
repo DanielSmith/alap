@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Override: persist the SQLite database across container restarts.
+# Used by run.sh when the user opts into persistence.
+services:
+  wordpress:
+    volumes:
+      - wp_database:/var/www/html/wp-content/database
+
+volumes:
+  wp_database:

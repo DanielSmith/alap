@@ -1,0 +1,72 @@
+{
+  "name": "@alap/mdx",
+  "version": "1.0.0",
+  "description": "MDX integration for Alap — transforms [text](alap:query) into AlapLink JSX components",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./remark": {
+      "types": "./dist/remarkAlapMDX.d.ts",
+      "import": "./dist/remarkAlapMDX.js"
+    },
+    "./provider": {
+      "types": "./dist/AlapMDXProvider.d.ts",
+      "import": "./dist/AlapMDXProvider.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "alap",
+    "mdx",
+    "remark",
+    "remark-plugin",
+    "react",
+    "next-js",
+    "docusaurus",
+    "remix"
+  ],
+  "license": "Apache-2.0",
+  "author": "Daniel Smith",
+  "dependencies": {
+    "unist-util-visit": "^5.1.0"
+  },
+  "peerDependencies": {
+    "@mdx-js/react": "^3.0.0",
+    "alap": "^3.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@mdx-js/react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "^3.0.0",
+    "@mdx-js/react": "^3.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/mdast": "^4.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "alap": "workspace:*",
+    "happy-dom": "^20.8.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "typescript": "^5.7.0",
+    "unified": "^11.0.5",
+    "vitest": "^3.0.0"
+  }
+}

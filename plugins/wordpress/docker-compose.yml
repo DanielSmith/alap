@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# WordPress + SQLite — single container, no database service.
+services:
+  wordpress:
+    build: .
+    ports:
+      - "8080:80"

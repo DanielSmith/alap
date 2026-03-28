@@ -37,5 +37,10 @@
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   },
-  "author": "Daniel Smith"
+  "author": "Daniel Smith",
+  "pnpm": {
+    "overrides": {
+      "picomatch": ">=4.0.4"
+    }
+  }
 }

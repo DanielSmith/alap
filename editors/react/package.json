@@ -27,5 +27,10 @@
     "vite-plugin-svgr": "^4.5.0"
   },
   "author": "Daniel Smith",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "pnpm": {
+    "overrides": {
+      "picomatch": ">=4.0.4"
+    }
+  }
 }

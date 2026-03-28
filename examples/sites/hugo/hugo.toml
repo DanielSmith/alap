@@ -1,0 +1,8 @@
+baseURL = "http://localhost:1313/"
+languageCode = "en-us"
+title = "Alap + Hugo"
+
+# In a real project, use the Hugo module instead of bundled shortcodes:
+# [module]
+#   [[module.imports]]
+#     path = "github.com/DanielSmith/alap/integrations/hugo-alap"

@@ -6,6 +6,7 @@ Framework-level packages that wire Alap into static site generators and document
 |-------------|-----------|-------------|-------|
 | [astro-alap/](astro-alap/) | Astro | Zero-config `injectScript`, optional remark-alap | 19 |
 | [eleventy-alap/](eleventy-alap/) | Eleventy | Static (zero JS) + interactive shortcodes and filters | 21 |
+| [hugo-alap/](hugo-alap/) | Hugo | Shortcode + partial for `<alap-link>` web components | — |
 
 > **Docusaurus:** A dedicated integration is planned but temporarily on hold due to an upstream transitive dependency vulnerability (`serialize-javascript` via `@docusaurus/core`). In the meantime, use `remark-alap` directly in your Docusaurus remark pipeline.
 
