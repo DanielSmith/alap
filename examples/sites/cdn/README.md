@@ -254,7 +254,7 @@ Instead of inlining the config, fetch it from your API:
 </script>
 ```
 
-This works with any of the 7 server examples (Express, Bun, Flask, Django, FastAPI, Laravel).
+This works with any of the 9 server examples (Express, Hono, Bun, Flask, Django, FastAPI, Laravel, Gin, Axum).
 
 ## What's on `window.Alap`
 

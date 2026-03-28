@@ -31,6 +31,7 @@ export default defineConfig({
       'alap/alpine': resolve(__dirname, 'src/ui/alpine/index.ts'),
       'alap/astro': resolve(__dirname, 'src/ui/astro/index.ts'),
       'alap/storage': resolve(__dirname, 'src/storage/index.ts'),
+      'alap/qwik': resolve(__dirname, 'src/ui/qwik/index.ts'),
       'alap': resolve(__dirname, 'src/index.ts'),
     },
   },
@@ -46,11 +47,12 @@ export default defineConfig({
         'astro/index': resolve(__dirname, 'src/ui/astro/index.ts'),
         'alpine/index': resolve(__dirname, 'src/ui/alpine/index.ts'),
         'solid/index': resolve(__dirname, 'src/ui/solid/index.ts'),
+        'qwik/index': resolve(__dirname, 'src/ui/qwik/index.ts'),
       },
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'vue', /^svelte($|\/)/, /^solid-js($|\/)/, 'idb'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'vue', /^svelte($|\/)/, /^solid-js($|\/)/, /^@builder\.io\/qwik($|\/)/, 'idb'],
     },
   },
   plugins: [
@@ -77,7 +79,7 @@ export default defineConfig({
         test: {
           name: 'ui',
           include: ['tests/ui/**/*.test.{ts,tsx}'],
-          exclude: ['tests/ui/solid/**'],
+          exclude: ['tests/ui/solid/**', 'tests/ui/qwik/**'],
           environment: 'happy-dom',
         },
       },
@@ -91,6 +93,12 @@ export default defineConfig({
           name: 'ui-solid',
           include: ['tests/ui/solid/**/*.test.tsx'],
           environment: 'happy-dom',
+        },
+      },
+      {
+        test: {
+          name: 'ui-qwik',
+          include: ['tests/ui/qwik/**/*.test.ts'],
         },
       },
       {

@@ -54,9 +54,15 @@
       "types": "./dist/ui/solid/index.d.ts",
       "import": "./dist/solid/index.js",
       "require": "./dist/solid/index.cjs"
+    },
+    "./qwik": {
+      "types": "./dist/ui/qwik/index.d.ts",
+      "import": "./dist/qwik/index.js",
+      "require": "./dist/qwik/index.cjs"
     }
   },
   "peerDependencies": {
+    "@builder.io/qwik": "^1.19.0",
     "alpinejs": "^3.0.0",
     "astro": "^4.0.0 || ^5.0.0 || ^6.0.0",
     "idb": "^8.0.0",
@@ -90,6 +96,9 @@
     },
     "solid-js": {
       "optional": true
+    },
+    "@builder.io/qwik": {
+      "optional": true
     }
   },
   "files": [
@@ -98,7 +107,7 @@
   ],
   "scripts": {
     "dev": "vite serve examples",
-    "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist",
+    "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
@@ -135,6 +144,7 @@
     }
   },
   "devDependencies": {
+    "@builder.io/qwik": "^1.19.2",
     "@mdx-js/rollup": "^3.1.1",
     "@solidjs/testing-library": "^0.8.10",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",

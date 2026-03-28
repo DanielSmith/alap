@@ -12,6 +12,7 @@ One page per framework. Each is self-contained — pick yours and go.
 | [SolidJS](solid.md) | SolidJS | Components + signals |
 | [Astro](astro.md) | Astro | `.astro` components wrapping the web component |
 | [Alpine.js](alpine.md) | Alpine.js | `x-alap` directive plugin |
+| [Qwik](qwik.md) | Qwik | Resumable components — zero JS until interaction |
 | [Eleventy](eleventy.md) | Eleventy | `eleventy-alap` plugin — shortcodes + filters |
 
 ## Which one should I use?
@@ -19,6 +20,7 @@ One page per framework. Each is self-contained — pick yours and go.
 - **No framework?** Start with [Web Component](web-component.md) — it works in plain HTML
 - **Have a framework?** Use its adapter — it feels native and integrates with your component tree
 - **Need maximum CSS control?** [Vanilla DOM](vanilla-dom.md) renders into the page with no shadow boundary
+- **Zero JS until click?** [Qwik](qwik.md) — resumability means no parser/engine code loads until someone interacts
 - **Static site?** [Eleventy](eleventy.md), [Astro](astro.md), or [Web Component](web-component.md) with the CDN build
 
 ## See also

@@ -55,17 +55,18 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **Storage layer** — IndexedDB, REST API client, offline-resilient hybrid
 - **9 server examples** — Node, Bun, Python, Go, Rust, PHP backends
 - **8 visual editors** — React, Vue, Svelte, Solid, Astro, Alpine builds
-- **Markdown support** — `[text](alap:query)` via remark plugin
-- **Astro & Eleventy integrations** — zero-config framework packages
-- **CDN / IIFE build** — `<script>` tag usage for WordPress, static sites, and zero-build setups (30.4 KB / 9.1 KB gzip)
+- **Markdown & MDX support** — `[text](alap:query)` via remark plugin, MDX provider
+- **Astro, Eleventy, Hugo & Qwik City integrations** — zero-config framework packages
+- **WordPress plugin** — `[alap]` shortcode, SQLite containers, instant demo
+- **CDN / IIFE build** — `<script>` tag usage for static sites and zero-build setups
 
 ## Next Steps
 
 | Where to go | What you'll find |
 |-------------|-----------------|
 | **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
-| **[Examples](examples/)** | 20 demo sites + 9 server backends |
-| **[Framework Guides](docs/framework-guides/)** | React, Vue, Svelte, Solid, Astro, Alpine, Eleventy, Web Component, DOM |
+| **[Examples](examples/)** | 22 demo sites + 9 server backends |
+| **[Framework Guides](docs/framework-guides/)** | React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Eleventy, Web Component, DOM |
 | **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |
 | **[FAQ](docs/FAQ.md)** | Common questions and answers |

@@ -4,6 +4,81 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### Qwik Adapter and Qwik City Integration (2026-03-28)
+
+Framework adapter for Qwik — the resumability-first framework. Alap's query state is already serialized into HTML attributes, so the engine, parser, and placement logic are only downloaded when the user actually interacts with a link. Zero JS until click.
+
+**Adapter (`alap/qwik`) — `src/ui/qwik/`:**
+- `AlapProvider` — context provider using `component$()`, `useContextProvider`, and `noSerialize` for the engine (non-serializable by design — only needed client-side)
+- `AlapLink` — component with `$()` lazy boundaries on all event handlers. Click/hover/keyboard handlers download on demand, not at page load.
+- `useAlap()` — hook returning `query()`, `resolve()`, `getLinks()` from context
+- Full feature parity with other adapters: compass placement, popover mode, keyboard nav, auto-dismiss timer, click-outside/escape dismissal, scroll-away detection, event hooks
+- `useVisibleTask$` for browser-only effects (no SSR side effects)
+- Props follow Qwik convention: `onTriggerHover$`, `onItemContext$` (QRL callbacks)
+
+**Integration (`qwik-alap`) — `integrations/qwik-alap/`:**
+- Vite plugin for Qwik City projects
+- `transformIndexHtml` hook injects web component registration and config loading
+- Options: `config`, `configName`, `validate`, `injectStyles` (same shape as `astro-alap`)
+- Optional default stylesheet with light/dark mode
+- Build-time config validation via dynamic `import('alap/core')`
+
+**Build:**
+- `tsconfig.qwik.json` — separate TypeScript config with `jsxImportSource: @builder.io/qwik` (same pattern as `tsconfig.solid.json`)
+- Added to `vite.config.ts` — entry, alias, external
+- Added to `package.json` — `./qwik` export, `@builder.io/qwik` peer dependency (optional)
+
+### pnpm Workspace Migration (2026-03-28)
+
+All internal consumers of Alap now reference it via `workspace:*` instead of ad-hoc `file:` or `link:` relative paths. Every editor, integration, plugin, example, and server resolves `alap` through `node_modules` — exactly as an end user would after `pnpm add alap`.
+
+**Created:**
+- `pnpm-workspace.yaml` — 21 workspace projects (root + 20 consumers)
+
+**Updated (15 package.json files):**
+- 8 editors: `"alap": "file:../../"` → `"alap": "workspace:*"`
+- 2 integrations: devDep `"alap": "link:../../"` / `"file:../../"` → `"alap": "workspace:*"`
+- 1 plugin (mdx): devDep → `"workspace:*"`
+- 2 example sites (eleventy, tiptap): `"alap": "file:../../.."` → `"workspace:*"`, cross-references too
+- 3 example servers: `"alap": "file:../../.."` → `"workspace:*"`
+
+**Verification script — `scripts/smoke-examples.sh` (new):**
+- Builds all 16 Vite-based examples against `dist/` with no source aliases
+- Creates a temporary vite config without alap aliases — examples must resolve from `node_modules`
+- Catches import issues that dev mode (Vite aliases → source) would mask
+
+### WordPress Plugin — SQLite (2026-03-28)
+
+Both WordPress container options now use SQLite via the WP Performance Team's SQLite Database Integration plugin. No MySQL or MariaDB — single container each.
+
+**Option B (fresh install) — `plugins/wordpress/`:**
+- Rewritten `Dockerfile` — downloads SQLite plugin at build time, installs to `/usr/src/wordpress/` (WordPress entrypoint copies to `wp-content/` at start)
+- Rewritten `docker-compose.yml` — single service, port 8080, no `db` service
+- Rewritten `run.sh` — asks about persistence (`[y/N]`), ephemeral by default
+- New `docker-compose.persist.yml` — volume override for persistence opt-in
+- New `seed/wp-config.php` — SQLite-aware config with `DB_DIR`, `DB_FILE` defines
+
+**Option A (instant demo) — `plugins/wordpress/demo/`:**
+- `Dockerfile` — pre-seeded SQLite database, instant boot
+- `docker-compose.yml` — single service, port 8090
+- `run.sh` — "Alap demo running at http://localhost:8090", admin demo/demo
+- `seed/wp-config.php` — demo-specific config (locked down, demo salts)
+- `seed/.ht.sqlite` — pre-seeded database (pending manual generation)
+
+**Docs:**
+- Rewritten `plugins/wordpress/README.md` — covers both options, SQLite explanation, database inspection, seed regeneration steps
+
+### New Constants (2026-03-28)
+
+Added shared constants to reduce hardwired values across adapters:
+
+- `DEFAULT_MENU_Z_INDEX` (10) — z-index for menu containers
+- `MENU_CONTAINER_CLASS` (`'alapelem'`) — CSS class for menu containers
+- `MENU_ITEM_CLASS` (`'alapListElem'`) — CSS class for menu list items
+- `DEFAULT_LINK_TARGET` (`'fromAlap'`) — default target for menu item anchors
+
+Used by the new Qwik adapter. Available for other adapters to adopt incrementally.
+
 ### Compass-Based Menu Placement Engine (2026-03-26)
 
 Menus now use a proper placement engine instead of ad-hoc flip logic. Preferred position with smart fallback, no page scroll, full viewport containment. Replaces the previous `viewportAdjust` flip behavior.

@@ -15,7 +15,8 @@
       "alap/solid": ["./src/ui/solid/index.ts"],
       "alap/alpine": ["./src/ui/alpine/index.ts"],
       "alap/astro": ["./src/ui/astro/index.ts"],
-      "alap/storage": ["./src/storage/index.ts"]
+      "alap/storage": ["./src/storage/index.ts"],
+      "alap/qwik": ["./src/ui/qwik/index.ts"]
     },
     "strict": true,
     "esModuleInterop": true,
@@ -30,5 +31,5 @@
     "rootDir": "./src"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "tests", "src/ui/solid"]
+  "exclude": ["node_modules", "dist", "tests", "src/ui/solid", "src/ui/qwik"]
 }

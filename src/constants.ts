@@ -67,3 +67,15 @@ export const DEFAULT_VIEWPORT_PADDING = 8;
 
 /** Default behavior when trigger scrolls off-screen while menu is open */
 export const DEFAULT_TRIGGER_OFFSCREEN = 'close' as const;
+
+/** Default z-index for menu containers */
+export const DEFAULT_MENU_Z_INDEX = 10;
+
+/** CSS class for the menu container */
+export const MENU_CONTAINER_CLASS = 'alapelem';
+
+/** CSS class for each menu list item */
+export const MENU_ITEM_CLASS = 'alapListElem';
+
+/** Default link target for menu item anchors */
+export const DEFAULT_LINK_TARGET = 'fromAlap';

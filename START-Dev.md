@@ -338,7 +338,7 @@ See [integrations/eleventy-alap/](integrations/eleventy-alap/).
 
 ```bash
 pnpm install
-pnpm test         # 751 tests across 39 files
+pnpm test         # 794 tests across 41 files
 pnpm typecheck
 pnpm build
 ```
@@ -349,7 +349,7 @@ pnpm build
 |-----|------|
 | [Getting Started](docs/getting-started/) | Installation, quick start, configuration |
 | [Core Concepts](docs/core-concepts/) | Expressions, macros, search patterns, refiners, styling |
-| [Framework Guides](docs/framework-guides/) | All 8 adapters — React, Vue, Svelte, Astro, Alpine, Solid, Web Component, Vanilla DOM |
+| [Framework Guides](docs/framework-guides/) | All 9 adapters — React, Vue, Svelte, Qwik, Astro, Alpine, Solid, Web Component, Vanilla DOM |
 | [API Reference](docs/api-reference/) | Engine, types, events, storage, servers, security |
 | [Cookbooks](docs/cookbook/) | Accessibility, editors, existing URLs, images, markdown, language ports |
 | [FAQ](docs/FAQ.md) | Common questions |

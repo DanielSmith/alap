@@ -24,7 +24,7 @@ No — the concept dates back to the 1990s:
 - **2012:** Originally called "MultiLinks," built with jQuery.
 - **2021 (v1):** Rewritten as an ES6 library, no dependencies. Published on npm as `alap`.
 - **2021 (v2):** Introduced an API mode so frameworks like Vue and React could use Alap for data without Alap touching the DOM.
-- **2026 (v3):** Complete rewrite in TypeScript. 9 framework adapters, expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, and Python. 550+ tests.
+- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, and Python. 790+ tests.
 
 ### How is this different from a dropdown menu or a tooltip?
 
@@ -189,7 +189,7 @@ Every Alap [editor](cookbook/editors.md) includes a live query tester. Type an e
 
 ### Is this AI-generated code?
 
-The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 550+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 8 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
+The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 790+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
 
 ### Why Apache 2.0 license?
 

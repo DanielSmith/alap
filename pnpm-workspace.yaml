@@ -1,6 +1,8 @@
 packages:
   - editors/*
-  - integrations/*
+  - integrations/astro-alap
+  - integrations/eleventy-alap
+  - integrations/qwik-alap
   - plugins/mdx
   - plugins/remark-alap
   - plugins/tiptap-alap

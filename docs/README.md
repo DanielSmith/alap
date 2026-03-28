@@ -36,6 +36,7 @@ One page per framework. Self-contained — pick yours and go.
 - [SolidJS](framework-guides/solid.md) — fine-grained signals
 - [Astro](framework-guides/astro.md) — `.astro` components
 - [Alpine.js](framework-guides/alpine.md) — `x-alap` directive
+- [Qwik](framework-guides/qwik.md) — resumable components + Qwik City integration
 - [Eleventy](framework-guides/eleventy.md) — `eleventy-alap` plugin with shortcodes and filters
 
 ## API Reference
@@ -56,6 +57,7 @@ Advanced topics and integrations.
 - [Language Ports](cookbook/language-ports.md) — Python, PHP, Go, Rust expression parsers
 - [Editors](cookbook/editors.md) — 7 visual editor apps for building configs
 - [Markdown](cookbook/markdown.md) — `remark-alap` plugin, `[text](alap:.tag)` syntax
+- [MDX](cookbook/markdown.md) — `@alap/mdx` plugin with React provider
 - [Rich-Text Editors](cookbook/rich-text.md) — `@alap/tiptap` extension for Tiptap/ProseMirror
 - [Accessibility](cookbook/accessibility.md) — ARIA, keyboard nav, focus management
 - [Existing URLs](cookbook/existing-urls.md) — progressive enhancement with `existingUrl`

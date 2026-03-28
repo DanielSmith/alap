@@ -1,16 +1,19 @@
 # Plugins
 
-Content-level transforms that bring Alap into Markdown and rich-text editing workflows.
+Content-level transforms and platform-specific packages that bring Alap into different environments.
 
 | Plugin | Environment | What it does | Tests |
 |--------|------------|-------------|-------|
 | [remark-alap/](remark-alap/) | Remark/unified | `[text](alap:query)` → `<alap-link>` in Markdown | 20 |
+| [mdx/](mdx/) | MDX/React | Remark transform + `AlapMDXProvider` for MDX content | — |
 | [tiptap-alap/](tiptap-alap/) | Tiptap/ProseMirror | Inline `<alap-link>` node extension for rich-text editors | 11 |
+| [wordpress/](wordpress/) | WordPress | `[alap query=".tag"]` shortcode, SQLite containers (instant demo + fresh install) | — |
 
 ## Quick Start
 
 ```bash
 npm install remark-alap   # for Markdown pipelines
+npm install @alap/mdx     # for MDX (includes remark transform + React provider)
 npm install @alap/tiptap  # for Tiptap editors
 ```
 

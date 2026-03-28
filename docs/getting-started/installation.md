@@ -24,6 +24,7 @@ npm install alap
 | `alap/solid` | `AlapProvider`, `AlapLink`, `useAlap()` | `solid-js` |
 | `alap/astro` | `AlapLink.astro`, `AlapSetup.astro` | `astro` |
 | `alap/alpine` | `alapPlugin`, `x-alap` directive | `alpinejs` |
+| `alap/qwik` | `AlapProvider`, `AlapLink`, `useAlap()` | `@builder.io/qwik` |
 | `alap/storage` | IndexedDB + Remote + Hybrid persistence | `idb` (optional) |
 
 Your bundler tree-shakes everything you don't import.

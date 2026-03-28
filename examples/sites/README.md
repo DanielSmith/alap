@@ -1,6 +1,6 @@
 # Site Examples
 
-15 browser demos showing Alap in action across different adapters, theming approaches, and features.
+22 browser demos showing Alap in action across different adapters, theming approaches, and features.
 
 Each example is self-contained with its own `serve.sh` for standalone running. Ports are unique so you can run multiple examples simultaneously.
 

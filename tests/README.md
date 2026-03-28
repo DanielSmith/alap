@@ -1,6 +1,6 @@
 # Tests
 
-550 tests across 29 files, run via Vitest in 4 projects.
+794 tests across 41 files, run via Vitest in 5 projects.
 
 ```bash
 pnpm test          # run all tests
@@ -10,7 +10,7 @@ pnpm test:ui       # adapter tests (happy-dom)
 
 ## Structure
 
-### `core/` — 251 tests
+### `core/` — 452 tests
 
 Expression parser, operators, macros, parentheses, regex search, and security.
 
@@ -33,21 +33,22 @@ Expression parser, operators, macros, parentheses, regex search, and security.
 | validate-regex | 23 | ReDoS detection, nested quantifier rejection |
 | validate-config | 22 | Config schema, URL sanitization, pattern validation |
 
-### `ui/` — 252 tests
+### `ui/` — 295 tests
 
 Adapter behavior: ARIA, keyboard nav, dismissal, rendering modes.
 
-| Directory | Adapter | Tests |
-|-----------|---------|-------|
-| dom/ | AlapUI (vanilla DOM) | 22 |
-| web-component/ | `<alap-link>` (Shadow DOM) | 24 |
-| react/ | React adapter | 35 |
-| vue/ | Vue adapter | 35 |
-| svelte/ | Svelte adapter | 33 |
-| solid/ | SolidJS adapter | 35 |
-| alpine/ | Alpine.js adapter | 21 |
-| astro/ | Astro adapter | 9 |
-| shared/ | buildMenuList + existingUrl | 38 |
+| Directory | Adapter | Tests | Project |
+|-----------|---------|-------|---------|
+| dom/ | AlapUI (vanilla DOM) | 22 | ui |
+| web-component/ | `<alap-link>` (Shadow DOM) | 24 | ui |
+| react/ | React adapter | 35 | ui |
+| vue/ | Vue adapter | 35 | ui |
+| svelte/ | Svelte adapter | 33 | ui |
+| solid/ | SolidJS adapter | 35 | ui-solid |
+| qwik/ | Qwik adapter (engine + exports) | 16 | ui-qwik |
+| alpine/ | Alpine.js adapter | 21 | ui |
+| astro/ | Astro adapter | 9 | ui |
+| shared/ | buildMenuList + placement + existingUrl | 65 | ui |
 
 ### `storage/` — 47 tests
 
