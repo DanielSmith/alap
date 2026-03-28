@@ -1,0 +1,130 @@
+---
+title: Alap + Eleventy
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>{{ title }}</h1>
+  <p>Alap works with Eleventy out of the box. Install the plugin, write shortcodes in your Nunjucks templates, and your links get interactive menus.</p>
+
+  <h2>Inline Links</h2>
+  <p>The <code>alapLink</code> shortcode turns any text into a clickable menu trigger. Write it inline, the way you'd write a regular link.</p>
+
+  <div class="example">
+    <div class="source">
+      <pre><code>&lt;p&gt;Check out some
+  &#123;% alapLink ".coffee" %&#125;coffee spots&#123;% endalapLink %&#125;
+  or famous
+  &#123;% alapLink ".bridge" %&#125;bridges&#123;% endalapLink %&#125;.
+&lt;/p&gt;</code></pre>
+    </div>
+    <div class="result">
+      <p>Check out some
+        {% alapLink ".coffee" %}coffee spots{% endalapLink %}
+        or famous
+        {% alapLink ".bridge" %}bridges{% endalapLink %}.
+      </p>
+    </div>
+  </div>
+
+  <h2>Expressions</h2>
+  <p>The full expression language works inline — intersections, unions, subtraction, macros.</p>
+
+  <div class="example">
+    <div class="source">
+      <pre><code>&lt;p&gt;Only the
+  &#123;% alapLink ".nyc + .bridge" %&#125;NYC bridges&#123;% endalapLink %&#125;,
+  or everything in
+  &#123;% alapLink ".nyc | .sf - .coffee" %&#125;NYC and SF except coffee&#123;% endalapLink %&#125;.
+&lt;/p&gt;
+
+&lt;p&gt;A macro:
+  &#123;% alapLink "@cars" %&#125;favorite cars&#123;% endalapLink %&#125;.
+&lt;/p&gt;</code></pre>
+    </div>
+    <div class="result">
+      <p>Only the
+        {% alapLink ".nyc + .bridge" %}NYC bridges{% endalapLink %},
+        or everything in
+        {% alapLink ".nyc | .sf - .coffee" %}NYC and SF except coffee{% endalapLink %}.
+      </p>
+      <p>A macro:
+        {% alapLink "@cars" %}favorite cars{% endalapLink %}.
+      </p>
+    </div>
+  </div>
+
+  <h2>Filters</h2>
+  <p>Use Alap data directly in your templates — count items or loop over resolved links.</p>
+
+  <div class="example">
+    <div class="source">
+      <pre><code>&lt;p&gt;There are &#123;&#123; ".coffee" | alapCount &#125;&#125; coffee spots
+  and &#123;&#123; ".bridge" | alapCount &#125;&#125; bridges in the config.&lt;/p&gt;</code></pre>
+    </div>
+    <div class="result">
+      <p>There are <strong>{{ ".coffee" | alapCount }}</strong> coffee spots
+         and <strong>{{ ".bridge" | alapCount }}</strong> bridges in the config.</p>
+    </div>
+  </div>
+
+  <div class="example">
+    <div class="source">
+      <pre><code>&#123;% set parks = ".park" | alapResolve %&#125;
+&lt;div class="cards"&gt;
+  &#123;% for link in parks %&#125;
+    &lt;a class="card" href="&#123;&#123; link.url &#125;&#125;"&gt;&#123;&#123; link.label &#125;&#125;&lt;/a&gt;
+  &#123;% endfor %&#125;
+&lt;/div&gt;</code></pre>
+    </div>
+    <div class="result">
+      {% set parks = ".park" | alapResolve %}
+      <div class="cards">
+        {% for link in parks %}
+          <a class="card" href="{{ link.url }}" target="fromAlap">{{ link.label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <h2>Setup</h2>
+  <div class="example">
+    <pre><code>// eleventy.config.js
+import alapPlugin from 'eleventy-alap';
+import config from './alap-config.json' with { type: 'json' };
+
+export default function(eleventyConfig) {
+  eleventyConfig.addPlugin(alapPlugin, { config });
+}</code></pre>
+  </div>
+
+  <script src="/alap.iife.js"></script>
+  <script src="/config.js"></script>
+  <script>
+    Alap.defineAlapLink();
+    Alap.registerConfig(config);
+
+    document.querySelectorAll('.source').forEach(function(source) {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', function() {
+        const code = source.querySelector('code');
+        navigator.clipboard.writeText(code.textContent).then(function() {
+          btn.textContent = 'Copied!';
+          setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+        });
+      });
+      source.style.position = 'relative';
+      source.appendChild(btn);
+    });
+  </script>
+</body>
+</html>

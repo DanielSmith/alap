@@ -24,7 +24,7 @@ No — the concept dates back to the 1990s:
 - **2012:** Originally called "MultiLinks," built with jQuery.
 - **2021 (v1):** Rewritten as an ES6 library, no dependencies. Published on npm as `alap`.
 - **2021 (v2):** Introduced an API mode so frameworks like Vue and React could use Alap for data without Alap touching the DOM.
-- **2026 (v3):** Complete rewrite in TypeScript. 8 framework adapters, expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, 550+ tests.
+- **2026 (v3):** Complete rewrite in TypeScript. 9 framework adapters, expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, and Python. 550+ tests.
 
 ### How is this different from a dropdown menu or a tooltip?
 

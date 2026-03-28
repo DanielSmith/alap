@@ -1,0 +1,15 @@
+{
+  "name": "alap-eleventy-example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx @11ty/eleventy --serve --port=9990",
+    "build": "npx @11ty/eleventy"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "alap": "file:../../..",
+    "eleventy-alap": "file:../../../integrations/eleventy-alap"
+  }
+}
