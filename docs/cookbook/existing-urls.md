@@ -1,6 +1,6 @@
 # Existing URL Handling
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Accessibility](accessibility.md) · **This Page** · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · **This Page** · [Images & Media](images-and-media.md) | [All docs](../README.md)
 
 What happens when a link already has an `href`?
 

@@ -1,6 +1,6 @@
 # Svelte
 
-**[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · **This Page** · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) | [All docs](../README.md)
+**[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · **This Page** · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) · [Eleventy](eleventy.md) | [All docs](../README.md)
 
 > Live version with interactive examples: https://alap.info/framework-guides/svelte
 

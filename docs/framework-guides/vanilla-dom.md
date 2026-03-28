@@ -1,6 +1,6 @@
 # Vanilla DOM Adapter
 
-**[Framework Guides](README.md):** **This Page** · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · [Svelte](svelte.md) · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) | [All docs](../README.md)
+**[Framework Guides](README.md):** **This Page** · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · [Svelte](svelte.md) · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) · [Eleventy](eleventy.md) | [All docs](../README.md)
 
 The `AlapUI` class binds Alap menus to vanilla HTML. No framework required.
 

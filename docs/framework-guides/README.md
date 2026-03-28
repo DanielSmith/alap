@@ -12,13 +12,14 @@ One page per framework. Each is self-contained — pick yours and go.
 | [SolidJS](solid.md) | SolidJS | Components + signals |
 | [Astro](astro.md) | Astro | `.astro` components wrapping the web component |
 | [Alpine.js](alpine.md) | Alpine.js | `x-alap` directive plugin |
+| [Eleventy](eleventy.md) | Eleventy | `eleventy-alap` plugin — shortcodes + filters |
 
 ## Which one should I use?
 
 - **No framework?** Start with [Web Component](web-component.md) — it works in plain HTML
 - **Have a framework?** Use its adapter — it feels native and integrates with your component tree
 - **Need maximum CSS control?** [Vanilla DOM](vanilla-dom.md) renders into the page with no shadow boundary
-- **Static site?** [Astro](astro.md) or [Web Component](web-component.md) with the CDN build
+- **Static site?** [Eleventy](eleventy.md), [Astro](astro.md), or [Web Component](web-component.md) with the CDN build
 
 ## See also
 

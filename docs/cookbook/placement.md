@@ -1,6 +1,6 @@
 # Placement
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) · **This Page** | [All docs](../README.md)
 
 How the menu gets positioned, how to control it, and where Alap's job ends and CSS takes over.
 

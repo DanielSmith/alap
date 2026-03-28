@@ -1,6 +1,6 @@
 # Images and Media
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · **This Page** | [All docs](../README.md)
 
 Alap menu items can display images instead of text, show thumbnails on hover, and carry rich metadata for custom interactions.
 

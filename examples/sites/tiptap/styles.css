@@ -1,5 +1,6 @@
 /**
- * Copyright 2026 Daniel Smith — Apache 2.0
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
@@ -14,17 +15,18 @@ body {
   background: #1a2f8a;
 }
 
-h1 { font-size: 1.5rem; margin-bottom: 0.25rem; color: #ffd666; }
-h3 { font-size: 0.95rem; color: #ffe8a0; margin: 0 0 0.5rem; }
+h1 { font-size: 1.5rem; color: #ffd666; margin-bottom: 0.25rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+h3 { font-size: 0.95rem; color: #ffe8a0; margin: 1rem 0 0.5rem; }
 h3:first-child { margin-top: 0; }
 
 code {
   font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85em;
   background: #1a2870;
   color: #88bbff;
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
 }
 
 a[href^="../../"] { color: #88bbff; text-decoration: underline; }
@@ -40,6 +42,30 @@ a[href^="../../"]:hover { color: #ffd666; }
 *::-webkit-scrollbar-thumb { background: #4470cc; border-radius: 4px; }
 *::-webkit-scrollbar-thumb:hover { background: #5588dd; }
 
+/* --- Help button (in toolbar) --- */
+
+.help-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: #2240a8;
+  color: #88bbff;
+  border: 1px solid #4470cc;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.25rem;
+}
+
+.help-btn:hover {
+  background: #3366d6;
+  color: #ffd666;
+  border-color: #ffd666;
+}
+
 /* --- Toolbar --- */
 
 .toolbar {
@@ -53,30 +79,37 @@ a[href^="../../"]:hover { color: #ffd666; }
   margin-bottom: 1rem;
 }
 
-.toolbar-text {
+.toolbar button {
+  padding: 0.3rem 0.75rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 0.85rem;
-  color: #b8c4e8;
-}
-
-.help-btn {
-  width: 1.75rem;
-  height: 1.75rem;
-  min-width: 1.75rem;
-  border-radius: 50%;
   background: #2240a8;
-  color: #88bbff;
+  color: #f0f2ff;
   border: 1px solid #4470cc;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 4px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.help-btn:hover {
+.toolbar button:hover {
   background: #3366d6;
+  border-color: #ffd666;
   color: #ffd666;
+}
+
+.toolbar input {
+  padding: 0.3rem 0.5rem;
+  width: 140px;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85rem;
+  background: #1a2870;
+  color: #f0f2ff;
+  border: 1px solid #4470cc;
+  border-radius: 4px;
+}
+
+.toolbar input:focus {
+  outline: 2px solid #ffd666;
+  outline-offset: 1px;
   border-color: #ffd666;
 }
 
@@ -101,29 +134,87 @@ a[href^="../../"]:hover { color: #ffd666; }
   margin: 0 0 0.5rem;
 }
 
-/* --- Editor areas --- */
+/* --- Tabs --- */
 
-.editor-area {
-  background: #1a2870;
+.tabs {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.tab {
+  padding: 0.35rem 1rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+  background: #141e6a;
+  color: #7888b8;
   border: 1px solid #2e48a0;
-  border-radius: 6px;
-  padding: 0.75rem;
-  font-family: 'JetBrains Mono', 'SF Mono', monospace;
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: #b8c4e8;
-  width: 100%;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #88bbff;
+}
+
+.tab.active {
+  background: #2240a8;
+  color: #ffd666;
+  border-color: #4470cc;
+}
+
+.tab-content {
+  display: none;
   flex: 1;
-  resize: none;
-  box-sizing: border-box;
   min-height: 0;
 }
 
-.editor-area:focus {
-  outline: 2px solid #ffd666;
-  outline-offset: 1px;
-  border-color: #ffd666;
+.tab-content.active {
+  display: flex;
+  flex-direction: column;
 }
+
+/* --- Editor --- */
+
+#editor {
+  background: #fff;
+  color: #1a1a2e;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+#editor .tiptap {
+  padding: 1rem 1.25rem;
+  outline: none;
+  line-height: 1.7;
+}
+
+#editor .tiptap p {
+  margin: 0.5rem 0;
+}
+
+#editor .alap-link {
+  color: #2563eb;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: text;
+  background: #eef2ff;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+}
+
+#editor .alap-link.ProseMirror-selectednode {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+  border-radius: 3px;
+}
+
+/* --- Config editor --- */
 
 .config-header {
   display: flex;
@@ -170,7 +261,25 @@ a[href^="../../"]:hover { color: #ffd666; }
 }
 
 .config-editor {
+  background: #1a2870;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
   font-size: 0.75rem;
+  line-height: 1.5;
+  color: #b8c4e8;
+  width: 100%;
+  flex: 1;
+  resize: none;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.config-editor:focus {
+  outline: 2px solid #ffd666;
+  outline-offset: 1px;
+  border-color: #ffd666;
 }
 
 .config-status {
@@ -183,65 +292,6 @@ a[href^="../../"]:hover { color: #ffd666; }
 .config-status.ok { color: #66cc88; }
 .config-status.error { color: #ff6b6b; }
 
-/* --- Tabs --- */
-
-.tabs {
-  display: flex;
-  gap: 0;
-  flex-shrink: 0;
-  margin-bottom: 0.5rem;
-}
-
-.tab {
-  padding: 0.35rem 1rem;
-  font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 0.85rem;
-  background: #141e6a;
-  color: #7888b8;
-  border: 1px solid #2e48a0;
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  cursor: pointer;
-}
-
-.tab:hover {
-  color: #88bbff;
-}
-
-.tab.active {
-  background: #2240a8;
-  color: #ffd666;
-  border-color: #4470cc;
-}
-
-.tab-content {
-  display: none;
-  flex: 1;
-  min-height: 0;
-}
-
-.tab-content.active {
-  display: flex;
-  flex-direction: column;
-}
-
-/* --- Rendered preview --- */
-
-.rendered {
-  line-height: 1.8;
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 1.25rem;
-  background: #2240a8;
-  border: 1px solid #2e48a0;
-  border-radius: 0 6px 6px 6px;
-}
-
-.rendered h1 { font-size: 1.3rem; color: #ffd666; }
-.rendered h2 { font-size: 1rem; color: #ffe8a0; }
-.rendered hr { border: none; border-top: 1px solid #2e48a0; margin: 1.5rem 0; }
-.rendered em { color: #b8c4e8; }
-
 /* --- HTML output --- */
 
 pre {
@@ -249,9 +299,9 @@ pre {
   background: #141e6a;
   color: #b8c4e8;
   padding: 0.75rem;
-  border-radius: 0 6px 6px 6px;
+  border-radius: 6px;
   border: 1px solid #2e48a0;
-  overflow-y: auto;
+  overflow-x: auto;
   font-family: 'JetBrains Mono', 'SF Mono', monospace;
   font-size: 0.75rem;
   line-height: 1.5;
@@ -259,45 +309,56 @@ pre {
   word-break: break-word;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
 }
 
-/* --- Alap link styling --- */
+/* --- Preview --- */
 
-alap-link {
+#preview {
+  background: #2240a8;
+  border: 1px solid #2e48a0;
+  border-radius: 0 6px 6px 6px;
+  padding: 1rem 1.25rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+#preview p { margin: 0.5rem 0; }
+
+#preview alap-link {
   color: #88bbff;
   text-decoration: underline;
-  text-decoration-color: #4470cc;
-  text-underline-offset: 2px;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
   cursor: pointer;
-  transition: text-decoration-color 0.15s, color 0.15s;
 }
 
-alap-link:hover {
-  color: #ffd666;
-  text-decoration-color: #ffd666;
-}
+#preview alap-link:hover { color: #ffd666; }
 
-alap-link::part(menu) {
+#preview alap-link::part(menu) {
   background: #2240a8;
-  border: 1px solid #4470cc;
-  border-radius: 8px;
+  border-color: #4470cc;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  padding: 0.25rem 0;
-  min-width: 180px;
 }
 
-alap-link::part(link) {
-  display: block;
-  padding: 0.4rem 0.75rem;
+#preview alap-link::part(list) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem;
+}
+
+#preview alap-link::part(link) {
   color: #f0f2ff;
-  text-decoration: none;
-  font-size: 0.85rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #2a50b8;
+  border-radius: 6px;
 }
 
-alap-link::part(link):hover,
-alap-link::part(link):focus-visible {
-  background: #3366d6;
+#preview alap-link::part(link):hover {
+  background: #3360d0;
   color: #ffd666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* --- Help slide-over --- */
@@ -387,11 +448,6 @@ alap-link::part(link):focus-visible {
 
 .help-body strong {
   color: #f0f2ff;
-}
-
-.help-body p {
-  font-size: 0.85rem;
-  color: #b8c4e8;
 }
 
 .help-body table {

@@ -1,6 +1,6 @@
 # Language Ports
 
-**[Cookbook](README.md):** **This Page** · [Editors](editors.md) · [Markdown](markdown.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** **This Page** · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
 
 Native ports of the Alap expression parser for Python, PHP, Go, and Rust. These enable server-side expression resolution without a Node.js sidecar.
 

@@ -26,6 +26,7 @@ export const demoConfig: AlapConfig = {
   settings: {
     listType: 'ul',
     menuTimeout: 5000,
+    placement: 'S',
   },
 
   macros: {

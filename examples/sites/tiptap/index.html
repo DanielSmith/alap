@@ -3,27 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alap — remark-alap Markdown Example</title>
+  <title>Alap + Tiptap</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <p><a href="../../">&larr; All Examples</a></p>
-  <h1>remark-alap</h1>
+  <h1>Alap + Tiptap</h1>
+  <p>A rich-text editor with inline <code>&lt;alap-link&gt;</code> nodes.
+     Edit the config below to add links, change tags, or create new macros.</p>
 
   <div class="toolbar">
     <button id="btn-help" class="help-btn" title="Help &amp; tips">?</button>
-    <span class="toolbar-text">
-      Edit markdown and config on the left.
-      <code>[text](alap:@macro)</code> links become interactive menus in the preview.
-    </span>
+    <button id="btn-insert" title="Insert Alap link (Cmd+Shift+A)">Insert Alap Link</button>
+    <input id="query-input" type="text" placeholder=".coffee" value=".coffee">
+    <button id="btn-remove" title="Remove Alap link, keep text">Remove</button>
   </div>
 
   <div class="grid">
     <div class="cell">
-      <h3>Markdown Source <button class="copy-btn" data-target="source">Copy</button></h3>
-      <textarea id="source" class="editor-area" spellcheck="false"></textarea>
+      <h3>Editor <button class="copy-btn" data-target="editor">Copy</button></h3>
+      <div id="editor"></div>
       <h3 class="config-header">Config <button class="copy-btn" data-target="config">Copy</button> <button id="btn-reset" class="reset-btn">Reset</button></h3>
-      <textarea id="config" class="editor-area config-editor" spellcheck="false"></textarea>
+      <textarea id="config" class="config-editor" spellcheck="false"></textarea>
       <div id="config-status" class="config-status"></div>
     </div>
     <div class="cell">
@@ -32,7 +33,7 @@
         <button class="tab" data-tab="html">HTML Output</button>
       </div>
       <div id="tab-preview" class="tab-content active">
-        <div id="content" class="rendered"></div>
+        <div id="preview"></div>
       </div>
       <div id="tab-html" class="tab-content">
         <pre id="html-output"></pre>
@@ -48,13 +49,15 @@
       <button id="btn-help-close" class="help-close">&times;</button>
     </div>
     <div class="help-body">
-      <h3>Markdown syntax</h3>
-      <p>Use <code>[text](alap:query)</code> to create an Alap link:</p>
-      <table>
-        <tr><td><code>[cafes](alap:.coffee)</code></td><td>Tag query</td></tr>
-        <tr><td><code>[bridges](alap:@nyc_bridges)</code></td><td>Macro (use for expressions with spaces)</td></tr>
-        <tr><td><code>[Brooklyn](alap:brooklyn)</code></td><td>Specific item by ID</td></tr>
-      </table>
+      <h3>Try these</h3>
+      <ul>
+        <li>Select a word, then click <strong>Insert Alap Link</strong> with query <code>.coffee</code></li>
+        <li>Click inside an existing Alap link, change the query to <code>.bridge</code>, click <strong>Update</strong></li>
+        <li>Try <code>.nyc + .bridge</code> for NYC bridges only</li>
+        <li>Use <code>@cars</code> for a macro</li>
+        <li>Press <strong>Cmd+Shift+A</strong> to insert at cursor</li>
+        <li>Click a link in the preview to see the menu</li>
+      </ul>
 
       <h3>Expression syntax</h3>
       <table>
@@ -65,7 +68,6 @@
         <tr><td><code>.a | .b</code></td><td>Union (either tag)</td></tr>
         <tr><td><code>.a - .b</code></td><td>Subtraction (a without b)</td></tr>
       </table>
-      <p><strong>Note:</strong> Expressions with spaces (operators) must use macros in Markdown — the parser breaks on spaces inside URLs.</p>
 
       <h3>Available tags</h3>
       <p id="help-tags" class="help-tags"></p>

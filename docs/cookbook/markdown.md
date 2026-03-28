@@ -1,6 +1,6 @@
 # Markdown Integration
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · **This Page** · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · **This Page** · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
 
 Alap works in Markdown. Write a standard Markdown link with an `alap:` prefix, and it becomes a multi-target menu in the rendered page.
 
@@ -93,3 +93,17 @@ export default defineConfig({
 Two modes:
 - **Interactive mode** — outputs web components (client-side JavaScript required)
 - **Static mode** — resolves expressions at build time, outputs plain HTML lists (zero client-side JavaScript)
+
+See [Eleventy](../framework-guides/eleventy.md) for the full guide.
+
+## Live editing
+
+The example app at [`examples/sites/markdown/`](../../examples/sites/markdown/) is a live sandbox:
+
+- **Editable markdown** on the left — type `[text](alap:query)` and the preview updates instantly
+- **Editable config** below the source — add links, change tags, create macros, and see the effect immediately. `registerConfig()` accepts being called again to replace the active config.
+- **Live preview** on the right with working `<alap-link>` web components
+- **Help panel** (slide-over from the **?** button) — shows markdown syntax, expression cheat sheet, and the available tags/macros from the current config (updates dynamically when config changes)
+- **Reset button** restores the original config
+
+This makes the example useful both as a demo and as a playground for experimenting with expressions, macros, and config structure.
