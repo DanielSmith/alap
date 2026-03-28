@@ -1,0 +1,10 @@
+packages:
+  - editors/*
+  - integrations/*
+  - plugins/mdx
+  - plugins/remark-alap
+  - plugins/tiptap-alap
+  - examples/sites/astro-integration
+  - examples/sites/eleventy
+  - examples/sites/tiptap
+  - examples/servers/*

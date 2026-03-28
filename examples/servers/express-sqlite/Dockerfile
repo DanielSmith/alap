@@ -2,14 +2,16 @@
 #
 #   docker build -t alap-express -f examples/servers/express-sqlite/Dockerfile .
 
-FROM node:20-alpine AS lib
+# node:22-alpine
+FROM node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3 AS lib
 WORKDIR /lib
 COPY package.json pnpm-lock.yaml ./
 COPY src/ src/
 COPY vite.config.ts vite.config.iife.ts tsconfig.json tsconfig.solid.json ./
-RUN npm i -g pnpm && pnpm install && pnpm build && pnpm pack
+RUN npm i -g pnpm@10.32.1 && pnpm install && pnpm build && pnpm pack
 
-FROM node:20-alpine
+# node:22-alpine
+FROM node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3
 WORKDIR /app
 
 COPY examples/servers/express-sqlite/package.json ./
@@ -24,4 +26,5 @@ RUN node seed.js
 
 EXPOSE 3000
 
+USER node
 CMD ["node", "server.js"]

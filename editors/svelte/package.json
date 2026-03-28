@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "alap": "file:../../",
+    "alap": "workspace:*",
     "short-unique-id": "^5.2.0",
     "svelte": "^5.53.11"
   },

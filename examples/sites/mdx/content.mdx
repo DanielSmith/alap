@@ -1,0 +1,95 @@
+{/* This file demonstrates both ways to use Alap in MDX:
+    1. Markdown syntax: [text](alap:query) — transformed by remarkAlapMDX
+    2. JSX syntax: <AlapLink query="..."> — used directly */}
+
+# City Guide
+
+Welcome to our city guide. Click any highlighted link to see curated destinations.
+
+## Markdown Syntax
+
+The `[text](alap:query)` syntax works in plain markdown. The remark plugin
+transforms it into `<AlapLink>` components at build time.
+
+Start your morning at one of our [favorite coffee spots](alap:@coffee).
+If you're in the Bay Area, try the [SF coffee scene](alap:@sf_coffee).
+
+```mdx
+Start your morning at one of our [favorite coffee spots](alap:@coffee).
+If you're in the Bay Area, try the [SF coffee scene](alap:@sf_coffee).
+```
+
+## Bridges
+
+New York's bridges are iconic. Explore the [NYC bridges](alap:@nyc_bridges),
+or browse [all bridges](alap:@all_bridges) across both cities.
+The [Brooklyn Bridge](alap:brooklyn) alone is worth the trip.
+
+```mdx
+Explore the [NYC bridges](alap:@nyc_bridges),
+or browse [all bridges](alap:@all_bridges) across both cities.
+The [Brooklyn Bridge](alap:brooklyn) alone is worth the trip.
+```
+
+## JSX Components
+
+Since this is MDX, you can also use `<AlapLink>` directly — with full
+access to props like operators in the query:
+
+<AlapLink query=".landmark">Landmarks across both cities</AlapLink>
+
+<AlapLink query=".sf + .coffee">SF coffee spots (intersection)</AlapLink> — only
+items tagged with both `.sf` and `.coffee`.
+
+```jsx
+<AlapLink query=".landmark">Landmarks across both cities</AlapLink>
+
+<AlapLink query=".sf + .coffee">SF coffee spots (intersection)</AlapLink>
+```
+
+## Macros
+
+Macros wrap complex expressions behind a simple `@name`. Define them once
+in your config, use them everywhere:
+
+Here are [my personal favorites](alap:@favorites) — a hand-picked macro.
+
+```mdx
+Here are [my personal favorites](alap:@favorites) — a hand-picked macro.
+```
+
+The macro `@favorites` expands to `brooklyn, bluebottle, goldengate` in the config.
+
+## Setup
+
+Wire `remarkAlapMDX` into your MDX pipeline and wrap content with `AlapProvider`:
+
+```tsx
+// vite.config.ts
+import mdx from '@mdx-js/rollup';
+import remarkAlapMDX from '@alap/mdx/remark';
+
+export default defineConfig({
+  plugins: [mdx({ remarkPlugins: [remarkAlapMDX] })],
+});
+```
+
+```tsx
+// App.tsx
+import { AlapProvider, AlapLink } from 'alap/react';
+import Content from './content.mdx';
+
+<AlapProvider config={config}>
+  <Content components={{ AlapLink }} />
+</AlapProvider>
+```
+
+---
+
+*This page is MDX. Markdown links use the `alap:` protocol, transformed by
+`remarkAlapMDX`. JSX components use `<AlapLink>` directly. Both resolve
+through the same `AlapProvider` context.*
+
+import { demoConfig } from './config';
+
+<ConfigPanel config={demoConfig} />

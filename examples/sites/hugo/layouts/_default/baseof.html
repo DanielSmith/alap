@@ -4,124 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ .Title }}</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
-
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-      max-width: 700px;
-      margin: 3rem auto;
-      padding: 0 1rem;
-      line-height: 1.7;
-      color: #f0f2ff;
-      background: #1a2f8a;
-    }
-
-    h1 { font-size: 1.5rem; color: #ffd666; }
-    h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
-
-    .example {
-      margin: 1rem 0;
-      background: #2240a8;
-      border: 1px solid #2e48a0;
-      border-radius: 6px;
-    }
-
-    .source {
-      background: #141e6a;
-      padding: 0 1rem;
-      border-bottom: 1px solid #2e48a0;
-    }
-
-    .source pre {
-      margin: 0;
-      background: none;
-      border: none;
-      padding: 1rem 0;
-    }
-
-    .result {
-      padding: 1rem 1.25rem;
-    }
-
-    alap-link {
-      color: #88bbff;
-      cursor: pointer;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      text-underline-offset: 3px;
-    }
-
-    alap-link:hover {
-      color: #ffd666;
-    }
-
-    alap-link::part(menu) {
-      background: #2240a8;
-      border-color: #4470cc;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    alap-link::part(list) {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      padding: 0.25rem;
-    }
-
-    alap-link::part(link) {
-      color: #f0f2ff;
-      font-family: 'DM Sans', system-ui, sans-serif;
-      background: #2a50b8;
-      border-radius: 6px;
-    }
-
-    alap-link::part(link):hover {
-      background: #3360d0;
-      color: #ffd666;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    pre {
-      background: #141e6a;
-      color: #b8c4e8;
-      padding: 1rem;
-      border-radius: 6px;
-      border: 1px solid #2e48a0;
-      overflow-x: auto;
-      font-family: 'JetBrains Mono', 'SF Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.5;
-    }
-
-    pre code {
-      background: none;
-      padding: 0;
-      color: inherit;
-      font-size: inherit;
-    }
-
-    code {
-      font-family: 'JetBrains Mono', 'SF Mono', monospace;
-      font-size: 0.85em;
-      background: #1a2870;
-      color: #88bbff;
-      padding: 0.15rem 0.35rem;
-      border-radius: 3px;
-    }
-
-    a[href^="../../"] {
-      color: #88bbff;
-      text-decoration: underline;
-    }
-
-    a[href^="../../"]:hover {
-      color: #ffd666;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ "css/styles.css" | relURL }}">
   {{ partial "alap-head.html" . }}
 </head>
 <body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>{{ .Title }}</h1>
+  <nav>
+    <a href="{{ "/" | relURL }}"{{ if eq .RelPermalink "/" }} class="active"{{ end }}>Guide</a>
+    <a href="{{ "/bridges/" | relURL }}"{{ if eq .RelPermalink "/bridges/" }} class="active"{{ end }}>Bridges</a>
+    <a href="{{ "/food/" | relURL }}"{{ if eq .RelPermalink "/food/" }} class="active"{{ end }}>Food</a>
+    <a href="{{ "/how-it-works/" | relURL }}"{{ if eq .RelPermalink "/how-it-works/" }} class="active"{{ end }}>How It Works</a>
+  </nav>
   {{ block "main" . }}{{ end }}
+
+  <script>
+    document.querySelectorAll('.source').forEach(function(source) {
+      var btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', function() {
+        var code = source.querySelector('code');
+        navigator.clipboard.writeText(code.textContent).then(function() {
+          btn.textContent = 'Copied!';
+          setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+        });
+      });
+      source.appendChild(btn);
+    });
+  </script>
 </body>
 </html>

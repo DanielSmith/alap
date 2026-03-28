@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "alap": "file:../../",
+    "alap": "workspace:*",
     "solid-js": "^1.9.11",
     "short-unique-id": "^5.2.0"
   },

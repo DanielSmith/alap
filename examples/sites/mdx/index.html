@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alap — MDX Example</title>
+  <style>
+    /* Code blocks with copy button */
+    .code-block {
+      position: relative;
+    }
+
+    .code-block pre { padding-right: 4rem; }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #2e48a0;
+      color: #7888b8;
+      border: 1px solid #4470cc;
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.7rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .code-block:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: #ffd666; border-color: #ffd666; }
+
+    /* Collapsible config panel */
+    .config-panel {
+      margin-top: 2rem;
+      border: 1px solid #2e48a0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .config-summary {
+      padding: 0.75rem 1rem;
+      background: #1a2870;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #ffe8a0;
+      list-style: none;
+    }
+
+    .config-summary::-webkit-details-marker { display: none; }
+
+    .config-summary::before {
+      content: '\25b6';
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-size: 0.7rem;
+      transition: transform 0.15s;
+    }
+
+    .config-panel[open] .config-summary::before { transform: rotate(90deg); }
+
+    .config-hint {
+      font-weight: 400;
+      color: #7888b8;
+      font-size: 0.85rem;
+    }
+
+    .config-body {
+      position: relative;
+      border-top: 1px solid #2e48a0;
+    }
+
+    .config-body pre {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      padding-right: 4rem;
+      max-height: 28rem;
+      overflow-y: auto;
+    }
+
+    .config-copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <div id="app"></div>
+  <script type="module" src="main.tsx"></script>
+</body>
+</html>

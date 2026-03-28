@@ -1,14 +1,14 @@
-FROM node:22-slim
+# node:22-slim
+FROM node:22-slim@sha256:80fdb3f57c815e1b638d221f30a826823467c4a56c8f6a8d7aa091cd9b1675ea
 
 WORKDIR /app
 
 COPY package.json ./
-# Override the pinned Astro 5 with Astro 6 for Node 22 environments
-RUN sed -i 's/"astro": "~5.9.0"/"astro": "^6.0.0"/' package.json \
-    && npm install
+RUN npm install
 
 COPY . .
 
 EXPOSE 9010
 
+USER node
 CMD ["npx", "astro", "dev", "--host", "0.0.0.0", "--port", "9010"]

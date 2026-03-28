@@ -2,6 +2,13 @@ baseURL = "http://localhost:1313/"
 languageCode = "en-us"
 title = "Alap + Hugo"
 
+# Allow raw HTML in markdown content (needed for example blocks)
+[markup.goldmark.renderer]
+  unsafe = true
+
+# Disable unused taxonomies
+[taxonomies]
+
 # In a real project, use the Hugo module instead of bundled shortcodes:
 # [module]
 #   [[module.imports]]

@@ -9,7 +9,7 @@
     "seed": "node seed.js"
   },
   "dependencies": {
-    "alap": "file:../../..",
+    "alap": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "better-sqlite3": "^11.10.0",
     "hono": "^4.6.0"

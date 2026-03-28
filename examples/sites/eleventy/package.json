@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "alap": "file:../../..",
-    "eleventy-alap": "file:../../../integrations/eleventy-alap"
+    "alap": "workspace:*",
+    "eleventy-alap": "workspace:*"
   }
 }

@@ -1,0 +1,184 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.5rem; color: #ffd666; }
+h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+
+p { margin: 0.75rem 0; }
+
+hr { border: none; border-top: 1px solid #2e48a0; margin: 1.5rem 0; }
+
+em { color: #b8c4e8; }
+
+/* --- Navigation --- */
+
+nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #2e48a0;
+  font-size: 0.9rem;
+}
+
+nav a {
+  color: #88bbff;
+  text-decoration: none;
+}
+
+nav a:hover,
+nav a.active {
+  color: #ffd666;
+}
+
+/* --- Examples (source/result pairs) --- */
+
+.example {
+  margin: 1rem 0;
+  background: #2240a8;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+}
+
+.source {
+  background: #141e6a;
+  padding: 0 1rem;
+  border-bottom: 1px solid #2e48a0;
+  position: relative;
+}
+
+.source pre {
+  margin: 0;
+  background: none;
+  border: none;
+  padding: 1rem 0;
+}
+
+.result {
+  padding: 1rem 1.25rem;
+}
+
+/* --- Alap link styling --- */
+
+alap-link {
+  color: #88bbff;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: #4470cc;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s, color 0.15s;
+}
+
+alap-link:hover {
+  color: #ffd666;
+  text-decoration-color: #ffd666;
+}
+
+alap-link::part(menu) {
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0;
+  min-width: 180px;
+}
+
+alap-link::part(list) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem;
+}
+
+alap-link::part(link) {
+  color: #f0f2ff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #2a50b8;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+alap-link::part(link):hover,
+alap-link::part(link):focus-visible {
+  background: #3360d0;
+  color: #ffd666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Code --- */
+
+pre {
+  background: #141e6a;
+  color: #b8c4e8;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #2e48a0;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85em;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+/* --- Copy button --- */
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  background: #2240a8;
+  color: #88bbff;
+  border: 1px solid #4470cc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.copy-btn:hover {
+  background: #3366d6;
+  color: #ffd666;
+  border-color: #ffd666;
+}
+
+/* --- Back link --- */
+
+a[href^="../../"] {
+  color: #88bbff;
+  text-decoration: underline;
+}
+
+a[href^="../../"]:hover {
+  color: #ffd666;
+}

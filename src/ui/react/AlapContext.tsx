@@ -14,10 +14,38 @@
  * limitations under the License.
  */
 
-import { createContext, useContext, useRef, useEffect, type ReactNode, type CSSProperties } from 'react';
+import { createContext, useContext, useRef, useEffect, useCallback, type ReactNode, type CSSProperties } from 'react';
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
+
+/**
+ * Lightweight close-others coordinator.
+ *
+ * Each AlapLink subscribes with a close callback. When one opens,
+ * it calls `notifyOpen(ownId)` — all other subscribers are closed.
+ * This mirrors the vanilla DOM adapter's single-container behavior.
+ */
+export interface MenuCoordinator {
+  subscribe: (id: string, close: () => void) => () => void;
+  notifyOpen: (id: string) => void;
+}
+
+function createMenuCoordinator(): MenuCoordinator {
+  const listeners = new Map<string, () => void>();
+
+  return {
+    subscribe(id, close) {
+      listeners.set(id, close);
+      return () => { listeners.delete(id); };
+    },
+    notifyOpen(id) {
+      for (const [listenerId, close] of listeners) {
+        if (listenerId !== id) close();
+      }
+    },
+  };
+}
 
 export interface AlapContextValue {
   engine: AlapEngine;
@@ -27,6 +55,7 @@ export interface AlapContextValue {
   defaultMenuClassName?: string;
   defaultListType: 'ul' | 'ol';
   defaultMaxVisibleItems: number;
+  menuCoordinator: MenuCoordinator;
 }
 
 const AlapCtx = createContext<AlapContextValue | null>(null);
@@ -50,6 +79,7 @@ export function AlapProvider({
   defaultMenuClassName,
 }: AlapProviderProps) {
   const engineRef = useRef<AlapEngine>(new AlapEngine(config));
+  const coordinatorRef = useRef<MenuCoordinator>(createMenuCoordinator());
 
   useEffect(() => {
     engineRef.current.updateConfig(config);
@@ -67,6 +97,7 @@ export function AlapProvider({
     defaultMenuClassName,
     defaultListType: (config.settings?.listType as 'ul' | 'ol') ?? 'ul',
     defaultMaxVisibleItems: (config.settings?.maxVisibleItems as number) ?? DEFAULT_MAX_VISIBLE_ITEMS,
+    menuCoordinator: coordinatorRef.current,
   };
 
   return <AlapCtx value={value}>{children}</AlapCtx>;

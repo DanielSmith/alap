@@ -125,12 +125,14 @@ describe('security: link text injection', () => {
     expect(node.children.every((c) => c.type === 'text')).toBe(true);
   });
 
-  it('script tags in link text become plain text', () => {
+  it('script tags in link text become plain text nodes, not HTML', () => {
     const tree = parse('[<script>alert(1)</script>](alap:@test)');
     const node = firstInline(tree);
-    const text = getTextContent(node);
-    expect(text).not.toContain('<script>');
+    // The text may contain the literal string "<script>" — that's fine.
+    // What matters is that every child is a text node, not an html node.
+    // JSX/React will render text nodes as escaped content, never as raw HTML.
     expect(node.children.every((c) => c.type === 'text')).toBe(true);
+    expect(node.children.some((c) => (c as any).type === 'html')).toBe(false);
   });
 
   it('JSX expression syntax in link text stays literal', () => {

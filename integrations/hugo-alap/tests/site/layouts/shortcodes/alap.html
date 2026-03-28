@@ -2,9 +2,11 @@
 
 {{- $query := "" -}}
 {{- $config := "" -}}
+{{- $placement := "" -}}
 {{- if .IsNamedParams -}}
   {{- $query = .Get "query" -}}
   {{- with .Get "config" }}{{ $config = . }}{{ end -}}
+  {{- with .Get "placement" }}{{ $placement = . }}{{ end -}}
 {{- else -}}
   {{- $query = .Get 0 -}}
 {{- end -}}
@@ -12,6 +14,7 @@
 {{- if $query -}}
 <alap-link query="{{ $query }}"
   {{- with $config }} config="{{ . }}"{{ end -}}
+  {{- with $placement }} placement="{{ . }}"{{ end -}}
 >{{ .Inner | safeHTML }}</alap-link>
 {{- else -}}
 {{ .Inner | safeHTML }}

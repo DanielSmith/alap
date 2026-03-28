@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "alap": "file:../../",
+    "alap": "workspace:*",
     "alpinejs": "^3.14.0",
     "short-unique-id": "^5.2.0"
   },

@@ -34,7 +34,7 @@
     "alap": "^3.0.0"
   },
   "devDependencies": {
-    "alap": "file:../../",
+    "alap": "workspace:*",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   },

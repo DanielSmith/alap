@@ -108,7 +108,7 @@ export function AlapLink({
   gap,
   padding,
 }: AlapLinkProps) {
-  const { engine, config, menuTimeout, defaultMenuStyle, defaultMenuClassName, defaultListType, defaultMaxVisibleItems } =
+  const { engine, config, menuTimeout, defaultMenuStyle, defaultMenuClassName, defaultListType, defaultMaxVisibleItems, menuCoordinator } =
     useAlapContext();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -144,6 +144,16 @@ export function AlapLink({
     return parts.join(' ');
   }, [defaultMenuClassName, menuClassName]);
 
+  // --- Coordinate with other AlapLinks (only one menu open at a time) ---
+
+  const closeMenuSilent = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  useEffect(() => {
+    return menuCoordinator.subscribe(triggerId, closeMenuSilent);
+  }, [menuCoordinator, triggerId, closeMenuSilent]);
+
   // --- Open / close ---
 
   const closeMenu = useCallback(() => {
@@ -154,9 +164,10 @@ export function AlapLink({
   const openMenu = useCallback(() => {
     const resolved = engine.resolve(query, anchorId);
     if (resolved.length === 0) return;
+    menuCoordinator.notifyOpen(triggerId);
     setItems(resolved);
     setIsOpen(true);
-  }, [engine, query, anchorId]);
+  }, [engine, query, anchorId, menuCoordinator, triggerId]);
 
   const toggleMenu = useCallback(() => {
     if (isOpen) closeMenu();
