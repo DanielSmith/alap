@@ -92,7 +92,7 @@ See [Styling](core-concepts/styling.md) for the full guide, and [Web Component](
 | **Web Component** | Per-element Shadow DOM, same placement engine, `::part()` theming | Style isolation, third-party embedding |
 | **Popover** | HTML Popover API, browser-managed stacking | Modern browsers, no z-index management |
 
-All modes support 9 placement positions (N, NE, E, SE, S, SW, W, NW, C) with automatic fallback when the preferred position doesn't fit in the viewport.
+DOM and Web Component modes support 9 placement positions (N, NE, E, SE, S, SW, W, NW, C) with automatic fallback when the preferred position doesn't fit in the viewport. Popover mode skips the compass placement engine and relies on the browser's native positioning instead.
 
 ### Can I have multiple configs on one page?
 

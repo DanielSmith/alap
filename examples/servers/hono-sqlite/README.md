@@ -37,19 +37,19 @@ npm start        # http://localhost:3000
 
 ## Run with Docker / Podman
 
-Build from the `servers/` parent directory (the shared `validate-regex.js` lives there):
+Build context needs the repo root (for the alap library build stage):
 
 ```bash
-cd ..   # from hono-sqlite/ to servers/
-docker build -f hono-sqlite/Dockerfile -t alap-server-hono .
+cd ../../..   # from hono-sqlite/ to repo root
+docker build -f examples/servers/hono-sqlite/Dockerfile -t alap-server-hono .
 docker run -p 3000:3000 alap-server-hono
 ```
 
 Or with Podman (drop-in compatible):
 
 ```bash
-cd ..
-podman build -f hono-sqlite/Dockerfile -t alap-server-hono .
+cd ../../..
+podman build -f examples/servers/hono-sqlite/Dockerfile -t alap-server-hono .
 podman run -p 3000:3000 alap-server-hono
 ```
 

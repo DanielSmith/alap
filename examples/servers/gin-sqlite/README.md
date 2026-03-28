@@ -11,14 +11,18 @@ go run main.go                       # http://localhost:3000
 
 ## Run with Docker
 
+Build context needs the repo root (for `src/other-languages/go/`):
+
 ```bash
-docker build -t alap-gin .
+cd ../../..   # from gin-sqlite/ to repo root
+docker build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
 docker run -p 3000:3000 alap-gin
 ```
 
 Podman:
 ```bash
-podman build -t alap-gin .
+cd ../../..
+podman build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
 podman run -p 3000:3000 alap-gin
 ```
 

@@ -11,15 +11,17 @@ cargo run --bin server               # http://localhost:3000
 
 ## Run with Docker
 
-Build from the repo root (so the Rust parser crate is accessible):
+Build context needs the repo root (for `src/other-languages/rust/`):
 
 ```bash
+cd ../../..   # from axum-sqlite/ to repo root
 docker build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
 docker run -p 3000:3000 alap-axum
 ```
 
 Podman:
 ```bash
+cd ../../..
 podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
 podman run -p 3000:3000 alap-axum
 ```

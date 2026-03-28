@@ -15,18 +15,18 @@ No `npm install` needed — zero external dependencies.
 
 ## Run with Docker
 
-Build from the `servers/` parent directory (the shared `validate-regex.js` lives there):
+Build context needs the repo root (for the alap library build stage):
 
 ```bash
-cd ..   # from bun-sqlite/ to servers/
-docker build -f bun-sqlite/Dockerfile -t alap-bun .
+cd ../../..   # from bun-sqlite/ to repo root
+docker build -f examples/servers/bun-sqlite/Dockerfile -t alap-bun .
 docker run -p 3000:3000 alap-bun
 ```
 
 Podman:
 ```bash
-cd ..
-podman build -f bun-sqlite/Dockerfile -t alap-bun .
+cd ../../..
+podman build -f examples/servers/bun-sqlite/Dockerfile -t alap-bun .
 podman run -p 3000:3000 alap-bun
 ```
 

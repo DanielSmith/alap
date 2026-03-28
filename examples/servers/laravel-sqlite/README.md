@@ -59,41 +59,41 @@ cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan db:seed         # seeds "demo" config
-php artisan serve           # http://localhost:8000
+php artisan serve --port=3000  # http://localhost:3000
 ```
 
-Open `http://localhost:8000/demo.html` for the interactive API test page.
+Open `http://localhost:3000/demo.html` for the interactive API test page.
 
 ## Run with Docker / Podman
 
 ```bash
 docker build -t alap-laravel .
-docker run -p 8000:8000 alap-laravel
+docker run -p 3000:3000 alap-laravel
 ```
 
 Or with Podman:
 
 ```bash
 podman build -t alap-laravel .
-podman run -p 8000:8000 alap-laravel
+podman run -p 3000:3000 alap-laravel
 ```
 
 ## Test It
 
 ```bash
 # List configs
-curl http://localhost:8000/api/configs
+curl http://localhost:3000/api/configs
 
 # Load the demo config
-curl http://localhost:8000/api/configs/demo
+curl http://localhost:3000/api/configs/demo
 
 # Save a new config
-curl -X PUT http://localhost:8000/api/configs/myconfig \
+curl -X PUT http://localhost:3000/api/configs/myconfig \
   -H "Content-Type: application/json" \
   -d '{"allLinks":{"test":{"label":"Test","url":"https://example.com","tags":["demo"]}}}'
 
 # Delete it
-curl -X DELETE http://localhost:8000/api/configs/myconfig
+curl -X DELETE http://localhost:3000/api/configs/myconfig
 ```
 
 ## Clean Up
@@ -105,14 +105,14 @@ docker rmi alap-laravel 2>/dev/null  # or: podman rmi alap-laravel
 
 ## Use with an Editor
 
-Any [Alap editor](../../../editors/) can connect to this server in remote or hybrid storage mode. Point the editor to `http://localhost:8000/api` (note the `/api` prefix).
+Any [Alap editor](../../../editors/) can connect to this server in remote or hybrid storage mode. Point the editor to `http://localhost:3000/api` (note the `/api` prefix).
 
 ## Connect from Alap
 
 ```typescript
 import { createRemoteStore } from 'alap/storage';
 
-const store = createRemoteStore({ baseUrl: 'http://localhost:8000/api' });
+const store = createRemoteStore({ baseUrl: 'http://localhost:3000/api' });
 
 const config = await store.load('demo');
 const names = await store.list();
