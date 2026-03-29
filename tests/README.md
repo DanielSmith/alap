@@ -74,8 +74,11 @@ Tests outside this directory:
 |----------|-------|--------|
 | `integrations/astro-alap/` | 19 | vitest |
 | `integrations/eleventy-alap/` | 21 | vitest |
+| `integrations/next-alap/` | 15 | vitest |
+| `integrations/nuxt-alap/` | 17 | vitest |
 | ~~`integrations/docusaurus-alap/`~~ | 21 | vitest | *temporarily removed — upstream dep vuln* |
 | `plugins/remark-alap/` | 20 | vitest |
+| `plugins/rehype-alap/` | 29 | vitest |
 | `plugins/tiptap-alap/` | 11 | vitest |
 | `src/other-languages/python/` | 39 | pytest |
 | `src/other-languages/php/` | 35 | PHPUnit |

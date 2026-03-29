@@ -21,7 +21,12 @@ One page per framework. Each is self-contained — pick yours and go.
 - **Have a framework?** Use its adapter — it feels native and integrates with your component tree
 - **Need maximum CSS control?** [Vanilla DOM](vanilla-dom.md) renders into the page with no shadow boundary
 - **Zero JS until click?** [Qwik](qwik.md) — resumability means no parser/engine code loads until someone interacts
+- **htmx / HTML-over-the-wire?** Use the [Web Component](web-component.md) — `<alap-link>` auto-initializes after htmx swaps. [See the htmx example](../../examples/sites/htmx/).
 - **Static site?** [Eleventy](eleventy.md), [Astro](astro.md), or [Web Component](web-component.md) with the CDN build
+- **Next.js?** See the [Next.js integration](../../integrations/next-alap/) — `'use client'` handled, layout component, MDX config
+- **Nuxt?** See the [Nuxt integration](../../integrations/nuxt-alap/) — client plugin, Vue re-exports, Nuxt Content
+- **Hugo?** See the [Hugo integration](../../integrations/hugo-alap/) — shortcodes + web component
+- **WordPress?** See the [WordPress plugin](../../plugins/wordpress/) — `[alap]` shortcode, SQLite containers
 
 ## See also
 

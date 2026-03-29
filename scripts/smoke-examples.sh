@@ -81,9 +81,10 @@ for dir in "$EXAMPLES_DIR"/*/; do
   fi
 
   # Skip mdx (has own vite config with relative plugin imports)
-  if [ "$name" = "mdx" ]; then
+  # Skip cms-content (depends on rehype-alap workspace plugin)
+  if [ "$name" = "mdx" ] || [ "$name" = "cms-content" ]; then
     SKIP=$((SKIP + 1))
-    echo "  $(dim '○') ${name} (custom vite config — skip)"
+    echo "  $(dim '○') ${name} (workspace plugin dependency — skip)"
     continue
   fi
 

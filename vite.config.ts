@@ -33,6 +33,7 @@ export default defineConfig({
       'alap/storage': resolve(__dirname, 'src/storage/index.ts'),
       'alap/qwik': resolve(__dirname, 'src/ui/qwik/index.ts'),
       'alap': resolve(__dirname, 'src/index.ts'),
+      'rehype-alap': resolve(__dirname, 'plugins/rehype-alap/src/index.ts'),
     },
   },
   build: {

@@ -38,6 +38,10 @@ One page per framework. Self-contained — pick yours and go.
 - [Alpine.js](framework-guides/alpine.md) — `x-alap` directive
 - [Qwik](framework-guides/qwik.md) — resumable components + Qwik City integration
 - [Eleventy](framework-guides/eleventy.md) — `eleventy-alap` plugin with shortcodes and filters
+- [Next.js](../integrations/next-alap/) — App Router layout + `'use client'` components
+- [Nuxt](../integrations/nuxt-alap/) — client plugin + Nuxt Content markdown
+- [Hugo](../integrations/hugo-alap/) — shortcodes + web component integration
+- [WordPress](../plugins/wordpress/) — `[alap]` shortcode plugin, SQLite containers
 
 ## API Reference
 
@@ -58,6 +62,7 @@ Advanced topics and integrations.
 - [Editors](cookbook/editors.md) — 7 visual editor apps for building configs
 - [Markdown](cookbook/markdown.md) — `remark-alap` plugin, `[text](alap:.tag)` syntax
 - [MDX](cookbook/markdown.md) — `@alap/mdx` plugin with React provider
+- [HTML / CMS Content](cookbook/markdown.md) — `rehype-alap` plugin for headless CMS output
 - [Rich-Text Editors](cookbook/rich-text.md) — `@alap/tiptap` extension for Tiptap/ProseMirror
 - [Accessibility](cookbook/accessibility.md) — ARIA, keyboard nav, focus management
 - [Existing URLs](cookbook/existing-urls.md) — progressive enhancement with `existingUrl`

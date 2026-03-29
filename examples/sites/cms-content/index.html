@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap + rehype — CMS Content Transform</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>rehype-alap: CMS Content Transform</h1>
+    <p>
+      Type HTML with <code>&lt;a href="alap:query"&gt;</code> links on the left.
+      The plugin transforms them into <code>&lt;alap-link&gt;</code> web components.
+      Click any dotted-underline link in the preview to see the menu.
+    </p>
+  </header>
+
+  <main>
+    <div class="panels">
+      <div class="panel panel-input">
+        <h2>CMS HTML</h2>
+        <textarea id="cms-input" spellcheck="false"></textarea>
+      </div>
+
+      <div class="panel panel-transformed">
+        <h2>Transformed HTML</h2>
+        <pre><code id="transformed-output"></code></pre>
+      </div>
+
+      <div class="panel panel-preview">
+        <h2>Live Preview</h2>
+        <div id="live-preview"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <details>
+      <summary>Link library (what the queries resolve to)</summary>
+      <div id="config-display"></div>
+    </details>
+  </footer>
+
+  <script type="module" src="main.ts"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Self-contained demos of the Alap library — browser examples and REST API serve
 
 | Directory | What | Count |
 |-----------|------|-------|
-| [sites/](sites/) | Browser demos — adapters, theming, advanced features | 22 |
+| [sites/](sites/) | Browser demos — adapters, theming, advanced features | 25 |
 | [servers/](servers/) | REST API servers — same contract, 9 language/framework combos | 9 |
 | `index.html` | Examples index page (served by `pnpm dev` from the repo root) |
 | `styles.css` | Shared stylesheet for site examples |

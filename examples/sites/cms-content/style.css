@@ -1,0 +1,170 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8f9fa;
+  color: #1a1a2e;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+header code {
+  background: #e8e8f0;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  min-height: 400px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+}
+
+#cms-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 1rem;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #1a1a2e;
+  background: #fff;
+}
+
+.panel-transformed pre {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+  margin: 0;
+}
+
+.panel-transformed code {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #2d5016;
+}
+
+#live-preview {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* Style alap-link triggers in the preview */
+#live-preview alap-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+#live-preview alap-link:hover {
+  text-decoration-style: solid;
+}
+
+/* Menu styling via ::part() */
+alap-link::part(menu) {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+  min-width: 160px;
+}
+
+alap-link::part(link) {
+  display: block;
+  padding: 6px 16px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+alap-link::part(link):hover,
+alap-link::part(link):focus-visible {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+footer {
+  margin-top: 1.5rem;
+}
+
+footer summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+#config-display {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  color: #555;
+  max-height: 300px;
+  overflow: auto;
+}
+
+@media (max-width: 900px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    min-height: 200px;
+  }
+}

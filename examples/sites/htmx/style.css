@@ -1,0 +1,164 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8f9fa;
+  color: #1a1a2e;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+header {
+  margin-bottom: 1rem;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+}
+
+header p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+header code {
+  background: #e8e8f0;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 0;
+}
+
+nav button {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+nav button:hover {
+  color: #1a1a2e;
+}
+
+nav button.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+main {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 1.5rem;
+  min-height: 250px;
+  line-height: 1.7;
+}
+
+main h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+}
+
+main h3 {
+  font-size: 1rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+main p {
+  margin-bottom: 0.8rem;
+}
+
+/* alap-link styling */
+alap-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+alap-link:hover {
+  text-decoration-style: solid;
+}
+
+alap-link::part(menu) {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+  min-width: 160px;
+}
+
+alap-link::part(link) {
+  display: block;
+  padding: 6px 16px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+alap-link::part(link):hover,
+alap-link::part(link):focus-visible {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* htmx swap indicator */
+.htmx-request main {
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+footer {
+  margin-top: 1.5rem;
+}
+
+footer summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.explainer {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.explainer code {
+  background: #e8e8f0;
+  padding: 0.1em 0.3em;
+  border-radius: 2px;
+  font-size: 0.9em;
+}
+
+.explainer p + p {
+  margin-top: 0.5rem;
+}

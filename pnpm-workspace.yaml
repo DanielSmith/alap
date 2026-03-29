@@ -2,8 +2,11 @@ packages:
   - editors/*
   - integrations/astro-alap
   - integrations/eleventy-alap
+  - integrations/next-alap
+  - integrations/nuxt-alap
   - integrations/qwik-alap
   - plugins/mdx
+  - plugins/rehype-alap
   - plugins/remark-alap
   - plugins/tiptap-alap
   - examples/sites/astro-integration

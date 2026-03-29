@@ -4,6 +4,62 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### Nuxt Integration (2026-03-28)
+
+`nuxt-alap` — Nuxt 3 integration. Client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
+
+**Package (`nuxt-alap`) — `integrations/nuxt-alap/`:**
+- `createAlapPlugin()` — factory for a Nuxt client plugin (`.client.ts` pattern). Registers config and web component via dynamic import (SSR-safe).
+- `AlapProvider`, `AlapLink`, `useAlap` re-exported from `alap/vue`
+- `withAlap()` — Nuxt config wrapper that adds `remark-alap` to Nuxt Content's markdown pipeline
+- 17 tests covering exports, plugin factory, config wrapper, immutability, and security
+
+### htmx Example (2026-03-28)
+
+Zero-framework example showing Alap with htmx — HTML fragments swap in via `hx-get`, and `<alap-link>` web components self-initialize after every swap. No build step, no bundler, no hydration.
+
+**Example (`examples/sites/htmx/`, port 9220):**
+- Tabbed page with 4 content fragments fetched via htmx
+- Fragments contain `<alap-link>` with tag queries, macros, intersections, and subtractions
+- Web component auto-registers via the custom element registry — no re-init needed
+- Static files only — served by Python's built-in HTTP server
+- Demonstrates Alap working in the "HTML over the wire" paradigm
+
+### Next.js Integration (2026-03-28)
+
+`next-alap` — Next.js App Router integration. Pre-wrapped `'use client'` components, a layout helper, and an optional MDX config wrapper. No webpack — Vite only.
+
+**Package (`next-alap`) — `integrations/next-alap/`:**
+- `AlapProvider`, `AlapLink`, `useAlap` re-exported with `'use client'` directive — server components import directly, no boundary errors
+- `AlapLayout` — drop-in layout component for `app/layout.tsx`. Wraps `AlapProvider` and optionally registers `<alap-link>` web component for MDX content
+- `withAlap()` — Next.js config wrapper for MDX integration (disables `mdxRs` so remark plugins work)
+- Dynamic `import('alap')` in `AlapLayout` avoids `HTMLElement` crash during SSR
+- 15 tests covering exports, config wrapper behavior, immutability, and security (no webpack, no eval, no header injection)
+
+**Example (`examples/sites/next/`, port 9210):**
+- Simulated App Router with three pages: React adapter, `useAlap()` hook, web component mode
+- Shows the layout pattern, programmatic queries, and mixed React + web component usage
+
+### rehype-alap Plugin and CMS Content Example (2026-03-28)
+
+Rehype plugin for transforming HTML from headless CMSs into Alap web components. Companion to `remark-alap` (which handles Markdown).
+
+**Plugin (`rehype-alap`) — `plugins/rehype-alap/`:**
+- Transforms `<a href="alap:.coffee">` → `<alap-link query=".coffee">` in HTML AST
+- Designed for content from headless CMSs (Contentful, Sanity, Strapi, WordPress REST API, Ghost) where authors use WYSIWYG editors
+- AST-based transformation via `unist-util-visit` on hast (HTML AST) — structurally prevents injection
+- Preserves children, class, id, data attributes from original anchors
+- Options: `tagName`, `queryAttr`, `className` (same pattern as remark-alap)
+- Idempotent — running twice produces same output as once
+- 29 tests covering transforms, edge cases, attribute handling, and security
+
+**Interactive example (`examples/sites/cms-content/`):**
+- Three-panel live editor: raw CMS HTML → transformed HTML → working Alap preview
+- rehype runs in the browser (pure JS) — transforms on every keystroke (debounced)
+- `rehype-sanitize` in the pipeline strips dangerous elements from user input
+- Pre-filled with realistic CMS blog content demonstrating tag queries, macros, and direct items
+- Config panel shows the link library for reference
+
 ### Qwik Adapter and Qwik City Integration (2026-03-28)
 
 Framework adapter for Qwik — the resumability-first framework. Alap's query state is already serialized into HTML attributes, so the engine, parser, and placement logic are only downloaded when the user actually interacts with a link. Zero JS until click.

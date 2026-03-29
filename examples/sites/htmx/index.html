@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap + htmx — Zero Framework, HTML Over the Wire</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Alap + htmx</h1>
+    <p>No framework. No build step. HTML fragments swap in via htmx.
+       <code>&lt;alap-link&gt;</code> web components self-initialize after every swap.</p>
+  </header>
+
+  <nav>
+    <button hx-get="fragments/coffee.html" hx-target="#content" hx-swap="innerHTML"
+            class="active" id="btn-coffee">Coffee</button>
+    <button hx-get="fragments/bridges.html" hx-target="#content" hx-swap="innerHTML"
+            id="btn-bridges">Bridges</button>
+    <button hx-get="fragments/city-guide.html" hx-target="#content" hx-swap="innerHTML"
+            id="btn-guide">City Guide</button>
+    <button hx-get="fragments/cars.html" hx-target="#content" hx-swap="innerHTML"
+            id="btn-cars">Cars</button>
+  </nav>
+
+  <main id="content">
+    <!-- Initial content (same as coffee fragment) -->
+    <h2>Coffee</h2>
+    <p>
+      We've curated the best <alap-link query=".coffee">coffee spots</alap-link>
+      across the country. Whether you're in
+      <alap-link query=".coffee + .sf">San Francisco</alap-link> or
+      <alap-link query=".coffee + .portland">Portland</alap-link>,
+      there's a great cup waiting.
+    </p>
+    <p>
+      All of these are independent roasters — no chains.
+      Browse <alap-link query=".coffee">the full list</alap-link>.
+    </p>
+  </main>
+
+  <footer>
+    <details>
+      <summary>How this works</summary>
+      <div class="explainer">
+        <p>Each nav button triggers an <code>hx-get</code> that fetches an HTML fragment.
+           htmx swaps the fragment into <code>#content</code>. The fragments contain
+           <code>&lt;alap-link&gt;</code> web components that self-initialize via the
+           custom element registry — no re-init call needed.</p>
+        <p>The Alap config and IIFE build are loaded once in the <code>&lt;head&gt;</code>.
+           That's it. No bundler, no framework, no hydration.</p>
+      </div>
+    </details>
+  </footer>
+
+  <!-- Alap: IIFE build + config -->
+  <script src="alap.iife.js"></script>
+  <script src="config.js"></script>
+  <script>
+    Alap.registerConfig(alapConfig);
+    Alap.defineAlapLink();
+  </script>
+
+  <!-- htmx: single script tag -->
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"
+          integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+          crossorigin="anonymous"></script>
+
+  <!-- Active tab tracking -->
+  <script>
+    document.body.addEventListener('htmx:beforeRequest', function(e) {
+      document.querySelectorAll('nav button').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      e.detail.elt.classList.add('active');
+    });
+  </script>
+
+</body>
+</html>

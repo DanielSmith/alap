@@ -1,6 +1,6 @@
 # Site Examples
 
-22 browser demos showing Alap in action across different adapters, theming approaches, and features.
+25 browser demos showing Alap in action across different adapters, theming approaches, and features.
 
 Each example is self-contained with its own `serve.sh` for standalone running. Ports are unique so you can run multiple examples simultaneously.
 
@@ -33,6 +33,7 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [solid](solid/) | 9070 | SolidJS | Fine-grained signals, `Dynamic` component |
 | [alpine](alpine/) | 9000 | Alpine.js | `x-alap` directive, no build step, CDN-loadable |
 | [astro-integration](astro-integration/) | 9010 | Astro | Real Astro project with auto-inject integration |
+| [next](next/) | 9210 | Next.js | App Router pattern — layout, pages, web component mode |
 | [hugo](hugo/) | 9170 | Hugo | Shortcode + web component (in active development) |
 
 **Note:** The Astro example uses its own dev server (`npx astro dev`), not the shared Vite config.
@@ -52,6 +53,8 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [external-data](external-data/) | 9160 | `:web:` protocol — API data as Alap links, mixed with local, scoped refiners |
 | [hooks-and-media](hooks-and-media/) | 9030 | Image triggers, hover preview, context popup, event log |
 | [markdown](markdown/) | 9040 | remark-alap plugin — `[text](alap:query)` in Markdown |
+| [cms-content](cms-content/) | 9200 | rehype-alap — live editor transforming CMS HTML into Alap menus |
+| [htmx](htmx/) | 9220 | htmx + web component — HTML over the wire, zero framework |
 
 ## Running
 

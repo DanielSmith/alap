@@ -1,0 +1,51 @@
+{
+  "name": "next-alap",
+  "version": "0.1.0",
+  "description": "Next.js integration for Alap — client components and config helpers for App Router",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config.js",
+      "types": "./dist/config.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "next",
+    "nextjs",
+    "react",
+    "alap",
+    "links",
+    "menus",
+    "web-component",
+    "app-router"
+  ],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "alap": "^3.0.0",
+    "next": "^14.0.0 || ^15.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "alap": "workspace:*",
+    "@types/react": "^19.0.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "author": "Daniel Smith"
+}

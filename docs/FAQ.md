@@ -56,7 +56,19 @@ The `<alap-link>` web component works in any framework that supports custom elem
 | **Stencil** | Web component to web component — works directly |
 | **htmx** | Use `<alap-link>` in any HTML; for zero-JS, use the Eleventy static shortcode |
 
-Alap ships native adapters for React, Vue, Svelte, SolidJS, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [Web Component](framework-guides/web-component.md) provides the full experience with no adapter code.
+Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [Web Component](framework-guides/web-component.md) provides the full experience with no adapter code.
+
+### What about WordPress, Hugo, CMSs?
+
+- **WordPress** — the [WordPress plugin](../plugins/wordpress/) adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing.
+- **Hugo** — the [Hugo integration](../integrations/hugo-alap/) provides shortcodes and partials that output `<alap-link>` web components.
+- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](../plugins/rehype-alap/) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components.
+- **Markdown-based CMSs** — use [`remark-alap`](../plugins/remark-alap/) for `[text](alap:query)` syntax.
+- **MDX** — use [`@alap/mdx`](../plugins/mdx/) for React-based MDX content.
+- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](../examples/sites/htmx/).
+- **Next.js** — the [`next-alap`](../integrations/next-alap/) integration handles `'use client'` boundaries and provides a layout component.
+- **Nuxt** — the [`nuxt-alap`](../integrations/nuxt-alap/) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
+- **Any platform with a `<script>` tag** — the [CDN / IIFE build](getting-started/installation.md) works everywhere.
 
 ### How big is the library?
 

@@ -1,0 +1,47 @@
+{
+  "name": "rehype-alap",
+  "version": "1.0.0",
+  "description": "Rehype plugin: transform <a href=\"alap:query\"> links into <alap-link> web components",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "rehype",
+    "rehype-plugin",
+    "alap",
+    "html",
+    "cms",
+    "web-component",
+    "headless-cms"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "unist-util-visit": "^5.1.0"
+  },
+  "peerDependencies": {
+    "unified": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.0",
+    "rehype-parse": "^9.0.0",
+    "rehype-stringify": "^10.0.0",
+    "typescript": "^5.7.0",
+    "unified": "^11.0.5",
+    "vitest": "^3.0.0"
+  },
+  "author": "Daniel Smith"
+}
