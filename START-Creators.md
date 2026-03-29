@@ -2,6 +2,8 @@
 
 This guide is for people who use Alap, not build it. You want to understand what Alap does, how the expression language works, and where to manage your links.
 
+> **Status: 3.0 Beta 1** — The core library, expression language, and framework adapters are very far along and well-tested. Editors, server examples, and some integrations are proof-of-concept implementations that show what's possible but may change before 3.0
+
 For install instructions, framework setup, and API details, see [START-Dev.md](START-Dev.md).
 
 ---
@@ -85,6 +87,10 @@ golden, brooklyn            two specific items
 golden, .coffee             one specific item plus all coffee items
 ```
 
+### There's More
+
+The expression language also supports [protocols](docs/core-concepts/protocols.md) that gather data dynamically — filtering by time, location, or pulling live results from external APIs and Bluesky — and [refiners](docs/core-concepts/refiners.md) that sort, limit, and shuffle results. You don't need these to get started, but they're there when your queries outgrow tags.
+
 ---
 
 ## How You'll Write Alap Links
@@ -111,11 +117,18 @@ Here are some [great cafes](alap:.coffee) nearby.
 **In a rich-text editor** (with Tiptap integration):
 Use the Alap button or `Mod-Shift-A` to insert a link, then type your expression.
 
+**In WordPress:**
+```
+[alap query=".bridge"]bridges[/alap]
+```
+
+These are just the most common entry points. Alap also works with htmx, Hugo shortcodes, MDX, Astro components, and more. If your environment can render HTML, chances are very good it can handle an Alap link. See [START-Dev.md](START-Dev.md#integrations) for the full list.
+
 ---
 
 ## The Editors
 
-Alap includes visual editors for managing your link library — adding items, tagging them, creating macros, and testing expressions.
+Alap includes proof-of-concept visual editors for managing your link library — adding items, tagging them, creating macros, and testing expressions.
 
 Your developer might have a specific editor in mind depending on their tech stack. They all look and function the same way — React, React + shadcn/ui, Vue, Svelte, Solid, Alpine, and Astro. Every editor includes:
 

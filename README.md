@@ -6,11 +6,11 @@
 
 A traditional link is a demand — one URL, chosen by the author. An Alap link is an invitation — a set of options, chosen by the reader.
 
-Instead of cluttering your writing with three separate links:
+Instead of cluttering your writing with many separate links:
 
-> "You can visit the **Brooklyn Bridge**, the **Manhattan Bridge**, or the **High Line**."
+> "You can visit the **Brooklyn Bridge**, the **Manhattan Bridge**, the **High Line**, or **this park**, or **this other place**."
 
-You write naturally:
+You can write naturally:
 
 > "There are several great **landmarks** within walking distance."
 
@@ -40,6 +40,16 @@ Tags, macros, and operators compose into a query language for your link library:
 golden, brooklyn            specific items by ID
 ```
 
+Protocols gather data dynamically. Refiners filter and order the results:
+
+```
+:time:30d:                  items added in the last 30 days
+:loc:40.7,-74.0:5mi:        items within 5 miles of a point
+:atproto:feed:with-alap:    live posts from a Bluesky feed
+.coffee + :time:7d:         combine with tags and operators
+*sort:label* *limit:5*      sort, limit, shuffle, paginate
+```
+
 One config, many menus. Update a URL once, every menu reflects it. Add a tag to an item, it appears in every expression that matches.
 
 
@@ -59,6 +69,8 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **Next.js, Nuxt, Astro, Eleventy, Hugo & Qwik City integrations** — zero-config framework packages
 - **WordPress plugin** — `[alap]` shortcode, SQLite containers, instant demo
 - **CDN / IIFE build** — `<script>` tag usage for static sites and zero-build setups
+- **AT Protocol / Bluesky** — `:atproto:` protocol for live feeds, profiles, and search
+- **htmx** — zero-framework HTML-over-the-wire; web components auto-initialize after swaps
 
 ## Next Steps
 

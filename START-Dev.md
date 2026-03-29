@@ -205,6 +205,13 @@ const config = {
     nycBridges: { linkItems: '.nyc + .bridge' },
   },
 
+  protocols: {
+    time: { filter: timeHandler },                // :time:30d: — filter by recency
+    loc:  { filter: locHandler },                 // :loc:40.7,-74.0:5mi: — filter by proximity
+    web:  { generate: webHandler, keys: {/*…*/} },// :web:books:photography: — fetch from any JSON API
+    atproto: { generate: atprotoHandler },        // :atproto:feed:with-alap: — live Bluesky data
+  },
+
   searchPatterns: {
     wiki: { pattern: 'wikipedia\\.org', options: { fields: 'u' } },
     recent: { pattern: '.', options: { age: '7d', sort: 'newest' } },
@@ -242,6 +249,28 @@ const config = {
 | `guid` | string | Permanent UUID for tracking |
 | `hooks` | string[] | Event hooks this item participates in |
 | `createdAt` | string/number | For regex search age/sort filters |
+| `meta` | object | Arbitrary key-value data for protocol handlers (e.g. `timestamp`, `location`, `price`) |
+
+### Protocols and Refiners
+
+Protocols filter or generate links based on dynamic dimensions — time, location, external APIs:
+
+```
+.coffee + :time:30d:              coffee added this month
+.restaurant + :loc:here:1mi:      restaurants within a mile
+:web:books:photography:limit=5:   books from an external JSON API
+:atproto:feed:with-alap:          live posts from a Bluesky feed
+```
+
+Refiners shape and order the result set:
+
+```
+.coffee *sort:label* *limit:5*    top 5 alphabetically
+.restaurant *shuffle* *limit:3*   3 random picks
+(.nyc *limit:3*) | (.sf *limit:3*)   3 from each city
+```
+
+See [Protocols](docs/core-concepts/protocols.md) and [Refiners](docs/core-concepts/refiners.md).
 
 See [Configuration](docs/getting-started/configuration.md) for full details.
 
@@ -286,7 +315,7 @@ Check out the [best bridges](alap:@nycBridges) in the city.
 Here are some [great cafes](alap:.coffee) nearby.
 ```
 
-Works with Astro, Next.js, Nuxt, or any remark pipeline. See [plugins/remark-alap/](plugins/remark-alap/).
+Works with Astro, Next.js, Nuxt, or any remark pipeline. See [remark-alap](plugins/remark-alap/) (`plugins/remark-alap/`) and the [remark-alap example](examples/sites/markdown/) (`examples/sites/markdown/`, `examples/sites/mdx/`).
 
 ### HTML / CMS Content (rehype-alap)
 
@@ -296,7 +325,7 @@ Transform `<a href="alap:query">` links from headless CMSs into `<alap-link>` we
 npm install rehype-alap
 ```
 
-For content from Contentful, Sanity, Strapi, WordPress API, Ghost. See [plugins/rehype-alap/](plugins/rehype-alap/).
+For content from Contentful, Sanity, Strapi, WordPress API, Ghost. See [rehype-alap](plugins/rehype-alap/) (`plugins/rehype-alap/`) and the [rehype-alap example](examples/sites/cms-content/) (`examples/sites/cms-content/`).
 
 ### Tiptap (Rich Text)
 
@@ -306,7 +335,7 @@ Insert `<alap-link>` as an inline node in Tiptap editors:
 npm install @alap/tiptap
 ```
 
-See [plugins/tiptap-alap/](plugins/tiptap-alap/).
+See [tiptap-alap](plugins/tiptap-alap/) (`plugins/tiptap-alap/`) and the [tiptap-alap example](examples/sites/tiptap/) (`examples/sites/tiptap/`).
 
 ### Astro Integration
 
@@ -327,7 +356,7 @@ export default defineConfig({
 });
 ```
 
-See [integrations/astro-alap/](integrations/astro-alap/).
+See [astro-alap](integrations/astro-alap/) (`integrations/astro-alap/`) and the [astro-alap example](examples/sites/astro-integration/) (`examples/sites/astro-integration/`).
 
 ### Eleventy Plugin
 
@@ -337,7 +366,7 @@ Static or interactive link menus for Eleventy sites:
 npm install eleventy-alap
 ```
 
-See [integrations/eleventy-alap/](integrations/eleventy-alap/).
+See [eleventy-alap](integrations/eleventy-alap/) (`integrations/eleventy-alap/`) and the [eleventy-alap example](examples/sites/eleventy/) (`examples/sites/eleventy/`).
 
 ### Next.js Integration
 
@@ -347,7 +376,7 @@ See [integrations/eleventy-alap/](integrations/eleventy-alap/).
 npm install next-alap
 ```
 
-See [integrations/next-alap/](integrations/next-alap/).
+See [next-alap](integrations/next-alap/) (`integrations/next-alap/`) and the [next-alap example](examples/sites/next/) (`examples/sites/next/`).
 
 ### Nuxt Integration
 
@@ -357,7 +386,7 @@ Client plugin factory + Vue component re-exports + Nuxt Content markdown:
 npm install nuxt-alap
 ```
 
-See [integrations/nuxt-alap/](integrations/nuxt-alap/).
+See [nuxt-alap](integrations/nuxt-alap/) (`integrations/nuxt-alap/`).
 
 ### Qwik City Integration
 
@@ -367,13 +396,13 @@ Vite plugin for Qwik City projects:
 npm install qwik-alap
 ```
 
-See [integrations/qwik-alap/](integrations/qwik-alap/).
+See [qwik-alap](integrations/qwik-alap/) (`integrations/qwik-alap/`).
 
 ### WordPress Plugin
 
 `[alap]` shortcode for WordPress. SQLite containers — no MySQL needed:
 
-See [plugins/wordpress/](plugins/wordpress/).
+See [wordpress-alap](plugins/wordpress/) (`plugins/wordpress/`) and the [WordPress demo](plugins/wordpress/demo/) (`plugins/wordpress/demo/`).
 
 <!-- Docusaurus integration temporarily removed pending upstream dependency fix.
      Use remark-alap directly with Docusaurus in the meantime. -->
