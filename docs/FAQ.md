@@ -42,33 +42,36 @@ Alap links render as web components or ARIA-attributed spans, not as traditional
 
 ## Technical
 
-### What about Angular / Lit / Preact / Qwik / Ember / htmx?
+### What about WordPress, Hugo, CMSs, and other platforms?
 
-The `<alap-link>` web component works in any framework that supports custom elements — which is all of them. No adapter needed:
+- **WordPress** — the [WordPress plugin](../plugins/wordpress/) adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing. See the [WordPress demo](../plugins/wordpress/demo/).
+- **Hugo** — the [Hugo integration](../integrations/hugo-alap/) provides shortcodes and partials that output `<alap-link>` web components. See the [Hugo example](../examples/sites/hugo/).
+- **Eleventy** — the [`eleventy-alap`](../integrations/eleventy-alap/) plugin resolves expressions at build time or renders interactive web components. See the [Eleventy example](../examples/sites/eleventy/).
+- **Next.js** — the [`next-alap`](../integrations/next-alap/) integration handles `'use client'` boundaries and provides a layout component. See the [Next.js example](../examples/sites/next/).
+- **Nuxt** — the [`nuxt-alap`](../integrations/nuxt-alap/) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
+- **Astro** — the [`astro-alap`](../integrations/astro-alap/) integration provides zero-config setup. See the [Astro example](../examples/sites/astro-integration/).
+- **Qwik City** — the [`qwik-alap`](../integrations/qwik-alap/) integration provides a Vite plugin.
+- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](../plugins/rehype-alap/) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components. See the [cms-content example](../examples/sites/cms-content/).
+- **Markdown-based CMSs** — use [`remark-alap`](../plugins/remark-alap/) for `[text](alap:query)` syntax. See the [markdown example](../examples/sites/markdown/).
+- **MDX** — use [`@alap/mdx`](../plugins/mdx/) for React-based MDX content. See the [MDX example](../examples/sites/mdx/).
+- **Tiptap / Rich Text** — use [`tiptap-alap`](../plugins/tiptap-alap/) to insert Alap links as inline nodes. See the [Tiptap example](../examples/sites/tiptap/).
+- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](../examples/sites/htmx/).
+- **Bluesky / AT Protocol** — the `:atproto:` protocol fetches live feeds, profiles, and search results. See the [Bluesky example](../examples/sites/bluesky-atproto/).
+- **Any platform with a `<script>` tag** — the [CDN / IIFE build](getting-started/installation.md) works everywhere. See the [CDN example](../examples/sites/cdn/).
+
+### What about Angular / Lit / Preact / Ember?
+
+The `<alap-link>` web component works in any framework that supports custom elements — which covers a lot of ground. No adapter needed:
 
 | Framework | How to use Alap |
 |-----------|----------------|
 | **Angular** | Add `CUSTOM_ELEMENTS_SCHEMA`, use `<alap-link>` directly in templates |
 | **Lit** | Native — Lit is a web component framework, `<alap-link>` is a web component |
 | **Preact** | `alap/react` works via Preact's React compatibility layer, or use the web component |
-| **Qwik** | Use `<alap-link>` as a custom element in Qwik templates |
 | **Ember** | Ember supports custom elements natively |
 | **Stencil** | Web component to web component — works directly |
-| **htmx** | Use `<alap-link>` in any HTML; for zero-JS, use the Eleventy static shortcode |
 
 Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [Web Component](framework-guides/web-component.md) provides the full experience with no adapter code.
-
-### What about WordPress, Hugo, CMSs?
-
-- **WordPress** — the [WordPress plugin](../plugins/wordpress/) adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing.
-- **Hugo** — the [Hugo integration](../integrations/hugo-alap/) provides shortcodes and partials that output `<alap-link>` web components.
-- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](../plugins/rehype-alap/) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components.
-- **Markdown-based CMSs** — use [`remark-alap`](../plugins/remark-alap/) for `[text](alap:query)` syntax.
-- **MDX** — use [`@alap/mdx`](../plugins/mdx/) for React-based MDX content.
-- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](../examples/sites/htmx/).
-- **Next.js** — the [`next-alap`](../integrations/next-alap/) integration handles `'use client'` boundaries and provides a layout component.
-- **Nuxt** — the [`nuxt-alap`](../integrations/nuxt-alap/) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
-- **Any platform with a `<script>` tag** — the [CDN / IIFE build](getting-started/installation.md) works everywhere.
 
 ### How big is the library?
 
@@ -142,7 +145,7 @@ Yes. Protocol expressions extend the query language with dimensional filtering:
 (:time:7d: + .featured), .pinned  → featured from last week, plus pinned
 ```
 
-Register custom handlers for any dimension — `:price:10:50:`, `:beds:2:4:`, anything. See [Protocols](core-concepts/protocols.md).
+Create custom handlers for any dimension — `:price:10:50:`, `:beds:2:4:`, anything. See [Protocols](core-concepts/protocols.md).
 
 ### Can I sort, limit, or shuffle results?
 
@@ -162,7 +165,7 @@ No, and deliberately so. It's a query language, not a programming language. No v
 
 ### Is the expression parser safe from malicious input?
 
-It has been hardened against known attack vectors, though it has not undergone a third-party security audit. See [Security](api-reference/security.md) for the full list of guardrails (URL sanitization, ReDoS protection, config validation, parser resource limits).
+It has been hardened against known attack vectors, though it has not undergone a third-party security audit. See [Security](api-reference/security.md) for the full list of guardrails (URL sanitization, ReDoS protection, config validation, parser resource limits). Work with a security pro, especially with anything mission critical.  Do your due diligence, etc.
 
 ---
 
