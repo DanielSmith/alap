@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Bluesky / AT Protocol</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <h1>Alap v3 — Bluesky / AT Protocol</h1>
+  <p>
+    AT Protocol URIs (<code>at://</code>) have no default browser handler —
+    they're a natural fit for Alap's Option of Choice pattern. This example
+    shows two data modes: <strong>static</strong> entries in <code>allLinks</code>
+    and <strong>dynamic</strong> results from the <code>:atproto:</code> protocol handler.
+  </p>
+
+  <!-- ============================================================ -->
+  <!-- AUTH BAR -->
+  <!-- ============================================================ -->
+
+  <details class="auth_bar">
+    <summary>Optional: log in for post search</summary>
+    <p class="disclaimer">
+      Read-only. Your session token is stored in this browser tab and
+      cleared when you close it. Check "Remember me" to persist across
+      browser sessions.
+    </p>
+
+    <p class="disclaimer">
+      <strong>Two ways to log in:</strong>
+    </p>
+    <ol class="disclaimer" style="margin: 0.3em 0 0.8em 1.2em; line-height: 1.6;">
+      <li>
+        <strong>App password only</strong> — if your account doesn't require email verification,
+        entering your handle and
+        <a href="https://bsky.app/settings/app-passwords" target="_blank">app password</a>
+        is all you need.
+      </li>
+      <li>
+        <strong>App password + email code</strong> — if your account has email verification
+        enabled, Bluesky will send a confirmation code to your email after the first step.
+        Enter that code to complete login.
+      </li>
+    </ol>
+
+    <details class="disclaimer" style="margin-bottom: 0.8em;">
+      <summary style="cursor: pointer; color: #8a9;">Why is this safe?</summary>
+      <p style="margin: 0.4em 0; line-height: 1.5;">
+        This demo authenticates directly with Bluesky's official API
+        (<code>bsky.social/xrpc/com.atproto.server.createSession</code>) —
+        the same endpoint the Bluesky app itself uses. Your credentials go
+        straight to Bluesky's servers, never through ours.
+        The email code step is Bluesky's own verification —
+        it confirms the request is really coming from you.
+        You can verify all of this in the
+        <a href="./main.ts" target="_blank">source code</a>,
+        and you can
+        <a href="https://bsky.app/settings/app-passwords" target="_blank">revoke your app password</a>
+        at any time.
+      </p>
+    </details>
+
+    <form id="login-form">
+      <input type="text" name="handle" placeholder="handle (e.g. you.bsky.social)" autocomplete="username">
+      <span class="pw_wrap">
+        <input type="password" name="password" placeholder="app password" autocomplete="current-password">
+        <button type="button" class="pw_toggle" aria-label="Toggle password visibility">&#x1F441;</button>
+      </span>
+      <button type="submit">Log in</button>
+      <label style="font-size: 0.8em; color: #7888b8; cursor: pointer;">
+        <input type="checkbox" id="remember-me"> Remember me
+      </label>
+    </form>
+    <div id="code-step" class="hidden" style="margin-top: 0.5em;">
+      <p class="status">Check your email for a verification code from Bluesky.</p>
+      <form id="code-form">
+        <input type="text" name="code" placeholder="email verification code" autocomplete="one-time-code">
+        <button type="submit">Verify</button>
+      </form>
+    </div>
+    <div class="session_row">
+      <button id="logout-btn" class="hidden">Log out</button>
+      <span id="login-status" class="status"></span>
+      <span id="login-error" class="error"></span>
+    </div>
+  </details>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: Static allLinks -->
+  <!-- ============================================================ -->
+
+  <h2>Static: Option of Choice for Posts</h2>
+  <p class="section_label">allLinks — no API calls</p>
+  <p class="note">
+    Each post is hand-curated with entries for different clients and tools.
+    Tags control which destinations appear in the menu.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".eff_post">EFF post</a>
+      — all destinations: client, inspector, raw JSON
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".pfrazee_post + .client">Paul Frazee post (clients only)</a>
+      — intersection: <span class="tag">.pfrazee_post + .client</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".atproto_post + .devtool">All posts (dev tools only)</a>
+      — every post's inspection link
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=".eff_post"&gt;EFF post&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=".pfrazee_post + .client"&gt;Paul Frazee post (clients only)&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=".atproto_post + .devtool"&gt;All posts (dev tools only)&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>Static: Profiles by Category</h2>
+  <p class="section_label">allLinks — no API calls</p>
+  <p class="note">
+    Profiles tagged by category. The expression grammar selects which
+    slice of <code>allLinks</code> to show.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".orgs + .client">Organizations</a>
+      — EFF, Internet Archive, Creative Commons, Signal
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".news + .client">News &amp; Publications</a>
+      — Nature, The Verge, Ars Technica, WIRED, NYT, New Yorker, TechCrunch
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".tech + .client">Tech Platforms</a>
+      — AT Protocol, Bluesky, GitHub, Node.js, WordPress, Linux Foundation
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="@all_profiles">Everyone (clients)</a>
+      — macro: <span class="tag">@all_profiles</span>
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=".orgs + .client"&gt;Organizations&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=".news + .client"&gt;News &amp; Publications&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=".tech + .client"&gt;Tech Platforms&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems="@all_profiles"&gt;Everyone (clients)&lt;/a&gt;</code></pre>
+  </details>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: Dynamic :atproto: protocol -->
+  <!-- ============================================================ -->
+
+  <h2>Dynamic: Live Profiles</h2>
+  <p class="section_label">:atproto: protocol — fetched from the network</p>
+  <p class="note">
+    The <code>:atproto:</code> handler calls the public Bluesky API and
+    maps the response to AlapLink objects. No auth needed.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:profile:atproto.com:">AT Protocol team</a>
+      — <span class="tag">:atproto:profile:atproto.com:</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:profile:eff.org:">EFF</a>
+      — fetched live from the API
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:profile:archive.org:">Internet Archive</a>
+      — a different organization
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=":atproto:profile:atproto.com:"&gt;AT Protocol team&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:profile:eff.org:"&gt;EFF&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:profile:archive.org:"&gt;Internet Archive&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>Dynamic: Author Feeds</h2>
+  <p class="section_label">:atproto: protocol — fetched from the network</p>
+  <p class="note">
+    Recent posts from different accounts. Same handler, different content.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:atproto.com:limit=5:">AT Protocol — recent posts</a>
+      — <span class="tag">:atproto:feed:atproto.com:limit=5:</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:eff.org:limit=5:">EFF — recent posts</a>
+      — digital rights and policy
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:nature.com:limit=5:">Nature — recent posts</a>
+      — science journal
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:theverge.com:limit=5:">The Verge — recent posts</a>
+      — tech news
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:archive.org:limit=3:">Internet Archive — recent 3</a>
+      — with <span class="tag">limit=3</span>
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=":atproto:feed:atproto.com:limit=5:"&gt;AT Protocol — recent posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:feed:eff.org:limit=5:"&gt;EFF — recent posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:feed:nature.com:limit=5:"&gt;Nature — recent posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:feed:theverge.com:limit=5:"&gt;The Verge — recent posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:feed:archive.org:limit=3:"&gt;Internet Archive — recent 3&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>Dynamic: People Search</h2>
+  <p class="section_label">:atproto: protocol — fetched from the network</p>
+  <p class="note">
+    Search for accounts by keyword. Results are live.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:people:open_source:limit=5:">People: "open source"</a>
+      — <span class="tag">:atproto:people:open_source:limit=5:</span> (alias for "open source")
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:people:creative_commons:limit=5:">People: "creative commons"</a>
+      — alias for "creative commons"
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:people:atproto:limit=5:">People: "atproto"</a>
+      — protocol community
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=":atproto:people:open_source:limit=5:"&gt;People: "open source"&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:people:creative_commons:limit=5:"&gt;People: "creative commons"&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:people:atproto:limit=5:"&gt;People: "atproto"&lt;/a&gt;
+
+// Multi-word queries use aliases defined in the config:
+// searches: { open_source: 'open source', creative_commons: 'creative commons' }</code></pre>
+  </details>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: Composition — static + dynamic -->
+  <!-- ============================================================ -->
+
+  <h2>Composition: Static + Dynamic</h2>
+  <p class="section_label">allLinks blended with :atproto: protocol</p>
+  <p class="note">
+    The same expression grammar works across both data sources.
+    Curated local entries and live API results in one menu.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".orgs + .client | :atproto:feed:eff.org:limit=3:">Org profiles + live EFF posts</a>
+      — static org links merged with 3 recent EFF posts
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.news + .client *sort:label*), (:atproto:feed:nature.com:limit=3:)">News outlets, then Nature posts</a>
+      — comma-separated: sorted news profiles, then live science posts
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".tech + .client | :atproto:people:atproto:limit=3:">Tech platforms + AT Proto people</a>
+      — curated platforms merged with live people search
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=".orgs + .client | :atproto:feed:eff.org:limit=3:"&gt;Org profiles + live EFF posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems="(.news + .client *sort:label*), (:atproto:feed:nature.com:limit=3:)"&gt;News outlets, then Nature posts&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=".tech + .client | :atproto:people:atproto:limit=3:"&gt;Tech platforms + AT Proto people&lt;/a&gt;</code></pre>
+  </details>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: Post Search (auth required) -->
+  <!-- ============================================================ -->
+
+  <div id="search-section" class="auth_required">
+    <h2>Dynamic: Post Search</h2>
+    <p class="section_label">:atproto: protocol — requires authentication</p>
+    <p class="note">
+      Post search (<code>searchPosts</code>) requires a logged-in session.
+      Use the login bar above with an
+      <a href="https://bsky.app/settings/app-passwords" target="_blank">app password</a>.
+    </p>
+    <p class="auth_hint">Log in above to enable these links.</p>
+    <div class="example">
+      <p>
+        <a class="alap" data-alap-linkitems=":atproto:search:decentralization:limit=5:">Search: "decentralization"</a>
+        — <span class="tag">:atproto:search:decentralization:limit=5:</span>
+      </p>
+      <p>
+        <a class="alap" data-alap-linkitems=":atproto:search:open_web:limit=5:">Search: "open web"</a>
+        — find posts about the open web
+      </p>
+      <p>
+        <a class="alap" data-alap-linkitems=":atproto:search:accessibility:limit=5:">Search: "accessibility"</a>
+        — a11y discussions
+      </p>
+    </div>
+    <p class="note" style="margin-top: 1em;">Or search for anything:</p>
+    <form class="custom_search" id="custom-search-form">
+      <input type="text" id="custom-search-input" placeholder="Search posts..." maxlength="100" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+    <div id="custom-search-result"></div>
+    <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=":atproto:search:decentralization:limit=5:"&gt;Search: "decentralization"&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:search:open_web:limit=5:"&gt;Search: "open web"&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:search:accessibility:limit=5:"&gt;Search: "accessibility"&lt;/a&gt;</code></pre>
+    </details>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Full config -->
+  <!-- ============================================================ -->
+
+  <h2>Full Config</h2>
+  <p class="note">
+    The complete configuration object powering this example.
+    <code>allLinks</code> is static local data, <code>protocols.atproto</code>
+    is the dynamic handler that fetches from the network.
+  </p>
+  <details class="src">
+    <summary>config.ts</summary>
+    <pre><code id="config-source"></code></pre>
+  </details>
+
+  <hr style="border-color: #2a2e3e; margin: 2em 0;">
+  <p>
+    <strong>Next:</strong>
+    <a href="./combined.html" style="color: #eeb544;">Three Sources, One Menu</a>
+    — combine static config, <code>:web:</code>, and <code>:atproto:</code> in a single expression.
+  </p>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

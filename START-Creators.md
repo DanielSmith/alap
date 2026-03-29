@@ -146,7 +146,9 @@ Each cookbook covers a specific topic:
 | [Editors](docs/cookbook/editors.md) | Setting up and using the visual editors |
 | [Existing URLs](docs/cookbook/existing-urls.md) | Preserving `href` when Alap enhances a link |
 | [Images & Media](docs/cookbook/images-and-media.md) | Image items, thumbnails, media in menus |
-| [Markdown](docs/cookbook/markdown.md) | Using Alap expressions in markdown content |
+| [Markdown & CMS Content](docs/cookbook/markdown.md) | Alap in markdown, MDX, and HTML from headless CMSs |
+| [Rich-Text Editors](docs/cookbook/rich-text.md) | Tiptap/ProseMirror integration |
+| [Placement](docs/cookbook/placement.md) | Compass-based menu positioning |
 | [Language Ports](docs/cookbook/language-ports.md) | Server-side ports in Rust, Python, Go, PHP |
 
 ---

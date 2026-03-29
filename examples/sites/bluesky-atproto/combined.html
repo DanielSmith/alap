@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Three Sources, One Menu</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <h1>Three Sources, One Menu</h1>
+  <p>
+    One Alap expression can pull data from three completely different sources
+    and merge the results into a single menu. Same grammar, same operators,
+    mixed origins.
+  </p>
+  <p class="note">
+    <span class="source source_static">allLinks</span> — static, hand-curated
+    &nbsp;&middot;&nbsp;
+    <span class="source source_web">:web:</span> — Open Library JSON API
+    &nbsp;&middot;&nbsp;
+    <span class="source source_atproto">:atproto:</span> — Bluesky / AT Protocol
+  </p>
+
+  <h2>Each Source Alone</h2>
+  <p class="note">For reference — what each source looks like individually.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".orgs">Curated orgs</a>
+      — <span class="source source_static">allLinks</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:books:decentralization:">Books: "decentralization"</a>
+      — <span class="source source_web">:web:</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":atproto:feed:eff.org:limit=3:">EFF — recent posts</a>
+      — <span class="source source_atproto">:atproto:</span>
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap" data-alap-linkitems=".orgs"&gt;Curated orgs&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":web:books:decentralization:"&gt;Books: "decentralization"&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems=":atproto:feed:eff.org:limit=3:"&gt;EFF — recent posts&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>All Three in One Expression</h2>
+  <p class="note">
+    Comma-separated scopes — each fetches from a different source,
+    results appear in one menu in order.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:decentralization:), (:atproto:feed:eff.org:limit=3:)">Decentralization: orgs + books + EFF posts</a>
+      — <span class="source source_static">static</span> +
+        <span class="source source_web">:web:</span> +
+        <span class="source source_atproto">:atproto:</span>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:bebop:), (:atproto:feed:archive.org:limit=3:)">Bebop jazz: orgs + books + Internet Archive posts</a>
+      — same pattern, different topic
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:architecture:), (:atproto:people:atproto:limit=3:)">Architecture: orgs + books + AT Proto people</a>
+      — static orgs, book search, and live people search
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:coffee:), (:atproto:feed:nature.com:limit=2:)">Coffee: orgs + books + Nature posts</a>
+      — because why not
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>// Three data sources in one expression:
+//   1. (.orgs *limit:2*)                  — static allLinks
+//   2. (:web:books:decentralization:)     — Open Library API
+//   3. (:atproto:feed:eff.org:limit=3:)   — Bluesky AT Protocol
+
+&lt;a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:decentralization:), (:atproto:feed:eff.org:limit=3:)"&gt;Decentralization&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:bebop:), (:atproto:feed:archive.org:limit=3:)"&gt;Bebop jazz&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:architecture:), (:atproto:people:atproto:limit=3:)"&gt;Architecture&lt;/a&gt;
+&lt;a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:books:coffee:), (:atproto:feed:nature.com:limit=2:)"&gt;Coffee&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>With Operators</h2>
+  <p class="note">
+    Union across sources — not just comma separation.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".orgs | :web:books:decentralization: | :atproto:feed:eff.org:limit=2:">Union: orgs | books | EFF posts</a>
+      — flat merge with <code>|</code> (OR)
+    </p>
+  </div>
+  <details class="src"><summary>View source</summary>
+<pre><code>&lt;a class="alap"
+   data-alap-linkitems=".orgs | :web:books:decentralization: | :atproto:feed:eff.org:limit=2:"
+&gt;Union: orgs | books | EFF posts&lt;/a&gt;</code></pre>
+  </details>
+
+  <h2>Config</h2>
+  <p class="note">
+    The config powering this page — all three protocol registrations
+    and the static allLinks entries.
+  </p>
+  <details class="src">
+    <summary>config-combined.ts</summary>
+    <pre><code id="config-source"></code></pre>
+  </details>
+
+  <hr style="border-color: #2a2e3e; margin: 2em 0;">
+  <p>
+    <a href="./index.html" style="color: #eeb544;">&larr; Back to the AT Protocol example</a>
+  </p>
+
+  <script type="module" src="./main-combined.ts"></script>
+</body>
+</html>

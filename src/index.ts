@@ -22,5 +22,7 @@ export type { AlapUIOptions } from './ui/dom/AlapUI';
 export { AlapLinkElement, registerConfig, updateRegisteredConfig, defineAlapLink } from './ui/web-component/AlapLinkElement';
 export type { AlapConfig, AlapLink, AlapMacro, AlapSettings, AlapSearchPattern, AlapSearchOptions, AlapProtocol, ProtocolHandler, GenerateHandler, WebKeyConfig } from './core/types';
 export { webHandler } from './protocols/web';
+export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atproto';
+export type { AtUri } from './protocols/atproto';
 export { ProtocolCache } from './protocols/cache';
 export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from './ui/shared';

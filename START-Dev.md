@@ -286,7 +286,17 @@ Check out the [best bridges](alap:@nycBridges) in the city.
 Here are some [great cafes](alap:.coffee) nearby.
 ```
 
-Works with Astro, Next.js, or any remark pipeline. See [plugins/remark-alap/](plugins/remark-alap/).
+Works with Astro, Next.js, Nuxt, or any remark pipeline. See [plugins/remark-alap/](plugins/remark-alap/).
+
+### HTML / CMS Content (rehype-alap)
+
+Transform `<a href="alap:query">` links from headless CMSs into `<alap-link>` web components:
+
+```bash
+npm install rehype-alap
+```
+
+For content from Contentful, Sanity, Strapi, WordPress API, Ghost. See [plugins/rehype-alap/](plugins/rehype-alap/).
 
 ### Tiptap (Rich Text)
 
@@ -328,6 +338,42 @@ npm install eleventy-alap
 ```
 
 See [integrations/eleventy-alap/](integrations/eleventy-alap/).
+
+### Next.js Integration
+
+`'use client'` component re-exports + layout component for the App Router:
+
+```bash
+npm install next-alap
+```
+
+See [integrations/next-alap/](integrations/next-alap/).
+
+### Nuxt Integration
+
+Client plugin factory + Vue component re-exports + Nuxt Content markdown:
+
+```bash
+npm install nuxt-alap
+```
+
+See [integrations/nuxt-alap/](integrations/nuxt-alap/).
+
+### Qwik City Integration
+
+Vite plugin for Qwik City projects:
+
+```bash
+npm install qwik-alap
+```
+
+See [integrations/qwik-alap/](integrations/qwik-alap/).
+
+### WordPress Plugin
+
+`[alap]` shortcode for WordPress. SQLite containers — no MySQL needed:
+
+See [plugins/wordpress/](plugins/wordpress/).
 
 <!-- Docusaurus integration temporarily removed pending upstream dependency fix.
      Use remark-alap directly with Docusaurus in the meantime. -->

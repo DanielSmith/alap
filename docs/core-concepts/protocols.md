@@ -258,7 +258,7 @@ Both produce sets. Both compose the same way. The expression doesn't know which 
 
 ## Built-in protocols
 
-Alap ships with two:
+Alap ships with filter and generate protocols:
 
 **`:time:`** — filter by when a link was created or last updated.
 
@@ -276,7 +276,37 @@ Alap ships with two:
 :loc:40.7,-74.0:40.8,-73.9:   → inside a bounding box
 ```
 
-Custom protocols follow the same pattern. Register a handler, document the segments it accepts, and it works everywhere `:time:` and `:loc:` work.
+**`:web:`** — fetch JSON from external APIs and map results to links. See the [external-data example](../../examples/sites/external-data/).
+
+**`:atproto:`** — fetch data from the AT Protocol network (Bluesky). Profiles, feeds, people search, and post search mapped to AlapLink objects.
+
+```
+:atproto:profile:eff.org:             → profile with Option of Choice destinations
+:atproto:feed:nature.com:limit=5:     → recent posts from an account
+:atproto:people:atproto:limit=5:      → search for accounts by keyword
+:atproto:search:accessibility:limit=5: → search posts (requires auth)
+```
+
+Multi-word queries use named aliases defined in the protocol config's `searches` map:
+
+```typescript
+protocols: {
+  atproto: {
+    generate: atprotoHandler,
+    cache: 5,
+    searches: {
+      open_source: 'open source',
+      creative_commons: 'creative commons',
+    },
+  },
+}
+```
+
+Then use the alias in expressions: `:atproto:people:open_source:limit=5:`. Single-word queries work directly. See the [bluesky-atproto example](../../examples/sites/bluesky-atproto/).
+
+All built-in protocols compose freely. A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](../../examples/sites/bluesky-atproto/combined.html) for a live demo.
+
+Custom protocols follow the same pattern. Register a handler, document the segments it accepts, and it works everywhere the built-in protocols work.
 
 ## Mixing everything
 

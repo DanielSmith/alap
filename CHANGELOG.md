@@ -4,6 +4,36 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### AT Protocol Integration (2026-03-29)
+
+`:atproto:` — a new generate protocol handler for fetching data from the AT Protocol network (Bluesky). Profiles, author feeds, people search, post thread resolution, and authenticated post search — all mapped to AlapLink objects and composable with static allLinks data in the same expression grammar.
+
+**Protocol handler (`src/protocols/atproto.ts`):**
+- `atprotoHandler` — generate handler with 5 commands: `profile`, `feed`, `people`, `thread`, `search`
+- `parseAtUri()` — parse `at://` URIs into typed components (authority, collection, rkey)
+- `atUriToDestinations()` — generate Option of Choice links for any AT URI (bsky.app, pdsls.dev, raw JSON)
+- Named search aliases via `searches` config — multi-word queries that can't appear directly in expressions
+- Auth plumbing: optional `accessJwt` in protocol config for post search (read-only, never stored)
+- Safety: timeout, response size limits, content-type validation, hardcoded origin (mirrors `:web:`)
+- CORS-aware: unauthenticated requests → `public.api.bsky.app`, authenticated → `bsky.social` PDS
+
+**Example (`examples/sites/bluesky-atproto/`, port 9170):**
+- Static allLinks: 50+ entries across 19 accounts (orgs, news, tech, individuals) with Option of Choice per profile/post
+- Dynamic `:atproto:` protocol: live profiles, author feeds, people search, post search
+- Composition demos: static tags blended with live API results in one expression
+- Optional app password login with 2FA email code flow
+- Session persistence via opt-in "Remember me" checkbox (sessionStorage)
+- Custom search input with sanitized user queries
+- Collapsible source blocks showing actual anchor tags, full config.ts loaded at runtime
+- Second page (`combined.html`): three sources in one expression — static allLinks + `:web:` (Open Library) + `:atproto:` (Bluesky), shared login session
+
+**Exports added to public API:**
+- `atprotoHandler`, `parseAtUri`, `atUriToDestinations` (functions)
+- `AtUri` (type)
+
+**Tests (`tests/core/tier25-atproto-protocol.test.ts`):**
+- 48 tests covering AT URI parsing, destination generation, all 5 commands, search alias resolution, auth/no-auth paths, error handling, and security (credentials omission, origin routing, content-type/size rejection, XSS in display names, token leakage, domain allowlisting, abort timeout)
+
 ### Nuxt Integration (2026-03-28)
 
 `nuxt-alap` — Nuxt 3 integration. Client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
