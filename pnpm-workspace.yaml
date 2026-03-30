@@ -5,6 +5,7 @@ packages:
   - integrations/next-alap
   - integrations/nuxt-alap
   - integrations/qwik-alap
+  - integrations/vitepress-alap
   - plugins/mdx
   - plugins/rehype-alap
   - plugins/remark-alap
@@ -12,4 +13,5 @@ packages:
   - examples/sites/astro-integration
   - examples/sites/eleventy
   - examples/sites/tiptap
+  - examples/sites/vitepress
   - examples/servers/*

@@ -398,6 +398,16 @@ npm install qwik-alap
 
 See [qwik-alap](integrations/qwik-alap/) (`integrations/qwik-alap/`).
 
+### VitePress Integration
+
+Vite plugin for VitePress documentation sites:
+
+```bash
+npm install vitepress-alap
+```
+
+See [vitepress-alap](integrations/vitepress-alap/) (`integrations/vitepress-alap/`).
+
 ### WordPress Plugin
 
 `[alap]` shortcode for WordPress. SQLite containers — no MySQL needed:

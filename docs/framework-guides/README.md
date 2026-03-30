@@ -28,6 +28,7 @@ Separate packages that connect Alap to specific platforms, build tools, and cont
 | [Astro Integration](../../integrations/astro-alap/) | `astro-alap` | Zero-config setup — one line in your Astro config |
 | [Hugo](../../integrations/hugo-alap/) | `hugo-alap` | Shortcodes + partials that output `<alap-link>` |
 | [Qwik City](../../integrations/qwik-alap/) | `qwik-alap` | Vite plugin for Qwik City projects |
+| [VitePress](../../integrations/vitepress-alap/) | `vitepress-alap` | Vite plugin for `<alap-link>` in markdown docs |
 | [WordPress](../../plugins/wordpress/) | WordPress plugin | `[alap]` shortcode, SQLite containers |
 | [Markdown](../../plugins/remark-alap/) | `remark-alap` | `[text](alap:query)` syntax for any remark pipeline |
 | [HTML / CMS](../../plugins/rehype-alap/) | `rehype-alap` | Transform `<a href="alap:query">` from headless CMSs |
@@ -43,7 +44,8 @@ Separate packages that connect Alap to specific platforms, build tools, and cont
 - **Need maximum CSS control?** [Vanilla DOM](vanilla-dom.md) renders into the page with no shadow boundary
 - **Zero JS until click?** [Qwik](qwik.md) — resumability means no parser/engine code loads until someone interacts
 - **htmx / HTML-over-the-wire?** Use the [Web Component](web-component.md) — `<alap-link>` auto-initializes after htmx swaps. See the [htmx example](../../examples/sites/htmx/)
-- **Static site?** [Eleventy](eleventy.md), [Astro](astro.md), or [Web Component](web-component.md) with the CDN build
+- **Static site?** [Eleventy](eleventy.md), [Astro](astro.md), [VitePress](../../integrations/vitepress-alap/), or [Web Component](web-component.md) with the CDN build
+- **VitePress docs?** See the [VitePress integration](../../integrations/vitepress-alap/) — Vite plugin registers `<alap-link>` for markdown
 - **Next.js?** See the [Next.js integration](../../integrations/next-alap/) — `'use client'` handled, layout component, MDX config
 - **Nuxt?** See the [Nuxt integration](../../integrations/nuxt-alap/) — client plugin, Vue re-exports, Nuxt Content
 - **Hugo?** See the [Hugo integration](../../integrations/hugo-alap/) — shortcodes + web component

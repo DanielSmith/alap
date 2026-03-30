@@ -102,6 +102,7 @@ Separate packages for specific platforms and content pipelines:
 | `qwik-alap` | Qwik City integration (Vite plugin) | `npm install qwik-alap` |
 | `next-alap` | Next.js App Router (`'use client'` + layout) | `npm install next-alap` |
 | `nuxt-alap` | Nuxt 3 (client plugin + Nuxt Content) | `npm install nuxt-alap` |
+| `vitepress-alap` | VitePress (Vite plugin + custom element) | `npm install vitepress-alap` |
 
 For WordPress, see the [WordPress plugin](../../plugins/wordpress/) (no npm — PHP plugin with Docker containers).
 For Hugo, see the [Hugo integration](../../integrations/hugo-alap/) (shortcodes + web component).

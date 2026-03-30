@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 
-use alap_core::{
+use alap::{
     cherry_pick, merge_configs, resolve, sanitize_url, Config, ExpressionParser, Link, Macro,
     Protocol,
 };

@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "alap_core"
+name = "alap"
 version = "0.1.0"
 dependencies = [
  "regex",

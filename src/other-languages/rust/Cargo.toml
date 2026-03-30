@@ -1,5 +1,5 @@
 [package]
-name          = "alap_core"
+name          = "alap"
 version       = "0.1.0"
 edition       = "2024"
 description   = "Alap expression parser — resolve tag-based link expressions server-side"

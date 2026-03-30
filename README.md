@@ -66,7 +66,7 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **9 server examples** — Node, Bun, Python, Go, Rust, PHP backends
 - **8 visual editors** — React, Vue, Svelte, Solid, Astro, Alpine builds
 - **Markdown, MDX & CMS support** — remark, rehype, and MDX plugins for any content pipeline
-- **Next.js, Nuxt, Astro, Eleventy, Hugo & Qwik City integrations** — zero-config framework packages
+- **Next.js, Nuxt, Astro, Eleventy, Hugo, Qwik City & VitePress integrations** — zero-config framework packages
 - **WordPress plugin** — `[alap]` shortcode, SQLite containers, instant demo
 - **CDN / IIFE build** — `<script>` tag usage for static sites and zero-build setups
 - **AT Protocol / Bluesky** — `:atproto:` protocol for live feeds, profiles, and search

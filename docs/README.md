@@ -49,6 +49,7 @@ Separate packages for specific platforms and content pipelines.
 - [Nuxt](../integrations/nuxt-alap/) — client plugin + Nuxt Content markdown
 - [Astro Integration](../integrations/astro-alap/) — zero-config setup
 - [Hugo](../integrations/hugo-alap/) — shortcodes + web component
+- [VitePress](../integrations/vitepress-alap/) — Vite plugin for `<alap-link>` in markdown docs
 - [WordPress](../plugins/wordpress/) — `[alap]` shortcode, SQLite containers
 - [Markdown](../plugins/remark-alap/) — `remark-alap` for any remark pipeline
 - [HTML / CMS](../plugins/rehype-alap/) — `rehype-alap` for headless CMS output

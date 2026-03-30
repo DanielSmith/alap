@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0
 // See https://www.apache.org/licenses/LICENSE-2.0
 
-use alap_core::validate_config;
+use alap::validate_config;
 use serde_json::json;
 
 // --- Structural validity ---

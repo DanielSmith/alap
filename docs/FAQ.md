@@ -51,6 +51,7 @@ Alap links render as web components or ARIA-attributed spans, not as traditional
 - **Nuxt** — the [`nuxt-alap`](../integrations/nuxt-alap/) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
 - **Astro** — the [`astro-alap`](../integrations/astro-alap/) integration provides zero-config setup. See the [Astro example](../examples/sites/astro-integration/).
 - **Qwik City** — the [`qwik-alap`](../integrations/qwik-alap/) integration provides a Vite plugin.
+- **VitePress** — the [`vitepress-alap`](../integrations/vitepress-alap/) integration registers `<alap-link>` as a custom element and optionally injects config.
 - **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](../plugins/rehype-alap/) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components. See the [cms-content example](../examples/sites/cms-content/).
 - **Markdown-based CMSs** — use [`remark-alap`](../plugins/remark-alap/) for `[text](alap:query)` syntax. See the [markdown example](../examples/sites/markdown/).
 - **MDX** — use [`@alap/mdx`](../plugins/mdx/) for React-based MDX content. See the [MDX example](../examples/sites/mdx/).

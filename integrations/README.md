@@ -10,6 +10,7 @@ Framework-level packages that wire Alap into static site generators and document
 | [qwik-alap/](qwik-alap/) | Qwik City | Vite plugin — auto-injects web component setup, config validation | — |
 | [next-alap/](next-alap/) | Next.js | `'use client'` re-exports, AlapLayout, MDX config wrapper (Vite only) | 15 |
 | [nuxt-alap/](nuxt-alap/) | Nuxt 3 | Client plugin factory, Vue re-exports, Nuxt Content markdown | 17 |
+| [vitepress-alap/](vitepress-alap/) | VitePress | Vite plugin — registers `<alap-link>` custom element, optional config injection | — |
 
 > **Docusaurus:** A dedicated integration is planned but temporarily on hold due to an upstream transitive dependency vulnerability (`serialize-javascript` via `@docusaurus/core`). In the meantime, use `remark-alap` directly in your Docusaurus remark pipeline.
 

@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0
 // See https://www.apache.org/licenses/LICENSE-2.0
 
-use alap_core::is_private_host;
+use alap::is_private_host;
 
 // --- Public addresses (should return false) ---
 

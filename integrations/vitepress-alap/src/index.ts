@@ -83,7 +83,7 @@ export function alapPlugin(options: AlapPluginOptions = {}): Plugin[] {
             },
           },
         },
-      };
+      } as Record<string, unknown>;
     },
   });
 

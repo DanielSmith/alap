@@ -79,6 +79,10 @@ The links render as clickable text. On click, a menu appears with the matching i
 
 That's it. The web component handles everything else — menus, keyboard nav, ARIA, positioning, dismiss behavior.
 
+## Known issues
+
+- **Option B (bundled config)** does not work yet — `transformIndexHtml` injection is not firing in VitePress dev mode. Use Option A (IIFE + public scripts) for now. Fix planned for next beta.
+
 ## See also
 
 - [Web Component guide](../../docs/framework-guides/web-component.md) — `<alap-link>` in depth

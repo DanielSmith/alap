@@ -1,0 +1,51 @@
+/* Alap theme overrides for VitePress */
+
+:root {
+  --vp-c-brand-1: #5b8def;
+  --vp-c-brand-2: #3a6fd8;
+  --vp-c-brand-3: #2558b8;
+}
+
+/* Alap links in docs */
+alap-link {
+  color: var(--vp-c-brand-1);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+alap-link:hover {
+  color: var(--vp-c-brand-3);
+}
+
+/* Alap menu styling */
+alap-link::part(menu) {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.dark alap-link {
+  color: #7eaef5;
+}
+
+.dark alap-link:hover {
+  color: #a8c8f8;
+}
+
+.dark alap-link::part(menu) {
+  background: #1e2a48;
+  border: 1px solid #3a5070;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dark alap-link::part(link) {
+  color: #d0d7e5;
+}
+
+.dark alap-link::part(link):hover,
+.dark alap-link::part(link):focus-visible {
+  background: #2a3d68;
+  color: #f5c842;
+}
