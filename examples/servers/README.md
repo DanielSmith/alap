@@ -1,6 +1,6 @@
 # Server Examples
 
-9 REST API servers implementing the same [Alap Config API contract](../../docs/openapi.yaml) (OpenAPI 3.1). Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
+9 REST API servers implementing the same Alap Config API contract. Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
 
 The point: Alap is language-agnostic. The same 7 endpoints work whether you prefer Node, Python, PHP, Go, or Bun.
 
@@ -34,7 +34,7 @@ POST   /cherry-pick       → resolve expression → { allLinks }
 POST   /query             → resolve expression → { results }
 ```
 
-Full spec: [`docs/openapi.yaml`](../../docs/openapi.yaml)
+Full contract details: [Servers API reference](../../docs/api-reference/servers.md)
 
 ## Running
 

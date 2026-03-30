@@ -1,6 +1,6 @@
 # Site Examples
 
-25 browser demos showing Alap in action across different adapters, theming approaches, and features.
+26 browser demos showing Alap in action across different adapters, theming approaches, and features.
 
 Each example is self-contained with its own `serve.sh` for standalone running. Ports are unique so you can run multiple examples simultaneously.
 
@@ -34,9 +34,10 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [alpine](alpine/) | 9000 | Alpine.js | `x-alap` directive, no build step, CDN-loadable |
 | [astro-integration](astro-integration/) | 9010 | Astro | Real Astro project with auto-inject integration |
 | [next](next/) | 9210 | Next.js | App Router pattern — layout, pages, web component mode |
-| [hugo](hugo/) | 9170 | Hugo | Shortcode + web component (in active development) |
+| [hugo](hugo/) | — | Hugo | Shortcode + web component |
+| [eleventy](eleventy/) | — | Eleventy | `eleventy-alap` plugin with shortcodes |
 
-**Note:** The Astro example uses its own dev server (`npx astro dev`), not the shared Vite config.
+**Note:** The Astro example uses its own dev server (`npx astro dev`), not the shared Vite config. Hugo and Eleventy examples use their own build tools.
 
 ## Advanced CSS
 
@@ -45,15 +46,30 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [advanced-css-wc](advanced-css-wc/) | 9140 | Web Component — 55+ CSS custom properties, corner-shape, shadows, typography, motion, themes |
 | [advanced-css-dom](advanced-css-dom/) | 9150 | DOM + Popover — same effects via light DOM CSS classes |
 
-## Advanced
+## Content Pipelines
+
+| Example | Port | What it shows |
+|---------|------|---------------|
+| [markdown](markdown/) | 9040 | `remark-alap` plugin — `[text](alap:query)` in Markdown |
+| [mdx](mdx/) | 9060 | `@alap/mdx` — React JSX in MDX content |
+| [cms-content](cms-content/) | 9200 | `rehype-alap` — live editor transforming CMS HTML into Alap menus |
+| [tiptap](tiptap/) | — | `tiptap-alap` — Alap links as inline nodes in a rich-text editor |
+
+## Protocols and Dynamic Data
+
+| Example | Port | What it shows |
+|---------|------|---------------|
+| [external-data](external-data/) | 9160 | `:web:` protocol — API data as Alap links, mixed with local, scoped refiners |
+| [bluesky-atproto](bluesky-atproto/) | 9170 | `:atproto:` protocol — live Bluesky feeds, profiles, search, combined with static data and `:web:` |
+
+## Advanced Features
 
 | Example | Port | What it shows |
 |---------|------|---------------|
 | [regex-search](regex-search/) | 9060 | `/key/opts` named patterns — field codes, sorting, age, limits |
-| [external-data](external-data/) | 9160 | `:web:` protocol — API data as Alap links, mixed with local, scoped refiners |
 | [hooks-and-media](hooks-and-media/) | 9030 | Image triggers, hover preview, context popup, event log |
-| [markdown](markdown/) | 9040 | remark-alap plugin — `[text](alap:query)` in Markdown |
-| [cms-content](cms-content/) | 9200 | rehype-alap — live editor transforming CMS HTML into Alap menus |
+| [placement](placement/) | 9170 | Compass-based menu positioning — 9 positions with viewport containment |
+| [cdn](cdn/) | 9130 | Zero-build `<script>` tag setup — no npm, no bundler |
 | [htmx](htmx/) | 9220 | htmx + web component — HTML over the wire, zero framework |
 
 ## Running

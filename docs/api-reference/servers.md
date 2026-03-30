@@ -8,7 +8,7 @@
 
 ## API contract
 
-Canonical spec: `examples/servers/openapi.yaml` (OpenAPI 3.1)
+All servers implement the same REST contract, documented below.
 
 All servers expose 7 endpoints:
 

@@ -6,7 +6,7 @@ Both options below use SQLite — single container, no MySQL or MariaDB.
 
 ## Quick Start
 
-### Option A — Instant demo (recommended for first look)
+### (not yet.. in progress) Option A — Instant demo (recommended for first look)
 
 Pre-seeded WordPress with Alap active and demo content ready. No wizard, no activation step.
 

@@ -26,7 +26,9 @@ How the expression language works.
 
 ## Framework Guides
 
-One page per framework. Self-contained — pick yours and go.
+### Adapters
+
+Ship with `alap` — import from `alap/react`, `alap/vue`, etc.
 
 - [Vanilla DOM](framework-guides/vanilla-dom.md) — `AlapUI` class, no framework needed
 - [Web Component](framework-guides/web-component.md) — `<alap-link>` custom element
@@ -36,12 +38,24 @@ One page per framework. Self-contained — pick yours and go.
 - [SolidJS](framework-guides/solid.md) — fine-grained signals
 - [Astro](framework-guides/astro.md) — `.astro` components
 - [Alpine.js](framework-guides/alpine.md) — `x-alap` directive
-- [Qwik](framework-guides/qwik.md) — resumable components + Qwik City integration
+- [Qwik](framework-guides/qwik.md) — resumable components
+
+### Integrations
+
+Separate packages for specific platforms and content pipelines.
+
 - [Eleventy](framework-guides/eleventy.md) — `eleventy-alap` plugin with shortcodes and filters
 - [Next.js](../integrations/next-alap/) — App Router layout + `'use client'` components
 - [Nuxt](../integrations/nuxt-alap/) — client plugin + Nuxt Content markdown
-- [Hugo](../integrations/hugo-alap/) — shortcodes + web component integration
-- [WordPress](../plugins/wordpress/) — `[alap]` shortcode plugin, SQLite containers
+- [Astro Integration](../integrations/astro-alap/) — zero-config setup
+- [Hugo](../integrations/hugo-alap/) — shortcodes + web component
+- [WordPress](../plugins/wordpress/) — `[alap]` shortcode, SQLite containers
+- [Markdown](../plugins/remark-alap/) — `remark-alap` for any remark pipeline
+- [HTML / CMS](../plugins/rehype-alap/) — `rehype-alap` for headless CMS output
+- [MDX](../plugins/mdx/) — `@alap/mdx` for React-based MDX
+- [Tiptap](../plugins/tiptap-alap/) — Alap links in Tiptap rich-text editors
+- [htmx](../../examples/sites/htmx/) — `<alap-link>` auto-initializes after swaps
+- [CDN / IIFE](getting-started/installation.md) — `<script>` tag, no bundler
 
 ## API Reference
 

@@ -24,12 +24,14 @@ Define named search patterns in your config:
 }
 ```
 
-Then reference them in a query with slashes:
+Then reference them in expressions with slashes:
 
 ```html
 <alap-link query="/bridges/">find bridges</alap-link>
 <alap-link query="/recent_coffee/">new cafes</alap-link>
 ```
+
+Note: `/bridges/` is a **lookup key**, not an inline regex. It references the `"bridges"` entry in `searchPatterns`, which holds the actual pattern and options. This is the same idea as `@macro` — a name that points to a definition in the config. The expression stays clean and readable; the regex complexity lives in the config where it belongs, not in the middle of an HTML attribute.
 
 The engine runs the pattern against your link library and returns whatever matches. No tags required. No manual curation. The pattern does the work.
 

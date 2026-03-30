@@ -37,7 +37,7 @@ They chain left to right. `*sort:label* *reverse* *limit:5*` means: sort alphabe
 
 ## Inline refiners
 
-The key design decision: refiners work inside parenthesized groups, not just at the end.
+Refiners can work inside parenthesized groups, not just at the end.
 
 ```
 (.nyc *sort:label* *limit:3*) | (.sf *sort:label* *limit:3*)

@@ -2,6 +2,8 @@
 
 Hugo module for [Alap](https://alap.info) multi-target link menus. Provides an `alap` shortcode that emits `<alap-link>` web components — the full expression language (tags, macros, operators, regex search, protocols, refiners) works out of the box.
 
+For a working site, see the [Hugo example](../../examples/sites/hugo/) (`examples/sites/hugo/`).
+
 ## Install
 
 ### Option A: Hugo Module (recommended)

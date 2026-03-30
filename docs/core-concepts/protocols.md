@@ -6,11 +6,12 @@ Tags are categories. A link is either tagged `coffee` or it isn't. That works fo
 
 - "What was added this week?"
 - "What's within walking distance?"
-- "What costs less than $20?"
+- "What books match this topic?"
+- "What are people posting about on Bluesky?"
 
-These are range queries over continuous data. You can't tag your way to "added in the last 30 days" without someone updating tags every morning.
+These are range queries over continuous data, or live queries against external APIs. You can't tag your way to "added in the last 30 days" without someone updating tags every morning.
 
-Protocol expressions solve this. They filter by dimensions — time, location, price, anything with a range — using the same syntax that already works for tags.
+Protocol expressions solve this. They filter by dimensions — time, location — or fetch live data from external sources, using the same syntax that already works for tags.
 
 > Live version with interactive examples: https://alap.info/core-concepts/protocols
 
@@ -21,7 +22,8 @@ A protocol expression is wrapped in colons:
 ```
 :time:30d:
 :loc:40.7,-74.0:5mi:
-:price:10:50:
+:web:books:photography:limit=5:
+:atproto:feed:nature.com:limit=5:
 ```
 
 The first segment is the protocol name. Everything after is arguments — the protocol handler decides what they mean.
@@ -30,7 +32,7 @@ The first segment is the protocol name. Everything after is arguments — the pr
 
 `:loc:40.7,-74.0:5mi:` means "links within 5 miles of this point." The `loc` handler parses coordinates and a radius.
 
-The parser doesn't understand `30d` or `5mi`. It just splits on colons and hands the strings to the handler. This means new protocols — `:rating:4:5:`, `:lang:en:`, `:author:daniel:` — don't require parser changes. You register a handler and you're done.
+The parser doesn't understand `30d` or `5mi`. It just splits on colons and hands the strings to the handler.
 
 ## How it composes
 
@@ -51,17 +53,15 @@ Group with parentheses, combine with macros, subtract tags:
 
 The parser doesn't care where a set came from — tag, macro, regex search, or protocol. It applies the operators the same way.
 
-## The handler contract
+## Two kinds of protocol
 
-There are two kinds of protocol handlers:
-
-**Filter** — a predicate that tests whether an existing link matches:
+**Filter** — a predicate that tests whether an existing link matches. Runs synchronously during expression evaluation:
 
 ```typescript
 type ProtocolHandler = (segments: string[], link: AlapLink, id: string) => boolean;
 ```
 
-The handler doesn't know about the parser, the engine, or the UI. It receives raw strings and a link object, and says "yes, this link matches" or "no, it doesn't." A `:time:` handler checks `link.createdAt`. A `:price:` handler checks `link.meta.price`. Each is a few lines of code.
+`:time:` and `:loc:` are filter protocols. They check each link in `allLinks` and return true or false.
 
 **Generate** — an async function that fetches external data and returns new links:
 
@@ -69,7 +69,7 @@ The handler doesn't know about the parser, the engine, or the UI. It receives ra
 type GenerateHandler = (segments: string[], config: AlapConfig) => Promise<AlapLink[]>;
 ```
 
-A generate handler receives the segments and the full config. It returns an array of links. The engine assigns temporary IDs, and the links become part of the result set — composable with tags, filters, and other protocols.
+`:web:` and `:atproto:` are generate protocols. They call external APIs, transform the results into AlapLink objects, and inject them into the result set. The engine pre-resolves all generate tokens *before* the parser runs — so the expression evaluates synchronously.
 
 A protocol declares which kind it is:
 
@@ -82,8 +82,6 @@ interface AlapProtocol {
   sources?: string[];
 }
 ```
-
-Filter protocols run synchronously during expression evaluation. Generate protocols resolve asynchronously *before* the parser runs — the engine pre-resolves all generate tokens, injects their results, then evaluates the expression synchronously. The parser never goes async.
 
 ## The meta field
 
@@ -98,55 +96,56 @@ Links have an optional `meta` field — a bag of key-value pairs that protocol h
       "tags": ["coffee", "nyc"],
       "meta": {
         "timestamp": "2026-03-01T12:00:00Z",
-        "location": [40.6892, -73.9838],
-        "price": 5
+        "location": [40.6892, -73.9838]
       }
     }
   }
 }
 ```
 
-Tags say what a link *is*. Meta says what a link *measures*. The `:time:` handler reads `meta.timestamp`. The `:loc:` handler reads `meta.location`. Each handler documents which fields it expects.
+Tags say what a link *is*. Meta says what a link *measures*. The `:time:` handler reads `meta.timestamp` (falling back to `createdAt`). The `:loc:` handler reads `meta.location`. Each handler documents which fields it expects.
 
 The `createdAt` field that already exists on every link gives `:time:` a bootstrap path — existing configs get time filtering for free, no `meta` required.
 
-## Where the data comes from
+## Built-in protocols
 
-There are two separate ideas here:
+### `:time:` — filter by recency
 
-**Source chain** — where the Alap config data itself lives. Your `allLinks`, your `macros`, your `settings` — that data can be loaded from a static JSON file, from IndexedDB, or from a remote API that serves Alap config. The data is already in Alap's format. The source chain controls where to look:
+Filter links by when they were created or last updated. Checks `meta.timestamp` first, then `createdAt`.
 
-```javascript
-protocols: {
-  time: {
-    sources: ['config', 'idb', 'api']
-  }
-}
+```
+:time:7d:                        → within the last 7 days
+:time:24h:                       → within the last 24 hours
+:time:2w:                        → within the last 2 weeks
+:time:today:                     → since midnight (local time)
+:time:7d:30d:                    → between 7 and 30 days ago (a range)
+:time:2025-01-01:               → on or after this date
+:time:2025-01-01:2025-12-31:    → within date range (inclusive)
 ```
 
-The engine iterates sources in order, runs the handler against links from each source, and merges results:
+Two arguments always means a range. Timestamps are compared in UTC milliseconds.
 
-- Start with `sources: ['config']` — everything works with a static JSON file
-- Add `'idb'` for local persistence
-- Add `'api'` for a shared backend that serves Alap-formatted data
+### `:loc:` — filter by proximity
 
-The expressions don't change. The HTML doesn't change. Only the config evolves.
+Filter links by geographic distance. Reads `meta.location` (a `[lat, lng]` tuple). Supports miles and kilometers.
 
-Handlers are registered separately — see [The handler contract](#the-handler-contract). The config names protocols and declares their sources, but contains no executable code.
+```
+:loc:40.7,-74.0:5mi:          → within 5 miles of a point
+:loc:40.7,-74.0:10km:         → within 10 kilometers
+:loc:40.7,-74.0:40.8,-73.9:   → inside a bounding box
+```
 
-**External data** — data from outside that isn't in Alap's format at all. A city data API, a bookmarks service, a CMS — these return their own JSON. A generate handler fetches that data and transforms it into Alap links.
+Uses the Haversine formula for distance calculation.
 
-This is entirely optional. An Alap config can be a static JSON file with a handful of links and no protocols at all. But when you need dynamic content, the same expression syntax handles it.
+### `:web:` — fetch from external JSON APIs
 
-### The `:web:` protocol
-
-Alap ships a built-in `:web:` generate handler. The config maps keys to API endpoints:
+A generate protocol that fetches JSON from any API and maps results to AlapLink objects. The config maps keys to API endpoints — no code, just data:
 
 ```javascript
 protocols: {
   web: {
     generate: webHandler,
-    allowedOrigins: ["https://openlibrary.org", "https://api.example.com"],
+    allowedOrigins: ["https://openlibrary.org"],
     keys: {
       books: {
         url: "https://openlibrary.org/search.json",
@@ -162,31 +161,23 @@ protocols: {
           meta: { author: "author_name.0", year: "first_publish_year" }
         },
         cache: 60
-      },
-      bridges: {
-        url: "https://api.example.com/bridges",
-        map: {
-          label: "name",
-          url: "wiki",
-          meta: { year: "year" }
-        }
-      },
-      intranet: {
-        url: "https://internal.corp/api/resources",
-        credentials: true
       }
     }
   }
 }
 ```
 
-The config is just data — URLs, field mappings, search aliases. The handler is registered once and never needs to change. Adding a new API source is adding lines to the config, not writing code. This is the kind of thing an Alap editor can manage visually.
+Adding a new API source is adding lines to the config, not writing code.
 
-**Security options:** `allowedOrigins` restricts which domains `:web:` can fetch from. `credentials: true` on a key sends the user's browser session (cookies, HTTP auth) with the request — useful for intranet or subscription APIs. Credentials are omitted by default. Fetches time out after 10 seconds and responses larger than 1 MB are rejected. See [Security](../api-reference/security.md) for full details.
+**In expressions:**
 
-### How arguments flow
+```
+:web:books:photography:limit=5:   → 5 photography books
+:web:books:adams:                 → Douglas Adams books
+:web:books:adams: + :time:1y:    → Adams books published this year
+```
 
-The parser splits on `:` and hands all segments to the handler. For `:web:books:architecture:limit=5:`:
+**How arguments flow.** For `:web:books:architecture:limit=5:`, the parser splits on `:` and hands segments to the handler:
 
 ```
 segments: ['books', 'architecture', 'limit=5']
@@ -198,87 +189,24 @@ segments: ['books', 'architecture', 'limit=5']
 
 The handler builds: `https://openlibrary.org/search.json?q=urban+frank+gehry&limit=5`
 
-The HTML stays clean:
+**Field mapping.** The `map` object tells the handler which API fields become which AlapLink fields. Dot paths reach into nested structures — `author_name.0` gets the first element of an array. If no `map` is provided, the handler tries common field names: `name`/`title` for label, `url`/`html_url`/`href` for URL.
 
-```html
-<a class="alap" data-alap-linkitems=":web:books:architecture:limit=5:">architecture</a>
-```
+Many APIs return relative paths instead of full URLs — Open Library returns `key: "/works/OL17199486W"`, not a complete link. The `linkBase` field handles this: it's prepended to any mapped URL that doesn't start with `http`.
 
-Nobody reading the markup needs to know the actual search is "urban frank gehry." That's a config concern, not a content concern.
+**Security.** `allowedOrigins` restricts which domains `:web:` can fetch from. `credentials: true` on a key sends the user's browser session with the request — useful for intranet APIs. Credentials are omitted by default. Fetches time out after 10 seconds and responses larger than 1 MB are rejected. See [Security](../api-reference/security.md) for full details.
 
-### Field mapping
-
-The `map` object tells the handler which API fields become which Alap link fields. Dot paths reach into nested structures — `author_name.0` gets the first element of an array.
-
-If no `map` is provided, the handler tries common field names: `name`/`title` for label, `url`/`html_url`/`href` for URL.
-
-Many APIs return relative paths instead of full URLs — Open Library returns `key: "/works/OL17199486W"`, not a complete link. The `linkBase` field handles this: it's prepended to any mapped URL that doesn't start with `http`. URLs that are already absolute are left alone.
-
-An API that returns:
-
-```json
-{
-  "docs": [
-    { "title": "Experimental Architecture",  "key": "/works/OL17199486W",  "author_name": ["Frank Gehry"],  "first_publish_year": 1999 },
-    { "title": "Urban Design Handbook",      "key": "/works/OL12345W",     "author_name": ["Jane Jacobs"],   "first_publish_year": 1961 }
-  ]
-}
-```
-
-The handler maps each object: `title` becomes `label`, the URL template fills in `key`, `author_name.0` becomes `meta.author`, `first_publish_year` becomes `meta.year`. Items without a URL are skipped. The handler finds the array automatically — whether it's the top-level response, nested in `docs`, `items`, or `results`.
-
-### Composition
-
-Generated links compose like anything else:
-
-```
-:web:books:photography:limit=5:                     → photography books
-:web:books:adams: + :time:1y:                       → Douglas Adams books published this year
-:web:bridges:borough=brooklyn: + :time:1900:1910:   → Brooklyn bridges built 1900–1910
-```
-
-### Caching
-
-Generate protocols cache results by default (5 minutes). Override per key:
+**Caching.** Generate protocols cache results by default (5 minutes). Override per key:
 
 ```javascript
 books: { url: "...", cache: 60 }    // cache for 1 hour
 bridges: { url: "...", cache: 0 }   // always refetch
 ```
 
-No `cache` key means use the default. `cache: 0` means no caching.
+See the [external-data example](../../examples/sites/external-data/) (`examples/sites/external-data/`).
 
-### The difference
+### `:atproto:` — live data from Bluesky
 
-Source chain gets Alap data from different storage layers — your `allLinks` loaded from a file, from IndexedDB, or from a remote store. The data is already in Alap's format.
-
-External protocols bring in non-Alap data and transform it into links. A city API, a book search, a CMS feed — the handler does the mapping.
-
-Both produce sets. Both compose the same way. The expression doesn't know which is which.
-
-## Built-in protocols
-
-Alap ships with filter and generate protocols:
-
-**`:time:`** — filter by when a link was created or last updated.
-
-```
-:time:30d:                → last 30 days
-:time:today:              → today
-:time:2025-01-01:         → since January 1, 2025
-:time:30d:60d:            → between 30 and 60 days ago (a range)
-```
-
-**`:loc:`** — filter by geographic proximity.
-
-```
-:loc:40.7,-74.0:5mi:          → within 5 miles of a point
-:loc:40.7,-74.0:40.8,-73.9:   → inside a bounding box
-```
-
-**`:web:`** — fetch JSON from external APIs and map results to links. See the [external-data example](../../examples/sites/external-data/).
-
-**`:atproto:`** — fetch data from the AT Protocol network (Bluesky). Profiles, feeds, people search, and post search mapped to AlapLink objects.
+A generate protocol that fetches data from the AT Protocol network (Bluesky). Profiles, feeds, people search, and post search mapped to AlapLink objects.
 
 ```
 :atproto:profile:eff.org:             → profile with Option of Choice destinations
@@ -302,31 +230,35 @@ protocols: {
 }
 ```
 
-Then use the alias in expressions: `:atproto:people:open_source:limit=5:`. Single-word queries work directly. See the [bluesky-atproto example](../../examples/sites/bluesky-atproto/).
+Then use the alias in expressions: `:atproto:people:open_source:limit=5:`. Single-word queries work directly.
 
-All built-in protocols compose freely. A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](../../examples/sites/bluesky-atproto/combined.html) for a live demo.
+A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](../../examples/sites/bluesky-atproto/combined.html) for a live demo.
 
-Custom protocols follow the same pattern. Register a handler, document the segments it accepts, and it works everywhere the built-in protocols work.
+See the [bluesky-atproto example](../../examples/sites/bluesky-atproto/) (`examples/sites/bluesky-atproto/`).
+
+## Custom protocols
+
+Custom protocols follow the same pattern. Register a handler in `config.protocols`, document the segments it accepts, and it works everywhere the built-in protocols work — composing with tags, operators, macros, parentheses, and refiners. No parser changes required.
 
 ## Mixing everything
 
-Every operand type — tags, item IDs, macros, regex search, filter protocols, generate protocols — returns the same thing: a set of links. They compose freely. Here are examples that mix them.
+Every operand type — tags, item IDs, macros, regex search, filter protocols, generate protocols — returns the same thing: a set of links. They compose freely.
 
 ### Local data only
 
 Tags, regex search, filter protocols — all against `allLinks`:
 
 ```
-.coffee + .nyc + :price:0:10: + :time:7d: + :loc:40.7,-74.0:1mi:
+.coffee + .nyc + :time:7d: + :loc:40.7,-74.0:1mi:
 ```
 
-"Cheap coffee in NYC, added this week, within a mile of here." Five filters composed in one expression.
+"Coffee in NYC, added this week, within a mile of here." Four filters composed in one expression.
 
 ```
 /bridge/ + :loc:40.7,-74.0:5mi:
 ```
 
-"Links matching 'bridge' that are within 5 miles of this point." Regex search narrowed by a location protocol.
+"Links matching 'bridge' that are within 5 miles." Regex search narrowed by a location protocol.
 
 ```
 (:time:30d: + .restaurant *sort:label* *limit:10*) | @favorites
@@ -350,13 +282,19 @@ Generate protocols bring in links from APIs:
 
 "Douglas Adams books published in the last year." The `:web:` handler fetches from the API, then `:time:` filters the results by their `meta.year`. Two different protocol types composed in one expression.
 
+```
+:atproto:feed:nature.com:limit=5: + :atproto:people:open_source:limit=3:
+```
+
+"Recent posts from Nature plus 3 open source accounts from Bluesky."
+
 ### Mixing local and external
 
 ```
 @my_bookmarks | (:web:books:photography: *sort:label* *limit:3*)
 ```
 
-"My saved bookmarks, plus the top 3 photography books sorted by title." The macro expands from `allLinks`. The parenthesized group fetches from an API, sorts, and limits — all scoped within the parentheses. The union merges both sets.
+"My saved bookmarks, plus the top 3 photography books sorted by title." The macro expands from `allLinks`. The parenthesized group fetches from an API, sorts, and limits — all scoped within the parentheses.
 
 ```
 (.nyc + .landmark *sort:label*), (:web:bridges:borough=brooklyn: *limit:5*)
@@ -385,9 +323,9 @@ This is the same scoping behavior that works with tags and filter protocols. Gen
 
 ## Why this matters
 
-Without protocols, Alap's expression language covers categories. With protocols, it covers dimensions. Tags for "what kind," protocols for "how much, how far, how recent." Generate protocols add a third axis: "from where."
+Without protocols, Alap's expression language covers categories. With protocols, it covers dimensions. Tags for "what kind," filter protocols for "how recent, how close." Generate protocols add a third axis: "from where" — external APIs, the AT Protocol network, any data source that returns JSON.
 
-A static config with a few links in `allLinks` works. Adding tags and filter protocols makes it queryable. Adding `:web:` makes it dynamic. Each layer is optional — you use what you need.
+A static config with a few links in `allLinks` works. Adding tags and filter protocols makes it queryable. Adding `:web:` or `:atproto:` makes it dynamic. Each layer is optional — you use what you need.
 
 The grammar doesn't grow. The engine barely changes. A new API source is a config entry, not a new feature.
 
@@ -397,3 +335,4 @@ The grammar doesn't grow. The engine barely changes. A new API source is a confi
 - [Refiners](refiners.md) — shape protocol results with sort, limit, shuffle
 - [Configuration](../getting-started/configuration.md) — protocol registration in the config object
 - [Types](../api-reference/types.md) — `AlapProtocol` and `ProtocolHandler` interfaces
+- [Security](../api-reference/security.md) — `:web:` origin allowlists, credential isolation, fetch limits

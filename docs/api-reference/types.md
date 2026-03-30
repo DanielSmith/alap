@@ -234,7 +234,7 @@ Safety limits enforced by the parser:
 | `MAX_TOKENS` | 1024 | Maximum tokens per expression |
 | `MAX_MACROS` | 10 | Maximum macro expansion rounds |
 | `MAX_REGEX` | 5 | Maximum regex searches per expression |
-| `MAX_REFINERS` | — | Maximum refiners per expression |
+| `MAX_REFINERS` | 10 | Maximum refiners per expression |
 | `MAX_GENERATED_LINKS` | 200 | Maximum links a generate handler can return per call |
 | `WEB_FETCH_TIMEOUT_MS` | 10,000 | Timeout for `:web:` protocol fetch requests (10 seconds) |
 | `MAX_WEB_RESPONSE_BYTES` | 1,048,576 | Maximum response body size for `:web:` fetch (1 MB) |

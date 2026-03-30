@@ -2,6 +2,8 @@
 
 Remark plugin that transforms `[text](alap:query)` markdown links into `<alap-link>` web components.
 
+For a working site, see the [remark-alap example](../../examples/sites/markdown/) (`examples/sites/markdown/`).
+
 ## Install
 
 ```bash

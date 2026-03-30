@@ -8,7 +8,7 @@ Visual tools for building and managing Alap link configurations.
 
 ## Overview
 
-Alap editors let users create items, assign tags, write macros, test expressions, and preview menus — all without editing JSON by hand. They consume the v3 library just like any other project (importing from `alap`, `alap/react`, etc.), which validates the public API.
+Alap editors let users create items, assign tags, write macros, test expressions, and preview menus — all without editing JSON by hand. They consume the v3 library just like any other project (importing from `alap`, `alap/react`, etc.), which validates the public API.  They are functional proofs of concept, and there is much more that could be done with them.
 
 ## The seven editors
 

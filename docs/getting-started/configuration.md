@@ -99,7 +99,7 @@ The `placement` setting controls where the menu appears relative to the trigger.
 ```
      NW    N    NE
       ┌────┬────┐
-   W  │  trigger │  E
+   W  │ trigger │  E
       └────┴────┘
      SW    S    SE
          (C = centered over trigger)

@@ -2,6 +2,8 @@
 
 Tiptap extension that adds inline `<alap-link>` nodes with query-based menus to rich-text editors.
 
+For a working site, see the [tiptap-alap example](../../examples/sites/tiptap/) (`examples/sites/tiptap/`).
+
 ## Install
 
 ```bash

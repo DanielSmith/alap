@@ -15,7 +15,7 @@ Every Alap menu is positioned by a compass-based placement engine. You specify a
 ```
      NW    N    NE
       ┌────┬────┐
-   W  │  trigger │  E
+   W  │ trigger │  E
       └────┴────┘
      SW    S    SE
 

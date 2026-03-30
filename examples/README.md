@@ -24,7 +24,7 @@ These examples can consume significant disk space:
 
 - **Server examples** each have their own dependencies. Running all 7 locally means installing Node, Python, PHP, Bun, and their respective packages. Budget ~100–500MB per server depending on the stack.
 
-- **Docker/Podman** images are much larger. Each server pulls a base image (Node, Python, PHP, Bun) plus dependencies. Running all 7 as containers can easily consume **2–5GB** of disk for images. First builds are slow; subsequent runs use cached layers.
+- **Docker/Podman** images are much larger. Each server pulls a base image (Node, Python, PHP, Bun) plus dependencies. Running all 7 as containers can easily consume **2–5GB** of disk for images. First builds can be quite slow to assemble (this has to do with the enviroment being downloaded or compiled); subsequent runs use cached layers.
 
 **Recommendations:**
 - Try one or two servers locally, not all 7 at once

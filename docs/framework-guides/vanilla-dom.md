@@ -142,7 +142,7 @@ Alap uses a compass-based placement engine. The menu is positioned relative to t
 ```
      NW    N    NE
       ┌────┬────┐
-   W  │  trigger │  E
+   W  │ trigger │  E
       └────┴────┘
      SW    S    SE
          (C = centered over trigger)

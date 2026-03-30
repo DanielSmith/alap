@@ -18,6 +18,7 @@ All adapters emit the same event types. Delivery mechanism varies:
 | Vue | Emitted events (`@item-hover`, etc.) |
 | Svelte | Callback props (`onItemHover`, etc.) |
 | SolidJS | Callback props (`onItemHover`, etc.) |
+| Qwik | QRL callback props (`onItemHover$`, etc.) |
 | Alpine | Custom DOM events (`alap:item-hover`, etc.) — bubble |
 
 ## Event types

@@ -78,7 +78,7 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 |-------------|-----------------|
 | **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
 | **[Examples](examples/)** | 26 demo sites + 9 server backends |
-| **[Framework Guides](docs/framework-guides/)** | React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Eleventy, Web Component, DOM |
+| **[Framework Guides](docs/framework-guides/)** | 9 adapters + integrations for Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more |
 | **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |
 | **[FAQ](docs/FAQ.md)** | Common questions and answers |

@@ -2,7 +2,7 @@
 
 Alap config editor built with React 19, Zustand + Immer, and Tailwind CSS. Custom-styled UI with SVG icons.
 
-I develop everything new to this editor first, and then have it ported to the others.
+I develop everything new to this editor first, and then port it to the others.
 
 ## Run
 

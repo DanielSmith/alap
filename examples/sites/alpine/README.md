@@ -1,4 +1,4 @@
-# Alpine.js
+cd # Alpine.js
 
 `alapPlugin` + `x-alap` directive — no build step required, sprinkle Alap onto any HTML page.
 

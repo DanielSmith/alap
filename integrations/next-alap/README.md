@@ -96,10 +96,9 @@ Both produce `<alap-link>` web components that `AlapLayout` registers automatica
 
 ## Security
 
-- **No webpack plugins** — this integration targets Vite only. No webpack callbacks, no code injection into the build.
 - **No eval or dynamic code generation** — `withAlap()` only sets config flags. The components are pure React re-exports.
 - **Dynamic import for web component** — `AlapLayout` uses `import('alap')` inside `useEffect` to avoid `HTMLElement` reference during SSR. The import only runs in the browser.
-- **Same security guarantees as `alap/react`** — URL sanitization, config validation, expression parser limits all apply.
+
 
 ## Vite only
 
