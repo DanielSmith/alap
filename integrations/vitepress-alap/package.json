@@ -1,0 +1,40 @@
+{
+  "name": "vitepress-alap",
+  "version": "0.1.0",
+  "description": "VitePress integration for Alap — <alap-link> web components in markdown docs",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "vitepress",
+    "alap",
+    "links",
+    "menus",
+    "web-component",
+    "docs"
+  ],
+  "license": "Apache-2.0",
+  "author": "Daniel Smith",
+  "peerDependencies": {
+    "alap": "^3.0.0",
+    "vitepress": "^1.0.0"
+  },
+  "devDependencies": {
+    "alap": "workspace:*",
+    "vitepress": "^1.6.4",
+    "typescript": "^5.7.0",
+    "vite": "^6.2.0"
+  }
+}

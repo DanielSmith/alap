@@ -1,0 +1,54 @@
+Alap Cryptographic Provenance
+==============================
+
+This file establishes proof-of-authorship for the Alap project using
+a cryptographic commitment scheme (hash-based proof of prior knowledge).
+
+
+=== Hash Commitment ===
+
+SHA256 of private authorship proof file:
+b774f2172a37d5f860c5af98f42773b4bd77dc2a67ea1b06e1d2d6e3f54d008b
+
+Date committed: 2026-03-30
+GPG key: B268535EEC1266DCE659B37BB15CED23FA57B7C5
+
+
+=== What This Proves ===
+
+The author of this repository possesses a private file matching the
+above SHA256 hash. The file contains:
+
+- Project origins and design history spanning 2012-2026
+- Technical decisions and rationale known only to the original author
+- Architectural dead ends and abandoned approaches
+- A cryptographic nonce to prevent brute-force attacks
+
+
+=== Verification ===
+
+If authorship is challenged:
+
+1. Author reveals the private proof file
+2. Verifier computes: shasum -a 256 authorship-proof.txt
+3. Output matches the hash above
+4. GPG-signed commit proves this hash was published at commit date
+5. OpenTimestamps proof anchors to Bitcoin blockchain
+   Verify with: ots verify PROVENANCE.txt.ots
+
+No one else can produce a file matching this hash without possessing
+the original (SHA256 preimage resistance).
+
+
+=== Related Protections ===
+
+- Layer 1: Git commit history (evolution of code since 2022)
+- Layer 2: GPG signed commits (see GPG-PUBLIC-KEY.asc in this directory)
+- Layer 3: OpenTimestamps blockchain anchoring (PROVENANCE.txt.ots)
+- Layer 4: This hash commitment scheme
+
+
+=== License ===
+
+This provenance proof does not change the license terms.
+Alap is licensed under Apache License 2.0. See LICENSE.
