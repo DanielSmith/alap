@@ -2,7 +2,51 @@
 
 All notable changes to Alap will be documented in this file.
 
-## [Unreleased]
+## [3.0.0-beta.3] — 2026-03-30
+
+### Published to Five Package Registries (2026-03-30)
+
+First public release of Alap v3 across all target ecosystems.
+
+| Registry | Package | Version |
+|----------|---------|---------|
+| npm | `alap` | 3.0.0-beta.3 |
+| crates.io | `alap` | 0.1.0 |
+| PyPI | `alap-python` | 0.1.1 |
+| Go modules | `github.com/DanielSmith/alap-go` | v0.1.0 |
+| Packagist | `danielsmith/alap` | dev-main |
+
+**npm provenance:** Published with Sigstore OIDC provenance — green badge on npmjs.com linking to exact source commit, build workflow, and transparency log entry.
+
+### CI/CD Workflows (2026-03-30)
+
+- `.github/workflows/ci.yml` — build, test, typecheck on every push to `main` and PR
+- `.github/workflows/release.yml` — tag-triggered npm publish with provenance + GitHub Release
+- `prepublishOnly` script added as safety net (build + test before any publish)
+- All GitHub Actions pinned to commit SHAs
+
+### Cryptographic Provenance Protection (2026-03-30)
+
+- GPG key (ed25519, expires 2029) — all commits signed, "Verified" badge on GitHub
+- `docs/provenance/PROVENANCE.txt` — SHA256 hash commitment of private authorship proof file
+- `docs/provenance/PROVENANCE.txt.ots` — OpenTimestamps blockchain anchor
+- `docs/provenance/GPG-PUBLIC-KEY.asc` — public key for independent signature verification
+
+### Rust Crate Rename (2026-03-30)
+
+- Renamed crate from `alap_core` to `alap` in `Cargo.toml` and all test imports
+- Updated `examples/servers/axum-sqlite/Cargo.toml` dependency reference
+- Fixed Go version in security audit workflow (1.22 → 1.25)
+
+### VitePress Integration (2026-03-30)
+
+`vitepress-alap` — Vite plugin for VitePress documentation sites. Registers `<alap-link>` as a Vue custom element so the template compiler passes it through.
+
+- `alapPlugin()` — tells Vue that `<alap-link>` is a custom element (not a component)
+- Option A (IIFE + public scripts) works now; Option B (bundled config injection) planned for next beta
+- VitePress example site at `examples/sites/vitepress/` with tags, operators, macros, direct IDs
+- Dark mode CSS theme matching the docs site
+- Added to all integration lists: README, docs, FAQ, framework guides, installation, START-Dev
 
 ### AT Protocol Integration (2026-03-29)
 
