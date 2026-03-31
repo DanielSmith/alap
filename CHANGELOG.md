@@ -2,6 +2,23 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [Unreleased]
+
+### Lightbox Renderer (2026-03-31)
+
+- Alternate renderer in `src/ui-lightbox/` — presents resolved links as a fullscreen lightbox/carousel instead of a dropdown menu
+- Same config, same expression engine — renderer is a code-level swap (`AlapLightbox` instead of `AlapUI`)
+- Photo credit support via `meta.photoCredit` and `meta.photoCreditUrl`
+- CSS custom property `--alap-lightbox-transition` controls fade duration
+- Example at `examples/sites/lightbox/` with side-by-side lightbox and menu renderers using identical config (an easter egg)
+
+### Hugo Example Improvements (2026-03-31)
+
+- Reworked coffee data: distinct regional groups (SF, NYC, Portland, Seattle, Sonoma) with no single-item menus
+- Renamed Food section to Coffee
+- Fixed Hugo shortcode escape syntax across all content pages
+- Added expressions reference section to Coffee page
+
 ## [3.0.0-beta.3] — 2026-03-30
 
 ### Published to Five Package Registries (2026-03-30)

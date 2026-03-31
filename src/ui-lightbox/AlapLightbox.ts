@@ -192,7 +192,13 @@ export class AlapLightbox {
     }
 
     card.appendChild(body);
+    card.classList.add('fading');
     this.overlay.appendChild(card);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        card.classList.remove('fading');
+      });
+    });
 
     // Navigation zones — hover areas flanking the card
     if (total > 1) {
