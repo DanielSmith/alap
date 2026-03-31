@@ -42,12 +42,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
-  --alap-lightbox-transition: 0.125s;
-  transition: opacity var(--alap-lightbox-transition) ease;
-}
-
-.alap-lightbox-card.fading {
-  opacity: 0;
+  --alap-lightbox-transition: 0.25s;
 }
 
 .alap-lightbox-card:has(.no-image) {
@@ -74,6 +69,7 @@
 
 .alap-lightbox-credit {
   font-size: 0.75rem;
+  transition: opacity var(--alap-lightbox-transition) ease;
   color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
   flex-shrink: 0;
@@ -94,6 +90,15 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: opacity var(--alap-lightbox-transition) ease;
+}
+
+.alap-lightbox-card.fading .alap-lightbox-image,
+.alap-lightbox-card.fading .alap-lightbox-title,
+.alap-lightbox-card.fading .alap-lightbox-credit,
+.alap-lightbox-card.fading .alap-lightbox-description,
+.alap-lightbox-card.fading .alap-lightbox-counter {
+  opacity: 0;
 }
 
 .alap-lightbox-body {
@@ -111,6 +116,7 @@
 .alap-lightbox-title {
   margin: 0;
   font-size: 1.4rem;
+  transition: opacity var(--alap-lightbox-transition) ease;
   font-weight: 600;
   color: #fff;
   white-space: nowrap;
@@ -126,6 +132,7 @@
 
 .alap-lightbox-description {
   margin: 0 0 1rem;
+  transition: opacity var(--alap-lightbox-transition) ease;
   color: #aaa;
   font-size: 0.95rem;
   line-height: 1.5;
@@ -151,6 +158,7 @@
 
 .alap-lightbox-counter {
   display: block;
+  transition: opacity var(--alap-lightbox-transition) ease;
   margin-top: 1rem;
   color: #666;
   font-size: 0.85rem;

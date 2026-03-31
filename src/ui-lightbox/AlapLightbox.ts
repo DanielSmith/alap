@@ -96,11 +96,9 @@ export class AlapLightbox {
     document.removeEventListener('keydown', this.handleKeydown);
   }
 
+  /** Build the skeleton once — called on open */
   private render(): void {
     if (!this.overlay) return;
-
-    const link = this.links[this.currentIndex];
-    const total = this.links.length;
 
     this.overlay.innerHTML = '';
 
@@ -116,92 +114,47 @@ export class AlapLightbox {
     const card = document.createElement('div');
     card.className = 'alap-lightbox-card';
 
-    // Image area — always present for consistent height
+    // Image area
     const imageWrap = document.createElement('div');
-    const hasImage = !!(link.image || link.thumbnail);
-    imageWrap.className = hasImage
-      ? 'alap-lightbox-image-wrap'
-      : 'alap-lightbox-image-wrap no-image';
-    if (hasImage) {
-      const img = document.createElement('img');
-      img.src = link.image ?? link.thumbnail!;
-      img.alt = link.altText ?? link.label ?? '';
-      img.className = 'alap-lightbox-image';
-      imageWrap.appendChild(img);
-
-    }
+    imageWrap.className = 'alap-lightbox-image-wrap';
+    const img = document.createElement('img');
+    img.className = 'alap-lightbox-image';
+    imageWrap.appendChild(img);
     card.appendChild(imageWrap);
 
     const body = document.createElement('div');
     body.className = 'alap-lightbox-body';
 
-    // Title row — label on left, photo credit on right
-    const credit = link.meta?.photoCredit as string | undefined;
-    const creditUrl = link.meta?.photoCreditUrl as string | undefined;
-    if (link.label || (credit && hasImage)) {
-      const titleRow = document.createElement('div');
-      titleRow.className = 'alap-lightbox-title-row';
+    // Title row
+    const titleRow = document.createElement('div');
+    titleRow.className = 'alap-lightbox-title-row';
+    const title = document.createElement('h2');
+    title.className = 'alap-lightbox-title';
+    titleRow.appendChild(title);
+    const creditEl = document.createElement('span');
+    creditEl.className = 'alap-lightbox-credit';
+    titleRow.appendChild(creditEl);
+    body.appendChild(titleRow);
 
-      if (link.label) {
-        const title = document.createElement('h2');
-        title.className = 'alap-lightbox-title';
-        title.textContent = link.label;
-        title.title = link.label;
-        titleRow.appendChild(title);
-      }
-
-      if (credit && hasImage) {
-        const creditEl = document.createElement('span');
-        creditEl.className = 'alap-lightbox-credit';
-        if (creditUrl) {
-          const creditLink = document.createElement('a');
-          creditLink.href = creditUrl;
-          creditLink.target = '_blank';
-          creditLink.rel = 'noopener noreferrer';
-          creditLink.textContent = `Photo: ${credit}`;
-          creditEl.appendChild(creditLink);
-        } else {
-          creditEl.textContent = `Photo: ${credit}`;
-        }
-        titleRow.appendChild(creditEl);
-      }
-
-      body.appendChild(titleRow);
-    }
-
-    if (link.description) {
-      const desc = document.createElement('p');
-      desc.className = 'alap-lightbox-description';
-      desc.textContent = link.description;
-      body.appendChild(desc);
-    }
+    const desc = document.createElement('p');
+    desc.className = 'alap-lightbox-description';
+    body.appendChild(desc);
 
     const visitBtn = document.createElement('a');
-    visitBtn.href = link.url;
-    visitBtn.target = link.targetWindow ?? '_blank';
     visitBtn.rel = 'noopener noreferrer';
     visitBtn.className = 'alap-lightbox-visit';
     visitBtn.textContent = 'Visit';
     body.appendChild(visitBtn);
 
-    if (total > 1) {
-      const counter = document.createElement('span');
-      counter.className = 'alap-lightbox-counter';
-      counter.textContent = `${this.currentIndex + 1} / ${total}`;
-      body.appendChild(counter);
-    }
+    const counter = document.createElement('span');
+    counter.className = 'alap-lightbox-counter';
+    body.appendChild(counter);
 
     card.appendChild(body);
-    card.classList.add('fading');
     this.overlay.appendChild(card);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        card.classList.remove('fading');
-      });
-    });
 
-    // Navigation zones — hover areas flanking the card
-    if (total > 1) {
+    // Navigation zones
+    if (this.links.length > 1) {
       const prevZone = document.createElement('div');
       prevZone.className = 'alap-lightbox-nav alap-lightbox-nav-prev';
       const prevBtn = document.createElement('button');
@@ -220,21 +173,84 @@ export class AlapLightbox {
       nextZone.appendChild(nextBtn);
       this.overlay.appendChild(nextZone);
     }
+
+    this.update();
+  }
+
+  /** Swap only the dynamic content — no DOM destruction */
+  private update(): void {
+    if (!this.overlay) return;
+
+    const link = this.links[this.currentIndex];
+    const total = this.links.length;
+    const hasImage = !!(link.image || link.thumbnail);
+
+    const card = this.overlay.querySelector('.alap-lightbox-card') as HTMLElement;
+    const imageWrap = card.querySelector('.alap-lightbox-image-wrap') as HTMLElement;
+    const img = imageWrap.querySelector('.alap-lightbox-image') as HTMLImageElement;
+    const title = card.querySelector('.alap-lightbox-title') as HTMLElement;
+    const creditEl = card.querySelector('.alap-lightbox-credit') as HTMLElement;
+    const desc = card.querySelector('.alap-lightbox-description') as HTMLElement;
+    const visitBtn = card.querySelector('.alap-lightbox-visit') as HTMLAnchorElement;
+    const counter = card.querySelector('.alap-lightbox-counter') as HTMLElement;
+
+    // Image
+    if (hasImage) {
+      img.src = link.image ?? link.thumbnail!;
+      img.alt = link.altText ?? link.label ?? '';
+      img.style.display = '';
+      imageWrap.classList.remove('no-image');
+      card.style.background = '';
+    } else {
+      img.style.display = 'none';
+      imageWrap.classList.add('no-image');
+      card.style.background = 'transparent';
+    }
+
+    // Title
+    title.textContent = link.label ?? '';
+    title.title = link.label ?? '';
+
+    // Photo credit
+    const credit = link.meta?.photoCredit as string | undefined;
+    const creditUrl = link.meta?.photoCreditUrl as string | undefined;
+    creditEl.innerHTML = '';
+    if (credit && hasImage) {
+      if (creditUrl) {
+        const creditLink = document.createElement('a');
+        creditLink.href = creditUrl;
+        creditLink.target = '_blank';
+        creditLink.rel = 'noopener noreferrer';
+        creditLink.textContent = `Photo: ${credit}`;
+        creditEl.appendChild(creditLink);
+      } else {
+        creditEl.textContent = `Photo: ${credit}`;
+      }
+    }
+
+    // Description
+    desc.textContent = link.description ?? '';
+    desc.style.display = link.description ? '' : 'none';
+
+    // Visit
+    visitBtn.href = link.url;
+    visitBtn.target = link.targetWindow ?? '_blank';
+
+    // Counter
+    counter.textContent = total > 1 ? `${this.currentIndex + 1} / ${total}` : '';
   }
 
   private navigate(delta: number): void {
     const card = this.overlay?.querySelector('.alap-lightbox-card') as HTMLElement | null;
-    if (card) {
-      card.classList.add('fading');
-      const duration = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
-      setTimeout(() => {
-        this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
-        this.render();
-      }, duration);
-    } else {
+    if (!card) return;
+
+    card.classList.add('fading');
+    const duration = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
+    setTimeout(() => {
       this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
-      this.render();
-    }
+      this.update();
+      card.classList.remove('fading');
+    }, duration);
   }
 
   private onKeydown(e: KeyboardEvent): void {
