@@ -1,0 +1,197 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.alap-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.alap-lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.alap-lightbox-close:hover {
+  opacity: 1;
+}
+
+.alap-lightbox-card {
+  background: #1a1a2e;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90vw;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --alap-lightbox-transition: 0.125s;
+  transition: opacity var(--alap-lightbox-transition) ease;
+}
+
+.alap-lightbox-card.fading {
+  opacity: 0;
+}
+
+.alap-lightbox-card:has(.no-image) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.alap-lightbox-card:has(.no-image) .alap-lightbox-body {
+  background: rgba(26, 26, 46, 0.85);
+  border-radius: 0 0 12px 12px;
+}
+
+.alap-lightbox-image-wrap {
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+  position: relative;
+  background: #111;
+}
+
+.alap-lightbox-image-wrap.no-image {
+  background: transparent;
+}
+
+.alap-lightbox-credit {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.alap-lightbox-credit a {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+
+.alap-lightbox-credit a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.alap-lightbox-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.alap-lightbox-body {
+  padding: 0.75rem 1.5rem 1.5rem;
+}
+
+.alap-lightbox-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.alap-lightbox-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.alap-lightbox-title:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+.alap-lightbox-description {
+  margin: 0 0 1rem;
+  color: #aaa;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.alap-lightbox-visit {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0.5rem 1.25rem;
+  background: #3a86ff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.alap-lightbox-visit:hover {
+  background: #2d6fdb;
+}
+
+.alap-lightbox-counter {
+  display: block;
+  margin-top: 1rem;
+  color: #666;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.alap-lightbox-nav {
+  position: absolute;
+  top: calc(50% + 9.5rem);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.alap-lightbox-card:hover ~ .alap-lightbox-nav,
+.alap-lightbox-nav:hover {
+  opacity: 1;
+}
+
+.alap-lightbox-nav button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alap-lightbox-nav button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.alap-lightbox-nav-prev {
+  left: calc(50% - 340px);
+}
+
+.alap-lightbox-nav-next {
+  right: calc(50% - 340px);
+}

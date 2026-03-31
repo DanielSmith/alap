@@ -7,7 +7,7 @@ Welcome to the city guide. Click any highlighted link to see curated destination
 ## Coffee
 
 Start your morning at one of our {{< alap "@coffee" >}}favorite coffee spots{{< /alap >}}.
-If you're in the Bay Area, check the {{< alap "@sf_spots" >}}SF options{{< /alap >}} for more.
+If you're in the Bay Area, check the {{< alap ".coffee + .sf" >}}SF roasters{{< /alap >}} for more.
 
 ## Bridges
 
@@ -15,7 +15,7 @@ New York has some of the most iconic bridges in the world.
 Explore the {{< alap "@nyc_bridges" >}}NYC bridges{{< /alap >}}, or browse
 {{< alap "@all_bridges" >}}all bridges{{< /alap >}} across both cities.
 
-The {{< alap "brooklyn" >}}Brooklyn Bridge{{< /alap >}} alone is worth the trip.
+The {{< alap ".nyc + .landmark" >}}NYC landmarks{{< /alap >}} alone are worth the trip.
 
 ## Parks
 

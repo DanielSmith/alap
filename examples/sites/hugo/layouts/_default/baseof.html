@@ -13,7 +13,7 @@
   <nav>
     <a href="{{ "/" | relURL }}"{{ if eq .RelPermalink "/" }} class="active"{{ end }}>Guide</a>
     <a href="{{ "/bridges/" | relURL }}"{{ if eq .RelPermalink "/bridges/" }} class="active"{{ end }}>Bridges</a>
-    <a href="{{ "/food/" | relURL }}"{{ if eq .RelPermalink "/food/" }} class="active"{{ end }}>Food</a>
+    <a href="{{ "/coffee/" | relURL }}"{{ if eq .RelPermalink "/coffee/" }} class="active"{{ end }}>Coffee</a>
     <a href="{{ "/how-it-works/" | relURL }}"{{ if eq .RelPermalink "/how-it-works/" }} class="active"{{ end }}>How It Works</a>
   </nav>
   {{ block "main" . }}{{ end }}

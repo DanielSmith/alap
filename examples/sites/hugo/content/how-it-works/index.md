@@ -8,7 +8,7 @@ One shortcode, one job: wrap your text in an `<alap-link>` web component.
 
 <div class="example">
 <div class="source">
-<pre><code>{{</*/* alap ".coffee" */*/>}}cafes{{</*/* /alap */*/>}}</code></pre>
+<pre><code>{{</* alap ".coffee" */>}}cafes{{</*/* /alap */>}}</code></pre>
 </div>
 <div class="result">
 
@@ -25,7 +25,7 @@ For multi-config setups, pass `query` and `config` as named parameters:
 
 <div class="example">
 <div class="source">
-<pre><code>{{</*/* alap query=".coffee" config="docs" */*/>}}cafes{{</*/* /alap */*/>}}</code></pre>
+<pre><code>{{</* alap query=".coffee" config="docs" */>}}cafes{{</*/* /alap */>}}</code></pre>
 </div>
 <div class="result">
 

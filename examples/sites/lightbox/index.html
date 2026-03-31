@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Lightbox Renderer</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <p><a href="../../">&larr; All Examples</a></p>
+  <h1>Lightbox Renderer</h1>
+  <p>Same Alap config, different renderer. Click any link to open a
+    fullscreen lightbox instead of a dropdown menu.</p>
+
+  <h2>Bridges</h2>
+  <div class="example">
+    <p>Explore
+      <a class="alap" data-alap-linkitems=".bridge">all bridges</a>,
+      or just the
+      <a class="alap" data-alap-linkitems=".nyc + .bridge">NYC bridges</a>.
+    </p>
+    <p class="note">Links with thumbnails show image previews in the lightbox.</p>
+  </div>
+
+  <h2>Coffee</h2>
+  <div class="example">
+    <p>Browse
+      <a class="alap" data-alap-linkitems=".coffee">all coffee spots</a>,
+      or narrow to
+      <a class="alap" data-alap-linkitems=".coffee + .sf">SF roasters</a>
+      or
+      <a class="alap" data-alap-linkitems=".coffee + .portland">Portland roasters</a>.
+    </p>
+    <p class="note">Links without thumbnails show a text card with description.</p>
+  </div>
+
+  <h2>Landmarks</h2>
+  <div class="example">
+    <p>See the
+      <a class="alap" data-alap-linkitems=".landmark">major landmarks</a>
+      across both cities.
+    </p>
+  </div>
+
+  <h2>Favorites</h2>
+  <div class="example">
+    <p>My
+      <a class="alap" data-alap-linkitems="@favorites">personal favorites</a>
+      across all categories.
+    </p>
+  </div>
+
+  <h2>Expressions</h2>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=".nyc | .sf - .coffee">NYC and SF, minus coffee</a>
+      &mdash; same expression language, different presentation.
+    </p>
+  </div>
+
+  <hr>
+
+  <h1>Same Config, Menu Renderer</h1>
+  <p>The links below use the exact same config object, but render with the
+    standard <code>AlapUI</code> dropdown menu. The only difference is one line
+    of code: <code>new AlapUI(config)</code> instead of
+    <code>new AlapLightbox(config)</code>.</p>
+
+  <h2>Bridges (menu)</h2>
+  <div class="example">
+    <p>Explore
+      <a class="alap-menu" data-alap-linkitems=".bridge">all bridges</a>,
+      or just the
+      <a class="alap-menu" data-alap-linkitems=".nyc + .bridge">NYC bridges</a>.
+    </p>
+  </div>
+
+  <h2>Coffee (menu)</h2>
+  <div class="example">
+    <p>Browse
+      <a class="alap-menu" data-alap-linkitems=".coffee">all coffee spots</a>,
+      or narrow to
+      <a class="alap-menu" data-alap-linkitems=".coffee + .sf">SF roasters</a>
+      or
+      <a class="alap-menu" data-alap-linkitems=".coffee + .portland">Portland roasters</a>.
+    </p>
+  </div>
+
+  <h2>Landmarks (menu)</h2>
+  <div class="example">
+    <p>See the
+      <a class="alap-menu" data-alap-linkitems=".landmark">major landmarks</a>
+      across both cities.
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
