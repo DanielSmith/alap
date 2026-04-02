@@ -60,6 +60,21 @@ export interface AlapDirectiveValue {
   padding?: number;
 }
 
+// --- Menu coordinator (module-level singleton — all x-alap directives share it) ---
+
+const menuListeners = new Map<string, () => void>();
+
+function subscribeMenu(id: string, close: () => void): () => void {
+  menuListeners.set(id, close);
+  return () => { menuListeners.delete(id); };
+}
+
+function notifyMenuOpen(id: string): void {
+  for (const [listenerId, close] of menuListeners) {
+    if (listenerId !== id) close();
+  }
+}
+
 // --- Shared menu container ---
 
 const MENU_STYLES = `
@@ -97,6 +112,13 @@ export function alapPlugin(Alpine: AlpineInstance): void {
     let engine: AlapEngine | null = null;
     let currentConfig: AlapConfig | null = null;
     let intersectionObserver: IntersectionObserver | null = null;
+
+    // Coordinator: close this menu when another opens
+    const uid = Math.random().toString(36).slice(2, 8);
+    const unsubscribe = subscribeMenu(uid, () => {
+      if (isOpen) closeMenu();
+    });
+    cleanup(unsubscribe);
 
     // --- Helpers ---
 
@@ -192,6 +214,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         menu.style.left = `${rect.left + window.scrollX}px`;
       }
 
+      notifyMenuOpen(uid);
       menu.setAttribute('aria-hidden', 'false');
       el.setAttribute('aria-expanded', 'true');
       isOpen = true;

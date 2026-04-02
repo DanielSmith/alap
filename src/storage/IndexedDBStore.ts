@@ -19,7 +19,7 @@ import type { AlapConfig } from '../core/types';
 import type { ConfigStore, ConfigEntry, ConfigMeta } from './ConfigStore';
 
 const DB_NAME = 'alap-editor';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'configs';
 
 /**
@@ -39,9 +39,19 @@ export async function createIndexedDBStore(
   dbName = DB_NAME,
 ): Promise<ConfigStore> {
   const db: IDBPDatabase = await openDB(dbName, DB_VERSION, {
-    upgrade(database) {
+    upgrade(database, oldVersion) {
       if (!database.objectStoreNames.contains(STORE_NAME)) {
         database.createObjectStore(STORE_NAME);
+      }
+      if (oldVersion < 2) {
+        if (!database.objectStoreNames.contains('siteRules')) {
+          database.createObjectStore('siteRules');
+        }
+        if (!database.objectStoreNames.contains('metaSnapshots')) {
+          const snapshots = database.createObjectStore('metaSnapshots', { autoIncrement: true });
+          snapshots.createIndex('by_url', 'url');
+          snapshots.createIndex('by_url_checksum', ['url', 'checksum']);
+        }
       }
     },
   });

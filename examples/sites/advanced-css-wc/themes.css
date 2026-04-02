@@ -43,20 +43,20 @@
 /* --- Auto dark mode --- */
 
 .auto-dark-section {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  color: #1e293b;
+  background: #152570;
+  border-color: #2e48a0;
+  color: #f0f2ff;
 }
-.auto-dark-section .note { color: #64748b; }
+.auto-dark-section .note { color: #7888b8; }
 
 .auto-dark-section alap-link {
-  color: #2563eb;
-  --alap-bg: #ffffff;
-  --alap-border: #e5e7eb;
-  --alap-text: #1a1a1a;
-  --alap-hover-bg: #eff6ff;
-  --alap-hover-text: #2563eb;
-  --alap-focus-ring: #2563eb;
+  color: #88bbff;
+  --alap-bg: #2240a8;
+  --alap-border: #4470cc;
+  --alap-text: #f0f2ff;
+  --alap-hover-bg: #3366d6;
+  --alap-hover-text: #ffd666;
+  --alap-focus-ring: #ffd666;
   --alap-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --alap-radius: 10px;
 }
@@ -163,29 +163,29 @@
 /* --- Brutalist --- */
 
 .brutalist-section {
-  background: #000000;
-  border-color: #ffffff;
+  background: #152570;
+  border-color: #ffd666;
 }
 
 .brutalist-section alap-link {
-  color: #ffffff;
+  color: #ffd666;
   font-weight: 700;
-  --alap-bg: #000000;
-  --alap-border: #ffffff;
+  --alap-bg: #152570;
+  --alap-border: #ffd666;
   --alap-border-width: 3px;
-  --alap-text: #ffffff;
-  --alap-hover-bg: #ffffff;
-  --alap-hover-text: #000000;
+  --alap-text: #f0f2ff;
+  --alap-hover-bg: #ffd666;
+  --alap-hover-text: #1a2f8a;
   --alap-corner-shape: straight;
   --alap-radius: 0;
   --alap-text-transform: uppercase;
   --alap-letter-spacing: 0.1em;
   --alap-font-weight: 700;
-  --alap-shadow: 8px 8px 0 #ffffff;
-  --alap-focus-ring: #ffffff;
+  --alap-shadow: 8px 8px 0 #ffd666;
+  --alap-focus-ring: #ffd666;
 }
 
-.brutalist-section alap-link:hover { color: #999999; }
+.brutalist-section alap-link:hover { color: #ffe8a0; }
 
 /* --- Focus customization --- */
 

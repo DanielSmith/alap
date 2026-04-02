@@ -19,7 +19,7 @@
   import { AlapEngine } from '../../core/AlapEngine';
   import type { AlapConfig } from '../../core/types';
   import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-  import type { AlapContextValue } from './context';
+  import { createMenuCoordinator, type AlapContextValue } from './context';
 
   const ALAP_KEY = Symbol.for('alap');
 
@@ -35,6 +35,7 @@
   let { children } = $derived(props);
 
   const engine = new AlapEngine(untrack(() => props.config));
+  const menuCoordinator = createMenuCoordinator();
 
   // Keep engine in sync when config changes
   $effect(() => {
@@ -43,6 +44,7 @@
 
   const ctx: AlapContextValue = {
     engine,
+    menuCoordinator,
     get config() { return props.config; },
     get menuTimeout() {
       return props.menuTimeout

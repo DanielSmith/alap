@@ -50,9 +50,49 @@ pre {
 a:not(alap-link) { color: #ffe8a0; }
 a:not(alap-link):hover { color: #ffd666; }
 
-/* --- Alap menu styling --- */
+/* --- Alap trigger styling --- */
+a.alap { color: #88bbff; text-decoration: underline; cursor: pointer; }
+a.alap:hover { color: #ffd666; }
+
 alap-link { color: #88bbff; text-decoration: underline; cursor: pointer; }
 alap-link:hover { color: #ffd666; }
+
+/* --- DOM adapter menu --- */
+.alapelem {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.alapelem ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.alapelem li { margin: 0; padding: 0; }
+
+.alapelem a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.alapelem a:hover,
+.alapelem a:focus {
+  background: #3366d6;
+  color: #ffd666;
+  outline: none;
+}
+
+/* --- Web component menu styling --- */
 
 alap-link::part(menu) {
   background: #2240a8;

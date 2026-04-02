@@ -549,5 +549,13 @@ export const atprotoHandler: GenerateHandler = async (segments, config) => {
   const protocol = config.protocols?.atproto;
   const accessJwt = protocol?.accessJwt as string | undefined;
 
-  return handler(positional, named, accessJwt, config);
+  const links = await handler(positional, named, accessJwt, config);
+
+  for (const link of links) {
+    link.cssClass = link.cssClass ? `${link.cssClass} source_atproto` : 'source_atproto';
+    if (!link.meta) link.meta = {};
+    link.meta.source = 'atproto';
+  }
+
+  return links;
 };

@@ -234,6 +234,22 @@ Then use the alias in expressions: `:atproto:people:open_source:limit=5:`. Singl
 
 A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](../../examples/sites/bluesky-atproto/combined.html) for a live demo.
 
+### Source indicators
+
+Both `:web:` and `:atproto:` automatically tag every link they produce:
+
+- **`cssClass`** — `source_web` or `source_atproto` is appended to each link's CSS class. Static `allLinks` items carry no source class.
+- **`meta.source`** — set to `'web'` or `'atproto'` for programmatic access.
+
+This lets you visually distinguish where each menu item came from in mixed-source menus:
+
+```css
+.alapListElem.source_web     { border-left: 3px solid #f0a050; }
+.alapListElem.source_atproto { border-left: 3px solid #66cc88; }
+```
+
+The `meta.source` field is also available in hooks like `onItemHover` for displaying provenance tooltips.
+
 See the [bluesky-atproto example](../../examples/sites/bluesky-atproto/) (`examples/sites/bluesky-atproto/`).
 
 ## Custom protocols

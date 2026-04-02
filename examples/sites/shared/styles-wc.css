@@ -1,0 +1,73 @@
+/**
+ * Copyright 2026 Daniel Smith
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Base theme for <alap-link> web component examples.
+ *
+ * All styling goes through CSS custom properties — the Shadow DOM
+ * reads these from the host element. No ::part() needed for basics.
+ *
+ * Exposed parts (for advanced per-element overrides):
+ *   ::part(menu)    — the menu container
+ *   ::part(list)    — the <ul>/<ol>
+ *   ::part(item)    — each <li>
+ *   ::part(link)    — each <a> inside a <li>
+ *   ::part(image)   — <img> inside a link (when config has image field)
+ *
+ * Import shared/styles.css first for page chrome (body, headings, code, nav),
+ * then this file for the web component menu defaults.
+ */
+
+/* --- Trigger element --- */
+
+alap-link {
+  color: #88bbff;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+alap-link:hover {
+  color: #ffd666;
+}
+
+/* --- Menu: custom properties (blue theme) --- */
+
+alap-link {
+  /* Container */
+  --alap-bg: #2240a8;
+  --alap-border: #4470cc;
+  --alap-radius: 6px;
+  --alap-gap: 0.5rem;
+  --alap-min-width: 200px;
+  --alap-font: 'DM Sans', system-ui, sans-serif;
+
+  /* Menu items */
+  --alap-text: #f0f2ff;
+  --alap-font-size: 0.9rem;
+  --alap-padding: 0.5rem 1rem;
+
+  /* Hover state */
+  --alap-hover-bg: #3366d6;
+  --alap-hover-text: #ffd666;
+
+  /* Focus state */
+  --alap-focus-ring: #ffd666;
+
+  /* Scrollbar (for long menus) */
+  --alap-scrollbar-color: #4470cc transparent;
+  --alap-scrollbar-thumb: #4470cc;
+}

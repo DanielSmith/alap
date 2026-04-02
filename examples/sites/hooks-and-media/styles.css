@@ -1,61 +1,4 @@
-/**
- * Copyright 2026 Daniel Smith — Apache 2.0
- */
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
-
-/* --- Base layout --- */
-
-body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-  max-width: 720px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  line-height: 1.6;
-  color: #f0f2ff;
-  background: #1a2f8a;
-}
-
-h1 { font-size: 1.5rem; margin-bottom: 0.25rem; color: #ffd666; }
-h2 { font-size: 1.15rem; margin-top: 2rem; color: #ffe8a0; }
-
-.example {
-  background: #2240a8;
-  border: 1px solid #2e48a0;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin: 0.75rem 0;
-}
-
-.note { font-size: 0.85rem; color: #7888b8; margin-top: 0.5rem; }
-
-code, kbd {
-  font-family: 'JetBrains Mono', 'SF Mono', monospace;
-  background: #1a2870;
-  color: #88bbff;
-  padding: 0.15rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.9em;
-}
-
-kbd {
-  border: 1px solid #4470cc;
-  box-shadow: 0 1px 0 #2e48a0;
-}
-
-/* --- Alap trigger links --- */
-
-a.alap {
-  color: #88bbff;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-
-a.alap:hover {
-  color: #ffd666;
-}
+@import '/shared/styles.css';
 
 /* --- Image trigger --- */
 
@@ -116,35 +59,15 @@ a.alap:hover {
   pointer-events: none;
 }
 
-/* --- Alap menu base styles --- */
+/* --- Menu overrides --- */
 
-.alapelem {
-  background: #2240a8;
+kbd {
   border: 1px solid #4470cc;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  margin-top: 0.5rem;
+  box-shadow: 0 1px 0 #2e48a0;
 }
 
-.alapelem ul {
-  list-style: none;
-  margin: 0;
-  padding: 0.25rem 0;
-}
-
-.alapelem a[role="menuitem"] {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #f0f2ff;
-  text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
-  outline: none;
-}
-
-.alapelem a[role="menuitem"]:hover,
-.alapelem a[role="menuitem"]:focus {
-  background: #3366d6;
-  color: #ffd666;
+a.alap {
+  text-decoration-style: dotted;
 }
 
 /* Image menu items */

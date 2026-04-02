@@ -134,3 +134,8 @@ details.src pre { margin: 0.4em 0 0 0; font-size: 0.8em; }
 .source_static { color: #88bbff; }
 .source_web { color: #f0a050; }
 .source_atproto { color: #66cc88; }
+
+/* Menu item source indicators (left border) */
+.alapListElem.source_web { border-left: 3px solid #f0a050; }
+.alapListElem.source_atproto { border-left: 3px solid #66cc88; }
+/* Static items have no source class — no border (clean default) */

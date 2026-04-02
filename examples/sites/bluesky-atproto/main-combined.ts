@@ -66,7 +66,7 @@ async function init() {
   // Load config source into the collapsible code block
   const configEl = document.getElementById('config-source');
   if (configEl) {
-    fetch('./config-combined.ts').then(r => r.text()).then(text => { configEl.textContent = text; });
+    import('./config-combined.ts?raw').then(m => { configEl.textContent = m.default; });
   }
 }
 

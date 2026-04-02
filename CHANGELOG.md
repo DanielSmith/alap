@@ -4,6 +4,43 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### Fix: Menu dismiss across all adapters (2026-04-01)
+
+- Vue, Svelte, Solid, and Alpine adapters now close the previous menu when a new one opens
+- Added `MenuCoordinator` (subscribe/notifyOpen pattern) to Vue, Svelte, and Solid, matching the existing React implementation
+- Alpine uses a module-level singleton coordinator (no provider to scope to)
+- DOM adapter (`AlapUI`): click-outside dismiss now uses `document` instead of `document.body` — clicks in the page margin outside the content area now correctly close the menu
+- Affected files: `src/ui/vue/`, `src/ui/svelte/`, `src/ui/solid/`, `src/ui/alpine/`, `src/ui/dom/AlapUI.ts`
+
+### Client-side metadata extraction for editors (2026-04-01)
+
+- Ported TTT's metadata extraction pipeline to Alap editors as a self-contained client-side module
+- Multi-strategy support: html_scrape, oEmbed (YouTube, Vimeo, Spotify, TikTok, Twitter/X), JSON API (Reddit)
+- IndexedDB stores for site rules (seeded with 9 domains) and metadata snapshots (checksum dedup)
+- Replaces ad-hoc `fetch('/api/meta')` + inline tag normalization in all 8 editors
+- 135 tests ported from TTT covering meta-rules, fetch-strategy, and html-scrape
+- New files in `editors/shared/meta/`: meta-rules, fetch-strategy, html-scrape, seed-rules, meta-store, meta-client
+
+### Protocol source indicators (2026-04-01)
+
+- `:web:` and `:atproto:` handlers now auto-tag every link with `cssClass` (`source_web`, `source_atproto`) and `meta.source`
+- Enables visual provenance in mixed-source menus (colored left borders, tooltips via hooks)
+- Static `allLinks` items carry no source class — clean default
+- Documented in `docs/core-concepts/protocols.md`
+
+### Examples site consolidation (2026-04-01, in progress)
+
+- Shared CSS base at `examples/sites/shared/styles.css` (dark blue theme)
+- Shared WC theme at `examples/sites/shared/styles-wc.css` (custom properties)
+- Gallery index page at `examples/sites/index.html`
+- Single Vite config at `examples/sites/vite.config.ts` for multi-entry build with shared chunks
+- Updated all examples to use `/shared/styles.css` instead of duplicated local copies
+- Replaced Wikipedia hotlinked images with local copies in `shared/img/`
+- Named window navigation: gallery is `alapDemo`, examples open in `alapDemoExample`
+- Advanced CSS examples (DOM + WC) remapped to blue palette
+- CDN example: added `.alapelem` DOM adapter menu styling
+- GitHub repos and JSONPlaceholder added as fallback `:web:` APIs for testing
+
 ### Lightbox Renderer (2026-03-31)
 
 - Alternate renderer in `src/ui-lightbox/` — presents resolved links as a fullscreen lightbox/carousel instead of a dropdown menu

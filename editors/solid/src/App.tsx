@@ -30,6 +30,7 @@ import { LoadPanel } from './components/LoadPanel';
 import { SettingsDialog } from './components/SettingsDialog';
 import { HelpDialog } from './components/HelpDialog';
 import { StatusBar } from './components/StatusBar';
+import { extractMetadata } from '../../shared/meta';
 
 function CenterPanel() {
   const style = (): JSX.CSSProperties => ({
@@ -165,45 +166,16 @@ export default function App() {
       editor.updateItem(id, { label: hostname, url, tags: [hostname.replace(/\./g, '_')] });
       editor.setStatus(`Dropped: ${hostname}`);
 
-      fetch(`/api/meta?url=${encodeURIComponent(url)}`)
-        .then((res) => res.json())
-        .then((meta: {
-          title?: string; description?: string; images?: string[];
-          keywords?: string[]; articleTags?: string[]; articleSection?: string;
-          siteName?: string; type?: string; canonicalUrl?: string; locale?: string;
-        }) => {
+      extractMetadata(url)
+        .then((fields) => {
           const updates: Record<string, unknown> = {};
-          if (meta.title) updates.label = meta.title;
-          if (meta.description) updates.description = meta.description;
-          if (meta.images?.length) updates.thumbnail = meta.images[0];
-          if (meta.canonicalUrl) updates.url = meta.canonicalUrl;
-
-          // Build tags from all available sources
-          const hostTag = hostname.replace(/\./g, '_');
-          const seen = new Set<string>();
-          const tags: string[] = [];
-
-          function addTag(raw: string) {
-            for (const part of raw.split(',')) {
-              const normalized = part.trim().toLowerCase().replace(/\s+/g, '_');
-              if (normalized && !seen.has(normalized)) {
-                seen.add(normalized);
-                tags.push(normalized);
-              }
-            }
-          }
-
-          addTag(hostTag);
-          if (meta.siteName) addTag(meta.siteName);
-          if (meta.type) addTag(meta.type);
-          if (meta.articleSection) addTag(meta.articleSection);
-          for (const k of meta.keywords ?? []) addTag(k);
-          for (const t of meta.articleTags ?? []) addTag(t);
-          if (meta.locale) addTag(meta.locale.replace(/-/g, '_'));
-          updates.tags = tags;
-
+          if (fields.title) updates.label = fields.title;
+          if (fields.description) updates.description = fields.description;
+          if (fields.thumbnail) updates.thumbnail = fields.thumbnail;
+          if (fields.canonicalUrl) updates.url = fields.canonicalUrl;
+          if (fields.tags.length) updates.tags = fields.tags;
           editor.updateItem(id, updates);
-          editor.setStatus(`Updated: ${meta.title ?? hostname}`);
+          editor.setStatus(`Updated: ${fields.title ?? hostname}`);
         })
         .catch(() => {});
     }

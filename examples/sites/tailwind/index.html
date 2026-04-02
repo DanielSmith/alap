@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#1a2f8a">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,22 +7,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased">
+<body class="bg-[#1a2f8a] text-[#f0f2ff] antialiased">
   <div class="max-w-2xl mx-auto py-10 px-4">
-    <p class="mb-4"><a href="../../" class="text-blue-600 hover:text-blue-800">&larr; All Examples</a></p>
-    <h1 class="text-2xl font-bold mb-2">Alap v3 — Tailwind CSS</h1>
-    <p class="text-gray-600 mb-8">Page layout uses Tailwind utilities. Alap menus are styled with plain CSS using Tailwind's design tokens (colors, radii, shadows).</p>
+    <p class="mb-4"><a href="/" target="alapDemo" class="text-[#ffe8a0] hover:text-[#ffd666]">&larr; Examples Gallery</a></p>
+    <h1 class="text-2xl font-bold mb-2 text-[#ffd666]">Alap v3 — Tailwind CSS</h1>
+    <p class="text-[#b8c4e8] mb-8">Page layout uses Tailwind utilities. Alap menus are styled with plain CSS using Tailwind's design tokens (colors, radii, shadows).</p>
 
     <!-- DEFAULT -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">Default Menu</h2>
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">Default Menu</h2>
+      <div class="bg-[#2240a8] rounded-lg border border-[#2e48a0] p-4">
         <p>My favorite
-          <a id="cars" class="alap text-blue-600 underline cursor-pointer" data-alap-linkitems="@cars">cars</a>
+          <a id="cars" class="alap text-[#88bbff] underline cursor-pointer" data-alap-linkitems="@cars">cars</a>
           &mdash; base styles using Tailwind color values.
         </p>
       </div>
-      <pre class="mt-2 bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">.alapelem {
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alapelem {
   background: #ffffff;
   border: 1px solid #e5e7eb;      /* gray-200 */
   border-radius: 0.5rem;          /* rounded-lg */
@@ -36,14 +36,14 @@
 
     <!-- GREEN ACCENT -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">Green Accent (Bridges)</h2>
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">Green Accent (Bridges)</h2>
+      <div class="bg-[#2240a8] rounded-lg border border-[#2e48a0] p-4">
         <p>Famous
-          <a id="bridges" class="alap text-blue-600 underline cursor-pointer" data-alap-linkitems=".bridge">bridges</a>
+          <a id="bridges" class="alap text-[#88bbff] underline cursor-pointer" data-alap-linkitems=".bridge">bridges</a>
           &mdash; green tint with bigger top offset.
         </p>
       </div>
-      <pre class="mt-2 bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">.alap_bridges {
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_bridges {
   margin-top: 1rem;
   background: #f0fdf4;            /* green-50 */
   border-color: #86efac;          /* green-300 */
@@ -56,14 +56,14 @@
 
     <!-- WARM TONES + OFFSET -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">Warm Tones + Left Offset (Coffee)</h2>
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">Warm Tones + Left Offset (Coffee)</h2>
+      <div class="bg-[#2240a8] rounded-lg border border-[#2e48a0] p-4">
         <p>Find some
-          <a id="coffee" class="alap text-blue-600 underline cursor-pointer" data-alap-linkitems=".coffee">coffee</a>
-          &mdash; amber palette, shifted right with <code class="bg-gray-100 px-1 rounded text-xs">margin-left: 2rem</code>.
+          <a id="coffee" class="alap text-[#88bbff] underline cursor-pointer" data-alap-linkitems=".coffee">coffee</a>
+          &mdash; amber palette, shifted right with <code class="bg-[#1a2870] px-1 rounded text-xs text-[#88bbff]">margin-left: 2rem</code>.
         </p>
       </div>
-      <pre class="mt-2 bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">.alap_coffee {
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_coffee {
   margin-left: 2rem;
   background: #fffbeb;            /* amber-50 */
   border-color: #fcd34d;          /* amber-300 */
@@ -76,14 +76,14 @@
 
     <!-- DARK THEME -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">Dark Theme (NYC)</h2>
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">Dark Theme (NYC)</h2>
+      <div class="bg-[#2240a8] rounded-lg border border-[#2e48a0] p-4">
         <p>Explore
-          <a id="nycspots" class="alap text-blue-600 underline cursor-pointer" data-alap-linkitems=".nyc">NYC spots</a>
+          <a id="nycspots" class="alap text-[#88bbff] underline cursor-pointer" data-alap-linkitems=".nyc">NYC spots</a>
           &mdash; slate background, light text.
         </p>
       </div>
-      <pre class="mt-2 bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">.alap_nycspots {
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_nycspots {
   background: #1e293b;            /* slate-800 */
   border-color: #334155;          /* slate-700 */
 }
@@ -98,14 +98,14 @@
 
     <!-- PILL STYLE -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">Pill Style (SF)</h2>
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">Pill Style (SF)</h2>
+      <div class="bg-[#2240a8] rounded-lg border border-[#2e48a0] p-4">
         <p>Check out
-          <a id="sfspots" class="alap text-blue-600 underline cursor-pointer" data-alap-linkitems=".sf">SF spots</a>
+          <a id="sfspots" class="alap text-[#88bbff] underline cursor-pointer" data-alap-linkitems=".sf">SF spots</a>
           &mdash; rounded pill shape with indigo accent.
         </p>
       </div>
-      <pre class="mt-2 bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">.alap_sfspots {
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_sfspots {
   border-radius: 1rem;            /* rounded-2xl */
   border: 2px solid #c7d2fe;      /* indigo-200 */
   background: #eef2ff;            /* indigo-50 */
@@ -116,8 +116,8 @@
 
     <!-- PATTERN SUMMARY -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">The Pattern</h2>
-      <pre class="bg-slate-800 text-slate-200 p-4 rounded-lg text-xs overflow-x-auto leading-relaxed">/* 1. Base — all menus */
+      <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">The Pattern</h2>
+      <pre class="bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* 1. Base — all menus */
 .alapelem { ... }
 
 /* 2. Per-anchor — menu gets alap_{anchorId} */

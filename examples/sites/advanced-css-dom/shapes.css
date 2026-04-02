@@ -61,7 +61,7 @@
 /* --- Pill items --- */
 
 .alap_sp-item-pill {
-  background: #f8fafc;
+  background: #2952c0;
 }
 
 .alap_sp-item-pill ul {
@@ -74,7 +74,13 @@
 
 .alap_sp-item-pill a {
   border-radius: 999px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #4470cc;
+  color: #f0f2ff;
+}
+
+.alap_sp-item-pill a:hover {
+  background: #3366d6;
+  border-color: #ffd666;
 }
 
 /* --- Sale tag --- */

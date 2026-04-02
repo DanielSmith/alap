@@ -242,6 +242,8 @@ export function metaGrabberPlugin(): Plugin {
           return;
         }
 
+        const rawMode = url.searchParams.get('raw') === 'true';
+
         try {
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 5000);
@@ -253,6 +255,16 @@ export function metaGrabberPlugin(): Plugin {
           clearTimeout(timeout);
 
           const text = (await response.text()).slice(0, 100_000);
+
+          if (rawMode) {
+            res.writeHead(200, {
+              'Content-Type': 'text/html; charset=utf-8',
+              'Cache-Control': 'no-store',
+            });
+            res.end(text);
+            return;
+          }
+
           const meta = extractMeta(text, parsed.hostname);
 
           res.writeHead(200, {
@@ -261,6 +273,12 @@ export function metaGrabberPlugin(): Plugin {
           });
           res.end(JSON.stringify(meta));
         } catch {
+          if (rawMode) {
+            res.writeHead(502, { 'Content-Type': 'text/plain' });
+            res.end('Fetch failed');
+            return;
+          }
+
           const fallback: MetaResult = {
             title: parsed.hostname,
             description: '',

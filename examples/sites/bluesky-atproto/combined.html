@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#1a2f8a">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alap v3 — Three Sources, One Menu</title>
-  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="/shared/styles.css">
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body>
+<body class="loaded">
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
   <h1>Three Sources, One Menu</h1>
   <p>
     One Alap expression can pull data from three completely different sources
@@ -96,6 +97,27 @@
    data-alap-linkitems=".orgs | :web:books:decentralization: | :atproto:feed:eff.org:limit=2:"
 &gt;Union: orgs | books | EFF posts&lt;/a&gt;</code></pre>
   </details>
+
+  <h2>GitHub Repos (test — :web: with alternate API)</h2>
+  <p class="note">Uses GitHub search API instead of Open Library. Verifies <code>:web:</code> protocol works when the upstream API is available.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:decentralization:">Decentralized protocol repos</a>
+      — GitHub stars
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:architecture:">Architecture/design system repos</a>
+      — GitHub stars
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:coffee:">Coffee repos</a>
+      — GitHub stars
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.orgs *limit:2*), (:web:repos:decentralization:), (:atproto:feed:eff.org:limit=3:)">Mixed: orgs + GitHub repos + EFF posts</a>
+      — three sources, one menu
+    </p>
+  </div>
 
   <h2>Config</h2>
   <p class="note">

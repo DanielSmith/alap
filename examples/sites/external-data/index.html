@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#1a2f8a">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alap v3 — External Data</title>
-  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="/shared/styles.css">
   <style>
     body:not(.loaded) .example { opacity: 0.5; }
     body.loaded .example { opacity: 1; transition: opacity 0.3s; }
@@ -20,7 +20,7 @@
   </style>
 </head>
 <body>
-  <p><a href="../../">&larr; All Examples</a></p>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
   <h1>Alap v3 — External Data</h1>
   <p>
     The <code>:web:</code> protocol fetches data from APIs and turns it into
@@ -59,6 +59,32 @@
     <p>
       <a class="alap" data-alap-linkitems=":web:books:gardening:">Gardening books</a>
       — search alias: <code>"vegetable garden organic"</code>
+    </p>
+  </div>
+
+  <h2>External Only (GitHub API)</h2>
+  <p class="note">Same <code>:web:</code> protocol, different API. GitHub search repos.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:javascript:">Top JavaScript repos</a>
+      — sorted by stars
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:rust:">Top Rust repos</a>
+      — sorted by stars
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":web:repos:css:">CSS frameworks</a>
+      — sorted by stars
+    </p>
+  </div>
+
+  <h2>External Only (JSONPlaceholder)</h2>
+  <p class="note">Fake REST API — always available, good for testing.</p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":web:posts:recent:">Recent posts</a>
+      — first 8 posts
     </p>
   </div>
   <pre><code>protocols: {

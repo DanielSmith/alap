@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#1a2f8a">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <p><a href="../../">&larr; All Examples</a></p>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
   <h1>Alap v3 — Hooks &amp; Media</h1>
   <p>Event hooks, image triggers, image menu items, hover previews, and context popups.</p>
 
@@ -18,7 +18,7 @@
     <p>Click the photo to open a menu. The menu appears at the click coordinates.</p>
     <img id="ggbridge" class="alap trigger-img"
          data-alap-linkitems=".sf"
-         src="../../img/golden-gate.jpg"
+         src="/shared/img/golden-gate.jpg"
          alt="Golden Gate Bridge"
          width="320">
   </div>
@@ -30,12 +30,12 @@
     <p>Any element can be an Alap trigger — not just <code>&lt;a&gt;</code> tags.</p>
     <div class="card-row">
       <div id="bridgecard" class="alap trigger-card" data-alap-linkitems=".bridge">
-        <img src="../../img/brooklyn-bridge.jpg" alt="Brooklyn Bridge" width="200">
+        <img src="/shared/img/brooklyn-bridge.jpg" alt="Brooklyn Bridge" width="200">
         <strong>Bridges</strong>
         <span>3 destinations</span>
       </div>
       <div id="sfcard" class="alap trigger-card" data-alap-linkitems=".sf">
-        <img src="../../img/sf-victorians.jpg" alt="SF Victorian houses" width="200">
+        <img src="/shared/img/sf-victorians.jpg" alt="SF Victorian houses" width="200">
         <strong>San Francisco</strong>
         <span>4 destinations</span>
       </div>
@@ -78,7 +78,7 @@
     <p>Image trigger + image menu items + hover preview + context popup:</p>
     <img id="chainimg" class="alap trigger-img"
          data-alap-linkitems="goldengate, brooklyn, paintedladies"
-         src="../../img/chain-links.jpg"
+         src="/shared/img/chain-links.jpg"
          alt="Chain links"
          width="280">
     <p class="note">Click the image, hover items for preview, right-click for detail.</p>

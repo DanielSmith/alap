@@ -61,6 +61,20 @@ export const combinedConfig: AlapConfig = {
             meta: { author: 'author_name.0', year: 'first_publish_year' },
           },
         },
+        repos: {
+          url: 'https://api.github.com/search/repositories',
+          searches: {
+            decentralization: { q: 'decentralized protocol', sort: 'stars', per_page: 3 },
+            architecture:     { q: 'architecture design system', sort: 'stars', per_page: 3 },
+            nature:           { q: 'nature conservation', sort: 'stars', per_page: 3 },
+            coffee:           { q: 'coffee brewing', sort: 'stars', per_page: 3 },
+          },
+          map: {
+            label: 'full_name',
+            url: 'html_url',
+            meta: { stars: 'stargazers_count', language: 'language' },
+          },
+        },
       },
     },
     atproto: {

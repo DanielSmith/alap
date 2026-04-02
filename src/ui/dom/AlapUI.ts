@@ -142,8 +142,8 @@ export class AlapUI {
   }
 
   private bindGlobalEvents(): void {
-    document.body.addEventListener('click', this.handleBodyClick);
-    document.body.addEventListener('keydown', this.handleBodyKeydown);
+    document.addEventListener('click', this.handleBodyClick);
+    document.addEventListener('keydown', this.handleBodyKeydown);
   }
 
   // --- Trigger handling ---
@@ -482,8 +482,8 @@ export class AlapUI {
   /** Clean up all event listeners and remove the menu container */
   destroy(): void {
     this.closeMenu();
-    document.body.removeEventListener('click', this.handleBodyClick);
-    document.body.removeEventListener('keydown', this.handleBodyKeydown);
+    document.removeEventListener('click', this.handleBodyClick);
+    document.removeEventListener('keydown', this.handleBodyKeydown);
     if (this.container) {
       this.container.remove();
       this.container = null;

@@ -80,15 +80,15 @@
 /* --- Brutalist --- */
 
 .alap_th-brutal {
-  background: #ffffff;
-  border: 2px solid #000000;
+  background: #152570;
+  border: 2px solid #ffd666;
   border-radius: 0;
-  box-shadow: 6px 6px 0 #000000;
+  box-shadow: 6px 6px 0 #ffd666;
 }
 .alap_th-brutal a {
-  color: #000000;
+  color: #f0f2ff;
   font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #2e48a0;
 }
 .alap_th-brutal a:last-child {
   border-bottom: none;
@@ -102,16 +102,16 @@
 /* --- Warm / Editorial --- */
 
 .alap_th-warm {
-  background: #fffbeb;
-  border-color: #d97706;
-  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
+  background: #2952c0;
+  border-color: #ffd666;
+  box-shadow: 0 4px 16px rgba(255, 214, 102, 0.15);
   border-radius: 8px;
 }
 .alap_th-warm a {
-  color: #92400e;
+  color: #ffe8a0;
 }
 .alap_th-warm a:hover,
 .alap_th-warm a:focus-visible {
-  background: #fef3c7;
-  color: #b45309;
+  background: #3366d6;
+  color: #ffd666;
 }

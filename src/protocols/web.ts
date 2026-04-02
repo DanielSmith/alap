@@ -248,7 +248,12 @@ export const webHandler: GenerateHandler = async (segments, config) => {
 
   for (let i = 0; i < limit; i++) {
     const link = mapToLink(items[i], keyConfig.map, keyConfig.linkBase);
-    if (link) links.push(link);
+    if (link) {
+      link.cssClass = link.cssClass ? `${link.cssClass} source_web` : 'source_web';
+      if (!link.meta) link.meta = {};
+      link.meta.source = 'web';
+      links.push(link);
+    }
   }
 
   return links;

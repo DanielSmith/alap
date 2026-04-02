@@ -52,9 +52,9 @@
   --alap-radius: 12px;
   --alap-border-width: 2px;
   --alap-border: #6366f1;
-  --alap-bg: #eef2ff;
-  --alap-hover-bg: #e0e7ff;
-  --alap-hover-text: #4338ca;
+  --alap-bg: #2240a8;
+  --alap-hover-bg: #3366d6;
+  --alap-hover-text: #ffd666;
 }
 
 /* --- Sale tag (asymmetric corners) --- */
@@ -146,8 +146,8 @@
   --alap-item-gap: 4px;
   --alap-item-border-radius: 6px;
   --alap-menu-padding: 0.5rem;
-  --alap-bg: #f8fafc;
-  --alap-item-border: 1px solid #e2e8f0;
-  --alap-hover-bg: #dbeafe;
-  --alap-hover-text: #1e40af;
+  --alap-bg: #2952c0;
+  --alap-item-border: 1px solid #4470cc;
+  --alap-hover-bg: #3366d6;
+  --alap-hover-text: #ffd666;
 }

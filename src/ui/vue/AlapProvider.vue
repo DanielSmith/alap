@@ -19,7 +19,7 @@ import { provide, shallowRef, watch, computed, type CSSProperties } from 'vue';
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-import { AlapKey, type AlapContextValue } from './providerKey';
+import { AlapKey, type AlapContextValue, createMenuCoordinator } from './providerKey';
 
 const props = defineProps<{
   config: AlapConfig;
@@ -29,6 +29,7 @@ const props = defineProps<{
 }>();
 
 const engineRef = shallowRef(new AlapEngine(props.config));
+const menuCoordinator = createMenuCoordinator();
 
 watch(() => props.config, (cfg) => {
   engineRef.value.updateConfig(cfg);
@@ -40,6 +41,7 @@ const ctx = computed<AlapContextValue>(() => ({
   menuTimeout: props.menuTimeout
     ?? (props.config.settings?.menuTimeout as number)
     ?? DEFAULT_MENU_TIMEOUT,
+  menuCoordinator,
   defaultMenuStyle: props.defaultMenuStyle,
   defaultMenuClassName: props.defaultMenuClassName,
   defaultListType: (props.config.settings?.listType as 'ul' | 'ol') ?? 'ul',

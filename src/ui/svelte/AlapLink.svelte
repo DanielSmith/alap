@@ -124,6 +124,12 @@
     timer = window.setTimeout(closeMenu, ctx.menuTimeout);
   }
 
+  // --- Menu coordinator (close others when this one opens) ---
+
+  const unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    isOpen = false;
+  });
+
   // --- Open / close ---
 
   function closeMenu() {
@@ -134,6 +140,7 @@
   function openMenu() {
     const resolved = ctx.engine.resolve(query, anchorId);
     if (resolved.length === 0) return;
+    ctx.menuCoordinator.notifyOpen(triggerId);
     items = resolved;
     isOpen = true;
   }
@@ -237,7 +244,10 @@
 
   // --- Cleanup timer ---
 
-  onDestroy(stopTimer);
+  onDestroy(() => {
+    stopTimer();
+    unsubscribe();
+  });
 
   // --- Trigger handlers ---
 

@@ -66,6 +66,31 @@ export const demoConfig: AlapConfig = {
           },
           cache: 60, // books don't change often
         },
+        // Fallback APIs for testing when Open Library is down
+        repos: {
+          url: 'https://api.github.com/search/repositories',
+          searches: {
+            javascript: { q: 'javascript', sort: 'stars', per_page: 8 },
+            rust:       { q: 'rust', sort: 'stars', per_page: 8 },
+            css:        { q: 'css framework', sort: 'stars', per_page: 8 },
+          },
+          map: {
+            label: 'full_name',
+            url: 'html_url',
+            meta: { stars: 'stargazers_count', language: 'language' },
+          },
+        },
+        posts: {
+          url: 'https://jsonplaceholder.typicode.com/posts',
+          linkBase: 'https://jsonplaceholder.typicode.com',
+          searches: {
+            recent: { _limit: 8 },
+          },
+          map: {
+            label: 'title',
+            url: 'id',
+          },
+        },
       },
     },
   },

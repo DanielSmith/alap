@@ -111,6 +111,12 @@ export default defineConfig({
           exclude: ['tests/storage/remote-store-integration.test.ts'],
         },
       },
+      {
+        test: {
+          name: 'meta',
+          include: ['tests/meta/**/*.test.ts'],
+        },
+      },
     ],
   },
 });

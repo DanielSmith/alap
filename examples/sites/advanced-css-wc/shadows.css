@@ -26,8 +26,8 @@
 }
 
 .shadow-hard alap-link {
-  --alap-shadow: 8px 8px 0 #fbbf24;
-  --alap-border: #fbbf24;
+  --alap-shadow: 8px 8px 0 #ffd666;
+  --alap-border: #ffd666;
 }
 
 /* --- Per-item shadow only --- */
@@ -42,14 +42,14 @@
 
 .shadow-both alap-link {
   --alap-shadow: 0 0 30px 5px rgba(99, 102, 241, 0.3);
-  --alap-hover-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+  --alap-hover-shadow: 0 4px 16px rgba(255, 214, 102, 0.5);
   --alap-transition: box-shadow 0.2s ease;
 }
 
 .shadow-both-hard alap-link {
-  --alap-shadow: 6px 6px 0 #fbbf24;
-  --alap-border: #fbbf24;
-  --alap-hover-shadow: 0 3px 8px rgba(251, 191, 36, 0.4);
+  --alap-shadow: 6px 6px 0 #ffd666;
+  --alap-border: #ffd666;
+  --alap-hover-shadow: 0 3px 8px rgba(255, 214, 102, 0.4);
   --alap-transition: box-shadow 0.2s ease;
 }
 
@@ -63,29 +63,29 @@
 /* --- Text shadow --- */
 
 .text-emboss alap-link {
-  --alap-bg: #1e293b;
-  --alap-text: #e2e8f0;
-  --alap-hover-bg: #334155;
-  --alap-hover-text: #f8fafc;
+  --alap-bg: #2240a8;
+  --alap-text: #f0f2ff;
+  --alap-hover-bg: #3366d6;
+  --alap-hover-text: #ffd666;
   --alap-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --alap-border: #334155;
+  --alap-border: #4470cc;
 }
 
 .text-neon alap-link {
-  --alap-bg: #0f172a;
+  --alap-bg: #152570;
   --alap-text: #38bdf8;
-  --alap-hover-bg: #1e293b;
+  --alap-hover-bg: #2240a8;
   --alap-hover-text: #7dd3fc;
   --alap-text-shadow: 0 0 8px rgba(56, 189, 248, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
-  --alap-border: #1e3a5f;
+  --alap-border: #2e48a0;
   --alap-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
 }
 
 /* --- Hover text glow --- */
 
 .hover-text-glow alap-link {
-  --alap-hover-text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
-  --alap-hover-text: #fbbf24;
+  --alap-hover-text-shadow: 0 0 8px rgba(255, 214, 102, 0.6);
+  --alap-hover-text: #ffd666;
   --alap-transition: text-shadow 0.2s ease, color 0.15s ease, background 0.15s ease;
 }
 

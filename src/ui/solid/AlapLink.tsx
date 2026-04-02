@@ -107,11 +107,18 @@ export function AlapLink(props: AlapLinkProps) {
     }
   }
 
+  // --- Menu coordinator (close others when this one opens) ---
+
+  const unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    setIsOpen(false);
+  });
+
   // --- Open / close ---
 
   function openMenu() {
     const resolved = ctx.engine.resolve(props.query, props.anchorId);
     if (resolved.length === 0) return;
+    ctx.menuCoordinator.notifyOpen(triggerId);
     setItems(resolved);
     setIsOpen(true);
   }
@@ -221,7 +228,10 @@ export function AlapLink(props: AlapLinkProps) {
 
   // --- Cleanup timer on unmount ---
 
-  onCleanup(stopTimer);
+  onCleanup(() => {
+    stopTimer();
+    unsubscribe();
+  });
 
   // --- Keyboard nav ---
 

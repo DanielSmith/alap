@@ -1,23 +1,7 @@
-/**
- * Copyright 2026 Daniel Smith
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/* --- Layout --- */
-
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  color: #1a1a1a;
-}
-
-h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
-h2 { font-size: 1.1rem; color: #555; }
+@import '/shared/styles.css';
 
 .intro {
-  color: #555;
+  color: #7888b8;
   font-size: 0.9rem;
   max-width: 600px;
 }
@@ -28,60 +12,24 @@ h2 { font-size: 1.1rem; color: #555; }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa;
+  color: #7888b8;
   font-style: italic;
-  border-left: 2px dashed #e5e7eb;
+  border-left: 2px dashed #2e48a0;
   margin-left: 1rem;
   padding-left: 1rem;
 }
 
 .trigger-zone {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: #152570;
+  border: 1px solid #2e48a0;
   border-radius: 8px;
   padding: 1.5rem;
 }
 
-.alap, alap-link {
-  cursor: pointer;
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-/* --- Menu styling (DOM adapter) --- */
-
-#alapelem {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
-}
-
-#alapelem ul {
-  list-style: none;
-  margin: 0;
-  padding: 0.25rem 0;
-}
-
-#alapelem a {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #1a1a1a;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-#alapelem a:hover {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
 /* Direction-aware animation */
-#alapelem.alap-placed-s,
-#alapelem.alap-placed-se,
-#alapelem.alap-placed-sw {
+.alapelem.alap-placed-s,
+.alapelem.alap-placed-se,
+.alapelem.alap-placed-sw {
   animation: slide-down 150ms ease-out;
 }
 

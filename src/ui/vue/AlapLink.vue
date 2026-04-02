@@ -15,7 +15,7 @@
 -->
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, type CSSProperties, type ComponentPublicInstance } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted, type CSSProperties, type ComponentPublicInstance } from 'vue';
 import { useAlapContext } from './useAlap';
 import { useMenuDismiss } from './useMenuDismiss';
 import { createMenuKeyHandler } from './useMenuKeyboard';
@@ -98,6 +98,20 @@ const scrollStyle = computed<CSSProperties | undefined>(() =>
     : undefined
 );
 
+// --- Menu coordinator (close others when this one opens) ---
+
+let unsubscribe: (() => void) | null = null;
+
+onMounted(() => {
+  unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    isOpen.value = false;
+  });
+});
+
+onUnmounted(() => {
+  unsubscribe?.();
+});
+
 // --- Open / close ---
 
 function closeMenu() {
@@ -108,6 +122,7 @@ function closeMenu() {
 function openMenu() {
   const resolved = ctx.engine.resolve(props.query, props.anchorId);
   if (resolved.length === 0) return;
+  ctx.menuCoordinator.notifyOpen(triggerId);
   items.value = resolved;
   isOpen.value = true;
 }

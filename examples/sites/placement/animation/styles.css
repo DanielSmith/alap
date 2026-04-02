@@ -1,38 +1,13 @@
-/**
- * Copyright 2026 Daniel Smith
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/* --- Layout --- */
+@import '/shared/styles.css';
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
   max-width: 900px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  color: #1a1a1a;
 }
-
-h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
-h2 { font-size: 1.1rem; color: #555; margin-top: 2rem; }
 
 .intro {
-  color: #555;
+  color: #7888b8;
   font-size: 0.9rem;
   max-width: 600px;
-}
-
-.note {
-  color: #888;
-  font-size: 0.8rem;
-  font-style: italic;
-}
-
-code {
-  background: #f3f4f6;
-  padding: 0.15rem 0.35rem;
-  border-radius: 3px;
-  font-size: 0.85em;
 }
 
 /* --- Compass grid --- */
@@ -50,46 +25,9 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: #152570;
+  border: 1px solid #2e48a0;
   border-radius: 6px;
-}
-
-.alap, alap-link {
-  cursor: pointer;
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-}
-
-/* --- Menu base styling (DOM adapter) --- */
-
-#alapelem {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
-}
-
-#alapelem ul {
-  list-style: none;
-  margin: 0;
-  padding: 0.25rem 0;
-}
-
-#alapelem a {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #1a1a1a;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-#alapelem a:hover {
-  background: #eff6ff;
-  color: #2563eb;
 }
 
 /* -------------------------------------------------------------------
@@ -101,31 +39,31 @@ code {
    ------------------------------------------------------------------- */
 
 /* South placements: menu is below trigger, slide down */
-#alapelem.alap-placed-s,
-#alapelem.alap-placed-se,
-#alapelem.alap-placed-sw {
+.alapelem.alap-placed-s,
+.alapelem.alap-placed-se,
+.alapelem.alap-placed-sw {
   animation: slide-down 150ms ease-out;
 }
 
 /* North placements: menu is above trigger, slide up */
-#alapelem.alap-placed-n,
-#alapelem.alap-placed-ne,
-#alapelem.alap-placed-nw {
+.alapelem.alap-placed-n,
+.alapelem.alap-placed-ne,
+.alapelem.alap-placed-nw {
   animation: slide-up 150ms ease-out;
 }
 
 /* East placement: menu is to the right, slide from right */
-#alapelem.alap-placed-e {
+.alapelem.alap-placed-e {
   animation: slide-right 150ms ease-out;
 }
 
 /* West placement: menu is to the left, slide from left */
-#alapelem.alap-placed-w {
+.alapelem.alap-placed-w {
   animation: slide-left 150ms ease-out;
 }
 
 /* Center placement: fade in */
-#alapelem.alap-placed-c {
+.alapelem.alap-placed-c {
   animation: fade-in 150ms ease-out;
 }
 
@@ -153,17 +91,3 @@ code {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
-/* -------------------------------------------------------------------
-   Direction-aware animations (Web Component)
-
-   Web component menus live in shadow DOM. Use ::part(menu) to style
-   them from the outside. The alap-placed-* class is applied to the
-   .menu element inside the shadow root.
-   ------------------------------------------------------------------- */
-
-/* Note: ::part() cannot match classes inside shadow DOM directly.
-   The web component applies the class to the .menu div, but external
-   CSS can't see it. For web components, use the --alap-menu-transition
-   CSS variable to enable transitions, or use the Astro/framework
-   adapters which render outside shadow DOM. */

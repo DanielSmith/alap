@@ -19,10 +19,32 @@ import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
 
+export interface MenuCoordinator {
+  subscribe: (id: string, close: () => void) => () => void;
+  notifyOpen: (id: string) => void;
+}
+
+function createMenuCoordinator(): MenuCoordinator {
+  const listeners = new Map<string, () => void>();
+
+  return {
+    subscribe(id, close) {
+      listeners.set(id, close);
+      return () => { listeners.delete(id); };
+    },
+    notifyOpen(id) {
+      for (const [listenerId, close] of listeners) {
+        if (listenerId !== id) close();
+      }
+    },
+  };
+}
+
 export interface AlapContextValue {
   engine: AlapEngine;
   config: AlapConfig;
   menuTimeout: number;
+  menuCoordinator: MenuCoordinator;
   defaultMenuStyle?: JSX.CSSProperties;
   defaultMenuClassName?: string;
   defaultListType: 'ul' | 'ol';
@@ -41,6 +63,7 @@ export interface AlapProviderProps {
 
 export function AlapProvider(props: AlapProviderProps) {
   const engine = new AlapEngine(props.config);
+  const menuCoordinator = createMenuCoordinator();
 
   // Keep engine in sync when config changes
   createEffect(on(() => props.config, (cfg) => {
@@ -49,6 +72,7 @@ export function AlapProvider(props: AlapProviderProps) {
 
   const value: AlapContextValue = {
     get engine() { return engine; },
+    menuCoordinator,
     get config() { return props.config; },
     get menuTimeout() {
       return props.menuTimeout
