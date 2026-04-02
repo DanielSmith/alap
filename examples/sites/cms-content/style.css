@@ -1,17 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400&display=swap');
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f8f9fa;
-  color: #1a1a2e;
-  padding: 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: #1a2f8a;
+  color: #f0f2ff;
+  padding: 0 1.5rem;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 2rem auto;
 }
+
+a:not(alap-link) { color: #ffe8a0; }
+a:not(alap-link):hover { color: #ffd666; }
 
 header {
   margin-bottom: 1.5rem;
@@ -19,17 +22,20 @@ header {
 
 header h1 {
   font-size: 1.4rem;
+  color: #ffd666;
   margin-bottom: 0.5rem;
 }
 
 header p {
   font-size: 0.9rem;
-  color: #555;
+  color: #b8c4e8;
   line-height: 1.5;
 }
 
-header code {
-  background: #e8e8f0;
+header code, code {
+  font-family: 'JetBrains Mono', monospace;
+  background: #1a2870;
+  color: #88bbff;
   padding: 0.1em 0.35em;
   border-radius: 3px;
   font-size: 0.85em;
@@ -43,8 +49,8 @@ header code {
 }
 
 .panel {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #152570;
+  border: 1px solid #2e48a0;
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -55,10 +61,10 @@ header code {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
+  color: #ffe8a0;
   padding: 0.6rem 1rem;
-  border-bottom: 1px solid #eee;
-  background: #fafafa;
+  border-bottom: 1px solid #2e48a0;
+  background: #2240a8;
 }
 
 #cms-input {
@@ -67,11 +73,11 @@ header code {
   outline: none;
   resize: none;
   padding: 1rem;
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
   line-height: 1.6;
-  color: #1a1a2e;
-  background: #fff;
+  color: #f0f2ff;
+  background: #152570;
 }
 
 .panel-transformed pre {
@@ -79,15 +85,17 @@ header code {
   padding: 1rem;
   overflow: auto;
   margin: 0;
+  background: #152570;
 }
 
 .panel-transformed code {
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  color: #2d5016;
+  color: #88bbff;
+  background: none;
 }
 
 #live-preview {
@@ -96,11 +104,12 @@ header code {
   overflow: auto;
   font-size: 0.95rem;
   line-height: 1.7;
+  color: #f0f2ff;
 }
 
 /* Style alap-link triggers in the preview */
 #live-preview alap-link {
-  color: inherit;
+  color: #88bbff;
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 2px;
@@ -108,15 +117,16 @@ header code {
 }
 
 #live-preview alap-link:hover {
+  color: #ffd666;
   text-decoration-style: solid;
 }
 
 /* Menu styling via ::part() */
 alap-link::part(menu) {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: #2240a8;
+  border: 1px solid #4470cc;
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(34, 64, 168, 0.5);
   padding: 4px 0;
   min-width: 160px;
 }
@@ -124,15 +134,15 @@ alap-link::part(menu) {
 alap-link::part(link) {
   display: block;
   padding: 6px 16px;
-  color: #333;
+  color: #f0f2ff;
   text-decoration: none;
   font-size: 0.9rem;
 }
 
 alap-link::part(link):hover,
 alap-link::part(link):focus-visible {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #3366d6;
+  color: #ffd666;
 }
 
 footer {
@@ -142,19 +152,19 @@ footer {
 footer summary {
   cursor: pointer;
   font-size: 0.85rem;
-  color: #888;
+  color: #7888b8;
 }
 
 #config-display {
   margin-top: 0.5rem;
   padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #152570;
+  border: 1px solid #2e48a0;
   border-radius: 8px;
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   white-space: pre-wrap;
-  color: #555;
+  color: #b8c4e8;
   max-height: 300px;
   overflow: auto;
 }

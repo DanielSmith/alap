@@ -14,7 +14,7 @@ import vue from '@vitejs/plugin-vue';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import solid from 'vite-plugin-solid';
 import { resolve, join } from 'path';
-import { readdirSync, existsSync, statSync } from 'fs';
+import { readdirSync, existsSync, statSync, cpSync } from 'fs';
 
 const sitesRoot = __dirname;
 const alapRoot = resolve(sitesRoot, '../..');
@@ -22,9 +22,11 @@ const alapRoot = resolve(sitesRoot, '../..');
 // Examples that have their own build systems — skip for the Vite build
 const SKIP = new Set([
   'astro-integration', 'eleventy', 'hugo', 'vitepress',  // own build systems
-  'cms-content', 'markdown', 'tiptap', 'mdx',            // need rehype/remark/tiptap deps
+  'mdx',                                                   // needs @mdx-js/rollup plugin
   'lightbox',                                              // imports from src/ui-lightbox (not published)
   'shared',                                                // not an example
+  'dist',                                                   // build output
+  'node_modules',
   'README.md',
 ]);
 
@@ -54,6 +56,9 @@ export default defineConfig({
       'alap/astro': resolve(alapRoot, 'src/ui/astro/index.ts'),
       'alap/storage': resolve(alapRoot, 'src/storage/index.ts'),
       'alap': resolve(alapRoot, 'src/index.ts'),
+      'rehype-alap': resolve(alapRoot, 'plugins/rehype-alap/src/index.ts'),
+      'remark-alap': resolve(alapRoot, 'plugins/remark-alap/src/index.ts'),
+      'tiptap-alap': resolve(alapRoot, 'plugins/tiptap-alap/src/index.ts'),
     },
   },
   build: {
@@ -70,5 +75,33 @@ export default defineConfig({
     vue(),
     svelte(),
     solid({ include: [resolve(alapRoot, 'src/ui/solid/**'), resolve(sitesRoot, 'solid/**')], solid: { generate: 'dom' } }),
+    {
+      // Copy static files for self-contained examples (cdn, htmx)
+      // that use IIFE scripts and HTML fragments Vite can't bundle.
+      name: 'copy-static-examples',
+      closeBundle() {
+        const dist = resolve(sitesRoot, 'dist');
+
+        // CDN: non-module scripts
+        for (const f of ['alap.iife.js', 'config.js', 'app.js']) {
+          const src = join(sitesRoot, 'cdn', f);
+          if (existsSync(src)) cpSync(src, join(dist, 'cdn', f));
+        }
+
+        // htmx: non-module scripts + HTML fragments
+        for (const f of ['alap.iife.js', 'config.js']) {
+          const src = join(sitesRoot, 'htmx', f);
+          if (existsSync(src)) cpSync(src, join(dist, 'htmx', f));
+        }
+        const fragSrc = join(sitesRoot, 'htmx', 'fragments');
+        const fragDst = join(dist, 'htmx', 'fragments');
+        if (existsSync(fragSrc)) cpSync(fragSrc, fragDst, { recursive: true });
+
+        // Shared images
+        const imgSrc = join(sitesRoot, 'shared', 'img');
+        const imgDst = join(dist, 'shared', 'img');
+        if (existsSync(imgSrc)) cpSync(imgSrc, imgDst, { recursive: true });
+      },
+    },
   ],
 });

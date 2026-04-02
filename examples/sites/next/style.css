@@ -1,26 +1,20 @@
+@import '/shared/styles.css';
+@import '/shared/styles-wc.css';
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f8f9fa;
-  color: #1a1a2e;
-}
-
-/* Simulated App Router layout chrome */
-.app-shell {
+  margin: 2rem auto;
   max-width: 900px;
-  margin: 0 auto;
-  min-height: 100vh;
+  padding: 0 1rem;
 }
 
 .app-header {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #fff;
+  border-bottom: 1px solid #4470cc;
+  background: #152570;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -29,21 +23,14 @@ body {
 .app-header h1 {
   font-size: 1.1rem;
   font-weight: 600;
-}
-
-.app-header code {
-  background: #e8e8f0;
-  padding: 0.15em 0.4em;
-  border-radius: 3px;
-  font-size: 0.8em;
-  color: #555;
+  color: #ffd666;
 }
 
 .nav {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid #e5e7eb;
-  background: #fff;
+  border-bottom: 1px solid #4470cc;
+  background: #152570;
 }
 
 .nav button {
@@ -52,28 +39,30 @@ body {
   background: none;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #666;
+  font-family: inherit;
+  color: #7888b8;
   border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
 }
 
 .nav button:hover {
-  color: #1a1a2e;
+  color: #f0f2ff;
 }
 
 .nav button.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+  color: #ffd666;
+  border-bottom-color: #ffd666;
 }
 
 .page {
   padding: 2rem 1.5rem;
-  background: #fff;
+  background: #2240a8;
   min-height: 400px;
 }
 
 .page h2 {
   font-size: 1.3rem;
+  color: #ffe8a0;
   margin-bottom: 1rem;
 }
 
@@ -84,40 +73,9 @@ body {
 
 .info-bar {
   padding: 0.8rem 1.5rem;
-  background: #f0f4ff;
-  border-top: 1px solid #e5e7eb;
+  background: #152570;
+  border-top: 1px solid #2e48a0;
   font-size: 0.8rem;
-  color: #555;
+  color: #7888b8;
   line-height: 1.5;
-}
-
-.info-bar code {
-  background: #dde4f0;
-  padding: 0.1em 0.3em;
-  border-radius: 2px;
-  font-size: 0.9em;
-}
-
-/* Alap menu styling */
-alap-link::part(menu) {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 4px 0;
-  min-width: 160px;
-}
-
-alap-link::part(link) {
-  display: block;
-  padding: 6px 16px;
-  color: #333;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-alap-link::part(link):hover,
-alap-link::part(link):focus-visible {
-  background: #eff6ff;
-  color: #2563eb;
 }
