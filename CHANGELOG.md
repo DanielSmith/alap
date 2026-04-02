@@ -28,18 +28,23 @@ All notable changes to Alap will be documented in this file.
 - Static `allLinks` items carry no source class — clean default
 - Documented in `docs/core-concepts/protocols.md`
 
-### Examples site consolidation (2026-04-01, in progress)
+### Examples site consolidation (2026-04-01)
 
-- Shared CSS base at `examples/sites/shared/styles.css` (dark blue theme)
-- Shared WC theme at `examples/sites/shared/styles-wc.css` (custom properties)
-- Gallery index page at `examples/sites/index.html`
-- Single Vite config at `examples/sites/vite.config.ts` for multi-entry build with shared chunks
-- Updated all examples to use `/shared/styles.css` instead of duplicated local copies
-- Replaced Wikipedia hotlinked images with local copies in `shared/img/`
-- Named window navigation: gallery is `alapDemo`, examples open in `alapDemoExample`
-- Advanced CSS examples (DOM + WC) remapped to blue palette
-- CDN example: added `.alapelem` DOM adapter menu styling
-- GitHub repos and JSONPlaceholder added as fallback `:web:` APIs for testing
+- Self-contained examples site at `examples/sites/` with own `vite.config.ts` and `package.json`
+- Single multi-entry Vite build: shared chunks, one copy of Alap/frameworks across all examples
+- Shared CSS base at `shared/styles.css` (dark blue theme) and `shared/styles-wc.css` (WC custom properties)
+- Gallery index at `index.html` with named window navigation (`alapDemo` / `alapDemoExample`)
+- All examples updated to consistent blue theme
+- Advanced CSS examples (DOM + WC) remapped from slate to blue palette
+- CDN and htmx: self-contained static files copied post-build (IIFE scripts, HTML fragments)
+- CMS content (rehype), markdown (remark), tiptap examples now included in the build
+- htmx: removed cars tab, rethemed to blue
+- next.js: rethemed to blue
+- cms-content: rethemed to blue with dark panels
+- Local images in `shared/img/` replace Wikipedia hotlinks
+- GitHub repos and JSONPlaceholder added as fallback `:web:` APIs
+- Web staging at `web/examples.alap.info/` — builds from repo source, copies dist for Cloudflare
+- 84 files, 2.3MB production build
 
 ### Lightbox Renderer (2026-03-31)
 
