@@ -7,6 +7,7 @@ settings:
 overrides:
   picomatch: '>=4.0.4'
   brace-expansion: '>=5.0.5'
+  lodash: '>=4.18.0'
 
 importers:
 
@@ -5568,8 +5569,8 @@ packages:
   lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -9088,7 +9089,7 @@ snapshots:
       '@rushstack/terminal': 0.22.3(@types/node@25.5.0)
       '@rushstack/ts-command-line': 5.3.3(@types/node@25.5.0)
       diff: 8.0.4
-      lodash: 4.17.23
+      lodash: 4.18.1
       minimatch: 10.2.3
       resolve: 1.22.11
       semver: 7.5.4
@@ -11208,7 +11209,7 @@ snapshots:
       graceful-fs: 4.2.11
       is-stream: 2.0.1
       lazystream: 1.0.1
-      lodash: 4.17.23
+      lodash: 4.18.1
       normalize-path: 3.0.0
       readable-stream: 4.7.0
 
@@ -13051,7 +13052,7 @@ snapshots:
 
   lodash.uniq@4.5.0: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.1: {}
 
   longest-streak@3.1.0: {}
 
