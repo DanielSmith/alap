@@ -4,6 +4,8 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0-beta.4] — 2026-04-02
+
 ### Fix: Menu dismiss across all adapters (2026-04-01)
 
 - Vue, Svelte, Solid, and Alpine adapters now close the previous menu when a new one opens
