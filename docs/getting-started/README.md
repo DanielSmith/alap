@@ -8,6 +8,12 @@ New to Alap? These three pages take you from zero to a working link menu.
 | [Quick Start](quick-start.md) | Build a working `<alap-link>` in 2 minutes — CDN and npm paths |
 | [Configuration](configuration.md) | The `AlapConfig` object: allLinks, settings, macros, searchPatterns, protocols |
 
+> **Try it now**
+> These are live Alap links — click to see a menu appear:
+> <alap-link query=".bridge">bridges</alap-link> ·
+> <alap-link query=".coffee">coffee shops</alap-link> ·
+> <alap-link query="@favorites">favorites</alap-link>
+
 ## Where to go next
 
 - [Core Concepts](../core-concepts/) — the expression language in depth

@@ -20,6 +20,11 @@ A macro is a named query. You define it once in your config, and use it anywhere
 <alap-link query="@sf_coffee">cafes</alap-link>
 ```
 
+> **Try it**
+> <alap-link query="@nyc_bridges">NYC bridges</alap-link> ·
+> <alap-link query="@sf_coffee">SF coffee</alap-link> ·
+> <alap-link query="@favorites">favorites</alap-link>
+
 That's the whole feature. But the consequences are worth spelling out.
 
 ## Change once, update everywhere

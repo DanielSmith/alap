@@ -50,6 +50,11 @@ Operators combine sets of links:
 
 These read naturally. `.coffee + .sf` isn't code — it's a sentence: "things that are coffee *and* SF."
 
+> **Try it**
+> <alap-link query=".nyc + .bridge">NYC bridges</alap-link> (AND) ·
+> <alap-link query=".nyc | .sf">NYC or SF</alap-link> (OR) ·
+> <alap-link query=".nyc - .tourist">NYC without tourist spots</alap-link> (WITHOUT)
+
 ```html
 <!-- Intersection: items tagged both "nyc" AND "bridge" -->
 <alap-link query=".nyc + .bridge">NYC bridges</alap-link>

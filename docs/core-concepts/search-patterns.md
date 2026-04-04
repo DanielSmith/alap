@@ -35,6 +35,12 @@ Note: `/bridges/` is a **lookup key**, not an inline regex. It references the `"
 
 The engine runs the pattern against your link library and returns whatever matches. No tags required. No manual curation. The pattern does the work.
 
+> **Try it**
+> Live search patterns from this site's config:
+> <alap-link query="/bridges/">find bridges</alap-link> ·
+> <alap-link query="/coffee_shops/">find coffee shops</alap-link> ·
+> <alap-link query="/parks/">find parks</alap-link>
+
 ## Searching specific fields
 
 By default, a pattern searches everything — labels, URLs, tags, descriptions, IDs. Narrow it with field codes:

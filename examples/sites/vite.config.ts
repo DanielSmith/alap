@@ -30,7 +30,7 @@ const SKIP = new Set([
   'README.md',
 ]);
 
-// Discover all example HTML entry points
+// Discover all example HTML entry points (up to 2 levels deep)
 const entries: Record<string, string> = {};
 for (const name of readdirSync(sitesRoot)) {
   if (SKIP.has(name)) continue;
@@ -39,6 +39,16 @@ for (const name of readdirSync(sitesRoot)) {
   const html = join(dir, 'index.html');
   if (existsSync(html)) {
     entries[name] = html;
+  }
+  // Check subdirectories (e.g. ui-sandbox/svelte/, placement/animation/)
+  for (const sub of readdirSync(dir)) {
+    if (SKIP.has(sub)) continue;
+    const subDir = join(dir, sub);
+    if (!statSync(subDir).isDirectory()) continue;
+    const subHtml = join(subDir, 'index.html');
+    if (existsSync(subHtml)) {
+      entries[`${name}/${sub}`] = subHtml;
+    }
   }
 }
 
@@ -74,7 +84,7 @@ export default defineConfig({
   plugins: [
     vue(),
     svelte(),
-    solid({ include: [resolve(alapRoot, 'src/ui/solid/**'), resolve(sitesRoot, 'solid/**')], solid: { generate: 'dom' } }),
+    solid({ include: [resolve(alapRoot, 'src/ui/solid/**'), resolve(sitesRoot, 'solid/**'), resolve(sitesRoot, 'ui-sandbox/solid/**')], solid: { generate: 'dom' } }),
     {
       // Copy static files for self-contained examples (cdn, htmx)
       // that use IIFE scripts and HTML fragments Vite can't bundle.

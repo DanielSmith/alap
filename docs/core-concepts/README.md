@@ -11,6 +11,13 @@ How the Alap expression language works — from simple tag queries to protocol f
 | [Refiners](refiners.md) | Set-level shaping (`*sort*`, `*limit:N*`, `*shuffle*`), inline refiners, pagination |
 | [Styling](styling.md) | CSS custom properties, `::part()` selectors, dark mode, transitions, effects |
 
+> **Try it**
+> Live Alap links — click any to see a menu:
+> <alap-link query=".bridge">bridges</alap-link> ·
+> <alap-link query=".coffee">coffee</alap-link> ·
+> <alap-link query=".nyc + .bridge">NYC bridges</alap-link> ·
+> <alap-link query="@favorites">favorites</alap-link>
+
 ## Reading order
 
 Start with [Expressions](expressions.md) — everything else builds on it. [Macros](macros.md) is a natural follow-up. The rest can be read in any order as you need them.
