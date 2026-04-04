@@ -120,7 +120,7 @@ document.addEventListener('alap:item-hover', (e) => {
 
 ## Image triggers and placement
 
-When an `<img>` element is an Alap trigger (DOM mode), the menu is positioned at the click coordinates using a synthetic point rect. The placement engine applies the same compass logic and viewport fallback as any other trigger — set `data-alap-placement="C"` for a centered context-menu feel, or use any other direction.
+When an `<img>` element is an Alap trigger (DOM mode), the menu is positioned at the click coordinates using a synthetic point rect. The placement engine applies the same compass logic, strategies (flip, clamp, place), and viewport fallback as any other trigger — set `data-alap-placement="C"` for a centered context-menu feel, or use any other direction.
 
 ```html
 <img class="alap" data-alap-linkitems=".gallery" data-alap-placement="SE">

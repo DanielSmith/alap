@@ -4,6 +4,19 @@ All notable changes to Alap will be documented in this file.
 
 ## [Unreleased]
 
+### Language port parity (2026-04-04)
+
+- Added `hooks` and `guid` fields to Rust `Link` struct and `validate_config` whitelist/extraction
+- Added `hooks` and `guid` fields to Go `Link` struct and `ValidateConfig` whitelist/extraction
+- Both ports now match PHP, Python, and Java on all 13 `AlapLink` fields
+- 7 new tests: 4 Rust (`preserves_hooks_and_guid`, `filters_non_string_hooks`, `hooks_none_when_not_provided`, `hooks_none_when_empty_array`) and 3 Go (`TestValidateConfigPreservesHooksAndGuid`, `TestValidateConfigFiltersNonStringHooks`, `TestValidateConfigHooksNilWhenAbsent`)
+
+### Examples quality pass (2026-04-04)
+
+- Tailwind example: menu CSS now uses actual Tailwind design tokens (amber-50, green-50, slate-800, indigo-50) instead of the default blue palette — each per-anchor theme is visually distinct
+- Placement example: added missing `.strategy-table` CSS using `var()` custom properties
+- External data example: removed broken `:echo:` protocol section (generate protocols require pre-resolution; the demo was non-functional)
+
 ## [3.0.0-beta.4] — 2026-04-02
 
 ### Fix: Menu dismiss across all adapters (2026-04-01)

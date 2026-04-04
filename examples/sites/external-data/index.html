@@ -108,46 +108,6 @@
 data-alap-linkitems=":web:books:photography:"
 data-alap-linkitems=":web:books:adams:"</code></pre>
 
-  <h2>Lazy-Loaded Protocol (:echo:)</h2>
-  <p class="note">
-    The <code>:echo:</code> protocol is a toy that turns its argument into a link.
-    It lives in a separate file (<code>echo-protocol.ts</code>) and is loaded via
-    <code>dynamic import()</code> on first use — it's not in the main bundle.
-    Open your browser's Network tab to see the chunk load on first click.
-  </p>
-  <div class="example">
-    <p>
-      <a class="alap" data-alap-linkitems=":echo:example.com:">echo example.com</a>
-      — generates <code>https://example.com</code>
-    </p>
-    <p>
-      <a class="alap" data-alap-linkitems=":echo:en.wikipedia.org/wiki/Coffee:">echo wikipedia coffee</a>
-      — generates <code>https://en.wikipedia.org/wiki/Coffee</code>
-    </p>
-    <p>
-      <a class="alap" data-alap-linkitems=".photography | :echo:unsplash.com:">Local photos + echo</a>
-      — mixed local links with a lazy-loaded echo result
-    </p>
-  </div>
-  <pre><code>// echo-protocol.ts — loaded on demand, not bundled
-import { sanitizeUrl } from 'alap/core';
-
-export const generate = async (segments) => {
-  const raw = segments.join(':');
-  const url = sanitizeUrl(raw.startsWith('http') ? raw : `https://${raw}`);
-  if (!url) return [];
-  return [{ label: raw, url, tags: ['echo'] }];
-};
-
-// config.ts — lazy wrapper
-echo: {
-  generate: async (segments) => {
-    const { generate } = await import('./echo-protocol');
-    return generate(segments);
-  },
-  cache: 0,
-}</code></pre>
-
   <h2>Mixed: Local + External</h2>
   <p class="note">Local bookmarks merged with API results. Refiners scoped by parentheses.</p>
   <div class="example">

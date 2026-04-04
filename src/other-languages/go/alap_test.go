@@ -4,6 +4,7 @@
 package alap
 
 import (
+	"context"
 	"sort"
 	"strings"
 	"testing"
@@ -41,7 +42,7 @@ var testConfig = &Config{
 }
 
 func newParser() *ExpressionParser {
-	return NewParser(testConfig)
+	return NewParser(context.Background(), testConfig)
 }
 
 func sorted(ids []string) []string {
@@ -188,7 +189,7 @@ func TestBareMacroWithAnchor(t *testing.T) {
 	}
 	macros["myanchor"] = Macro{LinkItems: "vwbug"}
 	cfg.Macros = macros
-	p := NewParser(&cfg)
+	p := NewParser(context.Background(), &cfg)
 	assertEq(t, p.Query("@", "myanchor"), []string{"vwbug"})
 }
 
@@ -228,14 +229,14 @@ func TestWhitespaceOnly(t *testing.T) {
 }
 
 func TestEmptyConfig(t *testing.T) {
-	p := NewParser(&Config{AllLinks: map[string]Link{}})
+	p := NewParser(context.Background(), &Config{AllLinks: map[string]Link{}})
 	if result := p.Query(".car", ""); len(result) != 0 {
 		t.Errorf("expected nil, got %v", result)
 	}
 }
 
 func TestNoAllLinks(t *testing.T) {
-	p := NewParser(&Config{})
+	p := NewParser(context.Background(), &Config{})
 	if result := p.Query("vwbug", ""); len(result) != 0 {
 		t.Errorf("expected nil, got %v", result)
 	}
@@ -244,7 +245,7 @@ func TestNoAllLinks(t *testing.T) {
 // --- Convenience ---
 
 func TestResolve(t *testing.T) {
-	results := Resolve(testConfig, ".car + .germany")
+	results := Resolve(context.Background(), testConfig, ".car + .germany")
 	ids := make([]string, len(results))
 	for i, r := range results {
 		ids[i] = r.ID
@@ -253,7 +254,7 @@ func TestResolve(t *testing.T) {
 }
 
 func TestCherryPick(t *testing.T) {
-	result := CherryPick(testConfig, "vwbug, miata")
+	result := CherryPick(context.Background(), testConfig, "vwbug, miata")
 	if _, ok := result["vwbug"]; !ok {
 		t.Error("missing vwbug")
 	}
@@ -336,7 +337,7 @@ func TestSanitizeInResolve(t *testing.T) {
 			"good": {Label: "Good", URL: "https://example.com", Tags: []string{"test"}},
 		},
 	}
-	results := Resolve(cfg, ".test")
+	results := Resolve(context.Background(), cfg,".test")
 	urls := make(map[string]string)
 	for _, r := range results {
 		urls[r.ID] = r.URL
@@ -355,7 +356,7 @@ func TestSanitizeInCherryPick(t *testing.T) {
 			"bad": {Label: "Evil", URL: "javascript:alert(1)", Tags: []string{"test"}},
 		},
 	}
-	result := CherryPick(cfg, ".test")
+	result := CherryPick(context.Background(), cfg,".test")
 	if result["bad"].URL != "about:blank" {
 		t.Errorf("got %q, want about:blank", result["bad"].URL)
 	}
@@ -396,20 +397,20 @@ func protocolConfig() *Config {
 }
 
 func TestProtocolBasic(t *testing.T) {
-	p := NewParser(protocolConfig())
+	p := NewParser(context.Background(), protocolConfig())
 	result := sorted(p.Query(":has-tag:germany:", ""))
 	assertEq(t, result, []string{"bmwe36", "vwbug"})
 }
 
 func TestProtocolWithArgs(t *testing.T) {
-	p := NewParser(protocolConfig())
+	p := NewParser(context.Background(), protocolConfig())
 	result := sorted(p.Query(":has-tag:car:", ""))
 	// should match all cars
 	assertEq(t, result, []string{"bmwe36", "miata", "vwbug"})
 }
 
 func TestProtocolUnknown(t *testing.T) {
-	p := NewParser(protocolConfig())
+	p := NewParser(context.Background(), protocolConfig())
 	result := p.Query(":nonexistent:", "")
 	if len(result) != 0 {
 		t.Errorf("expected empty for unknown protocol, got %v", result)
@@ -422,7 +423,7 @@ func TestProtocolNoProtocolsConfigured(t *testing.T) {
 			"a": {Label: "A", URL: "https://a.com"},
 		},
 	}
-	p := NewParser(cfg)
+	p := NewParser(context.Background(), cfg)
 	result := p.Query(":some-proto:", "")
 	if len(result) != 0 {
 		t.Errorf("expected empty, got %v", result)
@@ -430,7 +431,7 @@ func TestProtocolNoProtocolsConfigured(t *testing.T) {
 }
 
 func TestProtocolHandlerPanics(t *testing.T) {
-	p := NewParser(protocolConfig())
+	p := NewParser(context.Background(), protocolConfig())
 	// Should recover from panic, return empty, not crash
 	result := p.Query(":panicker:", "")
 	if len(result) != 0 {
@@ -439,7 +440,7 @@ func TestProtocolHandlerPanics(t *testing.T) {
 }
 
 func TestProtocolComposedWithTag(t *testing.T) {
-	p := NewParser(protocolConfig())
+	p := NewParser(context.Background(), protocolConfig())
 	// Intersection: protocol results AND .nyc tag
 	result := p.Query(":has-tag:bridge: + .nyc", "")
 	assertEq(t, result, []string{"brooklyn"})
@@ -629,7 +630,7 @@ func TestRefinerUnclosed(t *testing.T) {
 func TestMixedExpression(t *testing.T) {
 	// Full expression with items, tags, protocol, operators, and refiners
 	cfg := protocolConfig()
-	p := NewParser(cfg)
+	p := NewParser(context.Background(), cfg)
 	result := sorted(p.Query(":has-tag:car: + .germany *sort:label*", ""))
 	assertEq(t, result, []string{"bmwe36", "vwbug"})
 }
@@ -903,6 +904,67 @@ func TestValidateConfigDropsProtoKeys(t *testing.T) {
 	}
 	if _, ok := cfg.AllLinks["safe"]; !ok {
 		t.Error("safe key should be kept")
+	}
+}
+
+func TestValidateConfigPreservesHooksAndGuid(t *testing.T) {
+	raw := map[string]any{
+		"allLinks": map[string]any{
+			"item": map[string]any{
+				"url":   "https://example.com",
+				"hooks": []any{"item_hover", "item_context"},
+				"guid":  "550e8400-e29b-41d4-a716-446655440000",
+			},
+		},
+	}
+	cfg, err := ValidateConfig(raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	link := cfg.AllLinks["item"]
+	if link.GUID != "550e8400-e29b-41d4-a716-446655440000" {
+		t.Errorf("guid = %q, want UUID", link.GUID)
+	}
+	if len(link.Hooks) != 2 || link.Hooks[0] != "item_hover" || link.Hooks[1] != "item_context" {
+		t.Errorf("hooks = %v, want [item_hover item_context]", link.Hooks)
+	}
+}
+
+func TestValidateConfigFiltersNonStringHooks(t *testing.T) {
+	raw := map[string]any{
+		"allLinks": map[string]any{
+			"item": map[string]any{
+				"url":   "https://example.com",
+				"hooks": []any{"item_hover", 42, true, "item_context"},
+			},
+		},
+	}
+	cfg, err := ValidateConfig(raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	link := cfg.AllLinks["item"]
+	if len(link.Hooks) != 2 || link.Hooks[0] != "item_hover" || link.Hooks[1] != "item_context" {
+		t.Errorf("hooks = %v, want [item_hover item_context]", link.Hooks)
+	}
+}
+
+func TestValidateConfigHooksNilWhenAbsent(t *testing.T) {
+	raw := map[string]any{
+		"allLinks": map[string]any{
+			"item": map[string]any{"url": "https://example.com"},
+		},
+	}
+	cfg, err := ValidateConfig(raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	link := cfg.AllLinks["item"]
+	if link.Hooks != nil {
+		t.Errorf("hooks should be nil when absent, got %v", link.Hooks)
+	}
+	if link.GUID != "" {
+		t.Errorf("guid should be empty when absent, got %q", link.GUID)
 	}
 }
 

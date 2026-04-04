@@ -18,6 +18,7 @@
 package alap
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
@@ -79,6 +80,8 @@ type Link struct {
 	TargetWindow string         `json:"targetWindow,omitempty"`
 	Description  string         `json:"description,omitempty"`
 	Thumbnail    string         `json:"thumbnail,omitempty"`
+	Hooks        []string       `json:"hooks,omitempty"`
+	GUID         string         `json:"guid,omitempty"`
 	CreatedAt    any            `json:"createdAt,omitempty"`
 	Meta         map[string]any `json:"meta,omitempty"`
 }
@@ -125,18 +128,23 @@ type token struct {
 // An ExpressionParser is NOT safe for concurrent use. Create a new parser
 // per goroutine, or protect access with a mutex.
 type ExpressionParser struct {
+	ctx        context.Context
 	config     *Config
 	depth      int
 	regexCount int
 }
 
 // NewParser creates an ExpressionParser for the given config.
-func NewParser(config *Config) *ExpressionParser {
-	return &ExpressionParser{config: config}
+// The context is checked at loop boundaries to support timeout/cancellation.
+func NewParser(ctx context.Context, config *Config) *ExpressionParser {
+	return &ExpressionParser{ctx: ctx, config: config}
 }
 
 // Query parses an expression and returns matching item IDs (deduplicated).
 func (p *ExpressionParser) Query(expression string, anchorID string) []string {
+	if p.ctx.Err() != nil {
+		return nil
+	}
 	expr := strings.TrimSpace(expression)
 	if expr == "" {
 		return nil
@@ -172,6 +180,9 @@ func (p *ExpressionParser) SearchByClass(className string) []string {
 	}
 	var result []string
 	for id, link := range p.config.AllLinks {
+		if p.ctx.Err() != nil {
+			return result
+		}
 		for _, tag := range link.Tags {
 			if tag == className {
 				result = append(result, id)
@@ -260,7 +271,7 @@ func (p *ExpressionParser) SearchByRegex(patternKey string, fieldOpts string) []
 	var results []result
 
 	for id, link := range p.config.AllLinks {
-		if time.Since(start).Milliseconds() > RegexTimeoutMS {
+		if p.ctx.Err() != nil || time.Since(start).Milliseconds() > RegexTimeoutMS {
 			break
 		}
 		if maxAge > 0 {
@@ -508,6 +519,9 @@ func (p *ExpressionParser) parseQuery(tokens []token, pos *int) []string {
 	result := p.parseSegment(tokens, pos)
 
 	for *pos < len(tokens) && tokens[*pos].typ == tokComma {
+		if p.ctx.Err() != nil {
+			return result
+		}
 		*pos++ // skip comma
 		if *pos >= len(tokens) {
 			break
@@ -677,6 +691,9 @@ func (p *ExpressionParser) resolveProtocol(value string) []string {
 
 	var result []string
 	for id, link := range allLinks {
+		if p.ctx.Err() != nil {
+			return result
+		}
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
@@ -975,8 +992,8 @@ func ValidateRegex(pattern string) RegexValidation {
 
 // Resolve resolves an expression against a config and returns matching links
 // with sanitized URLs.
-func Resolve(config *Config, expression string) []LinkWithID {
-	parser := NewParser(config)
+func Resolve(ctx context.Context, config *Config, expression string) []LinkWithID {
+	parser := NewParser(ctx, config)
 	ids := parser.Query(expression, "")
 	var results []LinkWithID
 	for _, id := range ids {
@@ -989,8 +1006,8 @@ func Resolve(config *Config, expression string) []LinkWithID {
 }
 
 // CherryPick resolves an expression and returns a map of id → sanitized link.
-func CherryPick(config *Config, expression string) map[string]Link {
-	parser := NewParser(config)
+func CherryPick(ctx context.Context, config *Config, expression string) map[string]Link {
+	parser := NewParser(ctx, config)
 	ids := parser.Query(expression, "")
 	result := make(map[string]Link)
 	for _, id := range ids {
@@ -1068,6 +1085,8 @@ func ValidateConfig(raw map[string]any) (*Config, error) {
 		"targetWindow": true,
 		"description":  true,
 		"thumbnail":    true,
+		"hooks":        true,
+		"guid":         true,
 		"createdAt":    true,
 	}
 
@@ -1184,6 +1203,18 @@ func ValidateConfig(raw map[string]any) (*Config, error) {
 		}
 		if s, ok := linkMap["thumbnail"].(string); ok {
 			link.Thumbnail = s
+		}
+		if s, ok := linkMap["guid"].(string); ok {
+			link.GUID = s
+		}
+		if hooksRaw, ok := linkMap["hooks"]; ok {
+			if hooksSlice, ok := hooksRaw.([]any); ok {
+				for _, h := range hooksSlice {
+					if hookStr, ok := h.(string); ok {
+						link.Hooks = append(link.Hooks, hookStr)
+					}
+				}
+			}
 		}
 		if ca, ok := linkMap["createdAt"]; ok {
 			link.CreatedAt = ca

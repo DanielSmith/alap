@@ -17,7 +17,7 @@
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink } from '../../core/types';
 import { warn } from '../../core/logger';
-import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
+import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_MENU_Z_INDEX, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
 
@@ -268,7 +268,7 @@ export class AlapUI {
         visibility: hidden;
         top: -9999px;
         left: -9999px;
-        z-index: 10;
+        z-index: ${DEFAULT_MENU_Z_INDEX};
         display: block;
         max-height: none;
         overflow: visible;
@@ -299,7 +299,7 @@ export class AlapUI {
       this.container.style.cssText = `
         position: absolute;
         display: block;
-        z-index: 10;
+        z-index: ${DEFAULT_MENU_Z_INDEX};
         top: ${result.y + window.scrollY}px;
         left: ${result.x + window.scrollX}px;
         overflow-x: clip;
@@ -331,7 +331,7 @@ export class AlapUI {
       this.container.style.cssText = `
         position: absolute;
         display: block;
-        z-index: 10;
+        z-index: ${DEFAULT_MENU_Z_INDEX};
         top: ${triggerRect.bottom + window.scrollY}px;
         left: ${triggerRect.left + window.scrollX}px;
       `;

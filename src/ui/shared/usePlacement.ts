@@ -16,7 +16,7 @@
 
 import { computePlacement, parsePlacement, FALLBACK_ORDER } from './placement';
 import type { Placement, PlacementResult, PlacementStrategy, Size } from './placement';
-import { DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
+import { DEFAULT_MENU_Z_INDEX, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 
 /** Valid placement values for class name validation. */
 const VALID_PLACEMENTS = new Set<string>(Object.keys(FALLBACK_ORDER));
@@ -102,7 +102,7 @@ export function applyPlacementToMenu(
   menuEl.style.position = 'absolute';
   menuEl.style.top = `${result.y - wrapperRect.top}px`;
   menuEl.style.left = `${result.x - wrapperRect.left}px`;
-  menuEl.style.zIndex = '10';
+  menuEl.style.zIndex = String(DEFAULT_MENU_Z_INDEX);
 
   if (result.maxHeight != null) {
     menuEl.style.maxHeight = `${result.maxHeight}px`;

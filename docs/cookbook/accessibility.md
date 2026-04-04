@@ -73,4 +73,4 @@ All of this — ARIA roles, keyboard navigation, focus management, auto-dismiss 
 
 The placement engine ensures menus stay within the viewport. When a menu would overflow, it repositions automatically — no content is hidden off-screen, and the page never scrolls to accommodate a menu. If the menu is taller than the available space, it's clamped with a scrollable region. Keyboard navigation (arrow keys, Home, End) works correctly within scrollable menus.
 
-The menus follow the WAI-ARIA menu button pattern. Formal WCAG 2.1 AA auditing is planned but not yet complete.
+The menus follow the WAI-ARIA menu button pattern.

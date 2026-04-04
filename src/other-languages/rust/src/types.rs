@@ -87,6 +87,14 @@ pub struct Link {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thumbnail: Option<String>,
 
+    /// Event hooks this item participates in, e.g. `["item-hover", "item-context"]`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hooks: Option<Vec<String>>,
+
+    /// Permanent UUID. Survives renames; generated at creation time.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub guid: Option<String>,
+
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "createdAt")]
     pub created_at: Option<serde_json::Value>,
 

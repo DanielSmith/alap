@@ -27,6 +27,8 @@ const LINK_FIELDS: &[&str] = &[
     "targetWindow",
     "description",
     "thumbnail",
+    "hooks",
+    "guid",
     "createdAt",
 ];
 
@@ -138,6 +140,17 @@ pub fn validate_config(value: Value) -> Result<Config, String> {
         let target_window = string_field(raw_link, "targetWindow");
         let description = string_field(raw_link, "description");
         let thumbnail = string_field(raw_link, "thumbnail");
+        let guid = string_field(raw_link, "guid");
+        let hooks = match raw_link.get("hooks") {
+            Some(Value::Array(arr)) => {
+                let filtered: Vec<String> = arr
+                    .iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect();
+                if filtered.is_empty() { None } else { Some(filtered) }
+            }
+            _ => None,
+        };
         let created_at = raw_link.get("createdAt").cloned();
 
         // Warn about unknown fields (anything not in whitelist)
@@ -161,6 +174,8 @@ pub fn validate_config(value: Value) -> Result<Config, String> {
                 target_window,
                 description,
                 thumbnail,
+                hooks,
+                guid,
                 created_at,
                 meta: None,
             },

@@ -77,7 +77,7 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 | Where to go | What you'll find |
 |-------------|-----------------|
 | **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
-| **[Examples](examples/)** | 26 demo sites + 9 server backends |
+| **[Examples](examples/)** | 29 demo sites + 9 server backends |
 | **[Framework Guides](docs/framework-guides/)** | 9 adapters + integrations for Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more |
 | **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |

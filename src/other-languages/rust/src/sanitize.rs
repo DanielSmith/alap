@@ -11,10 +11,11 @@ use regex::Regex;
 use crate::types::Link;
 
 static CONTROL_CHAR_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"[\x00-\x1f\x7f]").unwrap());
+    LazyLock::new(|| Regex::new(r"[\x00-\x1f\x7f]").expect("CONTROL_CHAR_RE is a valid regex"));
 
-static DANGEROUS_SCHEME: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?i)^(javascript|data|vbscript|blob)\s*:").unwrap());
+static DANGEROUS_SCHEME: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?i)^(javascript|data|vbscript|blob)\s*:").expect("DANGEROUS_SCHEME is a valid regex")
+});
 
 /// Returns the URL unchanged if safe, or `"about:blank"` if it uses a
 /// dangerous scheme (`javascript:`, `data:`, `vbscript:`, `blob:`).

@@ -1,6 +1,6 @@
 # Site Examples
 
-26 browser demos showing Alap in action across different adapters, theming approaches, and features.
+29 browser demos showing Alap in action across different adapters, theming approaches, and features.
 
 Each example is self-contained with its own `serve.sh` for standalone running. Ports are unique so you can run multiple examples simultaneously.
 
@@ -34,6 +34,7 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [alpine](alpine/) | 9000 | Alpine.js | `x-alap` directive, no build step, CDN-loadable |
 | [astro-integration](astro-integration/) | 9010 | Astro | Real Astro project with auto-inject integration |
 | [next](next/) | 9210 | Next.js | App Router pattern — layout, pages, web component mode |
+| [vitepress](vitepress/) | — | VitePress | `vitepress-alap` plugin with `<alap-link>` in markdown |
 | [hugo](hugo/) | — | Hugo | Shortcode + web component |
 | [eleventy](eleventy/) | — | Eleventy | `eleventy-alap` plugin with shortcodes |
 
@@ -71,6 +72,13 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [placement](placement/) | 9170 | Compass-based menu positioning — 9 positions with viewport containment |
 | [cdn](cdn/) | 9130 | Zero-build `<script>` tag setup — no npm, no bundler |
 | [htmx](htmx/) | 9220 | htmx + web component — HTML over the wire, zero framework |
+| [lightbox](lightbox/) | — | Lightbox renderer — fullscreen overlay instead of dropdown, thumbnail previews |
+
+## Development
+
+| Example | Port | What it shows |
+|---------|------|---------------|
+| [ui-sandbox](ui-sandbox/) | 9300 | Placement engine test harness — identical scenarios across all 6 adapters |
 
 ## Running
 

@@ -39,7 +39,7 @@
 
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink as AlapLinkType } from '../../core/types';
-import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
+import { DEFAULT_MENU_TIMEOUT, DEFAULT_MENU_Z_INDEX, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT_GAP } from '../../constants';
 import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
 
@@ -79,7 +79,7 @@ function notifyMenuOpen(id: string): void {
 
 const MENU_STYLES = `
   position: absolute;
-  z-index: 9999;
+  z-index: ${DEFAULT_MENU_Z_INDEX};
   display: none;
 `;
 
@@ -200,7 +200,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
           if (!state) {
             // Measurement failed — fall back to trigger-relative positioning
             const rect = el.getBoundingClientRect();
-            menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+            menu.style.top = `${rect.bottom + window.scrollY + DEFAULT_PLACEMENT_GAP}px`;
             menu.style.left = `${rect.left + window.scrollX}px`;
           } else {
             const { result } = state;
@@ -222,7 +222,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         // No placement engine — position directly below trigger
         menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN;
         const rect = el.getBoundingClientRect();
-        menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+        menu.style.top = `${rect.bottom + window.scrollY + DEFAULT_PLACEMENT_GAP}px`;
         menu.style.left = `${rect.left + window.scrollX}px`;
       }
 

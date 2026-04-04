@@ -24,7 +24,7 @@ No — the concept dates back to the 1990s:
 - **2012:** Originally called "MultiLinks," built with jQuery.
 - **2021 (v1):** Rewritten as an ES6 library, no dependencies. Published on npm as `alap`.
 - **2021 (v2):** Introduced an API mode so frameworks like Vue and React could use Alap for data without Alap touching the DOM.
-- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, and Python. 790+ tests.
+- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, and Python. 990+ tests.
 
 ### How is this different from a dropdown menu or a tooltip?
 
@@ -33,6 +33,18 @@ A dropdown is a navigation element — it's part of the page structure. An Alap 
 ### Won't users be confused by links that open menus?
 
 The `aria-haspopup="true"` attribute signals to screen readers that the link opens a menu. For sighted users, the cursor changes and the menu appears on click — the interaction is the same as any popup menu. The key is signaling intent: dotted underlines, subtle icons, or different link styling can distinguish Alap links from regular links. See [Styling](core-concepts/styling.md) for details.
+
+### How does Alap handle accessibility?
+
+Accessibility is built in, not bolted on. Every adapter (DOM, Web Component, React, Vue, Svelte, Solid, Qwik, Alpine, Astro, Eleventy) ships the same behavior out of the box:
+
+- **ARIA roles** — triggers announce as `role="button"` with `aria-haspopup="true"` and `aria-expanded`. Screen readers hear "Coffee shops, button, menu, collapsed" before any interaction.
+- **Keyboard navigation** — `Enter`/`Space` opens, `ArrowDown`/`ArrowUp` navigates items, `Escape` closes and returns focus to the trigger. `Home`/`End` jump to first/last item. No focus is ever lost.
+- **Menu structure** — follows the WAI-ARIA menu button pattern. List semantics are removed so screen readers see only the menu and its items.
+- **Auto-dismiss** — mouse leave timeout, click outside, `Escape`, `Tab` (moves focus forward, menu closes), and native Popover API dismissal.
+- **Viewport containment** — the placement engine prevents menus from overflowing the viewport. If a menu is taller than the available space, it's clamped with a scrollable region that keyboard navigation works within.
+
+You don't configure any of this. Render the component and it's there. See [Accessibility](cookbook/accessibility.md) for the full details.
 
 ### Does this affect SEO?
 
@@ -108,7 +120,7 @@ See [Styling](core-concepts/styling.md) for the full guide, and [Web Component](
 | **Web Component** | Per-element Shadow DOM, same placement engine, `::part()` theming | Style isolation, third-party embedding |
 | **Popover** | HTML Popover API, browser-managed stacking | Modern browsers, no z-index management |
 
-DOM and Web Component modes support 9 placement positions (N, NE, E, SE, S, SW, W, NW, C) with automatic fallback when the preferred position doesn't fit in the viewport. Popover mode skips the compass placement engine and relies on the browser's native positioning instead.
+DOM and Web Component modes support 9 compass positions (N, NE, E, SE, S, SW, W, NW, C) with three strategies: **flip** (default — tries fallback directions), **clamp** (flip + constrain to viewport with scroll), and **place** (pinned, no fallback). Popover mode skips the compass placement engine and relies on the browser's native positioning instead. See [Placement](cookbook/placement.md) for the full guide.
 
 ### Can I have multiple configs on one page?
 
@@ -205,7 +217,7 @@ Every Alap [editor](cookbook/editors.md) includes a live query tester. Type an e
 
 ### Is this AI-generated code?
 
-The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 790+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
+The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 990+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
 
 ### Why Apache 2.0 license?
 

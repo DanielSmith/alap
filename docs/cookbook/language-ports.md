@@ -54,8 +54,8 @@ See [Security](../api-reference/security.md) for the full cross-language matrix.
 
 These are server-side ports. Browser-side concerns stay in the TypeScript client:
 
-- DOM rendering, compass-based menu placement, event handling
-- Viewport containment and placement fallback
+- DOM rendering, compass-based menu placement (flip/clamp/place strategies), event handling
+- Viewport containment and placement fallback logic
 - CSS injection, `alapelem` container management
 
 ## Python

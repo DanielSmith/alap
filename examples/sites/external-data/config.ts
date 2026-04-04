@@ -32,15 +32,6 @@ export const demoConfig: AlapConfig = {
   },
 
   protocols: {
-    // :echo: — toy protocol, lazy-loaded via dynamic import.
-    // The module only downloads when someone clicks a link with :echo: in its expression.
-    echo: {
-      generate: async (segments) => {
-        const { generate } = await import('./echo-protocol');
-        return generate(segments);
-      },
-      cache: 0,
-    },
     time: {
       // Using the built-in time handler — included for composition demos
       filter: (segments, link) => {

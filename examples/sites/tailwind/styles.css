@@ -33,11 +33,11 @@
 .alapelem {
   margin-top: 0.5rem;
   min-width: 200px;
-  background: #2240a8;
-  border: 1px solid #4470cc;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;            /* gray-200 */
   border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25),
-              0 4px 6px -4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 .alapelem ul {
@@ -56,15 +56,15 @@
   padding: 0.5rem 1rem;
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 0.875rem;
-  color: #f0f2ff;
+  color: #1f2937;                        /* gray-800 */
   text-decoration: none;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .alapelem a:hover,
 .alapelem a:focus {
-  background: #3366d6;
-  color: #ffd666;
+  background: #eff6ff;                   /* blue-50 */
+  color: #2563eb;                        /* blue-600 */
   outline: none;
 }
 
@@ -74,14 +74,18 @@
 
 .alap_bridges {
   margin-top: 1rem;
-  background: #1e3090;
-  border-color: #44dd77;
+  background: #f0fdf4;                  /* green-50 */
+  border-color: #86efac;                /* green-300 */
+}
+
+.alap_bridges a {
+  color: #166534;                        /* green-800 */
 }
 
 .alap_bridges a:hover,
 .alap_bridges a:focus {
-  background: #223098;
-  color: #44dd77;
+  background: #dcfce7;                  /* green-100 */
+  color: #166534;                        /* green-800 */
 }
 
 /* -------------------------------------------------------
@@ -90,14 +94,18 @@
 
 .alap_coffee {
   margin-left: 2rem;
-  background: #2952c0;
-  border-color: #ffd666;
+  background: #fffbeb;                  /* amber-50 */
+  border-color: #fcd34d;                /* amber-300 */
+}
+
+.alap_coffee a {
+  color: #92400e;                        /* amber-900 */
 }
 
 .alap_coffee a:hover,
 .alap_coffee a:focus {
-  background: #3366d6;
-  color: #ffe8a0;
+  background: #fef3c7;                  /* amber-100 */
+  color: #92400e;                        /* amber-900 */
 }
 
 /* -------------------------------------------------------
@@ -105,20 +113,20 @@
    ------------------------------------------------------- */
 
 .alap_nycspots {
-  background: #141e6a;
-  border-color: #2e48a0;
+  background: #1e293b;                  /* slate-800 */
+  border-color: #334155;                /* slate-700 */
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
               0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
 .alap_nycspots a {
-  color: #b8c4e8;
+  color: #e2e8f0;                        /* slate-200 */
 }
 
 .alap_nycspots a:hover,
 .alap_nycspots a:focus {
-  background: #1c2a82;
-  color: #88bbff;
+  background: #334155;                  /* slate-700 */
+  color: #60a5fa;                        /* blue-400 */
 }
 
 /* -------------------------------------------------------
@@ -128,10 +136,10 @@
 .alap_sfspots {
   border-radius: 1rem;
   border-width: 2px;
-  border-color: #4470cc;
-  background: #2952c0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
-              0 2px 4px -2px rgba(0, 0, 0, 0.15);
+  border-color: #c7d2fe;                /* indigo-200 */
+  background: #eef2ff;                  /* indigo-50 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 .alap_sfspots li:first-child a {
@@ -142,8 +150,12 @@
   border-radius: 0 0 1rem 1rem;
 }
 
+.alap_sfspots a {
+  color: #3730a3;                        /* indigo-800 */
+}
+
 .alap_sfspots a:hover,
 .alap_sfspots a:focus {
-  background: #3366d6;
-  color: #ffe8a0;
+  background: #e0e7ff;                  /* indigo-100 */
+  color: #3730a3;                        /* indigo-800 */
 }

@@ -1,6 +1,6 @@
 # Tests
 
-794 tests across 41 files, run via Vitest in 5 projects.
+992 tests across 45 files, run via Vitest in 5 projects.
 
 ```bash
 pnpm test          # run all tests

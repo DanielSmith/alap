@@ -31,7 +31,8 @@ const MAX_SEARCH_RESULTS: usize = 100;
 const REGEX_TIMEOUT_MS: u128 = 20;
 const MAX_REFINERS: usize = 10;
 
-static MACRO_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"@(\w*)").unwrap());
+static MACRO_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"@(\w*)").expect("MACRO_RE is a valid regex"));
 
 /// Resolves Alap expressions against a [`Config`].
 ///
@@ -728,7 +729,7 @@ fn matches_fields(
 }
 
 static AGE_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?i)^(\d+)\s*([dhwm])$").unwrap());
+    LazyLock::new(|| Regex::new(r"(?i)^(\d+)\s*([dhwm])$").expect("AGE_RE is a valid regex"));
 
 fn parse_age(age: &str) -> f64 {
     let caps = match AGE_RE.captures(age) {

@@ -271,6 +271,72 @@ fn allows_hyphens_in_non_expression_fields() {
     assert_eq!(link.description.as_deref(), Some("A well-known place"));
 }
 
+// --- hooks and guid ---
+
+#[test]
+fn preserves_hooks_and_guid() {
+    let input = json!({
+        "allLinks": {
+            "item": {
+                "url": "https://example.com",
+                "hooks": ["item_hover", "item_context"],
+                "guid": "550e8400-e29b-41d4-a716-446655440000"
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let link = &cfg.all_links["item"];
+    assert_eq!(
+        link.hooks.as_deref(),
+        Some(vec!["item_hover".to_string(), "item_context".to_string()].as_slice())
+    );
+    assert_eq!(link.guid.as_deref(), Some("550e8400-e29b-41d4-a716-446655440000"));
+}
+
+#[test]
+fn filters_non_string_hooks() {
+    let input = json!({
+        "allLinks": {
+            "item": {
+                "url": "https://example.com",
+                "hooks": ["item_hover", 42, true, "item_context"]
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let link = &cfg.all_links["item"];
+    assert_eq!(
+        link.hooks.as_deref(),
+        Some(vec!["item_hover".to_string(), "item_context".to_string()].as_slice())
+    );
+}
+
+#[test]
+fn hooks_none_when_not_provided() {
+    let input = json!({
+        "allLinks": {
+            "item": { "url": "https://example.com" }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    assert!(cfg.all_links["item"].hooks.is_none());
+    assert!(cfg.all_links["item"].guid.is_none());
+}
+
+#[test]
+fn hooks_none_when_empty_array() {
+    let input = json!({
+        "allLinks": {
+            "item": {
+                "url": "https://example.com",
+                "hooks": []
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    assert!(cfg.all_links["item"].hooks.is_none());
+}
+
 // --- Regex validation ---
 
 #[test]

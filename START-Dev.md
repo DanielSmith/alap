@@ -423,7 +423,7 @@ See [wordpress-alap](plugins/wordpress/) (`plugins/wordpress/`) and the [WordPre
 
 ```bash
 pnpm install
-pnpm test         # 794 tests across 41 files
+pnpm test         # 992 tests across 45 files
 pnpm typecheck
 pnpm build
 ```

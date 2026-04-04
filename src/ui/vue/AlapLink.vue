@@ -24,7 +24,7 @@ import { sanitizeUrl } from '../../core/sanitizeUrl';
 import type { AlapLinkMode } from './providerKey';
 import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
 import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import { REM_PER_MENU_ITEM } from '../../constants';
+import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
 type ResolvedLink = { id: string } & AlapLinkType;
 
@@ -78,7 +78,7 @@ const menuPositionDefaults: CSSProperties = {
   position: 'absolute',
   top: '100%',
   left: '0',
-  zIndex: 10,
+  zIndex: DEFAULT_MENU_Z_INDEX,
 };
 
 const mergedMenuStyle = computed<CSSProperties>(() => {

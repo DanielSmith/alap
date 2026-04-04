@@ -41,7 +41,7 @@ The web component (`<alap-link>`) also works directly in Astro with zero extra c
 |------|------|-------------|
 | `query` | `string` | Expression to evaluate |
 | `config` | `string` | Named config to use |
-| Any HTML attribute | — | Passed through to `<alap-link>` |
+| Any HTML attribute | — | Passed through to `<alap-link>` (e.g. `placement="N, clamp"`) |
 
 ## Examples
 

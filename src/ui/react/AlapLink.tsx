@@ -33,7 +33,7 @@ import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
 import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
 import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import { REM_PER_MENU_ITEM } from '../../constants';
+import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
 export type AlapLinkMode = 'dom' | 'webcomponent' | 'popover';
@@ -130,7 +130,7 @@ export function AlapLink({
     position: 'absolute',
     top: '100%',
     left: 0,
-    zIndex: 10,
+    zIndex: DEFAULT_MENU_Z_INDEX,
   };
 
   const mergedMenuStyle = useMemo<CSSProperties>(() => {

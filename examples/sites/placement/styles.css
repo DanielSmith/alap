@@ -41,6 +41,36 @@ p { max-width: 800px; margin-left: auto; margin-right: auto; }
   margin: 0 0.5rem;
 }
 
+/* --- Strategy table --- */
+
+.strategy-table {
+  max-width: 800px;
+  margin: 1rem auto;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.strategy-table th,
+.strategy-table td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border: 1px solid var(--alap-border, #4470cc);
+}
+
+.strategy-table thead th {
+  background: #152570;
+  color: #ffe8a0;
+  font-weight: 600;
+}
+
+.strategy-table tbody td {
+  background: var(--alap-bg, #2240a8);
+}
+
+.strategy-table tbody td:first-child {
+  white-space: nowrap;
+}
+
 /* --- Section divider --- */
 
 .section-divider {
