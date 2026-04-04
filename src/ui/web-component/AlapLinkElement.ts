@@ -18,8 +18,8 @@ import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement, PlacementResult, Size } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
 
 /**
  * Global registry of AlapEngine instances keyed by config name.
@@ -390,14 +390,14 @@ export class AlapLinkElement extends HTMLElement {
 
   // --- Placement ---
 
-  /** Read placement preference from element attribute or config. */
-  private getPlacement(): Placement {
+  /** Read and parse placement from element attribute or config. */
+  private getPlacement(): ParsedPlacement {
     const attr = this.getAttribute('placement');
-    if (attr && /^(N|NE|E|SE|S|SW|W|NW|C)$/.test(attr)) {
-      return attr as Placement;
-    }
+    if (attr) return parsePlacement(attr);
     const config = this.getConfig();
-    return (config?.settings?.placement as Placement) ?? DEFAULT_PLACEMENT;
+    const configVal = config?.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return parsePlacement(DEFAULT_PLACEMENT);
   }
 
   /** Read the gap value from --alap-gap CSS variable or config. */
@@ -482,7 +482,7 @@ export class AlapLinkElement extends HTMLElement {
       this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
 
       const triggerRect = this.getBoundingClientRect();
-      const placement = this.getPlacement();
+      const parsed = this.getPlacement();
       const gap = this.getGap();
       const padding = (config?.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
 
@@ -490,7 +490,8 @@ export class AlapLinkElement extends HTMLElement {
         triggerRect,
         menuSize: this.menuNaturalSize,
         viewport: { width: window.innerWidth, height: window.innerHeight },
-        placement,
+        placement: parsed.compass,
+        strategy: parsed.strategy,
         gap,
         padding,
       });
@@ -523,7 +524,7 @@ export class AlapLinkElement extends HTMLElement {
     const config = this.getConfig();
     const gap = this.getGap();
     const padding = (config?.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
-    const placement = this.getPlacement();
+    const parsed = this.getPlacement();
 
     this.scrollHandler = () => {
       if (!this.menu || !this.isOpen || !this.menuNaturalSize) return;
@@ -533,7 +534,8 @@ export class AlapLinkElement extends HTMLElement {
         triggerRect,
         menuSize: this.menuNaturalSize,
         viewport: { width: window.innerWidth, height: window.innerHeight },
-        placement,
+        placement: parsed.compass,
+        strategy: parsed.strategy,
         gap,
         padding,
       });

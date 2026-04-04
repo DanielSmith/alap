@@ -9,16 +9,17 @@
 <body>
   <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
   <h1>Placement Demo</h1>
-  <p>Alap uses a compass-based placement engine. Click any link to see the menu appear in the specified direction. When a preferred placement doesn't fit, the engine falls back automatically.</p>
+  <p>Alap uses a compass-based placement engine with three strategy levels. The <code>placement</code> attribute is a comma-separated string: compass direction + strategy.</p>
 
   <!-- ===================================================================
        TABLE OF CONTENTS
        =================================================================== -->
 
   <nav class="toc">
-    <div><strong>Jump to:</strong>
+    <div><strong>Basics:</strong>
+    <a href="#strategies">Strategies</a>
     <a href="#dom-compass">DOM Compass</a>
-    <a href="#wc-compass">Web Component Compass</a>
+    <a href="#wc-compass">WC Compass</a>
     <a href="#inline">Inline Text</a></div>
     <div><strong>Stress Tests:</strong>
     <a href="#h-flip">Horizontal Flips</a>
@@ -33,11 +34,30 @@
   </nav>
 
   <!-- ===================================================================
+       STRATEGIES
+       =================================================================== -->
+
+  <h2 id="strategies">Placement Strategies</h2>
+  <p>The <code>placement</code> attribute takes a compass direction and an optional strategy, separated by a comma:</p>
+
+  <table class="strategy-table">
+    <thead>
+      <tr><th>Attribute</th><th>What happens</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>placement="SE"</code></td><td>Position SE. If it doesn't fit, try fallbacks. <strong>Default strategy (flip).</strong></td></tr>
+      <tr><td><code>placement="SE, clamp"</code></td><td>Flip + constrain to viewport. Overrides <code>min-width</code>, scrolls long menus.</td></tr>
+      <tr><td><code>placement="SE, place"</code></td><td>Pinned at SE. No fallback, no clamping.</td></tr>
+      <tr><td><em>(not set)</em></td><td>Engine doesn't run. CSS positions the menu.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ===================================================================
        SECTION 1: DOM Compass Rose (happy path)
        =================================================================== -->
 
   <h2 id="dom-compass">1. DOM Adapter &mdash; Compass Rose</h2>
-  <p>Each link requests a specific direction. With the trigger centered on the page, every placement fits.</p>
+  <p>Each link requests a specific direction with the default <code>flip</code> strategy. Trigger centered &mdash; every placement fits.</p>
 
   <div class="compass-grid">
     <div class="compass-cell"><a class="alap" data-alap-linkitems=".bridge" data-alap-placement="NW">NW</a></div>
@@ -81,7 +101,7 @@
     <a class="alap" data-alap-linkitems=".park" data-alap-placement="E">beside (E)</a>,
     or <alap-link query=".bridge" placement="C">centered (C)</alap-link>
     over the trigger word. Here's a long menu
-    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">inline with 20 items</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE, clamp">inline with 20 items (clamped)</a>
     that should clamp without scrolling the page.
   </p>
 
@@ -132,14 +152,14 @@
        =================================================================== -->
 
   <h2 id="corners">6. Corner Stress Tests</h2>
-  <p>Links pinned to each corner. Every placement requested is the worst possible for that corner.</p>
+  <p>Links pinned to each corner. Every placement requested is the worst possible for that corner. Using <code>clamp</code> strategy to constrain to viewport.</p>
   <p class="scroll-hint"><a href="#corner-target">Scroll to test position &darr;</a></p>
 
   <div id="corner-target" class="corner-grid">
-    <a class="alap corner-tl" data-alap-linkitems=".bridge" data-alap-placement="NW">NW in top-left</a>
-    <a class="alap corner-tr" data-alap-linkitems=".bridge" data-alap-placement="NE">NE in top-right</a>
-    <a class="alap corner-bl" data-alap-linkitems=".bridge" data-alap-placement="SW">SW in bottom-left</a>
-    <a class="alap corner-br" data-alap-linkitems=".bridge" data-alap-placement="SE">SE in bottom-right</a>
+    <a class="alap corner-tl" data-alap-linkitems=".bridge" data-alap-placement="NW, clamp">NW in top-left</a>
+    <a class="alap corner-tr" data-alap-linkitems=".bridge" data-alap-placement="NE, clamp">NE in top-right</a>
+    <a class="alap corner-bl" data-alap-linkitems=".bridge" data-alap-placement="SW, clamp">SW in bottom-left</a>
+    <a class="alap corner-br" data-alap-linkitems=".bridge" data-alap-placement="SE, clamp">SE in bottom-right</a>
   </div>
 
   <!-- ===================================================================
@@ -147,25 +167,37 @@
        =================================================================== -->
 
   <h2 id="long-menu">7. Long Menu &mdash; Height Clamping</h2>
-  <p>20 items. The menu can't fit fully &mdash; it should clamp to available space and scroll internally. No page scroll.</p>
+  <p>20 items with <code>clamp</code> strategy. The menu can't fit fully &mdash; it should clamp to available space and scroll internally. No page scroll.</p>
   <p class="scroll-hint"><a href="#long-menu-target">Scroll to test position &darr;</a></p>
 
   <div id="long-menu-target" class="long-menu-row">
     <div class="long-menu-cell">
-      <p><code>SE</code> (default below)</p>
-      <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">20 items (SE)</a>
+      <p><code>SE, clamp</code></p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE, clamp">20 items</a>
     </div>
     <div class="long-menu-cell">
-      <p><code>N</code> (above)</p>
-      <a class="alap" data-alap-linkitems=".long" data-alap-placement="N">20 items (N)</a>
+      <p><code>N, clamp</code></p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="N, clamp">20 items</a>
     </div>
     <div class="long-menu-cell">
-      <p><code>C</code> (centered)</p>
-      <a class="alap" data-alap-linkitems=".long" data-alap-placement="C">20 items (C)</a>
+      <p><code>C, clamp</code></p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="C, clamp">20 items</a>
     </div>
     <div class="long-menu-cell">
-      <p><code>E</code> (beside)</p>
-      <a class="alap" data-alap-linkitems=".long" data-alap-placement="E">20 items (E)</a>
+      <p><code>E, clamp</code></p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="E, clamp">20 items</a>
+    </div>
+  </div>
+
+  <p>Same links with <code>flip</code> (default) &mdash; no clamping, menu may overflow:</p>
+  <div class="long-menu-row">
+    <div class="long-menu-cell">
+      <p><code>SE</code> (flip)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">20 items</a>
+    </div>
+    <div class="long-menu-cell">
+      <p><code>N</code> (flip)</p>
+      <a class="alap" data-alap-linkitems=".long" data-alap-placement="N">20 items</a>
     </div>
   </div>
 
@@ -174,19 +206,19 @@
        =================================================================== -->
 
   <h2 id="long-bottom">8. Long Menu Near Bottom of Viewport</h2>
-  <p>A long menu near the bottom. <code>SE</code> overflows massively &mdash; should flip above or clamp. Scroll so the links are near the bottom of your viewport, then click.</p>
+  <p>A long menu near the bottom with <code>clamp</code>. <code>SE</code> overflows massively &mdash; should flip above or clamp. Scroll so the links are near the bottom of your viewport, then click.</p>
   <p class="scroll-hint"><a href="#long-bottom-target">Scroll to test position &darr;</a> &mdash; the links should be near the <strong>bottom</strong> of your viewport after scrolling.</p>
 
   <div class="bottom-spacer"></div>
 
   <div id="long-bottom-target" class="bottom-stress">
-    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE">20 items, SE</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE, clamp">20 items, SE clamp</a>
     &nbsp;&mdash;&nbsp;
-    <a class="alap" data-alap-linkitems=".long" data-alap-placement="S">20 items, S</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="S, clamp">20 items, S clamp</a>
     &nbsp;&mdash;&nbsp;
-    <alap-link query=".long" placement="SE">20 items, SE (web component)</alap-link>
+    <alap-link query=".long" placement="SE, clamp">20 items, SE clamp (WC)</alap-link>
     &nbsp;&mdash;&nbsp;
-    <a class="alap" data-alap-linkitems=".long" data-alap-placement="C">20 items, C</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="C, clamp">20 items, C clamp</a>
   </div>
 
   <div class="bottom-spacer-after"></div>
@@ -196,14 +228,14 @@
        =================================================================== -->
 
   <h2 id="right-align">9. Right Edge &mdash; Forced Flips</h2>
-  <p>Links pinned flush against the right viewport edge. SE and E have no room to the right.</p>
+  <p>Links pinned flush against the right viewport edge. SE and E have no room to the right. Using <code>clamp</code> to constrain wide menus.</p>
   <p class="scroll-hint"><a href="#right-align-target">Scroll to test position &darr;</a></p>
 
   <div id="right-align-target" class="edge-right-col">
-    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE">SE flush right</a>
-    <a class="alap" data-alap-linkitems=".long" data-alap-placement="E">E flush right (20 items)</a>
-    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="NE">NE flush right</a>
-    <alap-link query=".long" placement="E">E flush right (WC, 20 items)</alap-link>
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE, clamp">SE flush right (clamp)</a>
+    <a class="alap" data-alap-linkitems=".long" data-alap-placement="E, clamp">E flush right, 20 items (clamp)</a>
+    <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="NE, clamp">NE flush right (clamp)</a>
+    <alap-link query=".long" placement="E, clamp">E flush right, 20 items (WC, clamp)</alap-link>
   </div>
 
   <div class="end-spacer"></div>
@@ -214,25 +246,18 @@
     // Make "scroll to position" links scroll the target to the appropriate
     // viewport edge. For "bottom" tests, scroll so the target is near the
     // bottom of the viewport. For everything else, scroll to the top.
-    document.querySelectorAll('.scroll-hint a[href^="#"]').forEach(function(link) {
-      link.addEventListener('click', function(e) {
+    document.querySelectorAll('.scroll-hint a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
         e.preventDefault();
-        const id = this.getAttribute('href').slice(1);
+        const id = link.getAttribute('href').slice(1);
         const target = document.getElementById(id);
         if (!target) return;
 
-        const isBottomTest = id === 'long-bottom-target';
-        if (isBottomTest) {
-          // Scroll so the target is near the bottom of the viewport
-          const targetRect = target.getBoundingClientRect();
-          const scrollTo = window.scrollY + targetRect.bottom - window.innerHeight + 40;
-          window.scrollTo({ top: Math.max(0, scrollTo), behavior: 'smooth' });
-        } else {
-          // Scroll so the target is near the top of the viewport
-          const targetRect = target.getBoundingClientRect();
-          const scrollTo = window.scrollY + targetRect.top - 10;
-          window.scrollTo({ top: Math.max(0, scrollTo), behavior: 'smooth' });
-        }
+        const rect = target.getBoundingClientRect();
+        const scrollTo = id === 'long-bottom-target'
+          ? window.scrollY + rect.bottom - window.innerHeight + 40
+          : window.scrollY + rect.top - 10;
+        window.scrollTo({ top: Math.max(0, scrollTo), behavior: 'smooth' });
       });
     });
   </script>

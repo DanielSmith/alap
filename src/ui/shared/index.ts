@@ -20,9 +20,9 @@ export { handleMenuKeyboard } from './menuKeyboard';
 export type { MenuKeyboardOptions } from './menuKeyboard';
 export { DismissTimer } from './dismissTimer';
 export { resolveExistingUrlMode, injectExistingUrl } from './existingUrl';
-export { computePlacement, FALLBACK_ORDER } from './placement';
-export type { Placement, Rect, Size, PlacementInput, PlacementResult } from './placement';
-export { calcPlacementState, applyPlacementToMenu, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from './usePlacement';
+export { computePlacement, parsePlacement, FALLBACK_ORDER } from './placement';
+export type { Placement, PlacementStrategy, ParsedPlacement, Rect, Size, PlacementInput, PlacementResult } from './placement';
+export { calcPlacementState, applyPlacementToMenu, applyPlacementAfterLayout, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from './usePlacement';
 export type { CalcPlacementOptions, PlacementState } from './usePlacement';
 export type {
   TriggerHoverDetail,

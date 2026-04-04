@@ -40,8 +40,8 @@
 import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink as AlapLinkType } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementState, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
 
 // Re-export core types for convenience
 export type { AlapConfig, AlapLinkType as AlapLink };
@@ -52,8 +52,8 @@ export interface AlapDirectiveValue {
   listType?: 'ul' | 'ol';
   menuTimeout?: number;
   maxVisibleItems?: number;
-  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
-  placement?: Placement;
+  /** Placement string, e.g. "SE", "SE, clamp", "N, place". When set, uses the placement engine. */
+  placement?: string;
   /** Pixel gap between trigger and menu edge. Default: 4. */
   gap?: number;
   /** Minimum pixel distance from viewport edges. Default: 8. */
@@ -188,27 +188,39 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         menu.classList.add(`alap_${el.id}`);
       }
 
-      // Position the menu
-      menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN;
-
       if (opts.placement) {
-        const state = calcPlacementState(el, menu, {
+        // Show the menu off-screen so it can be measured, then position it in rAF.
+        menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN + 'visibility: hidden;';
+
+        calcPlacementAfterLayout(el, menu, {
           placement: opts.placement,
           gap: opts.gap,
           padding: opts.padding,
+        }, (state) => {
+          if (!state) {
+            // Measurement failed — fall back to trigger-relative positioning
+            const rect = el.getBoundingClientRect();
+            menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+            menu.style.left = `${rect.left + window.scrollX}px`;
+          } else {
+            const { result } = state;
+            menu.style.top = `${result.y + window.scrollY}px`;
+            menu.style.left = `${result.x + window.scrollX}px`;
+            if (result.maxHeight != null) {
+              menu.style.maxHeight = `${result.maxHeight}px`;
+              menu.style.overflowY = 'auto';
+            }
+            if (result.maxWidth != null) {
+              menu.style.maxWidth = `${result.maxWidth}px`;
+              menu.style.minWidth = '0px';
+            }
+            applyPlacementClass(menu, result.placement);
+          }
+          menu.style.visibility = 'visible';
         });
-        const { result } = state;
-        menu.style.top = `${result.y + window.scrollY}px`;
-        menu.style.left = `${result.x + window.scrollX}px`;
-        if (result.maxHeight != null) {
-          menu.style.maxHeight = `${result.maxHeight}px`;
-          menu.style.overflowY = 'auto';
-        }
-        if (result.maxWidth != null) {
-          menu.style.maxWidth = `${result.maxWidth}px`;
-        }
-        applyPlacementClass(menu, result.placement);
       } else {
+        // No placement engine — position directly below trigger
+        menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN;
         const rect = el.getBoundingClientRect();
         menu.style.top = `${rect.bottom + window.scrollY + 4}px`;
         menu.style.left = `${rect.left + window.scrollX}px`;

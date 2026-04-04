@@ -31,8 +31,8 @@ import { useMenuDismiss } from './useMenuDismiss';
 import { createMenuKeyHandler } from './useMenuKeyboard';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
-import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -78,8 +78,8 @@ export interface AlapLinkProps {
   /** Fired on right-click of a menu item */
   onItemContext?: (detail: ItemContextDetail) => void;
 
-  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine instead of CSS-only positioning. */
-  placement?: Placement;
+  /** Placement string, e.g. "SE", "SE, clamp", "N, place". When set, uses the placement engine. */
+  placement?: string;
 
   /** Pixel gap between trigger and menu edge. Default: 4. Only used when placement is set. */
   gap?: number;
@@ -199,16 +199,10 @@ export function AlapLink({
     const menuEl = menuRef.current;
     const wrapperEl = wrapperRef.current;
 
-    const apply = () => {
-      const state = calcPlacementState(triggerEl, menuEl, { placement, gap, padding });
-      applyPlacementToMenu(menuEl, wrapperEl, state);
-    };
+    const applyNow = applyPlacementAfterLayout(triggerEl, menuEl, wrapperEl, { placement, gap, padding });
 
-    // Initial placement
-    apply();
-
-    // Recompute on scroll
-    const onScroll = () => apply();
+    // Recompute on scroll (synchronous — layout already settled)
+    const onScroll = () => applyNow();
     window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
@@ -231,7 +225,7 @@ export function AlapLink({
 
   useEffect(() => {
     if (isOpen) closeMenu();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [config]);
 
   // --- Keyboard nav ---

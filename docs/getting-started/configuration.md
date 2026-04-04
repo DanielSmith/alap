@@ -86,7 +86,7 @@ settings: {
 | `menuTimeout` | `number` | `5000` | Auto-dismiss timeout (ms) after mouse leaves |
 | `maxVisibleItems` | `number` | `10` | Items before the menu scrolls. `0` = no limit |
 | `existingUrl` | `'prepend' \| 'append' \| 'ignore'` | `'prepend'` | How to handle an existing `href` on the trigger |
-| `placement` | `'N' \| 'NE' \| 'E' \| 'SE' \| 'S' \| 'SW' \| 'W' \| 'NW' \| 'C'` | `'SE'` | Preferred menu placement relative to the trigger |
+| `placement` | `string` | `'SE'` | Comma-separated placement string: compass direction + strategy (e.g. `'SE'`, `'SE, clamp'`) |
 | `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
 | `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
 | `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment |
@@ -105,11 +105,13 @@ The `placement` setting controls where the menu appears relative to the trigger.
          (C = centered over trigger)
 ```
 
-The default is `SE` — below the trigger, left edge aligned with the trigger's left edge. If the preferred placement doesn't fit in the viewport, Alap tries the opposite side, then adjacent positions, then the best available fit with height clamping and scrolling. The menu never causes the page to scroll.
+The default is `SE` — below the trigger, left edge aligned with the trigger's left edge. The default strategy is `flip` — if the preferred direction doesn't fit, the engine tries fallback positions.
 
-Per-element override: `data-alap-placement="N"` (DOM mode) or `placement="N"` (web component).
+Add a strategy to control how hard the engine tries: `"SE"` (flip, default), `"SE, clamp"` (constrain to viewport), or `"SE, place"` (pinned, no fallback). When no `placement` is set at all, the engine doesn't run — CSS positions the menu.
 
-See [Placement](../cookbook/placement.md) for the full guide on placement vs. CSS styling.
+Per-element override: `data-alap-placement="N, clamp"` (DOM mode) or `placement="N, clamp"` (web component / framework adapters).
+
+See [Placement](../cookbook/placement.md) for the full guide on placement, strategies, and CSS styling.
 
 ## `macros` — reusable expressions
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-var alapConfig = {
+window.alapConfig = {
   settings: { listType: "ul", menuTimeout: 5000, placement: "SE", placementGap: 6 },
 
   macros: {

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placement Sandbox</title>
+  <link rel="stylesheet" href="./shared/styles.css">
+</head>
+<body>
+  <p class="back"><a href="/">&larr; Examples Gallery</a></p>
+  <h1>Placement Sandbox</h1>
+  <p>
+    Visual test pages for the placement engine across every adapter.
+    Each page has identical scenarios so you can compare behavior side by side.
+  </p>
+  <p>
+    <strong>What to look for:</strong> menus should never overflow the viewport.
+    The right-edge scenarios (section 2) reproduce the TTT bug where
+    "Browse filtered" opens a menu with long titles that extends past
+    the right edge of the screen.
+  </p>
+
+  <h2>Adapters</h2>
+  <div class="nav">
+    <a href="./dom/">DOM + Web Component</a>
+    <a href="./vue/">Vue</a>
+    <a href="./react/">React</a>
+    <a href="./svelte/">Svelte</a>
+    <a href="./solid/">Solid</a>
+    <a href="./alpine/">Alpine</a>
+  </div>
+
+  <h2>Scenarios (same on every page)</h2>
+  <ol style="max-width: 700px; line-height: 2;">
+    <li><strong>Compass Rose</strong> &mdash; all 9 placements, centered trigger, happy path</li>
+    <li><strong>Right-Edge Overflow</strong> &mdash; trigger near right edge, long titles, <code>min-width: 200px</code>
+      <ul>
+        <li>2a: With <code>placement="SE"</code></li>
+        <li>2b: Without placement prop (CSS default)</li>
+      </ul>
+    </li>
+    <li><strong>Wide Menu Stress</strong> &mdash; <code>min-width: 400px</code>, right-aligned trigger</li>
+    <li><strong>Dynamic Trigger Reflow</strong> &mdash; trigger that moves from left to right edge (Vue/React/Svelte/Solid only)</li>
+    <li><strong>Corner Stress</strong> &mdash; triggers in all 4 corners with long-title menus</li>
+    <li><strong>Long Menu</strong> &mdash; 14 items, should clamp to viewport and scroll internally</li>
+  </ol>
+
+  <h2>Quick start</h2>
+  <pre><code>cd examples/sites/ui-sandbox
+./serve.sh</code></pre>
+</body>
+</html>

@@ -22,8 +22,8 @@ import { createMenuKeyHandler } from './useMenuKeyboard';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
 import type { AlapLinkMode } from './providerKey';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
-import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 type ResolvedLink = { id: string } & AlapLinkType;
@@ -44,8 +44,8 @@ const props = withDefaults(defineProps<{
   menuStyle?: CSSProperties;
   listType?: 'ul' | 'ol';
   maxVisibleItems?: number;
-  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
-  placement?: Placement;
+  /** Placement string, e.g. "SE", "SE, clamp", "N, place". When set, uses the placement engine. */
+  placement?: string;
   /** Pixel gap between trigger and menu edge. Default: 4. Only used when placement is set. */
   gap?: number;
   /** Minimum pixel distance from viewport edges. Default: 8. Only used when placement is set. */
@@ -167,18 +167,13 @@ watch(isOpen, async (open) => {
   const wrapperEl = wrapperRef.value;
   if (!triggerEl || !menuEl || !wrapperEl) return;
 
-  const apply = () => {
-    const state = calcPlacementState(triggerEl, menuEl, {
-      placement: props.placement!,
-      gap: props.gap,
-      padding: props.padding,
-    });
-    applyPlacementToMenu(menuEl, wrapperEl, state);
-  };
+  const applyNow = applyPlacementAfterLayout(triggerEl, menuEl, wrapperEl, {
+    placement: props.placement!,
+    gap: props.gap,
+    padding: props.padding,
+  });
 
-  apply();
-
-  scrollHandler = () => apply();
+  scrollHandler = () => applyNow();
   window.addEventListener('scroll', scrollHandler, { passive: true });
 });
 

@@ -27,8 +27,8 @@ import {
 import { useAlapContext } from './context';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
-import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import {
   REM_PER_MENU_ITEM,
   DEFAULT_MENU_Z_INDEX,
@@ -53,7 +53,8 @@ export interface AlapLinkProps {
   onTriggerContext$?: QRL<(detail: TriggerContextDetail) => void>;
   onItemHover$?: QRL<(detail: ItemHoverDetail) => void>;
   onItemContext$?: QRL<(detail: ItemContextDetail) => void>;
-  placement?: Placement;
+  /** Placement string, e.g. "SE", "SE, clamp", "N, place". */
+  placement?: string;
   gap?: number;
   padding?: number;
 }
@@ -139,7 +140,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
 
   // --- Browser-only effects: dismissal, focus, placement ---
 
-  // eslint-disable-next-line qwik/no-use-visible-task
+
   useVisibleTask$(({ track, cleanup }) => {
     const open = track(() => isOpen.value);
     if (!open) return;
@@ -185,18 +186,13 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
       const wEl = wrapperRef.value;
 
       if (tEl && mEl && wEl) {
-        const apply = () => {
-          const state = calcPlacementState(tEl, mEl, {
-            placement: props.placement!,
-            gap: props.gap,
-            padding: props.padding,
-          });
-          applyPlacementToMenu(mEl, wEl, state);
-        };
+        const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
+          placement: props.placement!,
+          gap: props.gap,
+          padding: props.padding,
+        });
 
-        requestAnimationFrame(apply);
-
-        const onScroll = () => apply();
+        const onScroll = () => applyNow();
         window.addEventListener('scroll', onScroll, { passive: true });
 
         cleanup(() => {
@@ -214,7 +210,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   });
 
   // Popover toggle event
-  // eslint-disable-next-line qwik/no-use-visible-task
+
   useVisibleTask$(({ cleanup }) => {
     if (mode !== 'popover' || !menuRef.value) return;
     const el = menuRef.value;
@@ -228,7 +224,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   });
 
   // Cleanup timer on unmount
-  // eslint-disable-next-line qwik/no-use-visible-task
+
   useVisibleTask$(({ cleanup }) => {
     cleanup(() => {
       if (timerId.value) clearTimeout(timerId.value);

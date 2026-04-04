@@ -12,9 +12,9 @@
 <script src="{{ "js/alap.iife.js" | relURL }}" defer></script>
 <script src="{{ "js/alap-config.js" | relURL }}" defer></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Alap !== 'undefined' && typeof alapConfig !== 'undefined') {
-      Alap.registerConfig(alapConfig);
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Alap !== 'undefined' && window.alapConfig) {
+      Alap.registerConfig(window.alapConfig);
       Alap.defineAlapLink();
     }
   });

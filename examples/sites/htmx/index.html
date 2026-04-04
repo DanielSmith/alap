@@ -59,7 +59,7 @@
   <script src="alap.iife.js"></script>
   <script src="config.js"></script>
   <script>
-    Alap.registerConfig(alapConfig);
+    Alap.registerConfig(window.alapConfig);
     Alap.defineAlapLink();
   </script>
 
@@ -70,8 +70,8 @@
 
   <!-- Active tab tracking -->
   <script>
-    document.body.addEventListener('htmx:beforeRequest', function(e) {
-      document.querySelectorAll('nav button').forEach(function(btn) {
+    document.body.addEventListener('htmx:beforeRequest', (e) => {
+      document.querySelectorAll('nav button').forEach((btn) => {
         btn.classList.remove('active');
       });
       e.detail.elt.classList.add('active');

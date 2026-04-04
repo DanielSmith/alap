@@ -37,7 +37,7 @@ const configStatus = document.getElementById('config-status')!;
 const htmlOutputEl = document.getElementById('html-output')!;
 
 // 3. Render markdown through remark-alap pipeline
-async function render(markdown: string) {
+const render = async (markdown: string) => {
   const result = await unified()
     .use(remarkParse)
     .use(remarkAlap)
@@ -47,7 +47,7 @@ async function render(markdown: string) {
   const html = String(result);
   contentEl.innerHTML = html;
   htmlOutputEl.textContent = html;
-}
+};
 
 // 4. Initialize
 sourceEl.value = markdownSource;
@@ -56,56 +56,56 @@ render(markdownSource);
 
 // 5. Re-render markdown on edit (debounced)
 let mdTimer: ReturnType<typeof setTimeout>;
-sourceEl.addEventListener('input', function() {
+sourceEl.addEventListener('input', () => {
   clearTimeout(mdTimer);
-  mdTimer = setTimeout(function() {
+  mdTimer = setTimeout(() => {
     render(sourceEl.value);
   }, 150);
 });
 
 // 6. Config helpers
 
-function updateHelpPanel(config: AlapConfig) {
+const updateHelpPanel = (config: AlapConfig) => {
   const tags = new Set<string>();
   if (config.allLinks) {
     for (const link of Object.values(config.allLinks)) {
-      if (link.tags) link.tags.forEach(function(t: string) { tags.add(t); });
+      if (link.tags) link.tags.forEach((t: string) => { tags.add(t); });
     }
   }
   document.getElementById('help-tags')!.innerHTML =
-    Array.from(tags).sort().map(function(t) { return '<code>.' + t + '</code>'; }).join(' ');
+    Array.from(tags).sort().map((t) => `<code>.${t}</code>`).join(' ');
 
   const macros = config.macros ? Object.keys(config.macros) : [];
   document.getElementById('help-macros')!.innerHTML =
-    macros.sort().map(function(m) { return '<code>@' + m + '</code>'; }).join(' ');
-}
+    macros.sort().map((m) => `<code>@${m}</code>`).join(' ');
+};
 
-function applyConfig(config: AlapConfig) {
+const applyConfig = (config: AlapConfig) => {
   registerConfig(config);
   render(sourceEl.value);
   updateHelpPanel(config);
-}
+};
 
 // 7. Reset config button
-document.getElementById('btn-reset')!.addEventListener('click', function() {
+document.getElementById('btn-reset')!.addEventListener('click', () => {
   configEl.value = JSON.stringify(demoConfig, null, 2);
   applyConfig(demoConfig);
   configStatus.textContent = 'Config reset';
   configStatus.className = 'config-status ok';
-  setTimeout(function() { configStatus.textContent = ''; }, 1500);
+  setTimeout(() => { configStatus.textContent = ''; }, 1500);
 });
 
 // 8. Re-register config on edit (debounced)
 let cfgTimer: ReturnType<typeof setTimeout>;
-configEl.addEventListener('input', function() {
+configEl.addEventListener('input', () => {
   clearTimeout(cfgTimer);
-  cfgTimer = setTimeout(function() {
+  cfgTimer = setTimeout(() => {
     try {
       const newConfig = JSON.parse(configEl.value);
       applyConfig(newConfig);
       configStatus.textContent = 'Config updated';
       configStatus.className = 'config-status ok';
-      setTimeout(function() { configStatus.textContent = ''; }, 1500);
+      setTimeout(() => { configStatus.textContent = ''; }, 1500);
     } catch {
       configStatus.textContent = 'Invalid JSON';
       configStatus.className = 'config-status error';
@@ -117,45 +117,45 @@ configEl.addEventListener('input', function() {
 const helpPanel = document.getElementById('help-panel')!;
 const helpBackdrop = document.getElementById('help-backdrop')!;
 
-function openHelp() {
+const openHelp = () => {
   helpPanel.classList.add('open');
   helpBackdrop.classList.add('open');
-}
+};
 
-function closeHelp() {
+const closeHelp = () => {
   helpPanel.classList.remove('open');
   helpBackdrop.classList.remove('open');
-}
+};
 
 document.getElementById('btn-help')!.addEventListener('click', openHelp);
 document.getElementById('btn-help-close')!.addEventListener('click', closeHelp);
 helpBackdrop.addEventListener('click', closeHelp);
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && helpPanel.classList.contains('open')) closeHelp();
 });
 
 updateHelpPanel(demoConfig);
 
 // 10. Copy buttons
-document.querySelectorAll('.copy-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
+document.querySelectorAll('.copy-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
     const target = (btn as HTMLElement).dataset.target!;
     const el = document.getElementById(target) as HTMLTextAreaElement;
-    navigator.clipboard.writeText(el.value).then(function() {
+    navigator.clipboard.writeText(el.value).then(() => {
       const orig = btn.textContent;
       btn.textContent = 'Copied!';
-      setTimeout(function() { btn.textContent = orig; }, 1500);
+      setTimeout(() => { btn.textContent = orig; }, 1500);
     });
   });
 });
 
-// 10. Tab switching
-document.querySelectorAll('.tab').forEach(function(btn) {
-  btn.addEventListener('click', function() {
+// 11. Tab switching
+document.querySelectorAll('.tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
     const target = (btn as HTMLElement).dataset.tab!;
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach((t) => { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach((c) => { c.classList.remove('active'); });
     btn.classList.add('active');
-    document.getElementById('tab-' + target)!.classList.add('active');
+    document.getElementById(`tab-${target}`)!.classList.add('active');
   });
 });

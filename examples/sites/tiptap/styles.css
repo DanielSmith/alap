@@ -30,8 +30,8 @@ code {
   border-radius: 3px;
 }
 
-a[href^="../../"] { color: #88bbff; text-decoration: underline; }
-a[href^="../../"]:hover { color: #ffd666; }
+a[href="/"] { color: #ffd666; text-decoration: underline; }
+a[href="/"]:hover { color: #ffe8a0; }
 
 /* Scrollbars */
 * {

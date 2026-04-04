@@ -30,7 +30,7 @@ registerConfig(config);     // feed config to the registry
 | `query` | `string` | Yes | Expression to evaluate |
 | `config` | `string` | No | Named config to use. Default: `'_default'` |
 | `href` | `string` | No | Existing URL — included in menu per `existingUrl` setting |
-| `placement` | `string` | No | Menu placement: `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`, `C`. Overrides config |
+| `placement` | `string` | No | Placement string: compass + strategy, e.g. `"SE"`, `"SE, clamp"`. Overrides config |
 
 ```html
 <alap-link query=".coffee">cafes</alap-link>
@@ -242,18 +242,20 @@ alap-link {
 
 ## Positioning
 
-The web component uses the same compass-based placement engine as the DOM adapter. Set placement globally via `settings.placement` or per-element via the `placement` attribute:
+The web component uses the same compass-based placement engine as the DOM adapter. Set placement globally via `settings.placement` or per-element via the `placement` attribute. The value is a comma-separated string with a compass direction and optional strategy:
 
 ```html
 <alap-link query=".coffee" placement="S">centered below</alap-link>
 <alap-link query=".coffee" placement="N">above me</alap-link>
-<alap-link query=".coffee" placement="E">beside me</alap-link>
+<alap-link query=".coffee" placement="SE, clamp">constrained to viewport</alap-link>
 <alap-link query=".coffee" placement="C">centered over me</alap-link>
 ```
 
+Strategies: `flip` (default — tries fallbacks), `clamp` (flip + constrain to viewport), `place` (pinned, no fallback).
+
 The `--alap-gap` CSS custom property controls the gap between trigger and menu. The placement engine reads this value automatically. You can also set `placementGap` in config settings — the CSS variable takes priority when set.
 
-See [Configuration](../getting-started/configuration.md#placement) for the full placement reference.
+See [Placement](../cookbook/placement.md) for the full guide on placement, strategies, and CSS styling.
 
 ## CDN / IIFE build
 

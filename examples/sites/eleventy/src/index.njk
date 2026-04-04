@@ -111,15 +111,15 @@ export default function(eleventyConfig) {
     Alap.defineAlapLink();
     Alap.registerConfig(config);
 
-    document.querySelectorAll('.source').forEach(function(source) {
+    document.querySelectorAll('.source').forEach((source) => {
       const btn = document.createElement('button');
       btn.className = 'copy-btn';
       btn.textContent = 'Copy';
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', () => {
         const code = source.querySelector('code');
-        navigator.clipboard.writeText(code.textContent).then(function() {
+        navigator.clipboard.writeText(code.textContent).then(() => {
           btn.textContent = 'Copied!';
-          setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+          setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
         });
       });
       source.style.position = 'relative';

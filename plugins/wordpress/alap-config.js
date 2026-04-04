@@ -5,7 +5,7 @@
  * See https://alap.info/getting-started/configuration for the full schema.
  */
 
-var alapConfig = {
+window.alapConfig = {
   settings: { listType: "ul", menuTimeout: 5000, placement: "S" },
   macros: {
     cars: { linkItems: ".car" },

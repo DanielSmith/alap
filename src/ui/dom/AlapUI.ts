@@ -18,8 +18,8 @@ import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink } from '../../core/types';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement, PlacementResult, Size } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
 
 export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
 
@@ -191,13 +191,13 @@ export class AlapUI {
     return trigger.getBoundingClientRect();
   }
 
-  /** Read the placement preference from the trigger element or config. */
-  private getPlacement(trigger: HTMLElement): Placement {
+  /** Read and parse placement from the trigger element or config. */
+  private getPlacement(trigger: HTMLElement): ParsedPlacement {
     const attr = trigger.getAttribute('data-alap-placement');
-    if (attr && /^(N|NE|E|SE|S|SW|W|NW|C)$/.test(attr)) {
-      return attr as Placement;
-    }
-    return (this.config.settings?.placement as Placement) ?? DEFAULT_PLACEMENT;
+    if (attr) return parsePlacement(attr);
+    const configVal = this.config.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return parsePlacement(DEFAULT_PLACEMENT);
   }
 
   // --- Rendering ---
@@ -278,7 +278,7 @@ export class AlapUI {
       this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
 
       const triggerRect = this.getTriggerRect(trigger, event);
-      const placement = this.getPlacement(trigger);
+      const parsed = this.getPlacement(trigger);
       const gap = (this.config.settings?.placementGap as number) ?? DEFAULT_PLACEMENT_GAP;
       const padding = (this.config.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
 
@@ -286,7 +286,8 @@ export class AlapUI {
         triggerRect,
         menuSize: this.menuNaturalSize,
         viewport: { width: window.innerWidth, height: window.innerHeight },
-        placement,
+        placement: parsed.compass,
+        strategy: parsed.strategy,
         gap,
         padding,
       });
@@ -360,7 +361,7 @@ export class AlapUI {
     this.stopScrollTracking();
     const gap = (this.config.settings?.placementGap as number) ?? DEFAULT_PLACEMENT_GAP;
     const padding = (this.config.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
-    const placement = this.getPlacement(trigger);
+    const parsed = this.getPlacement(trigger);
 
     this.handleScroll = () => {
       if (!this.container || this.container.style.display === 'none') return;
@@ -371,7 +372,8 @@ export class AlapUI {
         triggerRect,
         menuSize: this.menuNaturalSize,
         viewport: { width: window.innerWidth, height: window.innerHeight },
-        placement,
+        placement: parsed.compass,
+        strategy: parsed.strategy,
         gap,
         padding,
       });

@@ -19,6 +19,66 @@ import { DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } fr
 /** The 9 placement positions: compass directions plus center. */
 export type Placement = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
 
+/**
+ * How hard the placement engine tries to resolve layout.
+ *
+ * - 'place': Position at compass point. No fallback, no clamping.
+ * - 'flip':  Place + try fallbacks if it doesn't fit. No clamping. (default)
+ * - 'clamp': Flip + constrain to viewport + scroll long menus.
+ */
+export type PlacementStrategy = 'place' | 'flip' | 'clamp';
+
+/** Known compass tokens (lowercase). */
+const COMPASS_TOKENS = new Set(['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'c']);
+
+/** Known strategy tokens (lowercase). */
+const STRATEGY_TOKENS = new Set<PlacementStrategy>(['place', 'flip', 'clamp']);
+
+/** Strategy effort ranking — higher index = more effort. */
+const STRATEGY_RANK: Record<PlacementStrategy, number> = { place: 0, flip: 1, clamp: 2 };
+
+/** Parsed result from a placement string. */
+export interface ParsedPlacement {
+  compass: Placement;
+  strategy: PlacementStrategy;
+}
+
+/**
+ * Parse a comma-separated placement string into compass direction + strategy.
+ *
+ * Accepts tokens like "SE", "se, clamp", "clamp", "N, flip", etc.
+ * Unknown tokens are silently discarded.
+ *
+ * Defaults: compass = 'SE', strategy = 'flip'.
+ *
+ * If multiple compass directions appear, uses the first.
+ * If multiple strategies appear, uses the highest effort.
+ */
+export function parsePlacement(input: string): ParsedPlacement {
+  let compass: Placement | null = null;
+  let strategy: PlacementStrategy | null = null;
+
+  for (const raw of input.split(',')) {
+    // Trim whitespace, lowercase, strip anything that isn't a-z
+    const token = raw.trim().toLowerCase().replace(/[^a-z]/g, '');
+    if (!token) continue;
+
+    if (COMPASS_TOKENS.has(token) && !compass) {
+      compass = token.toUpperCase() as Placement;
+    } else if (STRATEGY_TOKENS.has(token as PlacementStrategy)) {
+      const s = token as PlacementStrategy;
+      if (!strategy || STRATEGY_RANK[s] > STRATEGY_RANK[strategy]) {
+        strategy = s;
+      }
+    }
+  }
+
+  return {
+    compass: compass ?? (DEFAULT_PLACEMENT as Placement),
+    strategy: strategy ?? 'flip',
+  };
+}
+
 /** A rectangle in viewport coordinates (same shape as DOMRect). */
 export interface Rect {
   top: number;
@@ -45,6 +105,8 @@ export interface PlacementInput {
   viewport: Size;
   /** Preferred placement. Default: 'SE'. */
   placement?: Placement;
+  /** How hard to try. Default: 'flip'. */
+  strategy?: PlacementStrategy;
   /** Pixel gap between trigger and menu edge. Default: 4. */
   gap?: number;
   /** Minimum distance from viewport edges. Default: 8. */
@@ -150,20 +212,32 @@ function clampToViewport(
  * Pure geometry — no DOM access. Takes viewport-coordinate rects and
  * returns viewport-coordinate results. Consumers translate to their
  * own coordinate system (page-absolute, host-relative, etc.).
+ *
+ * Behavior is gated by strategy:
+ * - 'place': Stage 1 only (position at compass point).
+ * - 'flip':  Stages 1+2 (position + try fallbacks). Default.
+ * - 'clamp': Stages 1+2+3 (flip + constrain to viewport).
  */
 export function computePlacement(input: PlacementInput): PlacementResult {
-  const preferred = input.placement ?? DEFAULT_PLACEMENT;
+  const preferred = input.placement ?? (DEFAULT_PLACEMENT as Placement);
+  const strategy = input.strategy ?? 'flip';
   const gap = input.gap ?? DEFAULT_PLACEMENT_GAP;
   const pad = input.padding ?? DEFAULT_VIEWPORT_PADDING;
   const { triggerRect: t, menuSize: m, viewport: vp } = input;
 
-  // 1. Try preferred placement
+  // Stage 1: Try preferred placement
   const pos = calcPosition(preferred, t, m, gap);
+
+  if (strategy === 'place') {
+    // Pinned — return as-is, no fallback, no clamping.
+    return { placement: preferred, x: pos.x, y: pos.y, scrollY: false };
+  }
+
   if (fits(pos.x, pos.y, m, vp, pad)) {
     return { placement: preferred, x: pos.x, y: pos.y, scrollY: false };
   }
 
-  // 2. Try fallbacks in order
+  // Stage 2: Try fallbacks (strategy >= 'flip')
   for (const candidate of FALLBACK_ORDER[preferred]) {
     const p = calcPosition(candidate, t, m, gap);
     if (fits(p.x, p.y, m, vp, pad)) {
@@ -171,7 +245,13 @@ export function computePlacement(input: PlacementInput): PlacementResult {
     }
   }
 
-  // 3. No placement fits unclamped — find best-fit with clamping
+  // If strategy is 'flip', return the preferred position best-effort (no clamping).
+  if (strategy === 'flip') {
+    return { placement: preferred, x: pos.x, y: pos.y, scrollY: false };
+  }
+
+  // Stage 3: Clamp to viewport (strategy === 'clamp')
+  // No placement fits unclamped — find best-fit with clamping.
   const allPlacements: Placement[] = [preferred, ...FALLBACK_ORDER[preferred]];
   let bestScore = -1;
   let bestResult: PlacementResult = {

@@ -64,7 +64,7 @@ Children go inside the provider via Qwik's `<Slot />`:
 | `menuClassName` | `string` | — | CSS class on menu container |
 | `listType` | `'ul' \| 'ol'` | from config | List element type |
 | `maxVisibleItems` | `number` | from config | Scroll after N items |
-| `placement` | `Placement` | — | Compass placement (N, NE, E, SE, S, SW, W, NW, C) |
+| `placement` | `string` | — | Placement string: compass + strategy, e.g. `"SE"`, `"SE, clamp"` |
 | `gap` | `number` | 4 | Pixel gap between trigger and menu |
 | `padding` | `number` | 8 | Minimum distance from viewport edges |
 | `onTriggerHover$` | `QRL<(detail) => void>` | — | Mouse enters trigger |

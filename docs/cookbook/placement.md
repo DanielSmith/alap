@@ -8,7 +8,7 @@ How the menu gets positioned, how to control it, and where Alap's job ends and C
 
 ## The placement engine
 
-Every Alap menu is positioned by a compass-based placement engine. You specify a preferred direction; the engine handles the geometry.
+Every Alap menu is positioned by a compass-based placement engine. You specify a preferred direction and how hard the engine should try; it handles the geometry.
 
 ### The 9 positions
 
@@ -36,14 +36,17 @@ Every Alap menu is positioned by a compass-based placement engine. You specify a
 
 ### Setting placement
 
+The `placement` attribute is a comma-separated string with a compass direction and an optional strategy. The same format works everywhere — config, DOM attributes, web component attributes, and framework props.
+
 **Globally in config:**
 
 ```typescript
 const config = {
   settings: {
-    placement: 'S',       // all menus below, centered
-    placementGap: 8,      // 8px gap between trigger and menu
-    viewportPadding: 12,  // 12px from viewport edges
+    placement: 'S',             // all menus below, centered (flip strategy is the default)
+    // placement: 'S, clamp',   // same, but constrain to viewport
+    placementGap: 8,            // 8px gap between trigger and menu
+    viewportPadding: 12,        // 12px from viewport edges
   },
   allLinks: { ... },
 };
@@ -54,7 +57,7 @@ const config = {
 ```html
 <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="N">above</a>
 <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="E">beside</a>
-<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="C">centered</a>
+<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE, clamp">constrained</a>
 ```
 
 **Per-element (web component):**
@@ -62,16 +65,53 @@ const config = {
 ```html
 <alap-link query=".coffee" placement="N">above</alap-link>
 <alap-link query=".coffee" placement="E">beside</alap-link>
-<alap-link query=".coffee" placement="C">centered</alap-link>
+<alap-link query=".coffee" placement="SE, clamp">constrained</alap-link>
 ```
 
-### Fallback behavior
+**Framework adapters (Vue, React, Svelte, Solid, Alpine):**
 
-Placement is a preference, not a guarantee. When the preferred position doesn't fit in the viewport:
+```html
+<AlapLink query=".coffee" placement="SE, clamp">cafes</AlapLink>
+```
+
+### The four tiers
+
+The placement system has four tiers of effort. The first is the absence of the attribute — the engine stays out of it entirely.
+
+| Tier | Attribute value | What happens |
+|------|----------------|--------------|
+| 0 | *(not set)* | No placement engine. CSS positions the menu (`top: 100%; left: 0`). |
+| 1 | `"SE, place"` | Position at compass point. No fallback, no clamping. Pinned. |
+| 2 | `"SE"` | Position + flip to fallback if it doesn't fit. **Default strategy.** |
+| 3 | `"SE, clamp"` | Flip + constrain to viewport + scroll long menus. Maximum effort. |
+
+When you set `placement="SE"` without a strategy, you get **flip** — the engine tries the requested direction, flips to a fallback if it doesn't fit, but doesn't override your CSS sizing. This handles the common case (edge collisions) without side effects.
+
+When you need the menu to absolutely stay in viewport — dynamic trigger positions, long titles from metadata, `min-width` on the menu — use **clamp**. This overrides `min-width` and adds `overflow-y: auto` when needed.
+
+When you know exactly where the trigger is and want no engine intervention beyond initial positioning, use **place**.
+
+### Parsing rules
+
+The attribute value is parsed as comma-separated values, lowercased, with unrecognized values silently discarded:
+
+- Compass directions: `n`, `ne`, `e`, `se`, `s`, `sw`, `w`, `nw`, `c`
+- Strategies: `place`, `flip`, `clamp`
+- If no compass direction: defaults to `se`
+- If no strategy: defaults to `flip`
+- If multiple compass directions: first wins
+- If multiple strategies: highest effort wins
+
+### Fallback behavior (flip and clamp strategies)
+
+With **flip** or **clamp** strategy, placement is a preference, not a guarantee. When the preferred position doesn't fit in the viewport:
 
 1. **Try the opposite side** — if `SE` overflows, try `NW`
 2. **Try adjacent positions** — `NE`, `SW`, then `S`, `N`, etc.
-3. **Best fit with clamping** — if nothing fits fully, pick the position with the most visible area, clamp the height, and enable scrolling within the menu
+3. **Best-effort return** (flip) — return the preferred position anyway, no clamping
+4. **Best fit with clamping** (clamp only) — pick the position with the most visible area, clamp dimensions, and enable scrolling within the menu
+
+With **place** strategy, the engine positions at the compass point and returns — no fallback, no clamping.
 
 The menu never causes the page to scroll. In DOM mode, this is enforced with `overflow-x: clip` on the menu container, which prevents horizontal overflow from creating a scrollable context (unlike `overflow: hidden`, which can cause unwanted scrollbars on the other axis).
 
@@ -173,4 +213,6 @@ The menu appears centered at the click point. CSS can add a context-menu visual 
 
 ## Disabling placement
 
-Set `viewportAdjust: false` to disable the placement engine entirely. The menu is positioned with static CSS (`top: 100%; left: 0` or equivalent) with no viewport awareness. Use this only when you want full manual control over positioning via CSS.
+Simply don't set the `placement` attribute. Without it, the engine doesn't run — the menu is positioned with static CSS (`top: 100%; left: 0` or equivalent) with no viewport awareness. This is tier 0, the default.
+
+You can also set `viewportAdjust: false` in config settings to explicitly disable the engine globally.

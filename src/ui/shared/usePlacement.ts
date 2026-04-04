@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { computePlacement, FALLBACK_ORDER } from './placement';
-import type { Placement, PlacementResult, Size } from './placement';
+import { computePlacement, parsePlacement, FALLBACK_ORDER } from './placement';
+import type { Placement, PlacementResult, PlacementStrategy, Size } from './placement';
 import { DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 
 /** Valid placement values for class name validation. */
 const VALID_PLACEMENTS = new Set<string>(Object.keys(FALLBACK_ORDER));
 
 export interface CalcPlacementOptions {
-  placement: Placement;
+  /** Comma-separated placement string, e.g. "SE", "SE, clamp", "N, place". */
+  placement: string;
   gap?: number;
   padding?: number;
 }
@@ -46,16 +47,35 @@ export function calcPlacementState(
   triggerEl: HTMLElement,
   menuEl: HTMLElement,
   options: CalcPlacementOptions,
-): PlacementState {
+): PlacementState | null {
+  const { compass, strategy } = parsePlacement(options.placement);
   const triggerRect = triggerEl.getBoundingClientRect();
   const menuRect = menuEl.getBoundingClientRect();
-  const menuSize: Size = { width: menuRect.width, height: menuRect.height };
+
+  let menuSize: Size;
+
+  if (strategy === 'clamp') {
+    // Clamp strategy: check CSS min-width/min-height so fits() uses the
+    // true rendered size, not just current content width.
+    const computed = getComputedStyle(menuEl);
+    const cssMinWidth = parseFloat(computed.minWidth) || 0;
+    const cssMinHeight = parseFloat(computed.minHeight) || 0;
+    menuSize = {
+      width: Math.max(menuRect.width, cssMinWidth),
+      height: Math.max(menuRect.height, cssMinHeight),
+    };
+  } else {
+    menuSize = { width: menuRect.width, height: menuRect.height };
+  }
+
+  if (menuSize.width === 0 || menuSize.height === 0) return null;
 
   const result = computePlacement({
     triggerRect,
     menuSize,
     viewport: { width: window.innerWidth, height: window.innerHeight },
-    placement: options.placement,
+    placement: compass,
+    strategy,
     gap: options.gap ?? DEFAULT_PLACEMENT_GAP,
     padding: options.padding ?? DEFAULT_VIEWPORT_PADDING,
   });
@@ -73,8 +93,9 @@ export function calcPlacementState(
 export function applyPlacementToMenu(
   menuEl: HTMLElement,
   wrapperEl: HTMLElement,
-  state: PlacementState,
+  state: PlacementState | null,
 ): void {
+  if (!state) return;
   const { result } = state;
   const wrapperRect = wrapperEl.getBoundingClientRect();
 
@@ -93,8 +114,10 @@ export function applyPlacementToMenu(
 
   if (result.maxWidth != null) {
     menuEl.style.maxWidth = `${result.maxWidth}px`;
+    menuEl.style.minWidth = `0px`;
   } else {
     menuEl.style.maxWidth = '';
+    menuEl.style.minWidth = '';
   }
 
   // Apply placement class for animation hooks
@@ -127,6 +150,59 @@ export function clearPlacementClass(el: HTMLElement): void {
       el.classList.remove(cls);
     }
   }
+}
+
+/**
+ * Schedule placement after the browser has completed layout.
+ *
+ * Wraps requestAnimationFrame → calcPlacementState → applyPlacementToMenu
+ * so every adapter gets correct geometry without having to remember the
+ * rAF step themselves.
+ *
+ * For adapters that use a wrapper element (Vue, React, Svelte, Solid, Qwik):
+ *   applyPlacementAfterLayout(triggerEl, menuEl, wrapperEl, options)
+ *
+ * Returns a function that performs the same calc+apply synchronously,
+ * useful for scroll handlers where rAF would add unwanted latency.
+ */
+export function applyPlacementAfterLayout(
+  triggerEl: HTMLElement,
+  menuEl: HTMLElement,
+  wrapperEl: HTMLElement,
+  options: CalcPlacementOptions,
+): () => void {
+  const applyNow = () => {
+    const state = calcPlacementState(triggerEl, menuEl, options);
+    applyPlacementToMenu(menuEl, wrapperEl, state);
+  };
+
+  requestAnimationFrame(applyNow);
+
+  return applyNow;
+}
+
+/**
+ * Schedule placement after layout for adapters that position via
+ * viewport coordinates (e.g. Alpine, which appends the menu to
+ * document.body instead of a relative wrapper).
+ *
+ * Calls the provided callback with the PlacementState after rAF.
+ * Returns a synchronous apply function for scroll handlers.
+ */
+export function calcPlacementAfterLayout(
+  triggerEl: HTMLElement,
+  menuEl: HTMLElement,
+  options: CalcPlacementOptions,
+  onPlacement: (state: PlacementState | null) => void,
+): () => void {
+  const applyNow = () => {
+    const state = calcPlacementState(triggerEl, menuEl, options);
+    onPlacement(state);
+  };
+
+  requestAnimationFrame(applyNow);
+
+  return applyNow;
 }
 
 /**

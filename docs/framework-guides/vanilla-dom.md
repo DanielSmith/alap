@@ -47,7 +47,7 @@ See [Events](../api-reference/events.md) for callback detail types.
 | `class="alap"` | Trigger | Default selector (configurable via `selector`) |
 | `data-alap-linkitems` | Trigger | Expression to evaluate |
 | `data-alap-existing` | Trigger | Per-anchor `existingUrl` override: `"prepend"`, `"append"`, `"ignore"` |
-| `data-alap-placement` | Trigger | Per-anchor placement override: `"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`, `"C"` |
+| `data-alap-placement` | Trigger | Placement string: compass + strategy, e.g. `"SE"`, `"SE, clamp"`, `"N, place"` |
 
 ```html
 <a class="alap" data-alap-linkitems=".coffee">cafes</a>
@@ -148,20 +148,28 @@ Alap uses a compass-based placement engine. The menu is positioned relative to t
          (C = centered over trigger)
 ```
 
-Default: `SE` (below, left-aligned). Set globally via `settings.placement` or per-trigger via `data-alap-placement`:
+Default: `SE` (below, left-aligned). Set globally via `settings.placement` or per-trigger via `data-alap-placement`. The attribute accepts a comma-separated string with a compass direction and optional strategy:
 
 ```html
 <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="N">above me</a>
 <a class="alap" data-alap-linkitems=".coffee" data-alap-placement="E">beside me</a>
-<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="C">over me</a>
+<a class="alap" data-alap-linkitems=".coffee" data-alap-placement="SE, clamp">constrained</a>
 ```
 
-### Viewport containment
+### Strategies
 
-When `viewportAdjust` is `true` (default):
+The strategy controls how hard the engine tries:
+
+- **`flip`** (default) — tries the preferred direction, flips to a fallback if it doesn't fit
+- **`clamp`** — flip + constrain to viewport, override `min-width`, scroll long menus
+- **`place`** — pinned at compass point, no fallback, no clamping
+
+When no `placement` attribute is set at all, the engine doesn't run — CSS positions the menu.
+
+### Viewport containment (flip and clamp)
 
 - If the preferred placement overflows the viewport, Alap tries the opposite side, then adjacent positions
-- If no placement fits fully, the menu is clamped to the available space with vertical scrolling
+- With `clamp` strategy: if no placement fits fully, the menu is clamped to the available space with vertical scrolling
 - The menu never causes the page to scroll — uses `overflow: clip` to prevent layout shift
 - `placementGap` controls the pixel gap between trigger and menu (default: 4)
 - `viewportPadding` controls the minimum distance from viewport edges (default: 8)
@@ -172,7 +180,7 @@ Image triggers use a point rect at the click coordinates. The placement engine p
 
 ### Static positioning
 
-Set `viewportAdjust: false` to disable the placement engine. The menu is positioned below the trigger with no viewport awareness — the legacy behavior.
+Don't set the `placement` attribute, or set `viewportAdjust: false` to disable the engine globally. The menu is positioned below the trigger with no viewport awareness.
 
 ## Examples
 

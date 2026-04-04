@@ -46,34 +46,34 @@ registerConfig(demoConfig);
 
 // --- Toolbar ---
 
-document.getElementById('btn-insert')!.addEventListener('click', function() {
+document.getElementById('btn-insert')!.addEventListener('click', () => {
   const query = queryInput.value || '.coffee';
   editor.commands.setAlapLink({ query });
   editor.commands.focus();
 });
 
 let queryTimer: ReturnType<typeof setTimeout>;
-queryInput.addEventListener('input', function() {
+queryInput.addEventListener('input', () => {
   clearTimeout(queryTimer);
-  queryTimer = setTimeout(function() {
+  queryTimer = setTimeout(() => {
     const query = queryInput.value;
     if (query) editor.commands.updateAlapLink({ query });
   }, 300);
 });
 
-document.getElementById('btn-remove')!.addEventListener('click', function() {
+document.getElementById('btn-remove')!.addEventListener('click', () => {
   editor.commands.unsetAlapLink();
   editor.commands.focus();
 });
 
 // --- HTML output + live preview ---
 
-function formatHtml(html: string): string {
+const formatHtml = (html: string): string => {
   let indent = 0;
   return html
     .replace(/></g, '>\n<')
     .split('\n')
-    .map(function(line) {
+    .map((line) => {
       if (line.match(/^<\//)) indent--;
       const pad = '  '.repeat(Math.max(0, indent));
       if (line.match(/^<[^/!]/) && !line.match(/\/>/)) indent++;
@@ -81,13 +81,13 @@ function formatHtml(html: string): string {
       return pad + line;
     })
     .join('\n');
-}
+};
 
-function updateOutput(ed: Editor) {
+const updateOutput = (ed: Editor) => {
   const html = ed.getHTML();
   document.getElementById('html-output')!.textContent = formatHtml(html);
   document.getElementById('preview')!.innerHTML = html;
-}
+};
 
 updateOutput(editor);
 
@@ -96,23 +96,23 @@ updateOutput(editor);
 let currentConfig: AlapConfig = demoConfig;
 configEl.value = JSON.stringify(demoConfig, null, 2);
 
-function applyConfig(config: AlapConfig) {
+const applyConfig = (config: AlapConfig) => {
   currentConfig = config;
   registerConfig(config);
   updateOutput(editor);
   updateHelpPanel(config);
-}
+};
 
 let cfgTimer: ReturnType<typeof setTimeout>;
-configEl.addEventListener('input', function() {
+configEl.addEventListener('input', () => {
   clearTimeout(cfgTimer);
-  cfgTimer = setTimeout(function() {
+  cfgTimer = setTimeout(() => {
     try {
       const newConfig = JSON.parse(configEl.value);
       applyConfig(newConfig);
       configStatus.textContent = 'Config updated';
       configStatus.className = 'config-status ok';
-      setTimeout(function() { configStatus.textContent = ''; }, 1500);
+      setTimeout(() => { configStatus.textContent = ''; }, 1500);
     } catch {
       configStatus.textContent = 'Invalid JSON';
       configStatus.className = 'config-status error';
@@ -120,45 +120,45 @@ configEl.addEventListener('input', function() {
   }, 300);
 });
 
-document.getElementById('btn-reset')!.addEventListener('click', function() {
+document.getElementById('btn-reset')!.addEventListener('click', () => {
   configEl.value = JSON.stringify(demoConfig, null, 2);
   applyConfig(demoConfig);
   configStatus.textContent = 'Config reset';
   configStatus.className = 'config-status ok';
-  setTimeout(function() { configStatus.textContent = ''; }, 1500);
+  setTimeout(() => { configStatus.textContent = ''; }, 1500);
 });
 
 // --- Help panel ---
 
-function updateHelpPanel(config: AlapConfig) {
+const updateHelpPanel = (config: AlapConfig) => {
   const tags = new Set<string>();
   if (config.allLinks) {
     for (const link of Object.values(config.allLinks)) {
-      if (link.tags) link.tags.forEach(function(t: string) { tags.add(t); });
+      if (link.tags) link.tags.forEach((t: string) => { tags.add(t); });
     }
   }
   document.getElementById('help-tags')!.innerHTML =
-    Array.from(tags).sort().map(function(t) { return '<code>.' + t + '</code>'; }).join(' ');
+    Array.from(tags).sort().map((t) => `<code>.${t}</code>`).join(' ');
 
   const macros = config.macros ? Object.keys(config.macros) : [];
   document.getElementById('help-macros')!.innerHTML =
-    macros.sort().map(function(m) { return '<code>@' + m + '</code>'; }).join(' ');
-}
+    macros.sort().map((m) => `<code>@${m}</code>`).join(' ');
+};
 
-function openHelp() {
+const openHelp = () => {
   helpPanel.classList.add('open');
   helpBackdrop.classList.add('open');
-}
+};
 
-function closeHelp() {
+const closeHelp = () => {
   helpPanel.classList.remove('open');
   helpBackdrop.classList.remove('open');
-}
+};
 
 document.getElementById('btn-help')!.addEventListener('click', openHelp);
 document.getElementById('btn-help-close')!.addEventListener('click', closeHelp);
 helpBackdrop.addEventListener('click', closeHelp);
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && helpPanel.classList.contains('open')) closeHelp();
 });
 
@@ -167,8 +167,8 @@ updateHelpPanel(demoConfig);
 
 // --- Copy buttons ---
 
-document.querySelectorAll('.copy-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
+document.querySelectorAll('.copy-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
     const target = (btn as HTMLElement).dataset.target!;
     let text: string;
     if (target === 'editor') {
@@ -176,22 +176,22 @@ document.querySelectorAll('.copy-btn').forEach(function(btn) {
     } else {
       text = (document.getElementById(target) as HTMLTextAreaElement).value;
     }
-    navigator.clipboard.writeText(text).then(function() {
+    navigator.clipboard.writeText(text).then(() => {
       const orig = btn.textContent;
       btn.textContent = 'Copied!';
-      setTimeout(function() { btn.textContent = orig; }, 1500);
+      setTimeout(() => { btn.textContent = orig; }, 1500);
     });
   });
 });
 
 // --- Tab switching ---
 
-document.querySelectorAll('.tab').forEach(function(btn) {
-  btn.addEventListener('click', function() {
+document.querySelectorAll('.tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
     const target = (btn as HTMLElement).dataset.tab!;
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach((t) => { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach((c) => { c.classList.remove('active'); });
     btn.classList.add('active');
-    document.getElementById('tab-' + target)!.classList.add('active');
+    document.getElementById(`tab-${target}`)!.classList.add('active');
   });
 });

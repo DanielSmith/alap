@@ -218,22 +218,19 @@ export interface AlapSettings {
   viewportAdjust?: boolean;
 
   /**
-   * Preferred menu placement relative to the trigger.
-   * 9 compass positions plus center:
-   * - N: above, centered horizontally
-   * - NE: above, left edge aligned with trigger left
-   * - E: right of trigger, vertically centered
-   * - SE: below, left edge aligned with trigger left (default)
-   * - S: below, centered horizontally
-   * - SW: below, right edge aligned with trigger right
-   * - W: left of trigger, vertically centered
-   * - NW: above, right edge aligned with trigger right
-   * - C: centered over trigger
+   * Menu placement as a comma-separated string of compass direction and strategy.
    *
-   * Falls back to the best-fit position if the preferred one doesn't fit.
+   * Compass directions: N, NE, E, SE, S, SW, W, NW, C
+   * Strategies: place (pinned), flip (default — tries fallbacks), clamp (full viewport constraint)
+   *
+   * Examples: "SE", "SE, clamp", "N, place", "clamp"
+   *
+   * If only a compass is given, strategy defaults to "flip".
+   * If only a strategy is given, compass defaults to "SE".
+   *
    * @default 'SE'
    */
-  placement?: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
+  placement?: string;
 
   /**
    * Pixel gap between the trigger edge and the menu edge.

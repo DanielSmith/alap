@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placement Sandbox — DOM + Web Component</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+  <p class="back"><a href="../">&larr; All Adapters</a></p>
+  <h1>DOM + Web Component</h1>
+
+  <div class="strategy-picker">
+    <span class="strategy-picker__label">Strategy:</span>
+    <label><input type="radio" name="strategy" value="flip" checked /> flip <span class="strategy-hint">(default)</span></label>
+    <label><input type="radio" name="strategy" value="clamp" /> clamp <span class="strategy-hint">(constrain to viewport)</span></label>
+    <label><input type="radio" name="strategy" value="place" /> place <span class="strategy-hint">(pinned)</span></label>
+    <code class="strategy-picker__example" id="strategyDisplay">placement="SE, flip"</code>
+  </div>
+
+  <!-- 1. Compass rose -->
+  <h2>1. Compass Rose</h2>
+  <div class="scenario">
+    <p class="scenario__title">DOM adapter</p>
+    <div class="compass-grid">
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="NW" data-compass="NW">NW</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="N" data-compass="N">N</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="NE" data-compass="NE">NE</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="W" data-compass="W">W</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="C" data-compass="C">C</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="E" data-compass="E">E</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="SW" data-compass="SW">SW</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="S" data-compass="S">S</a></div>
+      <div class="compass-cell"><a class="alap" data-alap-linkitems=".short" data-alap-placement="SE" data-compass="SE">SE</a></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <p class="scenario__title">Web component</p>
+    <div class="compass-grid">
+      <div class="compass-cell"><alap-link query=".short" placement="NW" data-compass="NW">NW</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="N" data-compass="N">N</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="NE" data-compass="NE">NE</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="W" data-compass="W">W</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="C" data-compass="C">C</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="E" data-compass="E">E</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="SW" data-compass="SW">SW</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="S" data-compass="S">S</alap-link></div>
+      <div class="compass-cell"><alap-link query=".short" placement="SE" data-compass="SE">SE</alap-link></div>
+    </div>
+  </div>
+
+  <!-- 2. Right-edge overflow -->
+  <h2>2. Right-Edge Overflow (TTT Bug)</h2>
+
+  <h3>2a. With placement engine</h3>
+  <div class="scenario">
+    <p class="scenario__title">DOM — expression bar</p>
+    <div class="edge-bar">
+      <span class="edge-bar__label">Expression:</span>
+      <span class="edge-bar__expr">.content_collections</span>
+      <span class="edge-bar__trigger">
+        <a class="alap" data-alap-linkitems=".long" data-alap-placement="SE" data-compass="SE">Browse filtered</a>
+      </span>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <p class="scenario__title">Web component — expression bar</p>
+    <div class="edge-bar">
+      <span class="edge-bar__label">Expression:</span>
+      <span class="edge-bar__expr">.content_collections</span>
+      <span class="edge-bar__trigger">
+        <alap-link query=".long" placement="SE" data-compass="SE">Browse filtered</alap-link>
+      </span>
+    </div>
+  </div>
+
+  <h3>2b. No placement (tier 0 — CSS only)</h3>
+  <div class="scenario">
+    <p class="scenario__title">DOM — no placement attr — strategy toggle has no effect</p>
+    <div class="edge-bar">
+      <span class="edge-bar__label">Expression:</span>
+      <span class="edge-bar__expr">.tech | .news</span>
+      <span class="edge-bar__trigger">
+        <a class="alap" data-alap-linkitems=".long">Browse filtered (no placement)</a>
+      </span>
+    </div>
+  </div>
+
+  <!-- 3. Wide menu stress -->
+  <h2>3. Wide Menu Stress</h2>
+  <div class="scenario wide-menu">
+    <p class="scenario__title">DOM — 400px min-width, right-aligned</p>
+    <div class="right-push">
+      <a class="alap" data-alap-linkitems=".short" data-alap-placement="SE" data-compass="SE">Wide menu SE</a>
+    </div>
+  </div>
+
+  <!-- 4. Corners -->
+  <h2>4. Corner Stress</h2>
+  <div class="scenario">
+    <p class="scenario__title">DOM — long titles, worst-case placements</p>
+    <div class="corner-grid">
+      <a class="alap corner-tl" data-alap-linkitems=".long" data-alap-placement="NW" data-compass="NW">NW corner</a>
+      <a class="alap corner-tr" data-alap-linkitems=".long" data-alap-placement="NE" data-compass="NE">NE corner</a>
+      <a class="alap corner-bl" data-alap-linkitems=".long" data-alap-placement="SW" data-compass="SW">SW corner</a>
+      <a class="alap corner-br" data-alap-linkitems=".long" data-alap-placement="SE" data-compass="SE">SE corner</a>
+    </div>
+  </div>
+
+  <!-- 5. Long menu -->
+  <h2>5. Long Menu (14 items)</h2>
+  <div class="scenario">
+    <a class="alap" data-alap-linkitems=".planet" data-alap-placement="SE" data-compass="SE">14 planets (SE)</a>
+    &nbsp;&mdash;&nbsp;
+    <alap-link query=".planet" placement="N" data-compass="N">14 planets (N, WC)</alap-link>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+
+  <script>
+    document.querySelectorAll('input[name="strategy"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        const strategy = radio.value;
+        document.getElementById('strategyDisplay').textContent =
+          `placement="SE, ${strategy}"`;
+
+        document.querySelectorAll('[data-compass]').forEach((el) => {
+          const compass = el.getAttribute('data-compass');
+          const val = `${compass}, ${strategy}`;
+          if (el.hasAttribute('data-alap-placement')) {
+            el.setAttribute('data-alap-placement', val);
+          }
+          if (el.hasAttribute('placement')) {
+            el.setAttribute('placement', val);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

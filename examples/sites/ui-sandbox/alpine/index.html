@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placement Sandbox — Alpine</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    [x-alap] {
+      color: #88bbff;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    [x-alap]:hover { color: #ffd666; }
+  </style>
+</head>
+<body>
+  <p class="back"><a href="../">&larr; All Adapters</a></p>
+  <h1>Alpine Adapter</h1>
+
+  <div x-data="sandboxData">
+
+    <div class="strategy-picker">
+      <span class="strategy-picker__label">Strategy:</span>
+      <label><input type="radio" x-model="strategy" value="flip" /> flip <span class="strategy-hint">(default)</span></label>
+      <label><input type="radio" x-model="strategy" value="clamp" /> clamp <span class="strategy-hint">(constrain to viewport)</span></label>
+      <label><input type="radio" x-model="strategy" value="place" /> place <span class="strategy-hint">(pinned)</span></label>
+      <code class="strategy-picker__example" x-text="'placement=&quot;SE, ' + strategy + '&quot;'"></code>
+    </div>
+
+    <h2>1. Compass Rose</h2>
+    <div class="scenario">
+      <p class="scenario__title">All 9 placements</p>
+      <div class="compass-grid">
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('NW') }">NW</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('N') }">N</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('NE') }">NE</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('W') }">W</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('C') }">C</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('E') }">E</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('SW') }">SW</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('S') }">S</span></div>
+        <div class="compass-cell"><span x-alap="{ query: '.short', config, placement: p('SE') }">SE</span></div>
+      </div>
+    </div>
+
+    <h2>2. Right-Edge Overflow (TTT Bug)</h2>
+
+    <h3>2a. With placement engine</h3>
+    <div class="scenario">
+      <p class="scenario__title">Expression bar — trigger pushed right</p>
+      <div class="edge-bar">
+        <span class="edge-bar__label">Expression:</span>
+        <span class="edge-bar__expr">.content_collections</span>
+        <span class="edge-bar__trigger">
+          <span x-alap="{ query: '.long', config, placement: p('SE') }">Browse filtered</span>
+        </span>
+      </div>
+    </div>
+
+    <h3>2b. No placement (tier 0)</h3>
+    <div class="scenario">
+      <p class="scenario__title">No placement — strategy toggle has no effect</p>
+      <div class="edge-bar">
+        <span class="edge-bar__label">Expression:</span>
+        <span class="edge-bar__expr">.tech | .news</span>
+        <span class="edge-bar__trigger">
+          <span x-alap="{ query: '.long', config }">Browse filtered (no placement)</span>
+        </span>
+      </div>
+    </div>
+
+    <h2>3. Wide Menu Stress</h2>
+    <div class="scenario wide-menu">
+      <p class="scenario__title">min-width: 400px, right-aligned</p>
+      <div class="right-push">
+        <span x-alap="{ query: '.short', config, placement: p('SE') }">Wide menu SE</span>
+      </div>
+    </div>
+
+    <h2>4. Corner Stress</h2>
+    <div class="scenario">
+      <p class="scenario__title">Long titles, worst-case placements</p>
+      <div class="corner-grid">
+        <span class="corner-tl"><span x-alap="{ query: '.long', config, placement: p('NW') }">NW corner</span></span>
+        <span class="corner-tr"><span x-alap="{ query: '.long', config, placement: p('NE') }">NE corner</span></span>
+        <span class="corner-bl"><span x-alap="{ query: '.long', config, placement: p('SW') }">SW corner</span></span>
+        <span class="corner-br"><span x-alap="{ query: '.long', config, placement: p('SE') }">SE corner</span></span>
+      </div>
+    </div>
+
+    <h2>5. Long Menu (14 items)</h2>
+    <div class="scenario">
+      <span x-alap="{ query: '.planet', config, placement: p('SE') }">14 planets (SE)</span>
+      &nbsp;&mdash;&nbsp;
+      <span x-alap="{ query: '.planet', config, placement: p('N') }">14 planets (N)</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import Alpine from 'https://esm.sh/alpinejs@3';
+    import { alapPlugin } from 'alap/alpine';
+
+    Alpine.plugin(alapPlugin);
+
+    Alpine.data('sandboxData', () => ({
+      strategy: 'flip',
+
+      p(compass) {
+        return `${compass}, ${this.strategy}`;
+      },
+
+      config: {
+        settings: { listType: 'ul', menuTimeout: 8000 },
+        allLinks: {
+          brooklyn: { label: 'Brooklyn Bridge', url: '#', tags: ['bridge', 'short'] },
+          goldengate: { label: 'Golden Gate Bridge', url: '#', tags: ['bridge', 'short'] },
+          bluebottle: { label: 'Blue Bottle Coffee', url: '#', tags: ['coffee', 'short'] },
+
+          portless: { label: 'portless | Named Routes with Vite and Vue Router', url: '#', tags: ['long', 'tech'] },
+          astro_editor: { label: 'Astro Editor \u2014 Schema-Driven Content Management for Static Sites', url: '#', tags: ['long', 'tech'] },
+          huffpost_1: { label: 'HuffPost \u2014 Breaking News, U.S. and World News Coverage', url: '#', tags: ['long', 'news'] },
+          huffpost_2: { label: 'HuffPost \u2014 Breaking News and Entertainment Analysis', url: '#', tags: ['long', 'news'] },
+          nyt_cooking: { label: 'NYT Cooking \u2014 Recipes and Tips from The New York Times', url: '#', tags: ['long', 'news'] },
+          mdn_intersection: { label: 'IntersectionObserver API \u2014 Web APIs | MDN Web Docs', url: '#', tags: ['long', 'tech'] },
+          rust_book: { label: 'The Rust Programming Language \u2014 Comprehensive Guide (2024 Edition)', url: '#', tags: ['long', 'tech'] },
+          wiki_quantum: { label: 'Quantum entanglement \u2014 Wikipedia, the free encyclopedia', url: '#', tags: ['long', 'science'] },
+
+          mercury: { label: 'Mercury', url: '#', tags: ['planet'] },
+          venus: { label: 'Venus', url: '#', tags: ['planet'] },
+          earth: { label: 'Earth', url: '#', tags: ['planet'] },
+          mars: { label: 'Mars', url: '#', tags: ['planet'] },
+          jupiter: { label: 'Jupiter', url: '#', tags: ['planet'] },
+          saturn: { label: 'Saturn', url: '#', tags: ['planet'] },
+          uranus: { label: 'Uranus', url: '#', tags: ['planet'] },
+          neptune: { label: 'Neptune', url: '#', tags: ['planet'] },
+          pluto: { label: 'Pluto (dwarf planet)', url: '#', tags: ['planet'] },
+          ceres: { label: 'Ceres (dwarf planet)', url: '#', tags: ['planet'] },
+          eris: { label: 'Eris (dwarf planet)', url: '#', tags: ['planet'] },
+          moon: { label: 'The Moon', url: '#', tags: ['planet'] },
+          europa: { label: 'Europa', url: '#', tags: ['planet'] },
+          titan: { label: 'Titan', url: '#', tags: ['planet'] },
+        },
+      },
+    }));
+
+    Alpine.start();
+  </script>
+</body>
+</html>

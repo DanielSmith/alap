@@ -19,8 +19,8 @@
   import { getAlapContext, type AlapContextValue } from './context';
   import type { AlapLink as AlapLinkType } from '../../core/types';
   import { sanitizeUrl } from '../../core/sanitizeUrl';
-  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
-  import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+  import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
   import { REM_PER_MENU_ITEM } from '../../constants';
 
   type ResolvedLink = { id: string } & AlapLinkType;
@@ -39,8 +39,8 @@
     onTriggerContext?: (detail: TriggerContextDetail) => void;
     onItemHover?: (detail: ItemHoverDetail) => void;
     onItemContext?: (detail: ItemContextDetail) => void;
-    /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
-    placement?: Placement;
+    /** Placement string, e.g. "SE", "SE, clamp", "N, place". When set, uses the placement engine. */
+    placement?: string;
     /** Pixel gap between trigger and menu edge. Default: 4. */
     gap?: number;
     /** Minimum pixel distance from viewport edges. Default: 8. */
@@ -181,19 +181,13 @@
     const wEl = wrapperEl;
     const p = placement;
 
-    const apply = () => {
-      const state = calcPlacementState(tEl, mEl, {
-        placement: p,
-        gap: gapProp,
-        padding: paddingProp,
-      });
-      applyPlacementToMenu(mEl, wEl, state);
-    };
+    const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
+      placement: p,
+      gap: gapProp,
+      padding: paddingProp,
+    });
 
-    // Wait for DOM update then apply
-    requestAnimationFrame(() => apply());
-
-    placementScrollHandler = () => apply();
+    placementScrollHandler = () => applyNow();
     window.addEventListener('scroll', placementScrollHandler, { passive: true });
 
     return () => {

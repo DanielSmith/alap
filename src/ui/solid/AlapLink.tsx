@@ -19,8 +19,8 @@ import { Dynamic } from 'solid-js/web';
 import { useAlapContext } from './context';
 import type { AlapLink as AlapLinkType } from '../../core/types';
 import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, Placement } from '../shared';
-import { calcPlacementState, applyPlacementToMenu, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -40,8 +40,8 @@ export interface AlapLinkProps {
   onTriggerContext?: (detail: TriggerContextDetail) => void;
   onItemHover?: (detail: ItemHoverDetail) => void;
   onItemContext?: (detail: ItemContextDetail) => void;
-  /** Compass placement (N, NE, E, SE, S, SW, W, NW, C). When set, uses the placement engine. */
-  placement?: Placement;
+  /** Placement string, e.g. "SE", "SE, clamp", "N, place". When set, uses the placement engine. */
+  placement?: string;
   /** Pixel gap between trigger and menu edge. Default: 4. */
   gap?: number;
   /** Minimum pixel distance from viewport edges. Default: 8. */
@@ -196,18 +196,13 @@ export function AlapLink(props: AlapLinkProps) {
     const wEl = wrapperEl;
     const p = props.placement;
 
-    const apply = () => {
-      const state = calcPlacementState(tEl, mEl, {
-        placement: p,
-        gap: props.gap,
-        padding: props.padding,
-      });
-      applyPlacementToMenu(mEl, wEl, state);
-    };
+    const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
+      placement: p,
+      gap: props.gap,
+      padding: props.padding,
+    });
 
-    apply();
-
-    const onScroll = () => apply();
+    const onScroll = () => applyNow();
     window.addEventListener('scroll', onScroll, { passive: true });
 
     onCleanup(() => {

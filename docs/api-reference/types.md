@@ -71,7 +71,7 @@ interface AlapSettings {
   maxVisibleItems?: number;
   hooks?: string[];
   existingUrl?: 'prepend' | 'append' | 'ignore';
-  placement?: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
+  placement?: string;
   placementGap?: number;
   viewportPadding?: number;
   viewportAdjust?: boolean;
@@ -86,17 +86,17 @@ interface AlapSettings {
 | `maxVisibleItems` | `number` | `10` | Items before the menu scrolls. `0` = no limit |
 | `hooks` | `string[]` | — | Default hooks for all items |
 | `existingUrl` | `'prepend' \| 'append' \| 'ignore'` | `'prepend'` | How to handle an existing `href` on the trigger |
-| `placement` | `Placement` | `'SE'` | Preferred menu position: `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`, `C` |
+| `placement` | `string` | `'SE'` | Comma-separated placement string: compass direction + strategy. See below. |
 | `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
 | `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
 | `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment and fallback |
 | `targetWindow` | `string` | — | Global default for link targets |
 
-### Placement type
+### Placement string
 
-```typescript
-type Placement = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
-```
+The `placement` value is a comma-separated string with a compass direction and an optional strategy. The same format works in config settings, DOM attributes (`data-alap-placement`), web component attributes (`placement`), and framework props.
+
+**Compass directions:**
 
 | Value | Position | Alignment |
 |-------|----------|-----------|
@@ -110,7 +110,17 @@ type Placement = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C';
 | `NW` | Above trigger | Right edge aligned with trigger right |
 | `C` | Centered over trigger | Both axes |
 
-When the preferred placement doesn't fit in the viewport, Alap tries the opposite side first, then adjacent positions, then picks the best available fit — clamping height and enabling scroll if needed. The menu never causes the page to scroll.
+**Strategies:**
+
+| Strategy | Behavior |
+|----------|----------|
+| `place` | Position at compass point. No fallback, no clamping. |
+| `flip` | Position + try fallbacks if it doesn't fit. **Default.** |
+| `clamp` | Flip + constrain to viewport + scroll long menus. |
+
+**Examples:** `"SE"`, `"SE, clamp"`, `"N, place"`, `"clamp"` (defaults compass to SE).
+
+When no placement is set, the engine doesn't run — the menu uses CSS-only positioning.
 
 ## `AlapMacro`
 

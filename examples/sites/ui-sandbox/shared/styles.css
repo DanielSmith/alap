@@ -1,0 +1,318 @@
+/**
+ * Shared styles for placement sandbox.
+ *
+ * Intentionally includes min-width: 200px on .alapelem to reproduce
+ * the TTT/real-world scenario where CSS min-width causes overflow
+ * before the placement engine can measure it.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap');
+
+* { box-sizing: border-box; }
+
+html { background: #1a2f8a; }
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 1rem;
+  line-height: 1.7;
+  color: #f0f2ff;
+  background: #1a2f8a;
+}
+
+h1 { font-size: 1.4rem; color: #ffd666; margin: 0.5rem 0 1rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; color: #ffe8a0; }
+h3 { font-size: 0.95rem; color: #ff8a65; margin-top: 1.5rem; }
+p { max-width: 800px; }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background: #1a2870;
+  color: #88bbff;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+a { color: #88bbff; }
+a:hover { color: #ffd666; }
+
+/* --- Trigger styling --- */
+
+a.alap,
+[role="button"],
+alap-link {
+  color: #88bbff;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+a.alap:hover,
+[role="button"]:hover,
+alap-link:hover {
+  color: #ffd666;
+}
+
+[role="button"]:focus-visible {
+  outline: 2px solid #ffd666;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* --- Menu base (the real-world styling) --- */
+
+.alapelem {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.alapelem ul,
+.alapelem ol {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.alapelem li {
+  margin: 0;
+  padding: 0;
+}
+
+.alapelem a,
+.alapListElem a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #f0f2ff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.alapelem a:hover,
+.alapelem a:focus,
+.alapListElem a:hover,
+.alapListElem a:focus {
+  background: #3366d6;
+  color: #ffd666;
+  outline: none;
+}
+
+/* --- Scenario layouts --- */
+
+.scenario {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #152570;
+  border-radius: 8px;
+  border: 1px solid #2e48a0;
+  overflow: visible;
+}
+
+.scenario__title {
+  font-size: 0.85rem;
+  color: #7888b8;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Compass grid: 3x3 */
+.compass-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.compass-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: #2240a8;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Right-edge bar: mimics TTT expression bar */
+.edge-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #2240a8;
+  border-radius: 6px;
+}
+
+.edge-bar__label {
+  color: #7888b8;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.edge-bar__expr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #ff8a65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.edge-bar__trigger {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Full-width container to push trigger to right */
+.right-push {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Corner grid */
+.corner-grid {
+  position: relative;
+  width: 100%;
+  height: 180px;
+}
+
+.corner-tl { position: absolute; top: 0; left: 0; }
+.corner-tr { position: absolute; top: 0; right: 0; }
+.corner-bl { position: absolute; bottom: 0; left: 0; }
+.corner-br { position: absolute; bottom: 0; right: 0; }
+
+/* Dynamic trigger scenario */
+.dynamic-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #2240a8;
+  border-radius: 6px;
+  transition: justify-content 0.3s ease;
+}
+
+.dynamic-bar--left {
+  justify-content: flex-start;
+}
+
+.dynamic-bar--right {
+  justify-content: flex-end;
+}
+
+/* Wide menu stress: extra min-width */
+.wide-menu .alapelem {
+  min-width: 400px;
+}
+
+/* Status indicator */
+.status {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+}
+
+.status--pass {
+  background: #065f46;
+  color: #6ee7b7;
+}
+
+.status--fail {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+/* Strategy picker */
+.strategy-picker {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1rem;
+  margin: 0 0 1.5rem;
+  background: #0d1a52;
+  border: 1px solid #2e48a0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.strategy-picker__label {
+  font-weight: 600;
+  color: #ffe8a0;
+}
+
+.strategy-picker label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  color: #f0f2ff;
+}
+
+.strategy-picker input[type="radio"] {
+  accent-color: #ffd666;
+}
+
+.strategy-hint {
+  color: #7888b8;
+  font-size: 0.8rem;
+}
+
+.strategy-picker__example {
+  margin-left: auto;
+  padding: 0.2rem 0.5rem;
+  background: #1a2870;
+  border-radius: 3px;
+  color: #ff8a65;
+  font-size: 0.8rem;
+}
+
+/* Gallery nav */
+.nav {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.nav a {
+  padding: 0.4rem 0.8rem;
+  background: #2240a8;
+  border: 1px solid #4470cc;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.nav a:hover {
+  border-color: #ffd666;
+  color: #ffd666;
+}
+
+/* Back link */
+.back {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.back a { color: #ffe8a0; }

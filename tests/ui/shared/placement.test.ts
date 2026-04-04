@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { computePlacement, FALLBACK_ORDER } from '../../../src/ui/shared/placement';
+import { computePlacement, parsePlacement, FALLBACK_ORDER } from '../../../src/ui/shared/placement';
 import type { Placement, PlacementInput, Rect, Size } from '../../../src/ui/shared/placement';
 
 // --- Helpers ---
@@ -203,9 +203,10 @@ describe('computePlacement', () => {
   // Clamping behavior
   // ========================
 
-  describe('clamping when menu exceeds available space', () => {
+  describe('clamping when menu exceeds available space (strategy: clamp)', () => {
     it('menu taller than viewport — clamps height and enables scroll', () => {
       const result = computePlacement(makeInput({
+        strategy: 'clamp',
         menuSize: { width: 200, height: 1000 },
         viewport: { width: 1200, height: 400 },
         triggerRect: { top: 180, left: 450, bottom: 200, right: 550, width: 100, height: 20 },
@@ -217,6 +218,7 @@ describe('computePlacement', () => {
 
     it('menu wider than viewport — clamps width', () => {
       const result = computePlacement(makeInput({
+        strategy: 'clamp',
         menuSize: { width: 1500, height: 150 },
         viewport: { width: 800, height: 900 },
         triggerRect: centeredTrigger(),
@@ -227,6 +229,7 @@ describe('computePlacement', () => {
 
     it('very small viewport — both dimensions clamped', () => {
       const result = computePlacement(makeInput({
+        strategy: 'clamp',
         menuSize: { width: 300, height: 300 },
         viewport: { width: 200, height: 200 },
         triggerRect: { top: 90, left: 90, bottom: 110, right: 110, width: 20, height: 20 },
@@ -240,6 +243,7 @@ describe('computePlacement', () => {
       // Trigger near bottom, menu fits above
       const trigger: Rect = { top: 700, left: 450, bottom: 720, right: 550, width: 100, height: 20 };
       const result = computePlacement(makeInput({
+        strategy: 'clamp',
         placement: 'SE',
         triggerRect: trigger,
         viewport: { width: 1200, height: 750 },
@@ -248,6 +252,31 @@ describe('computePlacement', () => {
       // Falls back to a northern placement where it fits
       expect(result.maxHeight).toBeUndefined();
       expect(result.scrollY).toBe(false);
+    });
+
+    it('flip strategy does not clamp', () => {
+      const result = computePlacement(makeInput({
+        strategy: 'flip',
+        menuSize: { width: 200, height: 1000 },
+        viewport: { width: 1200, height: 400 },
+        triggerRect: { top: 180, left: 450, bottom: 200, right: 550, width: 100, height: 20 },
+      }));
+      expect(result.maxHeight).toBeUndefined();
+      expect(result.maxWidth).toBeUndefined();
+      expect(result.scrollY).toBe(false);
+    });
+
+    it('place strategy returns preferred position without fallback', () => {
+      const trigger: Rect = { top: 780, left: 450, bottom: 800, right: 550, width: 100, height: 20 };
+      const result = computePlacement(makeInput({
+        strategy: 'place',
+        placement: 'SE',
+        triggerRect: trigger,
+        viewport: { width: 1200, height: 820 },
+      }));
+      // SE overflows bottom, but place strategy doesn't flip
+      expect(result.placement).toBe('SE');
+      expect(result.y).toBe(trigger.bottom + 4); // gap
     });
   });
 
@@ -349,5 +378,89 @@ describe('computePlacement', () => {
         }
       }
     });
+  });
+});
+
+// ========================
+// parsePlacement
+// ========================
+
+describe('parsePlacement', () => {
+  it('compass only — defaults strategy to flip', () => {
+    const r = parsePlacement('SE');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('flip');
+  });
+
+  it('lowercase compass', () => {
+    const r = parsePlacement('ne');
+    expect(r.compass).toBe('NE');
+    expect(r.strategy).toBe('flip');
+  });
+
+  it('compass + strategy', () => {
+    const r = parsePlacement('SE, clamp');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('strategy only — defaults compass to SE', () => {
+    const r = parsePlacement('clamp');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('strategy + compass (reversed order)', () => {
+    const r = parsePlacement('clamp, N');
+    expect(r.compass).toBe('N');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('place strategy', () => {
+    const r = parsePlacement('W, place');
+    expect(r.compass).toBe('W');
+    expect(r.strategy).toBe('place');
+  });
+
+  it('multiple strategies — highest wins', () => {
+    const r = parsePlacement('SE, flip, clamp');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('multiple compass — first wins', () => {
+    const r = parsePlacement('N, S');
+    expect(r.compass).toBe('N');
+    expect(r.strategy).toBe('flip');
+  });
+
+  it('whitespace tolerance', () => {
+    const r = parsePlacement('  SE ,  clamp  ');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('unknown tokens are discarded', () => {
+    const r = parsePlacement('SE, bogus, clamp, xyz');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('clamp');
+  });
+
+  it('empty string — all defaults', () => {
+    const r = parsePlacement('');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('flip');
+  });
+
+  it('malicious characters are stripped', () => {
+    const r = parsePlacement('SE<script>, cl@mp');
+    expect(r.compass).toBe('SE');
+    expect(r.strategy).toBe('flip'); // cl@mp has @ stripped → "clmp" → unknown → discarded
+  });
+
+  it('C compass direction', () => {
+    const r = parsePlacement('c, place');
+    expect(r.compass).toBe('C');
+    expect(r.strategy).toBe('place');
   });
 });
