@@ -1,6 +1,6 @@
 {
   "name": "alap",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0",
   "description": "Dynamic menus for links — one click, multiple destinations",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -108,9 +108,18 @@
   "scripts": {
     "dev": "vite serve examples",
     "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
+    "build:lib": "vite build && vite build --config vite.config.iife.ts",
+    "build:all": "pnpm turbo run build",
     "test": "vitest run",
+    "test:all": "turbo run test",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
+    "typecheck:all": "turbo run typecheck",
+    "pack:lib": "pnpm run build:lib && pnpm pack --pack-destination ./dist-tgz",
+    "test:packaging": "vitest run --config vitest.packaging.ts",
+    "docker:express": "pnpm run pack:lib && podman build -t alap-express -f examples/servers/express-sqlite/Dockerfile .",
+    "docker:bun": "pnpm run pack:lib && podman build -t alap-bun -f examples/servers/bun-sqlite/Dockerfile .",
+    "docker:hono": "pnpm run pack:lib && podman build -t alap-hono -f examples/servers/hono-sqlite/Dockerfile .",
     "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "keywords": [
@@ -144,7 +153,12 @@
       "brace-expansion": ">=5.0.5",
       "lodash": ">=4.18.0",
       "esbuild": ">=0.25.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "sharp"
+    ]
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.19.2",
@@ -172,6 +186,7 @@
     "remark-parse": "^11.0.0",
     "solid-js": "^1.9.11",
     "svelte": "^5.53.11",
+    "turbo": "^2.9.3",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.58.0",
     "unified": "^11.0.5",

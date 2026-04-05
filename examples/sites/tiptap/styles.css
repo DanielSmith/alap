@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-@import '/shared/styles.css';
-@import '/shared/styles-wc.css';
+@import '../shared/styles.css';
+@import '../shared/styles-wc.css';
 
 body {
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;

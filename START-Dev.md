@@ -421,11 +421,24 @@ See [wordpress-alap](plugins/wordpress/) (`plugins/wordpress/`) and the [WordPre
 
 ## Development
 
+This is a pnpm workspace with [Turborepo](https://turborepo.dev) for build orchestration.
+
 ```bash
-pnpm install
-pnpm test         # 992 tests across 45 files
+pnpm install          # install all workspace packages
+
+# Root library
+pnpm build            # ESM + CJS + IIFE + type declarations
+pnpm test             # 992 tests across 45 files
 pnpm typecheck
-pnpm build
+
+# Entire workspace (via Turborepo)
+pnpm build:all        # root library first, then all packages in parallel
+pnpm test:all         # tests across all workspace packages
+pnpm typecheck:all    # type-check everything
+
+# Filtered builds
+pnpm turbo run build --filter=alap-editor-react...   # one editor + its deps
+pnpm turbo run build --filter=./integrations/*        # all integrations
 ```
 
 ## Further Reading

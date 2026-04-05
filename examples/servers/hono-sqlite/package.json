@@ -14,6 +14,9 @@
     "better-sqlite3": "^11.10.0",
     "hono": "^4.6.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3"]
+  },
   "author": "Daniel Smith",
   "license": "Apache-2.0"
 }

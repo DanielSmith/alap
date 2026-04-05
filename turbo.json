@@ -1,0 +1,44 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "//#build": {
+      "outputs": ["dist/**"],
+      "inputs": ["src/**", "package.json", "tsconfig.json", "vite.config.*"]
+    },
+    "build": {
+      "dependsOn": ["^build", "//#build"],
+      "outputs": ["dist/**", "_site/**", ".next/**", ".output/**", "docs/.vitepress/dist/**"],
+      "inputs": ["src/**", "package.json", "tsconfig.json", "vite.config.*"]
+    },
+    "build:lib": {
+      "outputs": ["dist/**", "dist-tgz/**"],
+      "inputs": ["src/**", "vite.config.*", "tsconfig.json"]
+    },
+    "//#test": {
+      "dependsOn": ["//#build"],
+      "outputs": [],
+      "inputs": ["src/**", "tests/**"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "inputs": ["src/**", "tests/**"]
+    },
+    "//#typecheck": {
+      "dependsOn": ["//#build"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

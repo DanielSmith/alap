@@ -1,28 +1,22 @@
-# Build from repo root:
-#
-#   docker build -t alap-hono -f examples/servers/hono-sqlite/Dockerfile .
+# Pre-req: pnpm run pack:lib   (produces dist-tgz/alap-*.tgz)
+# Build:   podman build -t alap-hono -f examples/servers/hono-sqlite/Dockerfile .
+#   or:    pnpm docker:hono
 
-# node:22-alpine
-FROM node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3 AS lib
-WORKDIR /lib
-COPY package.json pnpm-lock.yaml ./
-COPY src/ src/
-COPY vite.config.ts vite.config.iife.ts tsconfig.json tsconfig.solid.json ./
-RUN npm i -g pnpm@10.32.1 && pnpm install && pnpm build && pnpm pack
-
-# node:22-alpine
 FROM node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3
+RUN apk add --no-cache python3 make g++
 WORKDIR /app
 
+COPY dist-tgz/alap-*.tgz ./alap.tgz
 COPY examples/servers/hono-sqlite/package.json ./
-COPY --from=lib /lib/alap-*.tgz ./alap.tgz
-RUN sed -i 's|"alap": "file:../../.."|"alap": "file:./alap.tgz"|' package.json \
- && npm install --production
+RUN npm i -g pnpm@10.32.1 \
+ && sed -i 's|"alap": "workspace:\*"|"alap": "file:./alap.tgz"|' package.json \
+ && pnpm install --prod
 
 COPY examples/servers/shared/ /shared/
 COPY examples/servers/hono-sqlite/server.js examples/servers/hono-sqlite/seed.js ./
 COPY examples/servers/hono-sqlite/public/ public/
-RUN node seed.js
+RUN node seed.js \
+ && chown -R node:node /app
 
 EXPOSE 3000
 

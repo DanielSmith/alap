@@ -39,6 +39,6 @@ COPY --from=builder /repo/server-bin ./server
 COPY --from=builder /repo/alap.db .
 COPY --from=builder /repo/examples/servers/axum-sqlite/public/ ./public/
 EXPOSE 3000
-RUN adduser -D appuser && chown appuser:appuser /app/server /app/alap.db
+RUN adduser -D appuser && chown -R appuser:appuser /app
 USER appuser
 CMD ["./server"]

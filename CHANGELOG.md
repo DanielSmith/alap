@@ -2,7 +2,26 @@
 
 All notable changes to Alap will be documented in this file.
 
-## [Unreleased]
+## [3.0.0] — 2026-04-05
+
+### Turborepo build orchestration (2026-04-05)
+
+- Added Turborepo for cached, parallel, dependency-aware builds across all workspace packages
+- New `turbo.json` defines task pipeline: `build`, `test`, `typecheck`, `dev`, `start`
+- Root library builds first (`//#build`), then workspace packages build in parallel
+- Second build with no changes hits full cache (~600ms vs ~45s)
+- New scripts: `build:all`, `test:all`, `typecheck:all` run tasks across entire workspace
+- New scripts: `pack:lib` produces pre-built tarball for Docker, `docker:express`, `docker:bun`, `docker:hono`
+- Fixed tiptap example: CSS `@import '/shared/...'` absolute paths changed to relative `'../shared/...'`
+
+### Server Dockerfiles: minimal lib build (2026-04-05)
+
+- Added `build:lib` script — Vite builds only, no tsc type declarations (not needed by servers)
+- Node server Dockerfiles (express, hono, bun) now generate a slim `package.json` in the lib stage with only `vite` as a dependency — installs ~20 packages instead of 727
+- Fixed `workspace:*` sed pattern in Dockerfiles (was matching stale `file:../../..`)
+- Express and Hono `package.json`: added `pnpm.onlyBuiltDependencies` for `better-sqlite3` native builds
+- Express and Hono Dockerfiles: added `apk add python3 make g++` for native addon compilation
+- Version bump to 3.0.0
 
 ### Language port parity (2026-04-04)
 
@@ -16,6 +35,14 @@ All notable changes to Alap will be documented in this file.
 - Tailwind example: menu CSS now uses actual Tailwind design tokens (amber-50, green-50, slate-800, indigo-50) instead of the default blue palette — each per-anchor theme is visually distinct
 - Placement example: added missing `.strategy-table` CSS using `var()` custom properties
 - External data example: removed broken `:echo:` protocol section (generate protocols require pre-resolution; the demo was non-functional)
+- Examples build: entry discovery now goes two levels deep, fixing missing ui-sandbox and placement subdirectories
+- Solid plugin `include` expanded to cover `ui-sandbox/solid/` (was rendering blank)
+
+### Live Alap menus in docs (2026-04-04)
+
+- Added interactive "Try it" blocks with `<alap-link>` to 5 doc pages: Getting Started overview, Core Concepts overview, Expressions, Macros, Search Patterns
+- Uses web component directly in markdown — degrades to plain text on GitHub, becomes interactive on docs.alap.info
+- VitePress wiring already in place: IIFE bundle, docs-config.js, custom element compiler option, dark-mode menu CSS
 
 ## [3.0.0-beta.4] — 2026-04-02
 

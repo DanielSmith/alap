@@ -72,6 +72,37 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **AT Protocol / Bluesky** — `:atproto:` protocol for live feeds, profiles, and search
 - **htmx** — zero-framework HTML-over-the-wire; web components auto-initialize after swaps
 
+## Development
+
+This is a pnpm workspace with [Turborepo](https://turborepo.dev) for build orchestration.
+
+```bash
+pnpm install          # install all workspace packages
+
+# Root library only
+pnpm build            # ESM + CJS + IIFE + type declarations
+pnpm test             # 990+ tests across core, UI adapters, storage, plugins
+
+# Entire workspace (via Turborepo)
+pnpm build:all        # build root library, then all editors/integrations/plugins/examples in parallel
+pnpm test:all         # run tests across all workspace packages
+pnpm typecheck:all    # type-check everything
+
+# Filtered builds
+pnpm turbo run build --filter=alap-editor-react...   # one editor + its dependencies
+pnpm turbo run build --filter=./integrations/*        # all integrations
+pnpm turbo run test --filter=./plugins/*              # tests for plugins only
+
+# Docker (Node server examples)
+pnpm docker:express   # builds library tarball, then the Express container
+pnpm docker:bun       # same for Bun
+pnpm docker:hono      # same for Hono
+```
+
+Turborepo caches build outputs — a second run with no changes completes in under a second.
+
+`pnpm install` will show warnings about `pnpm.overrides` in editors, plugins, and server packages. These are expected — each sub-package carries its own dependency overrides for standalone use outside the workspace. The root `package.json` overrides take precedence in workspace mode; the per-package copies are harmless.
+
 ## Next Steps
 
 | Where to go | What you'll find |

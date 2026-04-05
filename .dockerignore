@@ -8,6 +8,7 @@ node_modules
 .github
 .vscode
 .claude
+.turbo
 
 docs
 tests
@@ -21,5 +22,6 @@ examples/img
 
 *.md
 *.tgz
+!dist-tgz/*.tgz
 *.log
 vitest.config*.ts
