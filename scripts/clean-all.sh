@@ -59,13 +59,34 @@ else
 fi
 
 echo ""
-echo "=== Podman ==="
-if $DRY_RUN; then
-  echo "  would run: podman system prune --all --force"
-  echo "  would run: podman volume prune --force"
+echo "=== Podman (alap-* images and containers only) ==="
+ALAP_CONTAINERS=$(podman ps -a --filter "ancestor=alap-*" --format "{{.ID}} {{.Image}}" 2>/dev/null || true)
+ALAP_IMAGES=$(podman images --format "{{.ID}} {{.Repository}}" 2>/dev/null | grep -E '\balap-' || true)
+
+if [[ -z "$ALAP_CONTAINERS" && -z "$ALAP_IMAGES" ]]; then
+  echo "  (no alap containers or images found)"
 else
-  podman system prune --all --force
-  podman volume prune --force
+  if [[ -n "$ALAP_CONTAINERS" ]]; then
+    echo "$ALAP_CONTAINERS" | while read -r id image; do
+      if $DRY_RUN; then
+        echo "  would remove container: $id ($image)"
+      else
+        echo "  removing container: $id ($image)"
+        podman rm --force "$id"
+      fi
+    done
+  fi
+
+  if [[ -n "$ALAP_IMAGES" ]]; then
+    echo "$ALAP_IMAGES" | while read -r id repo; do
+      if $DRY_RUN; then
+        echo "  would remove image: $id ($repo)"
+      else
+        echo "  removing image: $id ($repo)"
+        podman rmi --force "$id"
+      fi
+    done
+  fi
 fi
 
 echo ""
