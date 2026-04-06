@@ -106,7 +106,7 @@
     "src/ui/astro/*.astro"
   ],
   "scripts": {
-    "dev": "vite serve examples",
+    "dev": "vite serve examples/sites --config vite.config.ts",
     "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
     "build:lib": "vite build && vite build --config vite.config.iife.ts",
     "build:all": "pnpm turbo run build",

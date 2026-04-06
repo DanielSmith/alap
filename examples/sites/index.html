@@ -1,156 +1,132 @@
 <!DOCTYPE html>
-<html lang="en" style="background:#1a2f8a">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alap Examples</title>
-  <meta name="description" content="Interactive examples showing Alap's expression language, framework adapters, and advanced features." />
-  <link rel="stylesheet" href="/shared/gallery.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 Examples</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    ul { list-style: none; padding: 0; margin: 1rem 0; }
+    li { margin: 0.75rem 0; }
+    a {
+      display: inline-block;
+      padding: 0.4rem 0.9rem;
+      color: #88bbff;
+      text-decoration: none;
+      border: 1px solid #4470cc;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    a:hover { background: #2240a8; color: #ffd666; }
+    .desc { color: #7888b8; font-size: 0.85rem; margin-left: 0.5rem; }
+    .start-here a { border-color: #ffd666; background: #2240a8; color: #ffd666; font-weight: 500; }
+    .start-here a:hover { background: #3366d6; }
+    .note { font-size: 0.8rem; color: #7888b8; margin-top: 0.25rem; }
+  </style>
 </head>
 <body>
+  <h1>Alap v3 Examples</h1>
+  <p>Self-contained demos showing off the library.</p>
 
-  <script>window.name = 'alapDemo';</script>
+  <h2>Start Here</h2>
+  <p>New to Alap? Go through these three in order.</p>
+  <ul>
+    <li class="start-here">
+      <a href="./basic/">1. Basic</a>
+      <span class="desc">Item IDs, class queries, operators, parentheses, macros — the fundamentals</span>
+    </li>
+    <li class="start-here">
+      <a href="./react/">2. React Adapter</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — framework integration pattern</span>
+    </li>
+    <li class="start-here">
+      <a href="./web-component/">3. Web Component</a>
+      <span class="desc">&lt;alap-link&gt; custom element — zero-framework, works everywhere</span>
+    </li>
+  </ul>
 
-  <div class="gallery-container">
-    <h1>Alap Examples</h1>
-    <p>Self-contained demos showing off the library. Each card opens a demo in a separate window.</p>
+  <h2>Theming</h2>
+  <ul>
+    <li>
+      <a href="./styling/">Styling</a>
+      <span class="desc">Offsets, per-anchor themes, custom item classes, image triggers</span>
+    </li>
+    <li>
+      <a href="./tailwind/">Tailwind CSS</a>
+      <span class="desc">Menu styled entirely with Tailwind utilities</span>
+    </li>
+  </ul>
 
-    <h2>Start Here</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/basic/">
-        <div class="card-title">1. Basic</div>
-        <div class="card-desc">Item IDs, class queries, operators, parentheses, macros — the fundamentals</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/react/">
-        <div class="card-title">2. React Adapter</div>
-        <div class="card-desc"><code>&lt;AlapProvider&gt;</code> + <code>&lt;AlapLink&gt;</code> + <code>useAlap()</code> — framework integration pattern</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/web-component/">
-        <div class="card-title">3. Web Component</div>
-        <div class="card-desc"><code>&lt;alap-link&gt;</code> custom element — zero-framework, works everywhere</div>
-      </a>
-    </div>
+  <h2>Framework Adapters</h2>
+  <ul>
+    <li>
+      <a href="./react/">React</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() hook — all rendering modes</span>
+    </li>
+    <li>
+      <a href="./vue/">Vue</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() composable — SFC templates</span>
+    </li>
+    <li>
+      <a href="./svelte/">Svelte</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — Svelte 5 runes</span>
+    </li>
+    <li>
+      <a href="./solid/">SolidJS</a>
+      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — fine-grained reactivity</span>
+    </li>
+    <li>
+      <a href="./alpine/">Alpine.js</a>
+      <span class="desc">x-alap directive — no build step, sprinkle onto HTML</span>
+    </li>
+  </ul>
 
-    <h2>Theming</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/styling/">
-        <div class="card-title">Styling</div>
-        <div class="card-desc">Offsets, per-anchor themes, custom item classes, image triggers</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/tailwind/">
-        <div class="card-title">Tailwind CSS</div>
-        <div class="card-desc">Menu styled entirely with Tailwind utilities</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/advanced-css-dom/">
-        <div class="card-title">Advanced CSS (DOM)</div>
-        <div class="card-desc">Advanced CSS techniques with the DOM adapter</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/advanced-css-wc/">
-        <div class="card-title">Advanced CSS (Web Component)</div>
-        <div class="card-desc">Advanced CSS techniques with <code>::part()</code> styling</div>
-      </a>
-    </div>
+  <h2>Positioning</h2>
+  <ul>
+    <li>
+      <a href="./placement/">Placement</a>
+      <span class="desc">All 9 compass placements (N, NE, E, SE, S, SW, W, NW, C), viewport fallback, center popover — DOM + web component</span>
+    </li>
+  </ul>
 
-    <h2>Framework Adapters</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/react/">
-        <div class="card-title">React</div>
-        <div class="card-desc"><code>&lt;AlapProvider&gt;</code> + <code>&lt;AlapLink&gt;</code> + <code>useAlap()</code> hook</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/vue/">
-        <div class="card-title">Vue</div>
-        <div class="card-desc"><code>&lt;AlapProvider&gt;</code> + <code>&lt;AlapLink&gt;</code> + <code>useAlap()</code> composable</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/svelte/">
-        <div class="card-title">Svelte</div>
-        <div class="card-desc"><code>&lt;AlapProvider&gt;</code> + <code>&lt;AlapLink&gt;</code> — Svelte 5 runes</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/solid/">
-        <div class="card-title">SolidJS</div>
-        <div class="card-desc"><code>&lt;AlapProvider&gt;</code> + <code>&lt;AlapLink&gt;</code> — fine-grained reactivity</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/alpine/">
-        <div class="card-title">Alpine.js</div>
-        <div class="card-desc"><code>x-alap</code> directive — no build step, sprinkle onto HTML</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/vitepress/">
-        <div class="card-title">VitePress</div>
-        <div class="card-desc"><code>vitepress-alap</code> plugin — <code>&lt;alap-link&gt;</code> in VitePress markdown</div>
-      </a>
-    </div>
+  <h2>Advanced</h2>
+  <ul>
+    <li>
+      <a href="./hooks-and-media/">Hooks &amp; Media</a>
+      <span class="desc">Image triggers, div triggers, image menu items, hover preview, context popup, event log</span>
+    </li>
+    <li>
+      <a href="./regex-search/">Regex Search</a>
+      <span class="desc">/key/opts syntax — field filtering, sorting, age limits, composition with operators</span>
+    </li>
+    <li>
+      <a href="./markdown/">Markdown (remark-alap)</a>
+      <span class="desc">[text](alap:@macro) in Markdown → &lt;alap-link&gt; via remark plugin</span>
+    </li>
+    <li>
+      <a href="./tiptap/">Tiptap Rich-Text</a>
+      <span class="desc">Inline &lt;alap-link&gt; nodes in a Tiptap editor — side-by-side with live preview</span>
+    </li>
+    <li>
+      <a href="./external-data/">External Data</a>
+      <span class="desc">Load config from JSON files or remote endpoints</span>
+    </li>
+    <li>
+      <a href="./bluesky-atproto/">Bluesky / AT Protocol</a>
+      <span class="desc">:atproto: protocol — live profiles, feeds, people search, post search, plus a combined page mixing allLinks + :web: + :atproto: in one expression</span>
+    </li>
+  </ul>
 
-    <h2>Renderers</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/lightbox/">
-        <div class="card-title">Lightbox</div>
-        <div class="card-desc">Fullscreen overlay renderer — same config, <code>AlapLightbox</code> instead of <code>AlapUI</code></div>
-      </a>
-    </div>
-
-    <h2>Positioning</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/placement/">
-        <div class="card-title">Placement</div>
-        <div class="card-desc">All 9 compass placements, viewport fallback, edge flips, long menu clamping</div>
-      </a>
-    </div>
-
-    <h2>Advanced</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/hooks-and-media/">
-        <div class="card-title">Hooks &amp; Media</div>
-        <div class="card-desc">Image triggers, div triggers, image menu items, hover preview, context popup, event log</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/regex-search/">
-        <div class="card-title">Regex Search</div>
-        <div class="card-desc"><code>/key/opts</code> syntax — field filtering, sorting, age limits, composition with operators</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/external-data/">
-        <div class="card-title">External Data</div>
-        <div class="card-desc">Loading link configuration from external sources</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/bluesky-atproto/">
-        <div class="card-title">Bluesky / AT Protocol</div>
-        <div class="card-desc">Authenticated feeds, search, combined static + live data</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/cdn/">
-        <div class="card-title">CDN / Script Tag</div>
-        <div class="card-desc">Zero npm, zero build step — just a <code>&lt;script&gt;</code> tag</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/htmx/">
-        <div class="card-title">htmx</div>
-        <div class="card-desc">Fragment swaps with <code>hx-get</code> — Alap menus inside htmx-loaded content</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/next/">
-        <div class="card-title">Next.js (simulated)</div>
-        <div class="card-desc">App Router layout/page pattern with React adapter</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/markdown/">
-        <div class="card-title">Markdown (remark-alap)</div>
-        <div class="card-desc"><code>[text](alap:@macro)</code> in Markdown → <code>&lt;alap-link&gt;</code> via remark plugin</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/cms-content/">
-        <div class="card-title">CMS Content (rehype)</div>
-        <div class="card-desc">Transform existing HTML links into Alap menus with rehype</div>
-      </a>
-      <a class="card" target="alapDemoExample" href="/tiptap/">
-        <div class="card-title">Tiptap Editor</div>
-        <div class="card-desc">Rich-text editor with inline <code>&lt;alap-link&gt;</code> nodes</div>
-      </a>
-    </div>
-
-    <h2>Development</h2>
-    <div class="card-grid">
-      <a class="card" target="alapDemoExample" href="/ui-sandbox/">
-        <div class="card-title">Placement Sandbox</div>
-        <div class="card-desc">Visual test harness for the placement engine across all adapters. Toggle strategy (flip/clamp/place) in real time.</div>
-      </a>
-    </div>
-  </div>
-
-  <footer>
-    <p><a href="https://alap.info">alap.info</a> · <a href="https://docs.alap.info">Docs</a> · <a href="https://github.com/DanielSmith/alap">GitHub</a></p>
-  </footer>
-
+  <h2>Static Site Generators</h2>
+  <ul>
+    <li>
+      <a href="./eleventy/">Eleventy</a>
+      <span class="desc">eleventy-alap plugin — shortcodes and filters in Nunjucks templates</span>
+    </li>
+    <li>
+      <a href="http://localhost:9010/">Astro Integration</a>
+      <span class="desc">Separate server — run <code>examples/sites/astro-integration/serve.sh</code> first (port 9010)</span>
+    </li>
+  </ul>
 </body>
 </html>

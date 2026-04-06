@@ -82,14 +82,15 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 
 ## Running
 
-**Standalone** (from any example directory):
+**All examples via Vite** (from `alap/`):
 ```bash
-./serve.sh
-```
-
-**All from root** (from `alap/`):
-```bash
+pnpm build                # required first — examples import from the built library
 pnpm dev                  # http://localhost:5173/sites/<name>/
 ```
 
-**Run all concurrently** — each has a unique port, no conflicts.
+**Single example standalone** (from the example's directory):
+```bash
+./serve.sh                # runs on the port listed in the table above
+```
+
+Each example has a unique port, so you can run multiple `./serve.sh` instances concurrently without conflicts.
