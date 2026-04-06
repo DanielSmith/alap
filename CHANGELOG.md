@@ -2,6 +2,26 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.0.0] — 2026-04-06
+
+### Fresh-checkout walkthrough fixes (2026-04-06)
+
+- Fixed `pnpm dev` — now serves from `examples/sites/` with explicit `--config vite.config.ts` so aliases resolve correctly
+- Moved examples gallery (`index.html`, `styles.css`) from `examples/` to `examples/sites/` so CSS paths (`/shared/styles.css`) resolve without breakage
+- Updated gallery links from `./sites/<name>/` to `./<name>/`
+- Added copy-to-clipboard buttons for standalone server commands in the examples gallery (Eleventy, Astro, Hugo, VitePress)
+- Fixed Solid examples rendering blank — expanded `vite-plugin-solid` include to cover `examples/sites/solid/` and `examples/sites/ui-sandbox/solid/`
+- Fixed Laravel Dockerfile — added `mkdir -p bootstrap/cache` and `.gitkeep` so artisan runs on fresh checkout
+- Fixed Java Spring Boot demo page — title/heading said "flask-sqlite" instead of "java-spring"
+- Added Java Spring Boot Dockerfile build feedback — echo after JAR build, comment about JRE image download delay
+- Added FastAPI build command to README Docker section (was missing from the 10-server list)
+- Added `podman images | grep alap-` to README for listing built servers
+- Added `podman run`, `podman stop`, `podman rm` examples to README as separate commands
+- Added override warnings note to START-Dev.md Development section
+- New `scripts/clean-all.sh` — removes all `node_modules`, `dist`, `dist-tgz`, `.turbo` dirs, prunes pnpm store, removes only `alap-*` Podman containers/images. Dry run by default, `--force` to execute
+- Updated examples/sites/README.md — documented that Eleventy, Astro, Hugo, and VitePress need their own servers with copy-pasteable commands
+- Updated README: date to April 2026, test count to 992, examples link to `examples/sites/`
+
 ## [3.0.0] — 2026-04-05
 
 ### Turborepo build orchestration (2026-04-05)

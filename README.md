@@ -1,6 +1,6 @@
 # Alap
 
-## Version 3, Daniel Smith - March 2026
+## Version 3, Daniel Smith - April 2026
 
 **Turn any link into a curated menu of destinations.**
 
@@ -81,7 +81,7 @@ pnpm install          # install all workspace packages
 
 # Root library only
 pnpm build            # ESM + CJS + IIFE + type declarations
-pnpm test             # 990+ tests across core, UI adapters, storage, plugins
+pnpm test             # 992 tests across core, UI adapters, storage, plugins
 
 # Entire workspace (via Turborepo)
 pnpm build:all        # build root library, then all editors/integrations/plugins/examples in parallel
@@ -130,7 +130,7 @@ Turborepo caches build outputs — a second run with no changes completes in und
 | Where to go | What you'll find |
 |-------------|-----------------|
 | **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
-| **[Examples](examples/)** | 29 demo sites + 10 server backends |
+| **[Examples](examples/sites/)** | 29 demo sites + 10 server backends |
 | **[Framework Guides](docs/framework-guides/)** | 9 adapters + integrations for Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more |
 | **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |
