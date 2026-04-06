@@ -59,7 +59,7 @@ export default defineConfig({
   plugins: [
     vue(),
     svelte(),
-    solid({ include: ['src/ui/solid/**'], solid: { generate: 'dom' } }),
+    solid({ include: ['src/ui/solid/**', 'examples/sites/solid/**', 'examples/sites/ui-sandbox/solid/**'], solid: { generate: 'dom' } }),
   ],
   test: {
     globals: false,
