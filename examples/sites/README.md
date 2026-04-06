@@ -85,7 +85,7 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 **All examples via Vite** (from `alap/`):
 ```bash
 pnpm build                # required first — examples import from the built library
-pnpm dev                  # http://localhost:5173/sites/<name>/
+pnpm dev                  # http://localhost:5173/<name>/
 ```
 
 **Single example standalone** (from the example's directory):
@@ -94,3 +94,10 @@ pnpm dev                  # http://localhost:5173/sites/<name>/
 ```
 
 Each example has a unique port, so you can run multiple `./serve.sh` instances concurrently without conflicts.
+
+**Examples that need their own server:** Eleventy, Astro, Hugo, Next.js, and VitePress use their own build tools and cannot run through the shared Vite dev server. Start them separately:
+
+```bash
+cd examples/sites/eleventy && pnpm dev              # port 9990
+cd examples/sites/astro-integration && ./serve.sh   # port 9010
+```
