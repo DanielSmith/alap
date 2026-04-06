@@ -1,0 +1,478 @@
+openapi: 3.1.0
+info:
+  title: Alap Config API
+  version: 1.0.0
+  description: |
+    REST API for managing Alap link configurations. All 10 server implementations
+    (Express+SQLite, Hono+SQLite, Bun+SQLite, Laravel+SQLite, Gin+SQLite,
+    Axum+SQLite, Flask+SQLite, Django+SQLite, FastAPI+PostgreSQL,
+    Spring Boot+SQLite) conform to this spec.
+
+    All 10 servers fully support all endpoints, including expression resolution
+    via `POST /cherry-pick` and `POST /query`. Node/Bun servers use `alap/core`
+    (TypeScript); Python, PHP, Go, Rust, and Java servers use native ports of
+    the expression parser.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:3000
+    description: Local dev server (all servers default to port 3000)
+
+security: []
+
+paths:
+  /configs:
+    get:
+      operationId: listConfigs
+      summary: List all config names
+      responses:
+        "200":
+          description: Array of config names, sorted alphabetically
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: ["demo", "work-links"]
+
+  /configs/{name}:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Config name (e.g. "demo")
+
+    get:
+      operationId: getConfig
+      summary: Load a single config by name
+      responses:
+        "200":
+          description: Config with metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigEntry"
+        "404":
+          description: Config not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Config \"unknown\" not found"
+
+    put:
+      operationId: saveConfig
+      summary: Create or update a config (upsert)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlapConfig"
+      responses:
+        "204":
+          description: Config saved
+        "400":
+          description: Invalid or empty request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Request body must be a non-null JSON object"
+
+    delete:
+      operationId: deleteConfig
+      summary: Delete a config
+      description: |
+        Deletes the named config. Returns 204 regardless of whether the config
+        existed (idempotent).
+      responses:
+        "204":
+          description: Config deleted (or did not exist)
+
+  /search:
+    get:
+      operationId: searchLinks
+      summary: Search links across all configs
+      description: |
+        Cross-config full-text search. At least one of `tag`, `q`, or `regex`
+        is required. Results are returned as flat objects with the source config
+        name attached.
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+          description: Match links with this tag (exact match)
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Case-insensitive substring match across fields
+        - name: regex
+          in: query
+          schema:
+            type: string
+          description: Regex pattern match across fields (case-insensitive)
+        - name: fields
+          in: query
+          schema:
+            type: string
+            default: label,url,tags,description,id
+          description: |
+            Comma-separated list of fields to search.
+            Valid values: `label`, `url`, `tags`, `description`, `id`
+        - name: config
+          in: query
+          schema:
+            type: string
+          description: Regex pattern to filter which config names to search
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+          description: Maximum number of results to return
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Missing search criteria or invalid regex
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Provide at least one of: tag, q, regex"
+
+  /cherry-pick:
+    post:
+      operationId: cherryPick
+      summary: Resolve an expression and return matching links
+      description: |
+        Evaluates an Alap expression against a named config and returns the
+        matching links as a flat `allLinks` object. Useful for extracting a
+        subset of links from a config.
+
+        URLs in the response are sanitized to block dangerous URI schemes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CherryPickRequest"
+      responses:
+        "200":
+          description: Matched links
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CherryPickResponse"
+        "400":
+          description: Missing source or expression
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "\"source\" and \"expression\" are required"
+        "404":
+          description: Source config not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /query:
+    post:
+      operationId: queryLinks
+      summary: Resolve an expression and return result array
+      description: |
+        Evaluates an Alap expression and returns matching links as an array of
+        objects with `id` included. Supports merging multiple configs.
+
+        URLs in the response are sanitized to block dangerous URI schemes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+      responses:
+        "200":
+          description: Resolved links
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResponse"
+        "400":
+          description: Missing expression
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "\"expression\" is required"
+        "404":
+          description: Named config not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    AlapLink:
+      type: object
+      required: [url]
+      properties:
+        label:
+          type: string
+          description: Display text (required unless `image` is provided)
+        url:
+          type: string
+          description: Destination URL
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for class-based querying (.tag syntax)
+        cssClass:
+          type: string
+          description: CSS class applied to the menu list item
+        image:
+          type: string
+          description: Image URL displayed instead of text label
+        altText:
+          type: string
+          description: Alt text for image
+        targetWindow:
+          type: string
+          description: 'Anchor target attribute (e.g. "_self", "_blank", "fromAlap")'
+        description:
+          type: string
+          description: Human-readable description
+        thumbnail:
+          type: string
+          description: Image URL for tooltip/preview on hover
+        hooks:
+          type: array
+          items:
+            type: string
+          description: 'Event hooks this item participates in (e.g. ["item-hover"])'
+        guid:
+          type: string
+          format: uuid
+          description: Permanent UUID, survives renames
+        createdAt:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: number
+          description: Creation timestamp (ISO 8601 string or Unix ms)
+
+    AlapMacro:
+      type: object
+      required: [linkItems]
+      properties:
+        linkItems:
+          type: string
+          description: 'Expression string to expand (e.g. ".favorite + .video")'
+        config:
+          type: object
+          additionalProperties: true
+          description: Reserved for future per-macro configuration
+
+    AlapSearchPattern:
+      oneOf:
+        - type: string
+          description: Shorthand — just the regex pattern string
+        - type: object
+          required: [pattern]
+          properties:
+            pattern:
+              type: string
+              description: Regex pattern (compiled at query time)
+            options:
+              $ref: "#/components/schemas/AlapSearchOptions"
+
+    AlapSearchOptions:
+      type: object
+      properties:
+        fields:
+          type: string
+          description: 'Field codes: l(label), u(url), t(tags), d(description), k(id), a(all)'
+        limit:
+          type: integer
+          description: Maximum results to return
+        age:
+          type: string
+          description: 'Age filter (e.g. "30d", "24h", "2w")'
+        sort:
+          type: string
+          enum: [alpha, newest, oldest]
+          description: Result ordering
+
+    AlapSettings:
+      type: object
+      properties:
+        listType:
+          type: string
+          enum: [ul, ol]
+          default: ul
+        menuTimeout:
+          type: integer
+          default: 5000
+          description: Auto-dismiss timeout in ms after mouse leave
+        maxVisibleItems:
+          type: integer
+          default: 10
+          description: Max visible items before menu scrolls (0 = no limit)
+        hooks:
+          type: array
+          items:
+            type: string
+          description: 'Global default hooks for all items'
+      additionalProperties: true
+
+    AlapConfig:
+      type: object
+      required: [allLinks]
+      properties:
+        settings:
+          $ref: "#/components/schemas/AlapSettings"
+        macros:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AlapMacro"
+        searchPatterns:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AlapSearchPattern"
+        allLinks:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AlapLink"
+
+    ConfigMeta:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ConfigEntry:
+      type: object
+      required: [config, meta]
+      properties:
+        config:
+          $ref: "#/components/schemas/AlapConfig"
+        meta:
+          $ref: "#/components/schemas/ConfigMeta"
+
+    SearchResult:
+      type: object
+      required: [configName, id, link]
+      properties:
+        configName:
+          type: string
+        id:
+          type: string
+        link:
+          $ref: "#/components/schemas/AlapLink"
+
+    SearchResponse:
+      type: object
+      required: [results, configsSearched, linksScanned]
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+        configsSearched:
+          type: integer
+        linksScanned:
+          type: integer
+
+    CherryPickRequest:
+      type: object
+      required: [source, expression]
+      properties:
+        source:
+          type: string
+          description: Name of the config to resolve against
+        expression:
+          type: string
+          description: 'Alap expression (e.g. ".coffee + .nyc")'
+
+    CherryPickResponse:
+      type: object
+      required: [allLinks]
+      properties:
+        allLinks:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AlapLink"
+
+    QueryRequest:
+      type: object
+      required: [expression]
+      properties:
+        expression:
+          type: string
+          description: Alap expression to evaluate
+        configName:
+          type: string
+          default: demo
+          description: Single config name to resolve against
+        configs:
+          type: array
+          items:
+            type: string
+          description: Multiple config names to merge before resolving
+
+    QueryResponse:
+      type: object
+      required: [results]
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            required: [id, url]
+            properties:
+              id:
+                type: string
+              label:
+                type: string
+              url:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string
+              description:
+                type: string
+            additionalProperties: true
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

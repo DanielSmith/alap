@@ -14,14 +14,35 @@ All notable changes to Alap will be documented in this file.
 - New scripts: `pack:lib` produces pre-built tarball for Docker, `docker:express`, `docker:bun`, `docker:hono`
 - Fixed tiptap example: CSS `@import '/shared/...'` absolute paths changed to relative `'../shared/...'`
 
-### Server Dockerfiles: minimal lib build (2026-04-05)
+### Docker: pre-built tarball for Node servers (2026-04-05)
 
-- Added `build:lib` script — Vite builds only, no tsc type declarations (not needed by servers)
-- Node server Dockerfiles (express, hono, bun) now generate a slim `package.json` in the lib stage with only `vite` as a dependency — installs ~20 packages instead of 727
-- Fixed `workspace:*` sed pattern in Dockerfiles (was matching stale `file:../../..`)
-- Express and Hono `package.json`: added `pnpm.onlyBuiltDependencies` for `better-sqlite3` native builds
-- Express and Hono Dockerfiles: added `apk add python3 make g++` for native addon compilation
-- Version bump to 3.0.0
+- Node server Dockerfiles (Express, Hono, Bun) rewritten as single-stage builds
+- Library is now pre-built outside Docker via `pnpm run pack:lib` — Dockerfiles just COPY the tarball
+- Eliminates the duplicated Stage 1 that rebuilt the entire library from source inside each container
+- Server container builds drop from minutes to seconds
+
+### Java Spring Boot server example (2026-04-05)
+
+- New `examples/servers/java-spring/` — Spring Boot 3.4 + SQLite config server
+- Uses the existing Java 21 expression parser from `src/other-languages/java/alap/`
+- Full 7-endpoint REST API: list, load, save, delete, search, cherry-pick, query
+- Idiomatic Spring Boot: `@RestController`, `@Service`/`@Repository` layers, `JdbcTemplate`, `CommandLineRunner` seeder, records for DTOs
+- Multi-stage Dockerfile with Maven cache mounts for fast rebuilds
+- Package: `info.alap.server`
+
+### Docker: all 10 servers verified (2026-04-05)
+
+- All 10 server examples build and run: Express, Bun, Hono, Flask, Django, FastAPI+Postgres, Laravel, Axum (Rust), Gin (Go), Spring Boot (Java)
+- Fixed SQLite readonly errors in Express, Hono, Axum, Gin Dockerfiles (`chown -R` on /app before dropping to non-root user)
+- Fixed Go server: `alap.Resolve()` and `alap.CherryPick()` updated for new `context.Context` parameter
+- Go Dockerfile restructured: dependency manifests copied first, cache mounts for Go module and build caches
+- Added `examples/servers/.dockerignore` to exclude workspace symlinks from Python/Go build contexts
+
+### Packaging smoke test (2026-04-05)
+
+- New `pnpm test:packaging` — 17 tests verifying the published tarball works outside the workspace
+- Tests: package contents, ESM/CJS imports, IIFE build, type declarations, AlapEngine functional tests
+- Separate from `pnpm test` (runs in ~17s, packs and installs the library in a temp directory)
 
 ### Language port parity (2026-04-04)
 

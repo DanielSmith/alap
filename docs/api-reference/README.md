@@ -9,7 +9,7 @@ Types, methods, and contracts — the dry details.
 | [Storage](storage.md) | `ConfigStore` interface, `createIndexedDBStore`, `createRemoteStore`, `createHybridStore` |
 | [Events](events.md) | Event types, delivery by adapter, keyboard navigation, hook filtering, dismiss behavior |
 | [Security](security.md) | URL sanitization, ReDoS protection, config validation, parser resource limits |
-| [Servers](servers.md) | REST API contract (7 endpoints), 9 server examples, OpenAPI spec, quick start |
+| [Servers](servers.md) | REST API contract (7 endpoints), 10 server examples, [OpenAPI spec](openapi.yaml), quick start |
 
 ## See also
 

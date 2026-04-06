@@ -1,8 +1,8 @@
 # Server Examples
 
-9 REST API servers implementing the same Alap Config API contract. Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
+10 REST API servers implementing the same Alap Config API contract. Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
 
-The point: Alap is language-agnostic. The same 7 endpoints work whether you prefer Node, Python, PHP, Go, or Bun.
+The point: Alap is language-agnostic. The same 7 endpoints work whether you prefer Node, Python, PHP, Go, Rust, Java, or Bun.
 
 ## Server Matrix
 
@@ -16,9 +16,10 @@ The point: Alap is language-agnostic. The same 7 endpoints work whether you pref
 | [flask-sqlite](flask-sqlite/) | Python + Flask | SQLite | No | Yes (Python port) |
 | [django-sqlite](django-sqlite/) | Python + Django 5.1 | SQLite | No | Yes (Python port) |
 | [axum-sqlite](axum-sqlite/) | Rust + Axum | SQLite | No | Yes (Rust port) |
+| [java-spring](java-spring/) | Java 21 + Spring Boot 3.4 | SQLite | No | Yes (Java port) |
 | [fastapi-postgres](fastapi-postgres/) | Python + FastAPI | PostgreSQL | Yes (Postgres 16) | Yes (Python port) |
 
-All 9 servers implement all 7 endpoints. Python, PHP, Go, and Rust servers include native ports of the Alap expression parser — no Node.js sidecar required.
+All 10 servers implement all 7 endpoints. Python, PHP, Go, Rust, and Java servers include native ports of the Alap expression parser — no Node.js sidecar required.
 
 ## API Contract
 
@@ -38,56 +39,71 @@ Full contract details: [Servers API reference](../../docs/api-reference/servers.
 
 ## Running
 
-**SQLite servers** (no external database):
+### Docker / Podman
+
+**Node servers** use a pre-built library tarball (no compilation inside Docker):
+
+```bash
+# From repo root — builds the library tarball automatically, then the container
+pnpm docker:express   # Express + SQLite
+pnpm docker:bun       # Bun + SQLite
+pnpm docker:hono      # Hono + SQLite
+podman run -p 3000:3000 alap-express
+```
+
+**Go, Rust, Java** — build from repo root (they need their parser sources):
+
+```bash
+podman build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
+podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
+podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
+podman run -p 3000:3000 alap-gin
+```
+
+**Python** — build from `examples/servers/` (they need `shared/`):
+
+```bash
+podman build -t alap-flask -f flask-sqlite/Dockerfile examples/servers/
+podman build -t alap-django -f django-sqlite/Dockerfile examples/servers/
+podman run -p 3000:3000 alap-flask
+```
+
+**PHP** — self-contained:
+
+```bash
+podman build -t alap-laravel examples/servers/laravel-sqlite/
+podman run -p 3000:3000 alap-laravel
+```
+
+**FastAPI + PostgreSQL** — needs Postgres via compose:
+
+```bash
+cd examples/servers/fastapi-postgres
+podman compose up
+# → http://localhost:3000
+```
+
+### Local development (without Docker)
+
 ```bash
 cd express-sqlite && npm install && node seed.js && node server.js
 cd hono-sqlite && npm install && node seed.js && node server.js
 cd bun-sqlite && bun run seed.ts && bun run server.ts
 cd flask-sqlite && pip install -r requirements.txt && python seed.py && python server.py
-# or, with uv: cd flask-sqlite && uv pip install -r requirements.txt && python seed.py && python server.py
 cd django-sqlite && pip install -r requirements.txt && python manage.py migrate --run-syncdb && python seed.py && python manage.py runserver 0.0.0.0:3000
 cd laravel-sqlite && composer install && php artisan migrate --seed && php artisan serve --port=3000
 cd gin-sqlite && go run seed.go && go run main.go
 cd axum-sqlite && cargo run --bin seed && cargo run
+cd java-spring && mvn spring-boot:run
 ```
 
-**Compose servers** (database runs in a container alongside the app — run from `servers/`):
-```bash
-docker compose -f fastapi-postgres/docker-compose.yml up
-```
-
-**Every server also has a Dockerfile** — you can skip local installs entirely. Build from the repo root (Node/Bun servers use multi-stage builds to compile alap from source; Go and Rust servers need their parser crates):
+**Prerequisites:** On macOS, Podman needs a Linux VM running before you can build or run containers:
 
 ```bash
-# From repo root — Node, Bun, Go, and Rust servers need repo root as build context
-docker build -f examples/servers/express-sqlite/Dockerfile -t alap-express . && docker run -p 3000:3000 alap-express
-docker build -f examples/servers/hono-sqlite/Dockerfile -t alap-hono . && docker run -p 3000:3000 alap-hono
-docker build -f examples/servers/bun-sqlite/Dockerfile -t alap-bun . && docker run -p 3000:3000 alap-bun
-docker build -f examples/servers/gin-sqlite/Dockerfile -t alap-gin . && docker run -p 3000:3000 alap-gin
-docker build -f examples/servers/axum-sqlite/Dockerfile -t alap-axum . && docker run -p 3000:3000 alap-axum
-
-# From servers/ directory — Python servers use shared/ only
-cd examples/servers
-docker build -f flask-sqlite/Dockerfile -t alap-flask . && docker run -p 3000:3000 alap-flask
-docker build -f django-sqlite/Dockerfile -t alap-django . && docker run -p 3000:3000 alap-django
-
-# Self-contained — build from its own directory
-cd examples/servers/laravel-sqlite && docker build -t alap-laravel . && docker run -p 8000:8000 alap-laravel
+podman machine start   # creates + starts the VM (run `podman machine init` first if needed)
 ```
 
-Podman: replace `docker` with `podman` (or `podman-compose` for compose servers).
-
-**Prerequisites:** On macOS, Docker and Podman both need a Linux VM running before you can build or run containers:
-
-```bash
-# Docker Desktop — start the app, or:
-docker info          # check if the daemon is running
-
-# Podman — start the machine:
-podman machine start # creates + starts the VM (run `podman machine init` first if needed)
-```
-
-On Linux, Docker requires the daemon (`sudo systemctl start docker`). Podman is daemonless and works out of the box.
+On Linux, Podman is daemonless and works out of the box.
 
 **Note:** When running in containers, the database is transient. Any changes you make from an editor or the demo page are lost when the container stops. This is fine for experimenting — the seed data is rebuilt on each run. To persist data, mount a volume (see each server's README for details).
 
@@ -107,7 +123,7 @@ cd bun-sqlite && ../run-server.sh     # auto-detect from cwd
 
 ```bash
 ./smoke-test.sh express-sqlite     # test one (10 assertions)
-./smoke-test.sh all                # test all 9 sequentially
+./smoke-test.sh all                # test all 10 sequentially
 DOCKER=podman ./smoke-test.sh all  # use Podman instead of Docker
 ```
 

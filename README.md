@@ -63,7 +63,7 @@ One config, many menus. Update a URL once, every menu reflects it. Add a tag to 
 - **Regex search** — `/pattern/` syntax for content-aware filtering
 - **Security hardened** — URL sanitization, ReDoS protection, config validation
 - **Storage layer** — IndexedDB, REST API client, offline-resilient hybrid
-- **9 server examples** — Node, Bun, Python, Go, Rust, PHP backends
+- **10 server examples** — Node, Bun, Python, Go, Rust, PHP, Java backends
 - **8 visual editors** — React, Vue, Svelte, Solid, Astro, Alpine builds
 - **Markdown, MDX & CMS support** — remark, rehype, and MDX plugins for any content pipeline
 - **Next.js, Nuxt, Astro, Eleventy, Hugo, Qwik City & VitePress integrations** — zero-config framework packages
@@ -93,10 +93,19 @@ pnpm turbo run build --filter=alap-editor-react...   # one editor + its dependen
 pnpm turbo run build --filter=./integrations/*        # all integrations
 pnpm turbo run test --filter=./plugins/*              # tests for plugins only
 
-# Docker (Node server examples)
-pnpm docker:express   # builds library tarball, then the Express container
-pnpm docker:bun       # same for Bun
-pnpm docker:hono      # same for Hono
+# Docker (Node server examples — pre-builds library tarball automatically)
+pnpm docker:express   # Express + SQLite
+pnpm docker:bun       # Bun + SQLite
+pnpm docker:hono      # Hono + SQLite
+
+# Docker (other languages — self-contained, build from repo root or servers/)
+podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
+podman build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
+podman build -t alap-flask -f flask-sqlite/Dockerfile examples/servers/
+podman build -t alap-django -f django-sqlite/Dockerfile examples/servers/
+podman build -t alap-laravel examples/servers/laravel-sqlite/
+podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
+cd examples/servers/fastapi-postgres && podman compose up -d  # needs Postgres
 ```
 
 Turborepo caches build outputs — a second run with no changes completes in under a second.
@@ -108,7 +117,7 @@ Turborepo caches build outputs — a second run with no changes completes in und
 | Where to go | What you'll find |
 |-------------|-----------------|
 | **[Cookbook](docs/cookbook/)** | Language ports, editors, markdown, rich-text, accessibility, placement |
-| **[Examples](examples/)** | 29 demo sites + 9 server backends |
+| **[Examples](examples/)** | 29 demo sites + 10 server backends |
 | **[Framework Guides](docs/framework-guides/)** | 9 adapters + integrations for Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more |
 | **[API Reference](docs/api-reference/)** | Every type, function, component, attribute, CSS hook, and event |
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |

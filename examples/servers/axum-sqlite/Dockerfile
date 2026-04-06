@@ -1,10 +1,6 @@
 # Build from repo root to access the Rust parser in src/other-languages/rust/:
 #
-#   docker build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
-#
-# Or from the server directory with explicit context:
-#
-#   docker build -t alap-axum -f Dockerfile ../../..
+#   podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
 
 # rust:1.85-alpine
 FROM rust:1.85-alpine@sha256:4333721398de61f53ccbe53b0b855bcc4bb49e55828e8f652d7a8ac33dd0c118 AS builder

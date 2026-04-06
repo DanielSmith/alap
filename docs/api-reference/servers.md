@@ -2,13 +2,13 @@
 
 **[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · **This Page** | [All docs](../README.md)
 
-9 server examples implementing the same REST API contract. Swap backends without code changes — clients (editors, web apps, `RemoteStore`) work with any of them.
+10 server examples implementing the same REST API contract. Swap backends without code changes — clients (editors, web apps, `RemoteStore`) work with any of them.
 
 > Live version: https://alap.info/api-reference/servers
 
 ## API contract
 
-All servers implement the same REST contract, documented below.
+All servers implement the same REST contract, documented below. Machine-readable version: [openapi.yaml](openapi.yaml).
 
 All servers expose 7 endpoints:
 
@@ -35,7 +35,7 @@ POST   /query                → { expression, configName?, configs? } → { res
 
 ### Cherry-pick and query
 
-These endpoints resolve Alap expressions server-side. Node/Bun servers use `AlapEngine` from `alap/core`. Python, PHP, Go, and Rust servers use native ports of the expression parser. All servers sanitize URLs in responses.
+These endpoints resolve Alap expressions server-side. Node/Bun servers use `AlapEngine` from `alap/core`. Python, PHP, Go, Rust, and Java servers use native ports of the expression parser. All servers sanitize URLs in responses.
 
 ## Server matrix
 
@@ -50,12 +50,53 @@ These endpoints resolve Alap expressions server-side. Node/Bun servers use `Alap
 | FastAPI + PostgreSQL | Python | FastAPI | PostgreSQL | 4 |
 | Gin + SQLite | Go | Gin | SQLite | 3 |
 | Axum + SQLite | Rust | Axum | SQLite | 4 |
+| Spring Boot + SQLite | Java 21 | Spring Boot 3.4 | SQLite | 3 |
 
 All servers default to port 3000. All include Dockerfiles (Podman-compatible).
 
 ## Quick start
 
-### SQLite servers (no external database)
+### Node servers (pre-built library tarball)
+
+```bash
+pnpm docker:express   # or docker:bun, docker:hono
+podman run -p 3000:3000 alap-express
+# → http://localhost:3000
+```
+
+### Other languages (self-contained Dockerfiles)
+
+```bash
+# Python
+podman build -t alap-flask -f flask-sqlite/Dockerfile examples/servers/
+podman run -p 3000:3000 alap-flask
+
+# Go
+podman build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
+podman run -p 3000:3000 alap-gin
+
+# Rust
+podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
+podman run -p 3000:3000 alap-axum
+
+# Java
+podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
+podman run -p 3000:3000 alap-java-spring
+
+# PHP
+podman build -t alap-laravel examples/servers/laravel-sqlite/
+podman run -p 3000:3000 alap-laravel
+```
+
+### FastAPI + PostgreSQL
+
+```bash
+cd examples/servers/fastapi-postgres
+podman compose up
+# → http://localhost:3000
+```
+
+### Local development (without Docker)
 
 ```bash
 cd examples/servers/express-sqlite
@@ -63,22 +104,6 @@ npm install
 node seed.js
 node server.js
 # → http://localhost:3000
-```
-
-### FastAPI + PostgreSQL
-
-```bash
-cd examples/servers/fastapi-postgres
-docker compose up
-# → http://localhost:3000
-```
-
-### Docker (any server)
-
-```bash
-cd examples/servers/express-sqlite
-docker build -t alap-express .
-docker run -p 3000:3000 alap-express
 ```
 
 ## Using with `RemoteStore`
@@ -90,4 +115,4 @@ const store = createRemoteStore({ baseUrl: 'http://localhost:3000' });
 const config = await store.load('demo');
 ```
 
-Any of the 9 servers works as the backend. Pick the language and framework that fits your stack.
+Any of the 10 servers works as the backend. Pick the language and framework that fits your stack.

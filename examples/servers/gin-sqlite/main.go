@@ -434,7 +434,7 @@ func cherryPick(c *gin.Context) {
 		return
 	}
 
-	result := alap.CherryPick(config, body.Expression)
+	result := alap.CherryPick(c.Request.Context(), config, body.Expression)
 	c.JSON(http.StatusOK, gin.H{"allLinks": result})
 }
 
@@ -481,7 +481,7 @@ func queryEndpoint(c *gin.Context) {
 		}
 	}
 
-	results := alap.Resolve(config, body.Expression)
+	results := alap.Resolve(c.Request.Context(), config, body.Expression)
 	c.JSON(http.StatusOK, gin.H{"results": results})
 }
 

@@ -67,7 +67,7 @@ Types, methods, and contracts.
 - [Storage](api-reference/storage.md) — IndexedDB, Remote, Hybrid persistence
 - [Events](api-reference/events.md) — event types, keyboard navigation, hooks
 - [Security](api-reference/security.md) — URL sanitization, ReDoS protection, parser limits
-- [Servers](api-reference/servers.md) — REST API contract, 9 server examples, OpenAPI spec
+- [Servers](api-reference/servers.md) — REST API contract, 10 server examples, OpenAPI spec
 
 ## Cookbook
 

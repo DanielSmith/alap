@@ -41,7 +41,7 @@ The editors use the same `ConfigStore` interface as the library:
 | Strategy | When to use |
 |----------|-------------|
 | IndexedDB | Single user, local browser storage |
-| RemoteStore | Shared configs via one of the 9 server examples |
+| RemoteStore | Shared configs via one of the 10 server examples |
 | HybridStore | Offline-first with background sync to remote |
 
 ```typescript
