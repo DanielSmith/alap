@@ -425,6 +425,7 @@ This is a pnpm workspace with [Turborepo](https://turborepo.dev) for build orche
 
 ```bash
 pnpm install          # install all workspace packages
+                      # (override warnings from editors are expected — see note below)
 
 # Root library
 pnpm build            # ESM + CJS + IIFE + type declarations
@@ -435,7 +436,14 @@ pnpm typecheck
 pnpm build:all        # root library first, then all packages in parallel
 pnpm test:all         # tests across all workspace packages
 pnpm typecheck:all    # type-check everything
+```
 
+> **Override warnings during install:** pnpm warns that `pnpm.overrides` in editor
+> `package.json` files "will not take effect" in workspace mode. This is expected —
+> the root workspace overrides handle it. The editor-level overrides exist so each
+> editor can also be installed standalone with patched dependencies.
+
+```bash
 # Filtered builds
 pnpm turbo run build --filter=alap-editor-react...   # one editor + its deps
 pnpm turbo run build --filter=./integrations/*        # all integrations

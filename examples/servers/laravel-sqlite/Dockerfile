@@ -20,6 +20,9 @@ RUN composer install --no-dev --optimize-autoloader
 COPY . .
 RUN composer dump-autoload --optimize
 
+# Ensure bootstrap/cache exists (empty dirs aren't tracked by git)
+RUN mkdir -p bootstrap/cache
+
 # Create .env from example if not present, then migrate and seed
 # APP_KEY is generated at runtime via entrypoint — do not bake into image
 RUN cp -n .env.example .env || true \

@@ -106,6 +106,15 @@ podman build -t alap-django -f django-sqlite/Dockerfile examples/servers/
 podman build -t alap-laravel examples/servers/laravel-sqlite/
 podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
 cd examples/servers/fastapi-postgres && podman compose up -d  # needs Postgres
+
+# Run a server (example: Axum on port 3000)
+podman run -d -p 3000:3000 --name alap-axum alap-axum
+
+# Stop a running server
+podman stop alap-axum
+
+# Remove a stopped container
+podman rm alap-axum
 ```
 
 Turborepo caches build outputs — a second run with no changes completes in under a second.
