@@ -105,7 +105,11 @@ podman build -t alap-flask -f flask-sqlite/Dockerfile examples/servers/
 podman build -t alap-django -f django-sqlite/Dockerfile examples/servers/
 podman build -t alap-laravel examples/servers/laravel-sqlite/
 podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
-cd examples/servers/fastapi-postgres && podman compose up -d  # needs Postgres
+podman build -t alap-fastapi -f fastapi-postgres/Dockerfile examples/servers/
+cd examples/servers/fastapi-postgres && podman compose up -d  # starts FastAPI + Postgres together
+
+# List built server images
+podman images | grep alap-
 
 # Run a server (example: Axum on port 3000)
 podman run -d -p 3000:3000 --name alap-axum alap-axum

@@ -20,9 +20,10 @@ COPY examples/servers/java-spring/src/ ./src/
 # Build fat JAR
 RUN --mount=type=cache,target=/root/.m2/repository \
     mvn package -DskipTests -B && \
-    cp target/alap-server-spring-*.jar /repo/app.jar
+    cp target/alap-server-spring-*.jar /repo/app.jar && \
+    echo "=== JAR built successfully ==="
 
-# Stage 2: Runtime
+# Stage 2: Runtime (downloading JRE image may take a minute on first build)
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /repo/app.jar ./app.jar
