@@ -22,6 +22,12 @@
     .start-here a { border-color: #ffd666; background: #2240a8; color: #ffd666; font-weight: 500; }
     .start-here a:hover { background: #3366d6; }
     .note { font-size: 0.8rem; color: #7888b8; margin-top: 0.25rem; }
+    .copy-btn {
+      background: none; border: 1px solid #4470cc; color: #7888b8; border-radius: 4px;
+      padding: 0.1rem 0.4rem; margin-left: 0.4rem; cursor: pointer; font-size: 0.75rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .copy-btn:hover { color: #ffd666; border-color: #ffd666; }
   </style>
 </head>
 <body>
@@ -121,19 +127,19 @@
   <ul>
     <li>
       <a href="http://localhost:9990/">Eleventy</a>
-      <span class="desc">Separate server — run <code>cd examples/sites/eleventy && pnpm dev</code> first (port 9990)</span>
+      <span class="desc">Run first: <code>cd examples/sites/eleventy && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/eleventy && pnpm dev')">copy</button> (port 9990)</span>
     </li>
     <li>
       <a href="http://localhost:9010/">Astro Integration</a>
-      <span class="desc">Separate server — run <code>cd examples/sites/astro-integration && ./serve.sh</code> first (port 9010)</span>
+      <span class="desc">Run first: <code>cd examples/sites/astro-integration && ./serve.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/astro-integration && ./serve.sh')">copy</button> (port 9010)</span>
     </li>
     <li>
-      <a href="http://localhost:1313/">Hugo</a>
-      <span class="desc">Separate server (Podman) — see <code>examples/sites/hugo/README.md</code> (port 1313)</span>
+      <a href="http://localhost:9170/">Hugo</a>
+      <span class="desc">Run first: <code>cd examples/sites/hugo && ./run.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/hugo && ./run.sh')">copy</button> (port 9170, requires Podman)</span>
     </li>
     <li>
       <a href="http://localhost:5173/">VitePress</a>
-      <span class="desc">Separate server — run <code>cd examples/sites/vitepress && pnpm dev</code> first</span>
+      <span class="desc">Run first: <code>cd examples/sites/vitepress && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/vitepress && pnpm dev')">copy</button></span>
     </li>
   </ul>
 </body>
