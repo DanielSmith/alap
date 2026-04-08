@@ -15,7 +15,9 @@
  */
 
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig, AlapLink } from '../../core/types';
+import type { AlapConfig, AlapLink, ResolvedLink } from '../../core/types';
+import { RENDERER_MENU } from '../shared/coordinatedRenderer';
+import type { CoordinatedRenderer, OpenPayload } from '../shared/coordinatedRenderer';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_MENU_Z_INDEX, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
@@ -37,7 +39,9 @@ export interface AlapUIOptions {
   onItemContext?: AlapEventHooks['onItemContext'];
 }
 
-export class AlapUI {
+export class AlapUI implements CoordinatedRenderer {
+  readonly rendererType = RENDERER_MENU;
+
   private engine: AlapEngine;
   private config: AlapConfig;
   private container: HTMLElement | null = null;
@@ -457,7 +461,43 @@ export class AlapUI {
     }
   }
 
-  // --- Public API ---
+  // --- Public API / CoordinatedRenderer ---
+
+  get isOpen(): boolean {
+    return this.container?.style.display !== 'none';
+  }
+
+  close(): HTMLElement | null {
+    const trigger = this.activeTrigger;
+    this.closeMenu();
+    return trigger;
+  }
+
+  openWith(payload: OpenPayload): void {
+    const links = payload.links as Array<{ id: string } & AlapLink>;
+    if (links.length === 0) return;
+
+    if (this.activeTrigger) {
+      this.activeTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    const trigger = payload.triggerElement ?? null;
+    this.activeTrigger = trigger;
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    // Synthesize a mouse event for positioning. getTriggerRect only
+    // uses clientX/clientY for image triggers; for regular triggers
+    // it reads getBoundingClientRect directly.
+    const rect = trigger?.getBoundingClientRect();
+    const syntheticEvent = {
+      clientX: rect?.left ?? 0,
+      clientY: rect?.bottom ?? 0,
+    } as MouseEvent;
+
+    this.renderMenu(links, trigger ?? document.body, syntheticEvent);
+  }
 
   /** Re-scan the DOM for new trigger elements */
   refresh(): void {

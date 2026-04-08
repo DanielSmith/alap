@@ -6,8 +6,18 @@
   <title>Alap v3 — Tailwind CSS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="/shared/nav.css">
 </head>
-<body class="bg-[#1a2f8a] text-[#f0f2ff] antialiased">
+<body class="bg-[#1a2f8a] text-[#f0f2ff] antialiased has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
   <div class="max-w-2xl mx-auto py-10 px-4">
     <p class="mb-4"><a href="/" target="alapDemo" class="text-[#ffe8a0] hover:text-[#ffd666]">&larr; Examples Gallery</a></p>
     <h1 class="text-2xl font-bold mb-2 text-[#ffd666]">Alap v3 — Tailwind CSS</h1>

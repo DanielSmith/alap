@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alap — Placement Demo</title>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="../shared/nav.css">
 </head>
-<body>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
   <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
   <h1>Placement Demo</h1>
   <p>Alap uses a compass-based placement engine with three strategy levels. The <code>placement</code> attribute is a comma-separated string: compass direction + strategy.</p>

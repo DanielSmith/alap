@@ -16,6 +16,8 @@
 
 import { AlapEngine } from '../core/AlapEngine';
 import type { AlapConfig, ResolvedLink } from '../core/types';
+import { RENDERER_LIGHTBOX } from '../ui/shared/coordinatedRenderer';
+import type { CoordinatedRenderer, OpenPayload } from '../ui/shared/coordinatedRenderer';
 
 export interface AlapLightboxOptions {
   /** CSS selector for trigger elements. Default: '.alap' */
@@ -30,12 +32,15 @@ export interface AlapLightboxOptions {
  * elements, resolves expressions via AlapEngine. The only difference
  * is how results are presented.
  */
-export class AlapLightbox {
+export class AlapLightbox implements CoordinatedRenderer {
+  readonly rendererType = RENDERER_LIGHTBOX;
+
   private engine: AlapEngine;
   private selector: string;
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
   private currentIndex = 0;
+  private activeTrigger: HTMLElement | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
@@ -66,8 +71,23 @@ export class AlapLightbox {
     this.links = this.engine.resolve(expression, anchorId);
     if (this.links.length === 0) return;
 
+    this.activeTrigger = trigger;
     this.currentIndex = 0;
     this.open();
+  }
+
+  // --- CoordinatedRenderer ---
+
+  get isOpen(): boolean {
+    return this.overlay !== null;
+  }
+
+  openWith(payload: OpenPayload): void {
+    if (payload.links.length === 0) return;
+    this.links = payload.links;
+    this.currentIndex = payload.initialIndex ?? 0;
+    this.open();
+    this.activeTrigger = payload.triggerElement ?? null;
   }
 
   private open(): void {
@@ -88,12 +108,15 @@ export class AlapLightbox {
     document.addEventListener('keydown', this.handleKeydown);
   }
 
-  close(): void {
+  close(): HTMLElement | null {
+    const trigger = this.activeTrigger;
     if (this.overlay) {
       this.overlay.remove();
       this.overlay = null;
     }
     document.removeEventListener('keydown', this.handleKeydown);
+    this.activeTrigger = null;
+    return trigger;
   }
 
   /** Build the skeleton once — called on open */

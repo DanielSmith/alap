@@ -2,6 +2,38 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.0.0] — 2026-04-07
+
+### AlapLens: tests and transitions (2026-04-07)
+
+- 71 tests for AlapLens across 12 describe blocks: trigger setup, overlay lifecycle, dismissal, top zone rendering, meta field type detection, meta field filtering, display hint overrides, meta key formatting, actions zone, custom options, navigation, copy to clipboard, expression resolution, destroy
+- New test fixture (`tests/fixtures/lens-links.ts`) with 11 items exercising every meta data shape: numbers, booleans, strings, string arrays, URL arrays, display hints, internal keys, null/empty values, URL-less items
+- Navigation transition option: `transition: 'fade' | 'resize' | 'none'`
+  - `fade` (default): lightbox-style opacity crossfade, no reflow
+  - `resize`: TTT-style animated height via `scrollHeight` measurement + `requestAnimationFrame`
+  - `none`: instant swap
+- 9 transition-specific tests (fade class toggling, async content swap, transition blocking, resize height locking, none mode synchronous behavior)
+- New CSS tokens: `--alap-lens-resize-transition`, panel height transition, `.alap-lens-panel-fading` content opacity rules
+
+### RendererCoordinator: cross-renderer transitions (2026-04-07)
+
+- New `RendererCoordinator` class (`src/ui/shared/rendererCoordinator.ts`) orchestrates transitions between AlapUI, AlapLightbox, and AlapLens
+  - `register()` / `unregister()` — renderers opt in
+  - `transitionTo(target, payload)` — snapshot current state, push stack, close current, open target
+  - `back()` — pop stack, restore previous renderer with original links and index
+  - `closeAll()` — close everything, clear stack
+  - Capture-phase Escape key intercept via `bindKeyboard()` — walks the stack backward
+  - View Transitions API integration: wraps close→open in `startViewTransition()` when available, instant swap fallback
+  - `prefers-reduced-motion` respected automatically
+- New `CoordinatedRenderer` interface (`src/ui/shared/coordinatedRenderer.ts`) — minimal contract: `rendererType`, `isOpen`, `openWith(payload)`, `close()`
+- All three renderers now implement `CoordinatedRenderer`:
+  - `AlapUI`: new public `close()` (returns trigger), `openWith(payload)`, `isOpen` getter
+  - `AlapLightbox`: new `openWith(payload)`, `isOpen` getter, `close()` now returns trigger
+  - `AlapLens`: new `openWith(payload)`, `isOpen` getter, `close()` now returns trigger
+- New CSS for View Transitions (`src/ui/shared/rendererTransitions.css`): shared-element morphing for content + thumbnail, forward/back keyframe animations, reduced-motion override
+- 34 new tests: 17 coordinator unit tests with mock renderers, 17 integration tests with real renderers including a full menu→lens→back→menu round-trip
+- Exported from `src/index.ts`: `RendererCoordinator`, `CoordinatedRenderer`, `OpenPayload`, `RendererType`, renderer type constants
+
 ## [3.0.0] — 2026-04-06
 
 ### Fresh-checkout walkthrough fixes (2026-04-06)

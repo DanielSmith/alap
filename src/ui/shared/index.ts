@@ -32,3 +32,7 @@ export type {
   ItemContextDismissDetail,
   AlapEventHooks,
 } from './eventHooks';
+export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './coordinatedRenderer';
+export type { RendererType, OpenPayload, RendererStackEntry, CoordinatedRenderer } from './coordinatedRenderer';
+export { RendererCoordinator } from './rendererCoordinator';
+export type { RendererCoordinatorOptions } from './rendererCoordinator';

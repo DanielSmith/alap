@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Lens Renderer</title>
+  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+  <h1>Lens Renderer</h1>
+  <p>Same Alap config, different renderer. Click any link to inspect
+    the item's full data instead of navigating.</p>
+
+  <h2>Landmarks (lens)</h2>
+  <div class="example">
+    <p>Inspect
+      <a class="alap-lens" data-alap-linkitems=".landmark">all landmarks</a>,
+      or just
+      <a class="alap-lens" data-alap-linkitems=".bridge">bridges</a>.
+    </p>
+    <p class="section-note">Items with URLs show a "Visit" button. Items without URLs show metadata only.</p>
+  </div>
+
+  <h2>Fruit Data (lens, no URLs)</h2>
+  <div class="example">
+    <p>Browse
+      <a class="alap-lens" data-alap-linkitems=".fruit">all fruit</a>
+      or just
+      <a class="alap-lens" data-alap-linkitems=".rosaceae">rosaceae family</a>.
+    </p>
+    <p class="section-note">These items have no destination URL &mdash; the data itself is the content. Nutritional info, taxonomy, and other meta fields are rendered automatically by type.</p>
+  </div>
+
+  <h2>TV &amp; Places (lens)</h2>
+  <div class="example">
+    <p>Check out
+      <a class="alap-lens" data-alap-linkitems=".tv">TV shows</a>
+      with booleans, long descriptions, and link arrays. Or
+      <a class="alap-lens" data-alap-linkitems=".park">parks</a>
+      with mixed boolean fields.
+    </p>
+    <p class="section-note">These items exercise all meta rendering types: numbers, booleans (check/cross), arrays of strings (chips), arrays of URLs (link list), and long text (paragraph block).</p>
+  </div>
+
+  <h2>Mixed (lens)</h2>
+  <div class="example">
+    <p>My
+      <a class="alap-lens" data-alap-linkitems="@favorites">favorites</a>
+      span landmarks, coffee, and parks.
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>Same Config, Menu Renderer</h2>
+  <p>The links below use the exact same config, rendered as a standard dropdown menu.</p>
+
+  <div class="example">
+    <p>Browse
+      <a class="alap-menu" data-alap-linkitems=".landmark">landmarks</a>,
+      <a class="alap-menu" data-alap-linkitems=".bridge">bridges</a>,
+      or
+      <a class="alap-menu" data-alap-linkitems=".fruit">fruit</a>.
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

@@ -23,7 +23,7 @@ const alapRoot = resolve(sitesRoot, '../..');
 const SKIP = new Set([
   'astro-integration', 'eleventy', 'hugo', 'vitepress',  // own build systems
   'mdx',                                                   // needs @mdx-js/rollup plugin
-  'lightbox',                                              // imports from src/ui-lightbox (not published)
+  // 'lightbox' — imports from src/ui-lightbox (resolved via Vite aliases)
   'shared',                                                // not an example
   'dist',                                                   // build output
   'node_modules',
@@ -39,6 +39,13 @@ for (const name of readdirSync(sitesRoot)) {
   const html = join(dir, 'index.html');
   if (existsSync(html)) {
     entries[name] = html;
+  }
+  // Discover additional HTML pages in this directory (e.g. shapes.html, shadows.html)
+  for (const file of readdirSync(dir)) {
+    if (file === 'index.html') continue;
+    if (!file.endsWith('.html')) continue;
+    const pageName = file.replace('.html', '');
+    entries[`${name}/${pageName}`] = join(dir, file);
   }
   // Check subdirectories (e.g. ui-sandbox/svelte/, placement/animation/)
   for (const sub of readdirSync(dir)) {
@@ -106,6 +113,11 @@ export default defineConfig({
         const fragSrc = join(sitesRoot, 'htmx', 'fragments');
         const fragDst = join(dist, 'htmx', 'fragments');
         if (existsSync(fragSrc)) cpSync(fragSrc, fragDst, { recursive: true });
+
+        // Lightbox images (referenced as runtime strings in config)
+        const lbImgSrc = join(sitesRoot, 'lightbox', 'images');
+        const lbImgDst = join(dist, 'lightbox', 'images');
+        if (existsSync(lbImgSrc)) cpSync(lbImgSrc, lbImgDst, { recursive: true });
 
         // Shared images
         const imgSrc = join(sitesRoot, 'shared', 'img');

@@ -1,0 +1,87 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * View Transitions CSS for RendererCoordinator.
+ *
+ * These rules animate the swap between renderers (menu, lightbox,
+ * lens) using the View Transitions API. The coordinator sets
+ * view-transition-name on the active container and thumbnail
+ * before calling startViewTransition().
+ *
+ * Import this stylesheet when using RendererCoordinator with
+ * viewTransitions enabled. Without it, transitions still work
+ * (instant swap fallback) — this adds the visual polish.
+ */
+
+:root {
+  --alap-coordinator-transition: 0.3s;
+  --alap-coordinator-easing: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Content region (menu / overlay / panel) --- */
+
+::view-transition-group(alap_content) {
+  animation-duration: var(--alap-coordinator-transition);
+  animation-timing-function: var(--alap-coordinator-easing);
+}
+
+::view-transition-old(alap_content) {
+  animation-name: alap_vt_fade_slide_out;
+}
+
+::view-transition-new(alap_content) {
+  animation-name: alap_vt_fade_slide_in;
+}
+
+/* --- Thumbnail (shared element morph between renderers) --- */
+
+::view-transition-group(alap_thumbnail) {
+  animation-duration: var(--alap-coordinator-transition);
+  animation-timing-function: var(--alap-coordinator-easing);
+}
+
+/* --- Back navigation: reverse animation direction --- */
+
+.alap_vt_back::view-transition-old(alap_content) {
+  animation-name: alap_vt_fade_slide_in;
+  animation-direction: reverse;
+}
+
+.alap_vt_back::view-transition-new(alap_content) {
+  animation-name: alap_vt_fade_slide_out;
+  animation-direction: reverse;
+}
+
+/* --- Keyframes --- */
+
+@keyframes alap_vt_fade_slide_in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes alap_vt_fade_slide_out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(1.01);
+  }
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(alap_content),
+  ::view-transition-group(alap_thumbnail) {
+    animation-duration: 0.01s;
+  }
+}

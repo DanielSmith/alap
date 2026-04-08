@@ -1,0 +1,36 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Shared site navigation bar for all examples.
+ */
+
+.site-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem; height: 48px;
+  background: rgba(20, 30, 106, 0.95);
+  border-bottom: 1px solid #2e48a0;
+  backdrop-filter: blur(8px);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+}
+
+.site-nav a {
+  display: inline; padding: 0; border: none; border-radius: 0;
+  text-decoration: none; font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.site-nav a:hover { background: none; }
+
+.site-nav .nav-brand {
+  font-weight: 600; color: #ffd666; font-size: 1rem;
+}
+
+.site-nav .nav-links { display: flex; gap: 1.25rem; }
+
+.site-nav .nav-links a { color: #b8c4e8; }
+.site-nav .nav-links a:hover { color: #ffd666; }
+
+body.has-site-nav { padding-top: 60px; }

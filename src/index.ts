@@ -26,3 +26,7 @@ export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atp
 export type { AtUri } from './protocols/atproto';
 export { ProtocolCache } from './protocols/cache';
 export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from './ui/shared';
+export { RendererCoordinator } from './ui/shared';
+export type { RendererCoordinatorOptions } from './ui/shared';
+export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './ui/shared';
+export type { RendererType, OpenPayload, CoordinatedRenderer } from './ui/shared';

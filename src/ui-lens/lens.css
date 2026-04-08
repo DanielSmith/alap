@@ -1,0 +1,432 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * AlapLens — detail inspection renderer.
+ *
+ * CSS custom properties cover all design tokens (colors, sizes, spacing,
+ * radii, shadows, transitions). Structural properties (display, position,
+ * flex-direction, cursor, text-decoration) are not tokenized — they define
+ * how the component works, not how it looks.
+ *
+ * TODO: When web component integration lands (Phase 3), expose these
+ * same tokens through ::part() on the shadow DOM elements. All UI
+ * renderers (menu, lightbox, lens) should eventually support both
+ * DOM and web component modes.
+ */
+
+:root {
+  /* Panel */
+  --alap-lens-bg: #1a1a2e;
+  --alap-lens-radius: 12px;
+  --alap-lens-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --alap-lens-max-width: 520px;
+  --alap-lens-padding: 1.5rem;
+
+  /* Overlay */
+  --alap-lens-overlay-bg: rgba(0, 0, 0, 0.85);
+  --alap-lens-overlay-blur: 4px;
+
+  /* Label */
+  --alap-lens-label-color: #fff;
+  --alap-lens-label-size: 1.4rem;
+  --alap-lens-label-weight: 600;
+
+  /* Description */
+  --alap-lens-desc-color: #aaa;
+  --alap-lens-desc-size: 0.95rem;
+  --alap-lens-desc-line-height: 1.5;
+
+  /* Tags */
+  --alap-lens-tag-bg: rgba(255, 255, 255, 0.1);
+  --alap-lens-tag-color: #aac4f0;
+  --alap-lens-tag-radius: 12px;
+  --alap-lens-tag-size: 0.8rem;
+  --alap-lens-tag-padding: 0.15rem 0.6rem;
+  --alap-lens-tag-gap: 0.35rem;
+
+  /* Thumbnail */
+  --alap-lens-thumb-max-height: 280px;
+  --alap-lens-thumb-radius: 8px;
+
+  /* Separator */
+  --alap-lens-separator-color: rgba(255, 255, 255, 0.1);
+
+  /* Meta fields */
+  --alap-lens-meta-key-color: #7888b8;
+  --alap-lens-meta-key-size: 0.85rem;
+  --alap-lens-meta-key-width: 100px;
+  --alap-lens-meta-value-color: #d0d7e5;
+  --alap-lens-meta-value-size: 0.9rem;
+  --alap-lens-meta-text-color: #b8c4e8;
+  --alap-lens-meta-chip-bg: rgba(255, 255, 255, 0.08);
+  --alap-lens-meta-chip-color: #aac4f0;
+  --alap-lens-meta-chip-radius: 10px;
+  --alap-lens-meta-link-color: #88bbff;
+  --alap-lens-meta-link-hover: #ffd666;
+  --alap-lens-meta-link-size: 0.85rem;
+  --alap-lens-meta-muted-color: #5a6a9a;
+  --alap-lens-meta-row-gap: 1rem;
+  --alap-lens-meta-row-padding: 0.3rem 0;
+
+  /* Visit button */
+  --alap-lens-visit-bg: #3a86ff;
+  --alap-lens-visit-bg-hover: #2d6fdb;
+  --alap-lens-visit-color: #fff;
+  --alap-lens-visit-radius: 6px;
+  --alap-lens-visit-size: 0.9rem;
+  --alap-lens-visit-weight: 500;
+  --alap-lens-visit-padding: 0.5rem 1.25rem;
+
+  /* Close button */
+  --alap-lens-close-bg: rgba(255, 255, 255, 0.1);
+  --alap-lens-close-bg-hover: rgba(255, 255, 255, 0.15);
+  --alap-lens-close-color: #b8c4e8;
+  --alap-lens-close-color-hover: #fff;
+
+  /* Close X */
+  --alap-lens-close-x-color: #fff;
+  --alap-lens-close-x-size: 2rem;
+  --alap-lens-close-x-opacity: 0.7;
+
+  /* Copy button */
+  --alap-lens-copy-color: rgba(255, 255, 255, 0.3);
+  --alap-lens-copy-color-hover: rgba(255, 255, 255, 0.7);
+  --alap-lens-copy-done-color: #4ade80;
+  --alap-lens-copy-size: 1.2rem;
+
+  /* Navigation */
+  --alap-lens-nav-bg: rgba(255, 255, 255, 0.1);
+  --alap-lens-nav-bg-hover: rgba(255, 255, 255, 0.2);
+  --alap-lens-nav-color: #fff;
+  --alap-lens-nav-btn-size: 36px;
+  --alap-lens-nav-icon-size: 1.5rem;
+  --alap-lens-counter-color: #666;
+  --alap-lens-counter-size: 0.85rem;
+
+  /* Transitions */
+  --alap-lens-transition: 0.15s;
+  --alap-lens-resize-transition: 0.35s;
+}
+
+/* --- Overlay --- */
+
+.alap-lens-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--alap-lens-overlay-bg);
+  backdrop-filter: blur(var(--alap-lens-overlay-blur));
+}
+
+/* --- Close X --- */
+
+.alap-lens-close-x {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--alap-lens-close-x-color);
+  font-size: var(--alap-lens-close-x-size);
+  cursor: pointer;
+  line-height: 1;
+  opacity: var(--alap-lens-close-x-opacity);
+  transition: opacity var(--alap-lens-transition);
+}
+
+.alap-lens-close-x:hover {
+  opacity: 1;
+}
+
+/* --- Panel --- */
+
+.alap-lens-panel {
+  position: relative;
+  background: var(--alap-lens-bg);
+  border-radius: var(--alap-lens-radius);
+  max-width: var(--alap-lens-max-width);
+  width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--alap-lens-shadow);
+  padding: var(--alap-lens-padding);
+  transition: height var(--alap-lens-resize-transition) ease-in-out;
+}
+
+/* Fade transition — content fades out/in, panel stays put */
+
+.alap-lens-panel-fading .alap-lens-thumb-wrap,
+.alap-lens-panel-fading .alap-lens-label,
+.alap-lens-panel-fading .alap-lens-tags,
+.alap-lens-panel-fading .alap-lens-description,
+.alap-lens-panel-fading .alap-lens-separator,
+.alap-lens-panel-fading .alap-lens-meta,
+.alap-lens-panel-fading .alap-lens-actions,
+.alap-lens-panel-fading .alap-lens-nav,
+.alap-lens-panel-fading .alap-lens-counter {
+  opacity: 0;
+}
+
+.alap-lens-thumb-wrap,
+.alap-lens-label,
+.alap-lens-tags,
+.alap-lens-description,
+.alap-lens-separator,
+.alap-lens-meta,
+.alap-lens-actions,
+.alap-lens-nav,
+.alap-lens-counter {
+  transition: opacity var(--alap-lens-transition) ease;
+}
+
+/* --- Top zone --- */
+
+.alap-lens-thumb-wrap {
+  width: 100%;
+  max-height: var(--alap-lens-thumb-max-height);
+  overflow: hidden;
+  border-radius: var(--alap-lens-thumb-radius);
+  margin-bottom: 1rem;
+  background: #111;
+}
+
+.alap-lens-thumb-wrap-empty {
+  height: 0;
+  margin-bottom: 0;
+  background: transparent;
+}
+
+.alap-lens-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.alap-lens-label {
+  margin: 0 0 0.5rem;
+  font-size: var(--alap-lens-label-size);
+  font-weight: var(--alap-lens-label-weight);
+  color: var(--alap-lens-label-color);
+  line-height: 1.3;
+}
+
+.alap-lens-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--alap-lens-tag-gap);
+  margin-bottom: 0.75rem;
+}
+
+.alap-lens-tag {
+  display: inline-block;
+  padding: var(--alap-lens-tag-padding);
+  background: var(--alap-lens-tag-bg);
+  color: var(--alap-lens-tag-color);
+  border-radius: var(--alap-lens-tag-radius);
+  font-size: var(--alap-lens-tag-size);
+}
+
+.alap-lens-description {
+  margin: 0 0 0.75rem;
+  color: var(--alap-lens-desc-color);
+  font-size: var(--alap-lens-desc-size);
+  line-height: var(--alap-lens-desc-line-height);
+}
+
+/* --- Meta zone --- */
+
+.alap-lens-separator {
+  border: none;
+  border-top: 1px solid var(--alap-lens-separator-color);
+  margin: 0.5rem 0 0.75rem;
+}
+
+.alap-lens-meta {
+  margin: 0;
+}
+
+.alap-lens-meta-row {
+  display: flex;
+  gap: var(--alap-lens-meta-row-gap);
+  padding: var(--alap-lens-meta-row-padding);
+  align-items: baseline;
+}
+
+.alap-lens-meta-row-text,
+.alap-lens-meta-row-links {
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.alap-lens-meta-key {
+  color: var(--alap-lens-meta-key-color);
+  font-size: var(--alap-lens-meta-key-size);
+  min-width: var(--alap-lens-meta-key-width);
+  flex-shrink: 0;
+}
+
+.alap-lens-meta-value {
+  color: var(--alap-lens-meta-value-color);
+  font-size: var(--alap-lens-meta-value-size);
+  margin: 0;
+}
+
+.alap-lens-meta-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.alap-lens-meta-chip {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: var(--alap-lens-meta-chip-bg);
+  color: var(--alap-lens-meta-chip-color);
+  border-radius: var(--alap-lens-meta-chip-radius);
+  font-size: var(--alap-lens-tag-size);
+}
+
+.alap-lens-meta-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.alap-lens-meta-link {
+  color: var(--alap-lens-meta-link-color);
+  font-size: var(--alap-lens-meta-link-size);
+  text-decoration: none;
+  transition: color var(--alap-lens-transition);
+}
+
+.alap-lens-meta-link:hover {
+  color: var(--alap-lens-meta-link-hover);
+  text-decoration: underline;
+}
+
+.alap-lens-meta-more {
+  color: var(--alap-lens-meta-muted-color);
+  font-size: 0.8rem;
+}
+
+.alap-lens-meta-text {
+  color: var(--alap-lens-meta-text-color);
+  font-size: var(--alap-lens-meta-value-size);
+  line-height: var(--alap-lens-desc-line-height);
+  margin: 0;
+}
+
+/* --- Actions --- */
+
+.alap-lens-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.alap-lens-visit {
+  display: inline-block;
+  padding: var(--alap-lens-visit-padding);
+  background: var(--alap-lens-visit-bg);
+  color: var(--alap-lens-visit-color);
+  border-radius: var(--alap-lens-visit-radius);
+  font-size: var(--alap-lens-visit-size);
+  font-weight: var(--alap-lens-visit-weight);
+  text-decoration: none;
+  transition: background var(--alap-lens-transition);
+}
+
+.alap-lens-visit:hover {
+  background: var(--alap-lens-visit-bg-hover);
+}
+
+.alap-lens-close-btn {
+  padding: var(--alap-lens-visit-padding);
+  background: var(--alap-lens-close-bg);
+  color: var(--alap-lens-close-color);
+  border: none;
+  border-radius: var(--alap-lens-visit-radius);
+  font-size: var(--alap-lens-visit-size);
+  cursor: pointer;
+  transition: background var(--alap-lens-transition), color var(--alap-lens-transition);
+}
+
+.alap-lens-close-btn:hover {
+  background: var(--alap-lens-close-bg-hover);
+  color: var(--alap-lens-close-color-hover);
+}
+
+/* --- Navigation --- */
+
+.alap-lens-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--alap-lens-meta-row-gap);
+  margin-top: 1rem;
+}
+
+.alap-lens-nav-prev,
+.alap-lens-nav-next {
+  background: var(--alap-lens-nav-bg);
+  border: none;
+  color: var(--alap-lens-nav-color);
+  font-size: var(--alap-lens-nav-icon-size);
+  width: var(--alap-lens-nav-btn-size);
+  height: var(--alap-lens-nav-btn-size);
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--alap-lens-transition);
+}
+
+.alap-lens-nav-prev:hover,
+.alap-lens-nav-next:hover {
+  background: var(--alap-lens-nav-bg-hover);
+}
+
+.alap-lens-counter {
+  color: var(--alap-lens-counter-color);
+  font-size: var(--alap-lens-counter-size);
+}
+
+/* --- Copy button --- */
+
+.alap-lens-copy {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--alap-lens-copy-color);
+  font-size: var(--alap-lens-copy-size);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--alap-lens-transition), color var(--alap-lens-transition);
+}
+
+.alap-lens-panel:hover .alap-lens-copy {
+  opacity: 1;
+}
+
+.alap-lens-copy:hover {
+  color: var(--alap-lens-copy-color-hover);
+}
+
+.alap-lens-copy-done {
+  color: var(--alap-lens-copy-done-color);
+  opacity: 1;
+}
