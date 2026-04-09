@@ -101,10 +101,24 @@ export function validateConfig(config: unknown): AlapConfig {
     if (typeof rawLink.altText === 'string') sanitized.altText = rawLink.altText;
     if (typeof rawLink.targetWindow === 'string') sanitized.targetWindow = rawLink.targetWindow;
     if (typeof rawLink.description === 'string') sanitized.description = rawLink.description;
-    if (typeof rawLink.thumbnail === 'string') sanitized.thumbnail = rawLink.thumbnail;
+    if (typeof rawLink.thumbnail === 'string') sanitized.thumbnail = sanitizeUrl(rawLink.thumbnail);
     if (Array.isArray(rawLink.hooks)) sanitized.hooks = rawLink.hooks.filter((h): h is string => typeof h === 'string');
     if (typeof rawLink.guid === 'string') sanitized.guid = rawLink.guid;
     if (rawLink.createdAt !== undefined) sanitized.createdAt = rawLink.createdAt as string | number;
+
+    // meta — preserve the bag but sanitize any string values ending in "Url"
+    if (rawLink.meta && typeof rawLink.meta === 'object' && !Array.isArray(rawLink.meta)) {
+      const rawMeta = rawLink.meta as Record<string, unknown>;
+      const safeMeta: Record<string, unknown> = {};
+      for (const [mk, mv] of Object.entries(rawMeta)) {
+        if (typeof mv === 'string' && /url$/i.test(mk)) {
+          safeMeta[mk] = sanitizeUrl(mv);
+        } else {
+          safeMeta[mk] = mv;
+        }
+      }
+      sanitized.meta = safeMeta;
+    }
 
     sanitizedLinks[key] = sanitized;
   }

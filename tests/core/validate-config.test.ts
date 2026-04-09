@@ -299,6 +299,88 @@ describe('validateConfig', () => {
     expect(result.macros?.bad).toBeUndefined();
   });
 
+  // --- Thumbnail sanitization ---
+
+  it('sanitizes javascript: in thumbnail field', () => {
+    const config = {
+      allLinks: {
+        item: { label: 'Item', url: '/safe', thumbnail: 'javascript:alert(1)' },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.thumbnail).toBe('about:blank');
+  });
+
+  it('leaves safe thumbnail URLs unchanged', () => {
+    const config = {
+      allLinks: {
+        item: { label: 'Item', url: '/safe', thumbnail: 'images/photo.jpg' },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.thumbnail).toBe('images/photo.jpg');
+  });
+
+  // --- Meta passthrough and sanitization ---
+
+  it('preserves meta object on links', () => {
+    const config = {
+      allLinks: {
+        item: {
+          label: 'Item',
+          url: '/safe',
+          meta: { photoCredit: 'Jane Doe', rating: 5 },
+        },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.meta).toEqual({ photoCredit: 'Jane Doe', rating: 5 });
+  });
+
+  it('sanitizes javascript: in meta URL fields', () => {
+    const config = {
+      allLinks: {
+        item: {
+          label: 'Item',
+          url: '/safe',
+          meta: {
+            photoCreditUrl: 'javascript:alert(1)',
+            sourceUrl: 'data:text/html,<script>alert(1)</script>',
+            photoCredit: 'Safe text',
+          },
+        },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.meta?.photoCreditUrl).toBe('about:blank');
+    expect(result.allLinks.item.meta?.sourceUrl).toBe('about:blank');
+    expect(result.allLinks.item.meta?.photoCredit).toBe('Safe text');
+  });
+
+  it('leaves safe meta URL fields unchanged', () => {
+    const config = {
+      allLinks: {
+        item: {
+          label: 'Item',
+          url: '/safe',
+          meta: { photoCreditUrl: 'https://unsplash.com/@photographer' },
+        },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.meta?.photoCreditUrl).toBe('https://unsplash.com/@photographer');
+  });
+
+  it('ignores meta if not a plain object', () => {
+    const config = {
+      allLinks: {
+        item: { label: 'Item', url: '/safe', meta: 'not an object' },
+      },
+    };
+    const result = validateConfig(config);
+    expect(result.allLinks.item.meta).toBeUndefined();
+  });
+
   // --- Does not mutate input ---
 
   it('does not mutate the input config', () => {

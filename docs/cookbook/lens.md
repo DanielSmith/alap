@@ -1,0 +1,173 @@
+# Lens Renderer
+
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · **This Page** | [All docs](../README.md)
+
+The lens renderer shows a single item's full data in an overlay panel — label, description, thumbnail, tags, and all meta fields. Same config, different presentation.
+
+> Live version: https://examples.alap.info/lens/
+
+## Basic usage
+
+```typescript
+import { AlapLens } from 'alap/ui-lens';
+import 'alap/ui-lens/lens.css';
+
+const lens = new AlapLens(config, {
+  selector: '.alap-lens',
+});
+```
+
+```html
+<a class="alap-lens" data-alap-linkitems=".bridge">bridges</a>
+```
+
+Click the link to open the lens panel. If the expression resolves to multiple items, prev/next arrows and a set navigator appear.
+
+## Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `selector` | `string` | `'.alap'` | CSS selector for trigger elements |
+| `visitLabel` | `string` | `'Visit →'` | Label for the URL button |
+| `closeLabel` | `string` | `'Close'` | Label for the close button (when shown) |
+| `metaLabels` | `Record<string, string>` | `{}` | Display name overrides for meta keys |
+| `copyable` | `boolean` | `true` | Show copy-to-clipboard button on panel hover |
+| `panelCloseButton` | `boolean` | `false` | Show a Close button in the actions row |
+| `transition` | `'fade' \| 'resize' \| 'none'` | `'fade'` | Navigation transition between items |
+| `tagSwitchTooltip` | `number` | `3000` | Duration (ms) of "switching to .tag" tooltip on counter. `0` to disable |
+
+## Photographer credits
+
+If an item has `meta.photoCredit`, the lens displays it on the same row as the item label. If `meta.photoCreditUrl` is also present, the credit is a clickable link.
+
+```typescript
+allLinks: {
+  goldengate: {
+    label: 'Golden Gate Bridge',
+    thumbnail: '../shared/img/goldengate.jpg',
+    meta: {
+      photoCredit: 'Maarten van den Heuvel',
+      photoCreditUrl: 'https://unsplash.com/@mvdheuvel',
+    },
+  },
+}
+```
+
+## Clickable tags
+
+Tag chips in the lens are interactive. Click any tag to drill into that tag's full set — the lens resolves `.tagname` against the config and swaps the entire item set.
+
+When you drill into a tag:
+- The clicked tag stays highlighted (blue tint) across all items in the set
+- The counter briefly shows "switching to .tagname" as a tooltip (configurable duration, blue color)
+- The counter smoothly transitions between states (500ms ease-in-out, configurable)
+
+This turns the lens into a browsable data explorer without leaving the panel.
+
+## Set navigator
+
+When viewing multiple items, the counter (e.g. "2 / 5") doubles as a navigation menu:
+
+- **Hover** the counter to see "menu..." hint
+- **Click** the counter to open a popup listing all items
+- **Type** to filter items by label (greedy regex)
+- **Arrow keys** to highlight, **Enter** to jump
+- **Escape** closes the popup without closing the lens
+
+## Image zoom
+
+Click any thumbnail to open a fullscreen zoom overlay. Click or press Escape to dismiss. Escape stacking: first Escape closes zoom, second closes the lens.
+
+## Transitions
+
+Three modes for navigating between items:
+
+- **`fade`** (default) — opacity crossfade, no reflow. Content fades out, swaps, fades back in.
+- **`resize`** — animated height transition. Locks current height, swaps content, measures new height, animates smoothly. Good when items vary significantly in size.
+- **`none`** — instant swap, no animation.
+
+## CSS custom properties
+
+All visual values are tokenized. Override any of these on `:root` or a parent element:
+
+```css
+:root {
+  /* Panel */
+  --alap-lens-bg: #1a1a2e;
+  --alap-lens-radius: 12px;
+  --alap-lens-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --alap-lens-max-width: 520px;
+  --alap-lens-padding: 1.5rem;
+
+  /* Tag switch tooltip */
+  --alap-lens-tag-tooltip-color: #88bbff;
+  --alap-lens-tag-tooltip-size: 0.85rem;
+  --alap-lens-tag-tooltip-weight: 500;
+
+  /* Counter transition */
+  --alap-lens-counter-transition: 500ms;
+}
+```
+
+See `src/ui-lens/lens.css` for the full list of ~50 custom properties.
+
+## CoordinatedRenderer
+
+The lens implements the `CoordinatedRenderer` interface, so it works with `RendererCoordinator` for menu → lightbox → lens transitions:
+
+```typescript
+import { RendererCoordinator } from 'alap';
+import { AlapUI } from 'alap';
+import { AlapLens } from 'alap/ui-lens';
+
+const menu = new AlapUI(config);
+const lens = new AlapLens(config, { selector: '.alap-lens' });
+
+const coordinator = new RendererCoordinator();
+coordinator.register(menu);
+coordinator.register(lens);
+```
+
+## Items without URLs
+
+Items with empty or missing `url` fields are first-class in the lens. They show metadata only (no Visit button). This makes the lens useful for pure data display — nutritional info, reference data, dictionary definitions.
+
+```typescript
+allLinks: {
+  apple: {
+    label: 'Apple',
+    url: '',
+    tags: ['fruit', 'rosaceae'],
+    description: 'A widely cultivated tree fruit.',
+    meta: {
+      calories: 52,
+      fiber: 2.4,
+      vitamin_c: '14% DV',
+    },
+  },
+}
+```
+
+## Meta field auto-detection
+
+The lens inspects each meta value at render time and picks the appropriate presentation:
+
+| Type | Detection | Rendering |
+|---|---|---|
+| Short string (<100 chars) | `typeof === 'string'` | Key-value row |
+| Long string (>=100 chars) | Length check | Paragraph block |
+| Number | `typeof === 'number'` | Key-value row |
+| Boolean | `typeof === 'boolean'` | Check/cross icon |
+| Array of strings | `Array.isArray && every string` | Chips/badges |
+| Array of URLs | `Array.isArray && every http` | Clickable link list |
+
+Override auto-detection with `_display` hints in meta:
+
+```typescript
+meta: {
+  bio: 'A long biography...',
+  bio_display: 'text',      // force paragraph
+  episodes: ['https://...'],
+  episodes_display: 'links', // force link list
+}
+```

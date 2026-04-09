@@ -212,7 +212,7 @@ describe('AlapLens', () => {
 
     it('closes via close button in actions', () => {
       const trigger = createTrigger('t1', 'mrrobot');
-      lens = new AlapLens(lensTestConfig);
+      lens = new AlapLens(lensTestConfig, { panelCloseButton: true });
       clickTrigger(trigger);
 
       const closeBtn = document.querySelector('.alap-lens-close-btn') as HTMLButtonElement;
@@ -299,9 +299,9 @@ describe('AlapLens', () => {
       expect(thumbWrap!.querySelector('img')).toBeNull();
     });
 
-    it('omits tags section when item has no tags', () => {
+    it('omits tags section when item has no tags and copyable is false', () => {
       const trigger = createTrigger('t1', 'minimal');
-      lens = new AlapLens(lensTestConfig);
+      lens = new AlapLens(lensTestConfig, { copyable: false });
       clickTrigger(trigger);
 
       expect(getPanel()!.querySelector('.alap-lens-tags')).toBeNull();
@@ -615,14 +615,22 @@ describe('AlapLens', () => {
       expect(getPanel()!.querySelector('.alap-lens-visit')).toBeNull();
     });
 
-    it('always renders close button', () => {
+    it('renders close button when panelCloseButton is true', () => {
       const trigger = createTrigger('t1', 'fruitdata');
-      lens = new AlapLens(lensTestConfig);
+      lens = new AlapLens(lensTestConfig, { panelCloseButton: true });
       clickTrigger(trigger);
 
       const closeBtn = getPanel()!.querySelector('.alap-lens-close-btn');
       expect(closeBtn).not.toBeNull();
       expect(closeBtn!.textContent).toBe('Close');
+    });
+
+    it('omits close button by default', () => {
+      const trigger = createTrigger('t1', 'fruitdata');
+      lens = new AlapLens(lensTestConfig);
+      clickTrigger(trigger);
+
+      expect(getPanel()!.querySelector('.alap-lens-close-btn')).toBeNull();
     });
 
     it('respects targetWindow on visit link', () => {
@@ -651,7 +659,7 @@ describe('AlapLens', () => {
 
     it('applies custom closeLabel', () => {
       const trigger = createTrigger('t1', 'mrrobot');
-      lens = new AlapLens(lensTestConfig, { closeLabel: 'Done' });
+      lens = new AlapLens(lensTestConfig, { closeLabel: 'Done', panelCloseButton: true });
       clickTrigger(trigger);
 
       const closeBtn = getPanel()!.querySelector('.alap-lens-close-btn');

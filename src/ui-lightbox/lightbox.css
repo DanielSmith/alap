@@ -12,6 +12,12 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--alap-lightbox-fade, 0.5s) ease;
+}
+
+.alap-lightbox-visible {
+  opacity: 1;
 }
 
 .alap-lightbox-close {
@@ -156,13 +162,127 @@
   background: #2d6fdb;
 }
 
+.alap-lightbox-counter-wrap {
+  position: relative;
+  margin-top: 1rem;
+  text-align: center;
+  z-index: 2;
+}
+
 .alap-lightbox-counter {
   display: block;
   transition: opacity var(--alap-lightbox-transition) ease;
-  margin-top: 1rem;
-  color: #666;
-  font-size: 0.85rem;
-  text-align: center;
+  color: var(--alap-lightbox-counter-color, #666);
+  font-size: var(--alap-lightbox-counter-size, 0.85rem);
+  cursor: default;
+}
+
+.alap-lightbox-counter-wrap:hover .alap-lightbox-counter {
+  color: var(--alap-lightbox-counter-hover-color, #aac4f0);
+}
+
+/* --- Set navigator popup --- */
+
+.alap-lightbox-setnav.open {
+  display: flex;
+}
+
+.alap-lightbox-setnav:focus {
+  outline: none;
+}
+
+.alap-lightbox-setnav {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.25rem;
+  min-width: var(--alap-lightbox-setnav-min-width, 220px);
+  max-width: var(--alap-lightbox-setnav-max-width, 320px);
+  background: var(--alap-lightbox-setnav-bg, #1e1e3a);
+  border: 1px solid var(--alap-lightbox-setnav-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--alap-lightbox-setnav-radius, 8px);
+  box-shadow: var(--alap-lightbox-setnav-shadow, 0 8px 32px rgba(0, 0, 0, 0.4));
+  overflow: hidden;
+  flex-direction: column;
+  z-index: 10;
+}
+
+
+.alap-lightbox-setnav-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--alap-lightbox-setnav-list-padding, 0.25rem 0);
+  max-height: var(--alap-lightbox-setnav-max-height, 240px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #444 transparent;
+}
+
+.alap-lightbox-setnav-item {
+  padding: var(--alap-lightbox-setnav-item-padding, 0.4rem 0.75rem);
+  color: var(--alap-lightbox-setnav-item-color, #d0d7e5);
+  font-size: var(--alap-lightbox-setnav-item-size, 0.85rem);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.1s, color 0.1s;
+}
+
+.alap-lightbox-setnav-item:hover {
+  background: var(--alap-lightbox-setnav-item-hover-bg, rgba(255, 255, 255, 0.1));
+  color: var(--alap-lightbox-setnav-item-hover-color, #fff);
+}
+
+.alap-lightbox-setnav-item.active {
+  background: var(--alap-lightbox-setnav-item-active-bg, rgba(58, 134, 255, 0.2));
+  color: var(--alap-lightbox-setnav-item-active-color, #88bbff);
+  font-weight: var(--alap-lightbox-setnav-item-active-weight, 600);
+}
+
+.alap-lightbox-setnav-item.highlighted {
+  background: var(--alap-lightbox-setnav-item-highlight-bg, rgba(255, 255, 255, 0.15));
+  color: var(--alap-lightbox-setnav-item-highlight-color, #fff);
+}
+
+/* Filter input — below list, fixed position */
+
+.alap-lightbox-setnav-filter-wrap {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--alap-lightbox-setnav-border, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.alap-lightbox-setnav-filter {
+  flex: 1;
+  padding: var(--alap-lightbox-setnav-filter-padding, 0.5rem 0.75rem);
+  background: var(--alap-lightbox-setnav-filter-bg, rgba(255, 255, 255, 0.05));
+  border: none;
+  color: var(--alap-lightbox-setnav-filter-color, #fff);
+  font-size: var(--alap-lightbox-setnav-filter-size, 0.8rem);
+  outline: none;
+}
+
+.alap-lightbox-setnav-filter::placeholder {
+  color: var(--alap-lightbox-setnav-placeholder-color, rgba(255, 255, 255, 0.3));
+}
+
+.alap-lightbox-setnav-clear {
+  background: none;
+  border: none;
+  color: var(--alap-lightbox-setnav-clear-color, rgba(255, 255, 255, 0.4));
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  transition: color 0.1s;
+}
+
+.alap-lightbox-setnav-clear:hover {
+  color: var(--alap-lightbox-setnav-clear-hover-color, #fff);
 }
 
 .alap-lightbox-nav {
@@ -202,4 +322,30 @@
 
 .alap-lightbox-nav-next {
   right: calc(50% - 340px);
+}
+
+/* --- Image zoom popup --- */
+
+.alap-lightbox-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: zoom-out;
+}
+
+.alap-lightbox-zoom-visible {
+  opacity: 1;
+}
+
+.alap-lightbox-zoom-image {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
 }

@@ -2,6 +2,102 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.1.0-dev] — 2026-04-08
+
+### Lens: clickable tags and tag drill-down (2026-04-08)
+
+- Tag chips in the lens are now interactive — click any tag to resolve `.tagname` and swap the entire item set
+- Active tag highlighted with blue tint (`.active` class) across all items in the drilled set
+- "switching to .tagname" tooltip shown on the counter for configurable duration (default 3s, blue, `0` to disable)
+- Counter text transitions smoothly between states (500ms ease-in-out, `--alap-lens-counter-transition`)
+- Tag hover: brighter color with 0.5s fade in/out transition
+- New CSS custom properties: `--alap-lens-tag-tooltip-color`, `--alap-lens-tag-tooltip-size`, `--alap-lens-tag-tooltip-weight`, `--alap-lens-counter-transition`
+
+### Lens: photographer credits (2026-04-08)
+
+- Photo credit displayed on the title row (same line as the label, pushed right)
+- Reads `meta.photoCredit` (text) and `meta.photoCreditUrl` (clickable link)
+- Same pattern as the lightbox credit — no wasted vertical space
+- New CSS classes: `.alap-lens-title-row`, `.alap-lens-credit`
+
+### Lens: UI refinements (2026-04-08)
+
+- Actions Close button is now opt-in via `panelCloseButton: false` (default). X button, click-outside, and Escape still work.
+- Copy-to-clipboard button moved to the tags row (right side, `margin-left: auto`), appears on panel hover
+- New option: `tagSwitchTooltip` (ms) — controls duration of "switching to .tag" counter tooltip, `0` to disable
+
+### Lens: expanded example config (2026-04-08)
+
+- Grew lens example from 8 items to 37 items across 16 cities worldwide
+- All city items use shared images from `shared/img/` with photographer credits
+- New HTML sections: By City (16 city links), Expressions (intersection, subtraction, union), Coffee
+- Added `@everything` macro spanning all tags
+
+### Lens: documentation (2026-04-08)
+
+- New cookbook page: `docs/cookbook/lens.md` — options, clickable tags, set navigator, image zoom, transitions, CSS custom properties, meta auto-detection, CoordinatedRenderer usage
+- Added to docs index and cookbook README
+
+### Lightbox set navigator (2026-04-08)
+
+- Counter indicator (e.g. "1 / 5") now doubles as a navigation menu trigger
+  - Hover over counter → text swaps to "menu..." as a hint
+  - Click counter → popup menu opens showing all items in the current set
+  - Current item highlighted with `.active` class
+  - Click any item → lightbox jumps directly to that item
+  - Escape dismisses the popup without closing the lightbox
+- Type-to-filter: typing while the menu is open auto-focuses a filter input
+  - Greedy regex matching against item labels
+  - Clear button to reset the filter
+  - Filter is fixed below the list so it stays in a consistent position
+- Keyboard navigation in the set navigator
+  - Arrow Up/Down moves highlight through visible items
+  - Enter jumps to the highlighted item (or the sole visible item if only one match)
+  - Escape closes the menu
+- All set navigator CSS values tokenized with custom properties (`--alap-lightbox-setnav-*`)
+
+### Lightbox image zoom (2026-04-08)
+
+- Click any lightbox image thumbnail to open a full-size zoom popup
+  - Image displayed at natural size, capped at 95vw x 95vh
+  - No border — floating image with deep shadow for depth
+  - Cursor changes to `zoom-in` on thumbnail, `zoom-out` on zoomed image
+- Dismiss by clicking anywhere or pressing Escape
+- Proper Escape stacking: first Escape closes zoom, second closes lightbox
+- Fade in/out transition (0.2s)
+
+### Lightbox and lens fade transitions (2026-04-08)
+
+- Overlay fade in on open (opacity 0 → 1 via CSS transition)
+- Overlay fade out on close with `transitionend` listener
+- Graceful fallback: checks `transitionDuration` — removes immediately if no transitions (e.g. JSDOM tests)
+- Applied to both `AlapLightbox` and `AlapLens` DOM renderers
+
+### Shared config registry (2026-04-08)
+
+- Extracted config registry from `AlapLinkElement.ts` into `src/ui/shared/configRegistry.ts`
+- All web components (`<alap-link>`, `<alap-lightbox>`) share one registry via `registerConfig()`, `getEngine()`, `getConfig()`
+- Re-exported from `src/ui/shared/index.ts` and `src/index.ts`
+
+### Lightbox web component (2026-04-08)
+
+- New `<alap-lightbox>` custom element (`src/ui-lightbox/AlapLightboxElement.ts`)
+  - Shadow DOM with tokenized CSS (~40 custom properties)
+  - `::part()` on all meaningful elements for full layout rearrangement via CSS `order`
+  - Parts: overlay, close-x, card, image-wrap, image, body, title-row, title, credit, description, visit, close-btn, counter, nav-prev, nav-next
+  - Fade in/out transitions, `justClosed` flag to prevent close-then-reopen race
+  - Implements `CoordinatedRenderer` interface
+- New example page (`examples/sites/lightbox-wc/`) with basic usage, `::part()` theming, and layout rearrangement demos
+
+### Expanded lightbox example config (2026-04-08)
+
+- Grew link library from 10 to 37 items across 14 cities worldwide
+- Cities: NYC, SF, Portland, Chicago, Detroit, LA, London, Paris, Berlin, Seattle, Tokyo, Seoul, Melbourne, Shanghai, Mumbai
+- Categories: bridges, parks, landmarks, coffee, sci-fi TV, games
+- 30 Unsplash-sourced images with photographer credits
+- All images resized to max 1200px for reasonable file sizes
+- New HTML sections: Sci-fi, Games, Parks, Everything (full collection), per-city landmark links
+
 ## [3.0.0] — 2026-04-07
 
 ### AlapLens: tests and transitions (2026-04-07)

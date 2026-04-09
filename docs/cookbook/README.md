@@ -12,6 +12,7 @@ Advanced topics, integrations, and "how do I..." guides.
 | [Existing URLs](existing-urls.md) | Progressive enhancement with `existingUrl`: prepend, append, ignore |
 | [Images and Media](images-and-media.md) | Image items, thumbnails, hover previews, context menus, the `meta` field |
 | [Placement](placement.md) | Compass-based positioning, viewport containment, Alap config vs. raw CSS |
+| [Lens Renderer](lens.md) | Detail-inspection overlay, clickable tags, set navigator, image zoom, meta auto-detection |
 
 ## See also
 

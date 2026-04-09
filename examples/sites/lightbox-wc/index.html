@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Lightbox Web Component</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+  <style>
+    alap-lightbox {
+      color: #88bbff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    alap-lightbox:hover {
+      color: #ffd666;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #4470cc;
+      margin: 3rem 0;
+    }
+
+    /* Demo: custom styling via ::part() */
+    .custom-styled alap-lightbox::part(card) {
+      --alap-lightbox-bg: #2a1a3e;
+      --alap-lightbox-radius: 20px;
+    }
+    .custom-styled alap-lightbox::part(visit) {
+      --alap-lightbox-visit-bg: #9b59b6;
+      --alap-lightbox-visit-bg-hover: #8e44ad;
+    }
+
+    /* Demo: rearranged layout via ::part() + order */
+    .rearranged alap-lightbox::part(description) {
+      order: -1;
+      padding-top: 1rem;
+    }
+    .rearranged alap-lightbox::part(title) {
+      order: -2;
+      padding-top: 0.75rem;
+    }
+    .rearranged alap-lightbox::part(image-wrap) {
+      order: 1;
+      border-radius: 0 0 12px 12px;
+    }
+  </style>
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+  <h1>Lightbox Web Component</h1>
+  <p>Same config as the <a href="/lightbox/">DOM-mode lightbox</a>, but using
+    <code>&lt;alap-lightbox&gt;</code> custom elements. Shadow DOM isolation,
+    <code>::part()</code> styling, same set navigator and image zoom.</p>
+
+  <h2>Bridges</h2>
+  <div class="example">
+    <p>Explore
+      <alap-lightbox query=".bridge">all bridges</alap-lightbox>,
+      or just the
+      <alap-lightbox query=".nyc + .bridge">NYC bridges</alap-lightbox>.
+    </p>
+    <p class="note">Links with thumbnails show image previews in the lightbox.</p>
+  </div>
+
+  <h2>Coffee</h2>
+  <div class="example">
+    <p>Browse
+      <alap-lightbox query=".coffee">all coffee spots</alap-lightbox>,
+      or narrow to
+      <alap-lightbox query=".coffee + .sf">SF roasters</alap-lightbox>
+      or
+      <alap-lightbox query=".coffee + .portland">Portland roasters</alap-lightbox>.
+    </p>
+    <p class="note">Links without thumbnails show a text-only card.</p>
+  </div>
+
+  <h2>Landmarks</h2>
+  <div class="example">
+    <p>See
+      <alap-lightbox query=".landmark">all landmarks</alap-lightbox>,
+      or by city:
+      <alap-lightbox query=".london">London</alap-lightbox>,
+      <alap-lightbox query=".paris">Paris</alap-lightbox>,
+      <alap-lightbox query=".berlin">Berlin</alap-lightbox>,
+      <alap-lightbox query=".sydney">Sydney</alap-lightbox>,
+      <alap-lightbox query=".seattle">Seattle</alap-lightbox>,
+      <alap-lightbox query=".la">Los Angeles</alap-lightbox>,
+      <alap-lightbox query=".tokyo">Tokyo</alap-lightbox>,
+      <alap-lightbox query=".seoul">Seoul</alap-lightbox>,
+      <alap-lightbox query=".melbourne">Melbourne</alap-lightbox>,
+      <alap-lightbox query=".shanghai">Shanghai</alap-lightbox>,
+      <alap-lightbox query=".mumbai">Mumbai</alap-lightbox>.
+    </p>
+  </div>
+
+  <h2>Parks</h2>
+  <div class="example">
+    <p>Explore
+      <alap-lightbox query=".park">all parks</alap-lightbox>
+      from Central Park to Tiergarten.
+    </p>
+  </div>
+
+  <h2>Favorites</h2>
+  <div class="example">
+    <p>My
+      <alap-lightbox query="@favorites">personal favorites</alap-lightbox>
+      across all categories.
+    </p>
+  </div>
+
+  <h2>Sci-fi</h2>
+  <div class="example">
+    <p>Browse
+      <alap-lightbox query=".scifi">all sci-fi</alap-lightbox>,
+      just the
+      <alap-lightbox query=".tv">TV shows</alap-lightbox>,
+      or
+      <alap-lightbox query=".scifi + .game">sci-fi games</alap-lightbox>.
+    </p>
+  </div>
+
+  <h2>Games</h2>
+  <div class="example">
+    <p>Check out
+      <alap-lightbox query=".game">all games</alap-lightbox>.
+    </p>
+  </div>
+
+  <h2>Everything</h2>
+  <div class="example">
+    <p>The full collection:
+      <alap-lightbox query="@everything">all items</alap-lightbox>
+      &mdash; a good stress test for the set navigator.
+    </p>
+  </div>
+
+  <h2>Expressions</h2>
+  <div class="example">
+    <p>
+      <alap-lightbox query=".nyc | .sf - .coffee">NYC and SF, minus coffee</alap-lightbox>
+      &mdash; same expression language, different presentation.
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>::part() Custom Styling</h2>
+  <p>The lightbox below uses <code>::part()</code> to change the card background
+    and button color &mdash; no extra CSS classes on the component itself.</p>
+  <div class="example custom-styled">
+    <p>
+      <alap-lightbox query=".bridge">purple-themed bridges</alap-lightbox>
+    </p>
+  </div>
+
+  <h2>::part() Layout Rearrangement</h2>
+  <p>Using <code>::part()</code> with CSS <code>order</code> to move description
+    and title above the image.</p>
+  <div class="example rearranged">
+    <p>
+      <alap-lightbox query=".landmark">rearranged landmarks</alap-lightbox>
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>Same Config, Menu Web Component</h2>
+  <p>The links below use <code>&lt;alap-link&gt;</code> with the same
+    registered config.</p>
+  <div class="example">
+    <p>Browse
+      <alap-link query=".bridge">bridges</alap-link>,
+      <alap-link query=".coffee">coffee</alap-link>,
+      or
+      <alap-link query=".landmark">landmarks</alap-link>.
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

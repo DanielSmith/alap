@@ -83,3 +83,4 @@ Advanced topics and integrations.
 - [Existing URLs](cookbook/existing-urls.md) — progressive enhancement with `existingUrl`
 - [Images and Media](cookbook/images-and-media.md) — image items, thumbnails, hover previews
 - [Placement](cookbook/placement.md) — compass-based positioning, viewport containment, Alap vs. CSS
+- [Lens Renderer](cookbook/lens.md) — detail-inspection overlay, clickable tags, image zoom, meta auto-detection

@@ -26,6 +26,7 @@
   /* Overlay */
   --alap-lens-overlay-bg: rgba(0, 0, 0, 0.85);
   --alap-lens-overlay-blur: 4px;
+  --alap-lens-overlay-padding: 2rem;
 
   /* Label */
   --alap-lens-label-color: #fff;
@@ -47,6 +48,7 @@
 
   /* Thumbnail */
   --alap-lens-thumb-max-height: 280px;
+  --alap-lens-thumb-portrait-max-height: 420px;
   --alap-lens-thumb-radius: 8px;
 
   /* Separator */
@@ -104,6 +106,11 @@
   --alap-lens-counter-color: #666;
   --alap-lens-counter-size: 0.85rem;
 
+  /* Tag switch tooltip (shown on counter after tag drill-down) */
+  --alap-lens-tag-tooltip-color: #88bbff;
+  --alap-lens-tag-tooltip-size: 0.85rem;
+  --alap-lens-tag-tooltip-weight: 500;
+
   /* Transitions */
   --alap-lens-transition: 0.15s;
   --alap-lens-resize-transition: 0.35s;
@@ -118,8 +125,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--alap-lens-overlay-padding);
   background: var(--alap-lens-overlay-bg);
   backdrop-filter: blur(var(--alap-lens-overlay-blur));
+  opacity: 0;
+  transition: opacity var(--alap-lens-fade, 0.5s) ease;
+  overflow-y: auto;
+}
+
+.alap-lens-overlay-visible {
+  opacity: 1;
 }
 
 /* --- Close X --- */
@@ -209,6 +224,34 @@
   display: block;
 }
 
+.alap-lens-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.alap-lens-title-row .alap-lens-label {
+  margin: 0;
+}
+
+.alap-lens-credit {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.alap-lens-credit a {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+
+.alap-lens-credit a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
 .alap-lens-label {
   margin: 0 0 0.5rem;
   font-size: var(--alap-lens-label-size);
@@ -231,6 +274,17 @@
   color: var(--alap-lens-tag-color);
   border-radius: var(--alap-lens-tag-radius);
   font-size: var(--alap-lens-tag-size);
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+.alap-lens-tag:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.alap-lens-tag.active {
+  background: rgba(58, 134, 255, 0.3);
+  color: #88bbff;
 }
 
 .alap-lens-description {
@@ -390,7 +444,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--alap-lens-transition);
+  opacity: 0.25;
+  transition: background var(--alap-lens-transition), opacity 0.4s ease;
+}
+
+.alap-lens-nav:hover .alap-lens-nav-prev,
+.alap-lens-nav:hover .alap-lens-nav-next {
+  opacity: 1;
 }
 
 .alap-lens-nav-prev:hover,
@@ -398,17 +458,164 @@
   background: var(--alap-lens-nav-bg-hover);
 }
 
+.alap-lens-counter-wrap {
+  position: relative;
+  z-index: 2;
+}
+
 .alap-lens-counter {
+  display: block;
   color: var(--alap-lens-counter-color);
   font-size: var(--alap-lens-counter-size);
+  cursor: default;
+  white-space: nowrap;
+  min-width: var(--alap-lens-counter-min-width, 7em);
+  text-align: center;
+  transition: color var(--alap-lens-counter-transition, 500ms) ease-in-out,
+              opacity 500ms ease-in-out;
+}
+
+.alap-lens-counter-wrap:hover .alap-lens-counter {
+  color: var(--alap-lens-counter-hover-color, #aac4f0);
+}
+
+.alap-lens-counter.tag-tooltip {
+  color: var(--alap-lens-tag-tooltip-color);
+  font-size: var(--alap-lens-tag-tooltip-size);
+  font-weight: var(--alap-lens-tag-tooltip-weight);
+}
+
+/* --- Set navigator popup --- */
+
+.alap-lens-setnav {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.25rem;
+  min-width: var(--alap-lens-setnav-min-width, 220px);
+  max-width: var(--alap-lens-setnav-max-width, 320px);
+  background: var(--alap-lens-setnav-bg, #1e1e3a);
+  border: 1px solid var(--alap-lens-setnav-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--alap-lens-setnav-radius, 8px);
+  box-shadow: var(--alap-lens-setnav-shadow, 0 8px 32px rgba(0, 0, 0, 0.4));
+  overflow: hidden;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.alap-lens-setnav.open {
+  display: flex;
+}
+
+.alap-lens-setnav:focus {
+  outline: none;
+}
+
+.alap-lens-setnav-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--alap-lens-setnav-list-padding, 0.25rem 0);
+  max-height: var(--alap-lens-setnav-max-height, 240px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #444 transparent;
+}
+
+.alap-lens-setnav-item {
+  padding: var(--alap-lens-setnav-item-padding, 0.4rem 0.75rem);
+  color: var(--alap-lens-setnav-item-color, #d0d7e5);
+  font-size: var(--alap-lens-setnav-item-size, 0.85rem);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.1s, color 0.1s;
+}
+
+.alap-lens-setnav-item:hover {
+  background: var(--alap-lens-setnav-item-hover-bg, rgba(255, 255, 255, 0.1));
+  color: var(--alap-lens-setnav-item-hover-color, #fff);
+}
+
+.alap-lens-setnav-item.active {
+  background: var(--alap-lens-setnav-item-active-bg, rgba(58, 134, 255, 0.2));
+  color: var(--alap-lens-setnav-item-active-color, #88bbff);
+  font-weight: var(--alap-lens-setnav-item-active-weight, 600);
+}
+
+.alap-lens-setnav-item.highlighted {
+  background: var(--alap-lens-setnav-item-highlight-bg, rgba(255, 255, 255, 0.15));
+  color: var(--alap-lens-setnav-item-highlight-color, #fff);
+}
+
+.alap-lens-setnav-filter-wrap {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--alap-lens-setnav-border, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.alap-lens-setnav-filter {
+  flex: 1;
+  padding: var(--alap-lens-setnav-filter-padding, 0.5rem 0.75rem);
+  background: var(--alap-lens-setnav-filter-bg, rgba(255, 255, 255, 0.05));
+  border: none;
+  color: var(--alap-lens-setnav-filter-color, #fff);
+  font-size: var(--alap-lens-setnav-filter-size, 0.8rem);
+  outline: none;
+}
+
+.alap-lens-setnav-filter::placeholder {
+  color: var(--alap-lens-setnav-placeholder-color, rgba(255, 255, 255, 0.3));
+}
+
+.alap-lens-setnav-clear {
+  background: none;
+  border: none;
+  color: var(--alap-lens-setnav-clear-color, rgba(255, 255, 255, 0.4));
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  transition: color 0.1s;
+}
+
+.alap-lens-setnav-clear:hover {
+  color: var(--alap-lens-setnav-clear-hover-color, #fff);
+}
+
+/* --- Image zoom popup --- */
+
+.alap-lens-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: zoom-out;
+}
+
+.alap-lens-zoom-visible {
+  opacity: 1;
+}
+
+.alap-lens-zoom-image {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
 }
 
 /* --- Copy button --- */
 
 .alap-lens-copy {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  margin-left: auto;
   background: none;
   border: none;
   color: var(--alap-lens-copy-color);

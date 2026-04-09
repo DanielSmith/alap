@@ -20,6 +20,8 @@ export { mergeConfigs } from './core/mergeConfigs';
 export { AlapUI } from './ui/dom/AlapUI';
 export type { AlapUIOptions } from './ui/dom/AlapUI';
 export { AlapLinkElement, registerConfig, updateRegisteredConfig, defineAlapLink } from './ui/web-component/AlapLinkElement';
+export { getEngine, getConfig } from './ui/shared';
+export { AlapLightboxElement, defineAlapLightbox } from './ui-lightbox/AlapLightboxElement';
 export type { AlapConfig, AlapLink, AlapMacro, AlapSettings, AlapSearchPattern, AlapSearchOptions, AlapProtocol, ProtocolHandler, GenerateHandler, WebKeyConfig } from './core/types';
 export { webHandler } from './protocols/web';
 export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atproto';

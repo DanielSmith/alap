@@ -6,6 +6,88 @@
   <title>Alap Lens Renderer</title>
   <link rel="stylesheet" href="/shared/styles.css">
   <link rel="stylesheet" href="/shared/nav.css">
+  <style>
+    .placement-details {
+      margin: 1.5rem 0;
+      border: 1px solid #2e48a0;
+      border-radius: 10px;
+      background: rgba(21, 37, 112, 0.4);
+      padding: 0;
+    }
+    .placement-details summary {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      color: #aac4f0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      list-style: none;
+    }
+    .placement-details summary::before {
+      content: '\25b6';
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-size: 0.7rem;
+      transition: transform 0.2s;
+    }
+    .placement-details[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .placement-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .placement-details[open] > .compass-section {
+      padding: 0 1.25rem 1.25rem;
+    }
+    .compass-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    .compass-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .compass-info p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .compass-rose {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 2rem;
+      background: #152570;
+      border: 1px solid #2e48a0;
+      border-radius: 12px;
+    }
+    .compass-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #2240a8;
+      color: #aac4f0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+    }
+    .compass-btn:hover {
+      background: #2d50c0;
+      color: #fff;
+    }
+    .compass-btn.active {
+      background: #3a6aff;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 0 16px rgba(58, 134, 255, 0.3);
+    }
+  </style>
 </head>
 <body class="has-site-nav">
   <nav class="site-nav">
@@ -22,38 +104,87 @@
   <p>Same Alap config, different renderer. Click any link to inspect
     the item's full data instead of navigating.</p>
 
-  <h2>Landmarks (lens)</h2>
+  <details class="placement-details">
+    <summary>Panel Placement</summary>
+    <div class="compass-section">
+      <div class="compass-info">
+        <p>Select a compass direction to anchor the lens panel in the viewport.</p>
+        <p>Click a direction again to deselect. With no direction selected, the panel defaults to centered.</p>
+      </div>
+      <div id="compass" class="compass-rose"></div>
+    </div>
+  </details>
+
+  <h2>Cities &amp; Landmarks</h2>
   <div class="example">
     <p>Inspect
       <a class="alap-lens" data-alap-linkitems=".landmark">all landmarks</a>,
-      or just
-      <a class="alap-lens" data-alap-linkitems=".bridge">bridges</a>.
+      just the
+      <a class="alap-lens" data-alap-linkitems=".bridge">bridges</a>,
+      or
+      <a class="alap-lens" data-alap-linkitems=".park">parks</a>.
     </p>
-    <p class="section-note">Items with URLs show a "Visit" button. Items without URLs show metadata only.</p>
+    <p class="section-note">Photographs include photographer credits on the title row.</p>
   </div>
 
-  <h2>Fruit Data (lens, no URLs)</h2>
+  <h3>By City</h3>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems=".nyc">NYC</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".sf">SF</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".london">London</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".paris">Paris</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".berlin">Berlin</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".chicago">Chicago</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".la">LA</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".sydney">Sydney</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".seattle">Seattle</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".portland">Portland</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".tokyo">Tokyo</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".seoul">Seoul</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".melbourne">Melbourne</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".shanghai">Shanghai</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".mumbai">Mumbai</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".detroit">Detroit</a>
+    </p>
+  </div>
+
+  <h3>Expressions</h3>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems=".bridge + .landmark">landmark bridges</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".park - .nyc">parks outside NYC</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".nyc | .sf">NYC + SF combined</a> &middot;
+      <a class="alap-lens" data-alap-linkitems="@everything">everything</a>
+    </p>
+  </div>
+
+  <h2>Coffee</h2>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems=".coffee">all roasters</a>
+    </p>
+  </div>
+
+  <h2>Fruit Data (no URLs)</h2>
   <div class="example">
     <p>Browse
       <a class="alap-lens" data-alap-linkitems=".fruit">all fruit</a>
       or just
       <a class="alap-lens" data-alap-linkitems=".rosaceae">rosaceae family</a>.
     </p>
-    <p class="section-note">These items have no destination URL &mdash; the data itself is the content. Nutritional info, taxonomy, and other meta fields are rendered automatically by type.</p>
+    <p class="section-note">These items have no destination URL &mdash; the data itself is the content.</p>
   </div>
 
-  <h2>TV &amp; Places (lens)</h2>
+  <h2>TV Shows</h2>
   <div class="example">
-    <p>Check out
+    <p>
       <a class="alap-lens" data-alap-linkitems=".tv">TV shows</a>
-      with booleans, long descriptions, and link arrays. Or
-      <a class="alap-lens" data-alap-linkitems=".park">parks</a>
-      with mixed boolean fields.
+      with booleans, long descriptions, and link arrays.
     </p>
-    <p class="section-note">These items exercise all meta rendering types: numbers, booleans (check/cross), arrays of strings (chips), arrays of URLs (link list), and long text (paragraph block).</p>
   </div>
 
-  <h2>Mixed (lens)</h2>
+  <h2>Mixed</h2>
   <div class="example">
     <p>My
       <a class="alap-lens" data-alap-linkitems="@favorites">favorites</a>
@@ -70,6 +201,7 @@
     <p>Browse
       <a class="alap-menu" data-alap-linkitems=".landmark">landmarks</a>,
       <a class="alap-menu" data-alap-linkitems=".bridge">bridges</a>,
+      <a class="alap-menu" data-alap-linkitems=".coffee">coffee</a>,
       or
       <a class="alap-menu" data-alap-linkitems=".fruit">fruit</a>.
     </p>

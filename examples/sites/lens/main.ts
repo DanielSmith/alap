@@ -5,6 +5,7 @@
 
 import { AlapUI } from 'alap';
 import { AlapLens } from '../../../src/ui-lens';
+import type { Placement } from '../../../src/ui/shared/placement';
 import '../../../src/ui-lens/lens.css';
 import { demoConfig } from './config';
 
@@ -13,6 +14,41 @@ const lens = new AlapLens(demoConfig, { selector: '.alap-lens' });
 
 // Standard menu renderer for .alap-menu triggers (same config, different UI)
 const menu = new AlapUI(demoConfig, { selector: '.alap-menu' });
+
+// --- Compass rose: click a direction to set placement, click again to deselect ---
+
+const DIRECTIONS: Placement[] = ['NW', 'N', 'NE', 'W', 'C', 'E', 'SW', 'S', 'SE'];
+
+function initCompass(): void {
+  const container = document.getElementById('compass');
+  if (!container) return;
+
+  for (const dir of DIRECTIONS) {
+    const btn = document.createElement('button');
+    btn.className = 'compass-btn';
+    btn.dataset.dir = dir;
+    btn.textContent = dir;
+    btn.addEventListener('click', () => {
+      const wasActive = btn.classList.contains('active');
+
+      // Clear all
+      for (const b of container.querySelectorAll<HTMLElement>('.compass-btn')) {
+        b.classList.remove('active');
+      }
+
+      if (wasActive) {
+        // Deselect — no placement (CSS default centered)
+        lens.setPlacement(null);
+      } else {
+        btn.classList.add('active');
+        lens.setPlacement(dir);
+      }
+    });
+    container.appendChild(btn);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initCompass);
 
 // Expose for console debugging
 (window as any).alapLens = lens;

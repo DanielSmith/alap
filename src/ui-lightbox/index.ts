@@ -5,3 +5,4 @@
 
 export { AlapLightbox } from './AlapLightbox';
 export type { AlapLightboxOptions } from './AlapLightbox';
+export { AlapLightboxElement, defineAlapLightbox } from './AlapLightboxElement';

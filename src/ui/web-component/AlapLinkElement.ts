@@ -14,44 +14,13 @@
  * limitations under the License.
  */
 
-import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, registerConfig, updateRegisteredConfig, getEngine, getConfig } from '../shared';
 import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
 
-/**
- * Global registry of AlapEngine instances keyed by config name.
- * Web components look up their engine by the `config` attribute.
- * The default config (unnamed) uses the key '_default'.
- */
-const engineRegistry = new Map<string, AlapEngine>();
-const configRegistry = new Map<string, AlapConfig>();
-
-/**
- * Register a config so that <alap-link> elements can use it.
- *
- *   registerConfig(myConfig);                // registers as '_default'
- *   registerConfig(myConfig, 'secondary');   // registers as 'secondary'
- */
-export function registerConfig(config: AlapConfig, name = '_default'): void {
-  configRegistry.set(name, config);
-  engineRegistry.set(name, new AlapEngine(config));
-}
-
-/**
- * Update a previously registered config.
- */
-export function updateRegisteredConfig(config: AlapConfig, name = '_default'): void {
-  const engine = engineRegistry.get(name);
-  if (engine) {
-    engine.updateConfig(config);
-    configRegistry.set(name, config);
-  } else {
-    registerConfig(config, name);
-  }
-}
+export { registerConfig, updateRegisteredConfig };
 
 // ---------- Shadow DOM styles ----------
 
@@ -295,14 +264,14 @@ export class AlapLinkElement extends HTMLElement {
 
   // --- Engine lookup ---
 
-  private getEngine(): AlapEngine | undefined {
+  private getEngine() {
     const configName = this.getAttribute('config') ?? '_default';
-    return engineRegistry.get(configName);
+    return getEngine(configName);
   }
 
   private getConfig(): AlapConfig | undefined {
     const configName = this.getAttribute('config') ?? '_default';
-    return configRegistry.get(configName);
+    return getConfig(configName);
   }
 
   private getMenuTimeout(): number {
