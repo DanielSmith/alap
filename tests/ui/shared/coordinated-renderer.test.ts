@@ -142,7 +142,7 @@ describe('CoordinatedRenderer integration', () => {
       const overlay = document.querySelector('.alap-lightbox-overlay');
       expect(overlay).not.toBeNull();
 
-      const title = overlay!.querySelector('.alap-lightbox-title');
+      const title = overlay!.querySelector('.alap-lightbox-label');
       expect(title!.textContent).toBe(links[1].label);
     });
 

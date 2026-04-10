@@ -147,9 +147,9 @@ export class AlapLightbox implements CoordinatedRenderer {
     closeBtn.addEventListener('click', () => this.close());
     this.overlay.appendChild(closeBtn);
 
-    // Content card
+    // Content panel
     const card = document.createElement('div');
-    card.className = 'alap-lightbox-card';
+    card.className = 'alap-lightbox-panel';
 
     // Image area
     const imageWrap = document.createElement('div');
@@ -169,9 +169,9 @@ export class AlapLightbox implements CoordinatedRenderer {
 
     // Title row
     const titleRow = document.createElement('div');
-    titleRow.className = 'alap-lightbox-title-row';
+    titleRow.className = 'alap-lightbox-label-row';
     const title = document.createElement('h2');
-    title.className = 'alap-lightbox-title';
+    title.className = 'alap-lightbox-label';
     titleRow.appendChild(title);
     const creditEl = document.createElement('span');
     creditEl.className = 'alap-lightbox-credit';
@@ -423,10 +423,10 @@ export class AlapLightbox implements CoordinatedRenderer {
     const total = this.links.length;
     const hasImage = !!(link.image || link.thumbnail);
 
-    const card = this.overlay.querySelector('.alap-lightbox-card') as HTMLElement;
+    const card = this.overlay.querySelector('.alap-lightbox-panel') as HTMLElement;
     const imageWrap = card.querySelector('.alap-lightbox-image-wrap') as HTMLElement;
     const img = imageWrap.querySelector('.alap-lightbox-image') as HTMLImageElement;
-    const title = card.querySelector('.alap-lightbox-title') as HTMLElement;
+    const title = card.querySelector('.alap-lightbox-label') as HTMLElement;
     const creditEl = card.querySelector('.alap-lightbox-credit') as HTMLElement;
     const desc = card.querySelector('.alap-lightbox-description') as HTMLElement;
     const visitBtn = card.querySelector('.alap-lightbox-visit') as HTMLAnchorElement;
@@ -487,7 +487,7 @@ export class AlapLightbox implements CoordinatedRenderer {
 
   private jumpTo(index: number): void {
     if (index === this.currentIndex) return;
-    const card = this.overlay?.querySelector('.alap-lightbox-card') as HTMLElement | null;
+    const card = this.overlay?.querySelector('.alap-lightbox-panel') as HTMLElement | null;
     if (!card) return;
 
     card.classList.add('fading');
@@ -500,7 +500,7 @@ export class AlapLightbox implements CoordinatedRenderer {
   }
 
   private navigate(delta: number): void {
-    const card = this.overlay?.querySelector('.alap-lightbox-card') as HTMLElement | null;
+    const card = this.overlay?.querySelector('.alap-lightbox-panel') as HTMLElement | null;
     if (!card) return;
 
     card.classList.add('fading');

@@ -176,6 +176,32 @@
     <p class="section-note">These items have no destination URL &mdash; the data itself is the content.</p>
   </div>
 
+  <h2>Pok&eacute;mon</h2>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems="charizard_lite">charizard lite</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".pokemon">all Pok&eacute;mon</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".fire">fire type</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".ghost">ghost type</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".normal">normal type</a>
+    </p>
+    <p class="section-note">Stats, types, abilities, and flavor text from
+      <a href="https://pokeapi.co" target="_blank">PokeAPI</a>. Deep nesting flattened into meta fields.</p>
+  </div>
+
+  <h2>NASA Astronomy Picture of the Day</h2>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems=".nasa">all NASA</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".galaxy">galaxies</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".nebula">nebulae</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".meteor">meteors</a> &middot;
+      <a class="alap-lens" data-alap-linkitems=".comet">comets</a>
+    </p>
+    <p class="section-note">Real data from
+      <a href="https://api.nasa.gov" target="_blank">NASA's public API</a>. Dates, credits, HD links, and observation metadata.</p>
+  </div>
+
   <h2>TV Shows</h2>
   <div class="example">
     <p>
@@ -204,6 +230,24 @@
       <a class="alap-menu" data-alap-linkitems=".coffee">coffee</a>,
       or
       <a class="alap-menu" data-alap-linkitems=".fruit">fruit</a>.
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>Same Config, Web Component</h2>
+  <p>The <code>&lt;alap-lens&gt;</code> custom element uses the same registered config.</p>
+
+  <div class="example">
+    <p>Browse
+      <alap-lens query=".landmark">landmarks</alap-lens>,
+      <alap-lens query=".bridge">bridges</alap-lens>,
+      <alap-lens query=".coffee">coffee</alap-lens>,
+      or
+      <alap-lens query=".fruit">fruit</alap-lens>.
+    </p>
+    <p>With close button:
+      <alap-lens query=".tv" panel-close-button>TV shows</alap-lens>.
     </p>
   </div>
 

@@ -42,7 +42,7 @@ function getOverlay(): HTMLElement | null {
 }
 
 function getCard(): HTMLElement | null {
-  return document.querySelector('.alap-lightbox-card');
+  return document.querySelector('.alap-lightbox-panel');
 }
 
 function pressKey(key: string, target: EventTarget = document): void {
@@ -151,10 +151,10 @@ describe('AlapLightbox', () => {
       lightbox = new AlapLightbox(lightboxTestConfig);
 
       clickTrigger(t1);
-      const title1 = getCard()!.querySelector('.alap-lightbox-title')!.textContent;
+      const title1 = getCard()!.querySelector('.alap-lightbox-label')!.textContent;
 
       clickTrigger(t2);
-      const title2 = getCard()!.querySelector('.alap-lightbox-title')!.textContent;
+      const title2 = getCard()!.querySelector('.alap-lightbox-label')!.textContent;
 
       expect(title1).toBe('Brooklyn Bridge');
       expect(title2).toBe('Aqus Cafe');
@@ -198,7 +198,7 @@ describe('AlapLightbox', () => {
       expect(getOverlay()).toBeNull();
     });
 
-    it('does not close on card click', () => {
+    it('does not close on panel click', () => {
       const trigger = createTrigger('t1', '.bridge');
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
@@ -344,7 +344,7 @@ describe('AlapLightbox', () => {
       expect(imageWrap.classList.contains('no-image')).toBe(true);
     });
 
-    it('sets transparent background on card without image', () => {
+    it('sets transparent background on panel without image', () => {
       const trigger = createTrigger('t1', 'aqus');
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
@@ -355,16 +355,16 @@ describe('AlapLightbox', () => {
   });
 
   // ===========================================================================
-  // Content rendering — title, description, visit
+  // Content rendering — label, description, visit
   // ===========================================================================
 
   describe('content rendering (text)', () => {
-    it('renders title', () => {
+    it('renders label', () => {
       const trigger = createTrigger('t1', 'brooklyn');
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
 
-      const title = getCard()!.querySelector('.alap-lightbox-title')!;
+      const title = getCard()!.querySelector('.alap-lightbox-label')!;
       expect(title.textContent).toBe('Brooklyn Bridge');
       expect(title.getAttribute('title')).toBe('Brooklyn Bridge');
     });
@@ -451,7 +451,7 @@ describe('AlapLightbox', () => {
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
 
-      const title = getCard()!.querySelector('.alap-lightbox-title')!;
+      const title = getCard()!.querySelector('.alap-lightbox-label')!;
       expect(title.textContent).toBe('Brooklyn Bridge');
 
       // ArrowRight triggers navigate with fading — in JSDOM parseFloat on
@@ -899,7 +899,7 @@ describe('AlapLightbox', () => {
 
       lightbox.openWith({ links, initialIndex: 2 });
 
-      const title = getCard()!.querySelector('.alap-lightbox-title')!;
+      const title = getCard()!.querySelector('.alap-lightbox-label')!;
       expect(title.textContent).toBe(links[2].label);
     });
 
@@ -957,12 +957,12 @@ describe('AlapLightbox', () => {
   // ===========================================================================
 
   describe('security', () => {
-    it('title uses textContent, not innerHTML', () => {
+    it('label uses textContent, not innerHTML', () => {
       const trigger = createTrigger('t1', 'xss_attempt');
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
 
-      const title = getCard()!.querySelector('.alap-lightbox-title')!;
+      const title = getCard()!.querySelector('.alap-lightbox-label')!;
       // Should render as literal text, not parsed HTML
       expect(title.textContent).toBe('<script>alert("xss")</script>');
       expect(title.querySelector('script')).toBeNull();

@@ -5,3 +5,4 @@
 
 export { AlapLens } from './AlapLens';
 export type { AlapLensOptions } from './AlapLens';
+export { AlapLensElement, defineAlapLens } from './AlapLensElement';

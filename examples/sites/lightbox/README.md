@@ -13,8 +13,8 @@ pnpm dev                  # http://localhost:5173/sites/lightbox/
 
 - **Lightbox renderer** — `AlapLightbox` opens a fullscreen overlay instead of a dropdown
 - **Side-by-side comparison** — same config rendered as lightbox (top) and standard menu (bottom)
-- **Thumbnail previews** — items with `thumbnail` show image cards in the lightbox
-- **Text fallback** — items without thumbnails show a text card with description
+- **Thumbnail previews** — items with `thumbnail` show image panels in the lightbox
+- **Text fallback** — items without thumbnails show a text panel with description
 - **One-line swap** — the only code difference is `new AlapLightbox(config)` vs `new AlapUI(config)`
 
 ## Key Files

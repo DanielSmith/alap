@@ -38,7 +38,7 @@
   opacity: 1;
 }
 
-.alap-lightbox-card {
+.alap-lightbox-panel {
   background: #1a1a2e;
   border-radius: 12px;
   max-width: 600px;
@@ -51,12 +51,12 @@
   --alap-lightbox-transition: 0.25s;
 }
 
-.alap-lightbox-card:has(.no-image) {
+.alap-lightbox-panel:has(.no-image) {
   background: transparent;
   box-shadow: none;
 }
 
-.alap-lightbox-card:has(.no-image) .alap-lightbox-body {
+.alap-lightbox-panel:has(.no-image) .alap-lightbox-body {
   background: rgba(26, 26, 46, 0.85);
   border-radius: 0 0 12px 12px;
 }
@@ -99,11 +99,11 @@
   transition: opacity var(--alap-lightbox-transition) ease;
 }
 
-.alap-lightbox-card.fading .alap-lightbox-image,
-.alap-lightbox-card.fading .alap-lightbox-title,
-.alap-lightbox-card.fading .alap-lightbox-credit,
-.alap-lightbox-card.fading .alap-lightbox-description,
-.alap-lightbox-card.fading .alap-lightbox-counter {
+.alap-lightbox-panel.fading .alap-lightbox-image,
+.alap-lightbox-panel.fading .alap-lightbox-label,
+.alap-lightbox-panel.fading .alap-lightbox-credit,
+.alap-lightbox-panel.fading .alap-lightbox-description,
+.alap-lightbox-panel.fading .alap-lightbox-counter {
   opacity: 0;
 }
 
@@ -111,7 +111,7 @@
   padding: 0.75rem 1.5rem 1.5rem;
 }
 
-.alap-lightbox-title-row {
+.alap-lightbox-label-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -119,7 +119,7 @@
   margin-bottom: 0.5rem;
 }
 
-.alap-lightbox-title {
+.alap-lightbox-label {
   margin: 0;
   font-size: 1.4rem;
   transition: opacity var(--alap-lightbox-transition) ease;
@@ -131,7 +131,7 @@
   min-width: 0;
 }
 
-.alap-lightbox-title:hover {
+.alap-lightbox-label:hover {
   white-space: normal;
   overflow: visible;
 }
@@ -292,7 +292,7 @@
   transition: opacity 0.2s;
 }
 
-.alap-lightbox-card:hover ~ .alap-lightbox-nav,
+.alap-lightbox-panel:hover ~ .alap-lightbox-nav,
 .alap-lightbox-nav:hover {
   opacity: 1;
 }

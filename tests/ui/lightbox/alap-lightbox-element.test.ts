@@ -38,7 +38,7 @@ function getOverlay(el: AlapLightboxElement): HTMLElement | null {
 }
 
 function getCard(el: AlapLightboxElement): HTMLElement | null {
-  return el.shadowRoot?.querySelector('.card') ?? null;
+  return el.shadowRoot?.querySelector('.panel') ?? null;
 }
 
 function clickElement(el: HTMLElement): void {
@@ -193,7 +193,7 @@ describe('Web Component — <alap-lightbox>', () => {
       expect(getOverlay(el)).toBeNull();
     });
 
-    it('does not close on card click', () => {
+    it('does not close on panel click', () => {
       const el = createElement('.bridge');
       clickElement(el);
 
@@ -306,7 +306,7 @@ describe('Web Component — <alap-lightbox>', () => {
   // ===========================================================================
 
   describe('content rendering (no image)', () => {
-    it('hides image and adds no-image class to card', () => {
+    it('hides image and adds no-image class to panel', () => {
       const el = createElement('aqus');
       clickElement(el);
 
@@ -330,11 +330,11 @@ describe('Web Component — <alap-lightbox>', () => {
   // ===========================================================================
 
   describe('content rendering (text)', () => {
-    it('renders title', () => {
+    it('renders label', () => {
       const el = createElement('brooklyn');
       clickElement(el);
 
-      const title = getCard(el)!.querySelector('.title')!;
+      const title = getCard(el)!.querySelector('.label')!;
       expect(title.textContent).toBe('Brooklyn Bridge');
       expect(title.getAttribute('title')).toBe('Brooklyn Bridge');
     });
@@ -421,20 +421,20 @@ describe('Web Component — <alap-lightbox>', () => {
       expect(getOverlay(el)!.getAttribute('part')).toBe('overlay');
     });
 
-    it('exposes card part', () => {
+    it('exposes panel part', () => {
       const el = createElement('.bridge');
       clickElement(el);
-      expect(getCard(el)!.getAttribute('part')).toBe('card');
+      expect(getCard(el)!.getAttribute('part')).toBe('panel');
     });
 
-    it('exposes image-wrap, image, title, body parts', () => {
+    it('exposes image-wrap, image, label, body parts', () => {
       const el = createElement('.bridge');
       clickElement(el);
 
       const card = getCard(el)!;
       expect(card.querySelector('.image-wrap')!.getAttribute('part')).toBe('image-wrap');
       expect(card.querySelector('.image')!.getAttribute('part')).toBe('image');
-      expect(card.querySelector('.title')!.getAttribute('part')).toBe('title');
+      expect(card.querySelector('.label')!.getAttribute('part')).toBe('label');
       expect(card.querySelector('.body')!.getAttribute('part')).toBe('body');
     });
 
@@ -797,11 +797,11 @@ describe('Web Component — <alap-lightbox>', () => {
   // ===========================================================================
 
   describe('security', () => {
-    it('title uses textContent, not innerHTML', () => {
+    it('label uses textContent, not innerHTML', () => {
       const el = createElement('xss_attempt');
       clickElement(el);
 
-      const title = getCard(el)!.querySelector('.title')!;
+      const title = getCard(el)!.querySelector('.label')!;
       expect(title.textContent).toBe('<script>alert("xss")</script>');
       expect(title.querySelector('script')).toBeNull();
     });

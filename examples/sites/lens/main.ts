@@ -5,6 +5,8 @@
 
 import { AlapUI } from 'alap';
 import { AlapLens } from '../../../src/ui-lens';
+import { defineAlapLens } from '../../../src/ui-lens/AlapLensElement';
+import { registerConfig } from '../../../src/ui/shared/configRegistry';
 import type { Placement } from '../../../src/ui/shared/placement';
 import '../../../src/ui-lens/lens.css';
 import { demoConfig } from './config';
@@ -14,6 +16,10 @@ const lens = new AlapLens(demoConfig, { selector: '.alap-lens' });
 
 // Standard menu renderer for .alap-menu triggers (same config, different UI)
 const menu = new AlapUI(demoConfig, { selector: '.alap-menu' });
+
+// Web component — register config and define <alap-lens>
+registerConfig(demoConfig);
+defineAlapLens();
 
 // --- Compass rose: click a direction to set placement, click again to deselect ---
 

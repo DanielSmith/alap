@@ -23,7 +23,7 @@
     }
 
     /* Demo: custom styling via ::part() */
-    .custom-styled alap-lightbox::part(card) {
+    .custom-styled alap-lightbox::part(panel) {
       --alap-lightbox-bg: #2a1a3e;
       --alap-lightbox-radius: 20px;
     }
@@ -37,7 +37,7 @@
       order: -1;
       padding-top: 1rem;
     }
-    .rearranged alap-lightbox::part(title) {
+    .rearranged alap-lightbox::part(label) {
       order: -2;
       padding-top: 0.75rem;
     }
@@ -82,7 +82,7 @@
       or
       <alap-lightbox query=".coffee + .portland">Portland roasters</alap-lightbox>.
     </p>
-    <p class="note">Links without thumbnails show a text-only card.</p>
+    <p class="note">Links without thumbnails show a text-only panel.</p>
   </div>
 
   <h2>Landmarks</h2>
@@ -157,7 +157,7 @@
   <hr>
 
   <h2>::part() Custom Styling</h2>
-  <p>The lightbox below uses <code>::part()</code> to change the card background
+  <p>The lightbox below uses <code>::part()</code> to change the panel background
     and button color &mdash; no extra CSS classes on the component itself.</p>
   <div class="example custom-styled">
     <p>

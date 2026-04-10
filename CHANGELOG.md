@@ -2,6 +2,50 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.1.0-dev] — 2026-04-09
+
+### Lens web component (2026-04-09)
+
+- New `<alap-lens>` custom element (`src/ui-lens/AlapLensElement.ts`)
+  - Shadow DOM with fully tokenized CSS (~50 custom properties, `--alap-lens-*`)
+  - `::part()` on all meaningful elements for full layout rearrangement via CSS `order`
+  - Parts: overlay, panel, close-x, image-wrap, image, title-row, label, credit, tags, description, meta, actions, visit, close-btn, nav, nav-prev, nav-next, counter-wrap, counter, setnav, setnav-filter, zoom-overlay
+  - Attribute-driven configuration: `query`, `config`, `placement`, `transition`, `copyable`, `panel-close-button`, `visit-label`, `close-label`, `tag-switch-tooltip`
+  - Full feature parity with DOM lens: set navigator, image zoom, clickable tags, tag switch tooltip, photographer credits, copy-to-clipboard, fade/resize/none transitions
+  - Portrait image detection: `object-fit: contain` when `naturalHeight > naturalWidth`
+  - Implements `CoordinatedRenderer` interface
+- 52 new tests (`tests/ui/lens/alap-lens-element.test.ts`): registration, shadow DOM, ARIA, overlay lifecycle, dismissal, content rendering, meta fields, navigation, `::part()` exposure, attribute options, cleanup, security
+- New example site (`examples/sites/lens-wc/`) with basic usage and WC-specific demos
+- `defineAlapLens()` helper exported from `src/index.ts`
+
+### Cross-component naming consistency (2026-04-09)
+
+- Aligned internal CSS class names, `::part()` names, and CSS custom properties across menu, lightbox, and lens
+- **Lightbox:** `card` → `panel`, `title` → `label`, `title-row` → `label-row`
+  - CSS classes: `alap-lightbox-card` → `alap-lightbox-panel`, `alap-lightbox-title` → `alap-lightbox-label`, `alap-lightbox-title-row` → `alap-lightbox-label-row`
+  - WC parts: `card` → `panel`, `title` → `label`, `title-row` → `label-row`
+  - CSS custom properties: `--alap-lightbox-title-*` → `--alap-lightbox-label-*`
+- **Lens:** `thumb-wrap` → `image-wrap`, `thumbnail` (class) → `image`
+  - CSS classes: `alap-lens-thumb-wrap` → `alap-lens-image-wrap`, `alap-lens-thumbnail` → `alap-lens-image`
+  - WC parts: `thumb-wrap` → `image-wrap`, `thumbnail` → `image`
+  - CSS custom properties: `--alap-lens-thumb-*` → `--alap-lens-image-*`
+- Config fields (`label`, `image`, `thumbnail`) unchanged — this only affects internal DOM/CSS naming
+- All tests, examples, and documentation updated
+
+### Lens example data: Pokemon + NASA APOD (2026-04-09)
+
+- Added 4 Pokemon items (Charizard, Eevee, Snorlax, Gengar) with full stats, types, abilities from PokeAPI
+- Added 5 NASA APOD items (NGC 1232, NGC 1398, Seahorse Nebula, Geminids, Comet 12P) with credits and HD URLs
+- Pokemon artwork served locally from `shared/img/pokemon/` (GitHub raw content rate-limits)
+- New macros: `gen1`, `apod`; updated `everything` to include `.pokemon, .nasa`
+- New lens example sections: Pokemon (by type), NASA APOD (by category)
+
+### Known issue: meta overflow (2026-04-09)
+
+- Items with many meta fields (15+) push Visit button and nav controls below the viewport
+- Confirmed with full Pokemon stats vs trimmed "charizard_lite" (2 fields fits perfectly)
+- Planned fix: drawer slide toggle on title row to reclaim vertical space
+
 ## [3.1.0-dev] — 2026-04-08
 
 ### Lens: clickable tags and tag drill-down (2026-04-08)

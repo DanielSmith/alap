@@ -46,10 +46,10 @@
   --alap-lens-tag-padding: 0.15rem 0.6rem;
   --alap-lens-tag-gap: 0.35rem;
 
-  /* Thumbnail */
-  --alap-lens-thumb-max-height: 280px;
-  --alap-lens-thumb-portrait-max-height: 420px;
-  --alap-lens-thumb-radius: 8px;
+  /* Image */
+  --alap-lens-image-max-height: 280px;
+  --alap-lens-image-portrait-max-height: 420px;
+  --alap-lens-image-radius: 8px;
 
   /* Separator */
   --alap-lens-separator-color: rgba(255, 255, 255, 0.1);
@@ -176,7 +176,7 @@
 
 /* Fade transition — content fades out/in, panel stays put */
 
-.alap-lens-panel-fading .alap-lens-thumb-wrap,
+.alap-lens-panel-fading .alap-lens-image-wrap,
 .alap-lens-panel-fading .alap-lens-label,
 .alap-lens-panel-fading .alap-lens-tags,
 .alap-lens-panel-fading .alap-lens-description,
@@ -188,7 +188,7 @@
   opacity: 0;
 }
 
-.alap-lens-thumb-wrap,
+.alap-lens-image-wrap,
 .alap-lens-label,
 .alap-lens-tags,
 .alap-lens-description,
@@ -202,22 +202,22 @@
 
 /* --- Top zone --- */
 
-.alap-lens-thumb-wrap {
+.alap-lens-image-wrap {
   width: 100%;
-  max-height: var(--alap-lens-thumb-max-height);
+  max-height: var(--alap-lens-image-max-height);
   overflow: hidden;
-  border-radius: var(--alap-lens-thumb-radius);
+  border-radius: var(--alap-lens-image-radius);
   margin-bottom: 1rem;
   background: #111;
 }
 
-.alap-lens-thumb-wrap-empty {
+.alap-lens-image-wrap-empty {
   height: 0;
   margin-bottom: 0;
   background: transparent;
 }
 
-.alap-lens-thumbnail {
+.alap-lens-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -386,6 +386,7 @@
   gap: 0.75rem;
   justify-content: center;
   margin-top: 1.25rem;
+  flex-shrink: 0;
 }
 
 .alap-lens-visit {
@@ -428,6 +429,7 @@
   justify-content: center;
   gap: var(--alap-lens-meta-row-gap);
   margin-top: 1rem;
+  flex-shrink: 0;
 }
 
 .alap-lens-nav-prev,

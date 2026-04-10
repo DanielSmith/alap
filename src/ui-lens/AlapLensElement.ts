@@ -14,55 +14,16 @@
  * limitations under the License.
  */
 
-import { AlapEngine } from '../core/AlapEngine';
-import type { AlapConfig, ResolvedLink } from '../core/types';
-import { RENDERER_LENS } from '../ui/shared/coordinatedRenderer';
-import type { CoordinatedRenderer, OpenPayload } from '../ui/shared/coordinatedRenderer';
-import type { Placement } from '../ui/shared/placement';
-
-// --- Options ---
-
-export interface AlapLensOptions {
-  /** CSS selector for trigger elements. Default: DEFAULT_SELECTOR */
-  selector?: string;
-  /** Label for the visit/navigate button. Default: DEFAULT_VISIT_LABEL */
-  visitLabel?: string;
-  /** Label for the close button. Default: DEFAULT_CLOSE_LABEL */
-  closeLabel?: string;
-  /** Custom display names for meta keys. E.g. { calories: 'Calories (kcal)' } */
-  metaLabels?: Record<string, string>;
-  /** Show copy-to-clipboard button on panel hover. Default: true */
-  copyable?: boolean;
-  /** Show a Close button in the actions row (next to Visit). Default: false */
-  panelCloseButton?: boolean;
-  /**
-   * Navigation transition between items.
-   * - 'fade': opacity crossfade (lightbox style) — no reflow
-   * - 'resize': animated height (TTT style) — smooth panel resize
-   * - 'none': instant swap, no animation
-   * Default: 'fade'
-   */
-  transition?: 'fade' | 'resize' | 'none';
-  /** Duration (ms) of the "switching to [tag]" tooltip on the counter. 0 to disable. Default: 3000 */
-  tagSwitchTooltip?: number;
-  /**
-   * Viewport placement for the overlay panel. Uses compass directions.
-   * - 'C': centered (default) — panel recenters when height changes
-   * - 'N': anchored to top — stable vertical position, content grows downward
-   * - 'S': anchored to bottom — content grows upward
-   * - 'NE', 'NW', 'SE', 'SW': corner anchoring
-   * - 'E', 'W': vertically centered, horizontally anchored
-   * When omitted, the overlay uses CSS defaults (centered).
-   */
-  placement?: Placement;
-}
+import type { ResolvedLink } from '../core/types';
+import { warn } from '../core/logger';
+import { getEngine } from '../ui/shared/configRegistry';
+import { STYLES } from './lens-element.css';
 
 // --- Constants ---
 
-const DEFAULT_SELECTOR = '.alap';
+const DEFAULT_CONFIG_KEY = '_default';
 const DEFAULT_VISIT_LABEL = 'Visit \u2192';
 const DEFAULT_CLOSE_LABEL = 'Close';
-const DEFAULT_TARGET = '_blank';
 
 const LONG_TEXT_THRESHOLD = 100;
 const MAX_VISIBLE_LINKS = 5;
@@ -75,100 +36,15 @@ const TRANSITION_SAFETY_BUFFER = 100;
 
 const URL_PATTERN = /^https?:\/\//;
 
-// Placement → flexbox alignment mapping
-const PLACEMENT_ALIGN: Record<Placement, string> = {
-  N: 'flex-start', NE: 'flex-start', NW: 'flex-start',
-  S: 'flex-end',   SE: 'flex-end',   SW: 'flex-end',
-  E: 'center',     W: 'center',      C: 'center',
-};
-const PLACEMENT_JUSTIFY: Record<Placement, string> = {
-  N: 'center',     S: 'center',      C: 'center',
-  NE: 'flex-end',  E: 'flex-end',    SE: 'flex-end',
-  NW: 'flex-start', W: 'flex-start', SW: 'flex-start',
-};
-
 const TAG_SEPARATOR = ' \u00b7 ';
-const COPY_LABEL = 'Copy';
 const COPY_DONE_LABEL = 'Copied';
 const COPY_DONE_DURATION = 1500;
 const DEFAULT_TAG_SWITCH_TOOLTIP = 3000;
 
-// Icons / symbols
 const ICON_CLOSE = '\u00d7';
 const ICON_PREV = '\u2039';
 const ICON_NEXT = '\u203a';
 const ICON_COPY = '\u2398';
-
-type TransitionMode = 'fade' | 'resize' | 'none';
-const DEFAULT_TRANSITION: TransitionMode = 'fade';
-
-// CSS class names
-const CSS = {
-  overlay: 'alap-lens-overlay',
-  overlayVisible: 'alap-lens-overlay-visible',
-  panel: 'alap-lens-panel',
-  panelFading: 'alap-lens-panel-fading',
-  closeX: 'alap-lens-close-x',
-  imageWrap: 'alap-lens-image-wrap',
-  imageWrapEmpty: 'alap-lens-image-wrap-empty',
-  image: 'alap-lens-image',
-  titleRow: 'alap-lens-title-row',
-  credit: 'alap-lens-credit',
-  label: 'alap-lens-label',
-  tags: 'alap-lens-tags',
-  tag: 'alap-lens-tag',
-  description: 'alap-lens-description',
-  separator: 'alap-lens-separator',
-  meta: 'alap-lens-meta',
-  metaRow: 'alap-lens-meta-row',
-  metaRowLinks: 'alap-lens-meta-row-links',
-  metaRowText: 'alap-lens-meta-row-text',
-  metaKey: 'alap-lens-meta-key',
-  metaValue: 'alap-lens-meta-value',
-  metaChips: 'alap-lens-meta-chips',
-  metaChip: 'alap-lens-meta-chip',
-  metaLinks: 'alap-lens-meta-links',
-  metaLink: 'alap-lens-meta-link',
-  metaMore: 'alap-lens-meta-more',
-  metaText: 'alap-lens-meta-text',
-  actions: 'alap-lens-actions',
-  visit: 'alap-lens-visit',
-  closeBtn: 'alap-lens-close-btn',
-  nav: 'alap-lens-nav',
-  navPrev: 'alap-lens-nav-prev',
-  navNext: 'alap-lens-nav-next',
-  counterWrap: 'alap-lens-counter-wrap',
-  counter: 'alap-lens-counter',
-  setnav: 'alap-lens-setnav',
-  setnavList: 'alap-lens-setnav-list',
-  setnavItem: 'alap-lens-setnav-item',
-  setnavFilterWrap: 'alap-lens-setnav-filter-wrap',
-  setnavFilter: 'alap-lens-setnav-filter',
-  setnavClear: 'alap-lens-setnav-clear',
-  zoomOverlay: 'alap-lens-zoom-overlay',
-  zoomVisible: 'alap-lens-zoom-visible',
-  zoomImage: 'alap-lens-zoom-image',
-  copyBtn: 'alap-lens-copy',
-  copyDone: 'alap-lens-copy-done',
-} as const;
-
-// ARIA attributes
-const ARIA = {
-  role: 'dialog',
-  modal: 'true',
-  dialogLabel: 'Item details',
-  copyLabel: 'Copy to clipboard',
-  closeLabel: 'Close',
-  prevLabel: 'Previous',
-  nextLabel: 'Next',
-} as const;
-
-// Meta keys that are internal to Alap, not user-facing data
-const INTERNAL_META_KEYS = new Set([
-  'source', 'sourceLabel', 'updated',
-  'atUri', 'handle', 'did',
-  'photoCredit', 'photoCreditUrl',
-]);
 
 // Display type hints
 const DISPLAY_VALUE = 'value';
@@ -177,107 +53,174 @@ const DISPLAY_LINKS = 'links';
 const DISPLAY_TEXT = 'text';
 const DISPLAY_HINT_SUFFIX = '_display';
 
-/**
- * Detail-inspection renderer. Shows a single item's full data in an
- * overlay panel — label, description, thumbnail, tags, and all meta fields.
- *
- * Items without a URL show metadata only (no visit button).
- * Items with rich meta fields are rendered with type-aware auto-detection.
- *
- * Same contract as AlapUI / AlapLightbox: takes an AlapConfig, binds to
- * trigger elements, resolves expressions via AlapEngine.
- */
-export class AlapLens implements CoordinatedRenderer {
-  readonly rendererType = RENDERER_LENS;
+// Meta keys that are internal to Alap, not user-facing data
+const INTERNAL_META_KEYS = new Set([
+  'source', 'sourceLabel', 'updated',
+  'atUri', 'handle', 'did',
+  'photoCredit', 'photoCreditUrl',
+]);
 
-  private engine: AlapEngine;
-  private selector: string;
-  private visitLabel: string;
-  private closeLabel: string;
-  private metaLabels: Record<string, string>;
-  private copyable: boolean;
-  private panelCloseButton: boolean;
-  private tagSwitchTooltip: number;
-  private placement: Placement | null;
-  private transition: TransitionMode;
+// ---------- The custom element ----------
+// Shadow DOM styles imported from ./lens-element.css.ts
+
+export class AlapLensElement extends HTMLElement {
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
   private currentIndex = 0;
+  private isOpen = false;
+  private justClosed = false;
   private transitioning = false;
-  private activeTrigger: HTMLElement | null = null;
   private activeTag: string | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
-  constructor(config: AlapConfig, options: AlapLensOptions = {}) {
-    this.engine = new AlapEngine(config);
-    this.selector = options.selector ?? DEFAULT_SELECTOR;
-    this.visitLabel = options.visitLabel ?? DEFAULT_VISIT_LABEL;
-    this.closeLabel = options.closeLabel ?? DEFAULT_CLOSE_LABEL;
-    this.metaLabels = options.metaLabels ?? {};
-    this.copyable = options.copyable ?? true;
-    this.panelCloseButton = options.panelCloseButton ?? false;
-    this.tagSwitchTooltip = options.tagSwitchTooltip ?? DEFAULT_TAG_SWITCH_TOOLTIP;
-    this.placement = options.placement ?? null;
-    this.transition = options.transition ?? DEFAULT_TRANSITION;
-    this.handleKeydown = this.onKeydown.bind(this);
-    this.init();
+  static get observedAttributes(): string[] {
+    return ['query', 'config', 'placement', 'transition', 'copyable', 'panel-close-button', 'tag-switch-tooltip'];
   }
 
-  private init(): void {
-    const triggers = document.querySelectorAll<HTMLElement>(this.selector);
-    for (const trigger of triggers) {
-      trigger.addEventListener('click', (e) => this.onTriggerClick(e, trigger));
-      trigger.setAttribute('role', 'button');
-      trigger.setAttribute('tabindex', trigger.getAttribute('tabindex') ?? '0');
+  constructor() {
+    super();
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    const style = document.createElement('style');
+    style.textContent = STYLES;
+    shadow.appendChild(style);
+
+    const slot = document.createElement('slot');
+    shadow.appendChild(slot);
+
+    this.handleKeydown = this.onKeydown.bind(this);
+  }
+
+  connectedCallback(): void {
+    if (!this.getAttribute('role')) {
+      this.setAttribute('role', 'button');
+    }
+    this.setAttribute('aria-haspopup', 'dialog');
+    if (!this.getAttribute('tabindex')) {
+      this.setAttribute('tabindex', '0');
+    }
+
+    this.addEventListener('click', this.onTriggerClick);
+    this.addEventListener('keydown', this.onTriggerKeydown);
+  }
+
+  disconnectedCallback(): void {
+    this.close();
+    this.removeEventListener('click', this.onTriggerClick);
+    this.removeEventListener('keydown', this.onTriggerKeydown);
+  }
+
+  attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void {
+    if (oldValue !== newValue && this.isOpen) {
+      this.close();
     }
   }
 
-  private onTriggerClick(event: MouseEvent, trigger: HTMLElement): void {
+  // --- Attribute helpers ---
+
+  private get visitLabel(): string {
+    return this.getAttribute('visit-label') ?? DEFAULT_VISIT_LABEL;
+  }
+
+  private get closeLabel(): string {
+    return this.getAttribute('close-label') ?? DEFAULT_CLOSE_LABEL;
+  }
+
+  private get copyable(): boolean {
+    const attr = this.getAttribute('copyable');
+    return attr !== 'false';
+  }
+
+  private get panelCloseButton(): boolean {
+    return this.hasAttribute('panel-close-button');
+  }
+
+  private get transitionMode(): 'fade' | 'resize' | 'none' {
+    const attr = this.getAttribute('transition') as 'fade' | 'resize' | 'none' | null;
+    if (attr === 'fade' || attr === 'resize' || attr === 'none') return attr;
+    return 'fade';
+  }
+
+  private get tagSwitchTooltip(): number {
+    const attr = this.getAttribute('tag-switch-tooltip');
+    if (attr !== null) {
+      const parsed = parseInt(attr, 10);
+      return Number.isFinite(parsed) ? parsed : DEFAULT_TAG_SWITCH_TOOLTIP;
+    }
+    return DEFAULT_TAG_SWITCH_TOOLTIP;
+  }
+
+  private get placement(): string | null {
+    return this.getAttribute('placement');
+  }
+
+  // --- Trigger ---
+
+  private onTriggerClick = (event: MouseEvent): void => {
+    if (this.overlay && event.composedPath().includes(this.overlay)) return;
+
+    if (this.justClosed) {
+      this.justClosed = false;
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
-    const expression = trigger.getAttribute('data-alap-linkitems');
-    if (!expression) return;
+    const query = this.getAttribute('query');
+    if (!query) return;
 
-    const anchorId = trigger.id || undefined;
-    this.links = this.engine.resolve(expression, anchorId);
+    const configName = this.getAttribute('config') ?? DEFAULT_CONFIG_KEY;
+    const engine = getEngine(configName);
+    if (!engine) {
+      warn(`<alap-lens>: no config registered for "${configName}". Call registerConfig() first.`);
+      return;
+    }
+
+    const anchorId = this.id || undefined;
+    this.links = engine.resolve(query, anchorId);
     if (this.links.length === 0) return;
 
     this.currentIndex = 0;
     this.activeTag = null;
     this.open();
-    this.activeTrigger = trigger;
-  }
+  };
 
-  // --- CoordinatedRenderer ---
+  private onTriggerKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.click();
+    }
+  };
 
-  get isOpen(): boolean {
-    return this.overlay !== null;
-  }
-
-  openWith(payload: OpenPayload): void {
-    if (payload.links.length === 0) return;
-    this.links = payload.links;
-    this.currentIndex = payload.initialIndex ?? 0;
-    this.open();
-    this.activeTrigger = payload.triggerElement ?? null;
-  }
-
-  // --- Overlay lifecycle ---
+  // --- Open / Close ---
 
   private open(): void {
     this.close();
 
     this.overlay = document.createElement('div');
-    this.overlay.className = CSS.overlay;
-    this.overlay.setAttribute('role', ARIA.role);
-    this.overlay.setAttribute('aria-modal', ARIA.modal);
-    this.overlay.setAttribute('aria-label', ARIA.dialogLabel);
+    this.overlay.className = 'overlay';
+    this.overlay.setAttribute('part', 'overlay');
+    this.overlay.setAttribute('role', 'dialog');
+    this.overlay.setAttribute('aria-modal', 'true');
+    this.overlay.setAttribute('aria-label', 'Item details');
 
-    if (this.placement) {
-      this.overlay.style.alignItems = PLACEMENT_ALIGN[this.placement];
-      this.overlay.style.justifyContent = PLACEMENT_JUSTIFY[this.placement];
+    // Apply placement
+    const p = this.placement;
+    if (p) {
+      const alignMap: Record<string, string> = {
+        N: 'flex-start', NE: 'flex-start', NW: 'flex-start',
+        S: 'flex-end',   SE: 'flex-end',   SW: 'flex-end',
+        E: 'center',     W: 'center',      C: 'center',
+      };
+      const justifyMap: Record<string, string> = {
+        N: 'center',     S: 'center',      C: 'center',
+        NE: 'flex-end',  E: 'flex-end',    SE: 'flex-end',
+        NW: 'flex-start', W: 'flex-start', SW: 'flex-start',
+      };
+      if (alignMap[p]) this.overlay.style.alignItems = alignMap[p];
+      if (justifyMap[p]) this.overlay.style.justifyContent = justifyMap[p];
     }
 
     this.overlay.addEventListener('click', (e) => {
@@ -285,50 +228,52 @@ export class AlapLens implements CoordinatedRenderer {
     });
 
     this.render();
-    document.body.appendChild(this.overlay);
+    this.shadowRoot!.appendChild(this.overlay);
 
-    // Fade in
     void this.overlay.offsetHeight;
-    this.overlay.classList.add(CSS.overlayVisible);
+    this.overlay.classList.add('visible');
 
+    this.isOpen = true;
+    this.setAttribute('aria-expanded', 'true');
     document.addEventListener('keydown', this.handleKeydown);
   }
 
-  close(): HTMLElement | null {
-    const trigger = this.activeTrigger;
-    if (this.overlay) {
-      const overlay = this.overlay;
-      this.overlay = null;
+  close(): void {
+    if (!this.overlay) return;
 
-      // Fade out, then remove
-      overlay.classList.remove(CSS.overlayVisible);
-      const duration = parseFloat(getComputedStyle(overlay).transitionDuration);
-      if (duration > 0) {
-        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-      } else {
-        overlay.remove();
-      }
+    const overlay = this.overlay;
+    this.overlay = null;
+    this.isOpen = false;
+    this.justClosed = true;
+    requestAnimationFrame(() => { this.justClosed = false; });
+
+    overlay.classList.remove('visible');
+    const duration = parseFloat(getComputedStyle(overlay).transitionDuration);
+    if (duration > 0) {
+      overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    } else {
+      overlay.remove();
     }
+    this.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', this.handleKeydown);
-    this.activeTrigger = null;
-    return trigger;
   }
 
   // --- Rendering ---
 
   private render(): void {
     if (!this.overlay) return;
-
-    const link = this.links[this.currentIndex];
-    const total = this.links.length;
-
     this.overlay.innerHTML = '';
 
-    const closeX = this.createButton(CSS.closeX, ICON_CLOSE, ARIA.closeLabel, () => this.close());
+    const closeX = this.createButton('close-x', ICON_CLOSE, 'Close', () => this.close());
+    closeX.setAttribute('part', 'close-x');
     this.overlay.appendChild(closeX);
 
     const panel = document.createElement('div');
-    panel.className = CSS.panel;
+    panel.className = 'panel';
+    panel.setAttribute('part', 'panel');
+
+    const link = this.links[this.currentIndex];
+    const total = this.links.length;
 
     this.renderTopZone(panel, link);
     this.renderMetaZone(panel, link);
@@ -343,44 +288,50 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderTopZone(panel: HTMLElement, link: ResolvedLink): void {
     const thumbSrc = link.thumbnail || link.image;
-    const imageWrap = document.createElement('div');
-    imageWrap.className = thumbSrc ? CSS.imageWrap : `${CSS.imageWrap} ${CSS.imageWrapEmpty}`;
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = thumbSrc ? 'image-wrap' : 'image-wrap image-wrap-empty';
+    thumbWrap.setAttribute('part', 'image-wrap');
+
     if (thumbSrc) {
-      const img = document.createElement('img');
-      img.className = CSS.image;
-      img.src = thumbSrc;
-      img.alt = link.altText ?? link.label ?? '';
-      img.style.cursor = 'zoom-in';
-      img.addEventListener('load', () => {
-        if (img.naturalHeight > img.naturalWidth) {
-          img.style.objectFit = 'contain';
-          imageWrap.style.maxHeight = 'var(--alap-lens-image-portrait-max-height)';
+      const thumb = document.createElement('img');
+      thumb.className = 'image';
+      thumb.setAttribute('part', 'image');
+      thumb.src = thumbSrc;
+      thumb.alt = link.altText ?? link.label ?? '';
+      thumb.style.cursor = 'zoom-in';
+      thumb.addEventListener('load', () => {
+        if (thumb.naturalHeight > thumb.naturalWidth) {
+          thumb.style.objectFit = 'contain';
+          thumbWrap.style.maxHeight = 'var(--alap-lens-image-portrait-max-height, 420px)';
         }
       });
-      img.addEventListener('click', (e) => {
+      thumb.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (img.src) this.openZoom(img.src);
+        if (thumb.src) this.openZoom(thumb.src);
       });
-      imageWrap.appendChild(img);
+      thumbWrap.appendChild(thumb);
     }
-    panel.appendChild(imageWrap);
+    panel.appendChild(thumbWrap);
 
     // Title row — label + photo credit on the same line
     const creditName = link.meta?.photoCredit as string | undefined;
     if (link.label || (creditName && thumbSrc)) {
       const titleRow = document.createElement('div');
-      titleRow.className = CSS.titleRow;
+      titleRow.className = 'title-row';
+      titleRow.setAttribute('part', 'title-row');
 
       if (link.label) {
         const label = document.createElement('h2');
-        label.className = CSS.label;
+        label.className = 'label';
+        label.setAttribute('part', 'label');
         label.textContent = link.label;
         titleRow.appendChild(label);
       }
 
       if (creditName && thumbSrc) {
         const creditEl = document.createElement('span');
-        creditEl.className = CSS.credit;
+        creditEl.className = 'credit';
+        creditEl.setAttribute('part', 'credit');
         const creditUrl = link.meta?.photoCreditUrl as string | undefined;
         if (creditUrl) {
           const creditLink = document.createElement('a');
@@ -398,19 +349,24 @@ export class AlapLens implements CoordinatedRenderer {
       panel.appendChild(titleRow);
     }
 
+    // Tags + copy button
     if ((link.tags && link.tags.length > 0) || this.copyable) {
       const tagsWrap = document.createElement('div');
-      tagsWrap.className = CSS.tags;
+      tagsWrap.className = 'tags';
+      tagsWrap.setAttribute('part', 'tags');
+
       if (link.tags) {
         for (const tag of link.tags) {
           const chip = document.createElement('span');
-          chip.className = CSS.tag;
+          chip.className = 'tag';
           if (this.activeTag === tag) chip.classList.add('active');
           chip.textContent = tag;
-          chip.style.cursor = 'pointer';
           chip.addEventListener('click', (e) => {
             e.stopPropagation();
-            const resolved = this.engine.resolve(`.${tag}`);
+            const configName = this.getAttribute('config') ?? DEFAULT_CONFIG_KEY;
+            const engine = getEngine(configName);
+            if (!engine) return;
+            const resolved = engine.resolve(`.${tag}`);
             if (resolved.length === 0) return;
             this.links = resolved;
             this.currentIndex = 0;
@@ -423,6 +379,7 @@ export class AlapLens implements CoordinatedRenderer {
           tagsWrap.appendChild(chip);
         }
       }
+
       if (this.copyable) {
         this.renderCopyButton(tagsWrap, link);
       }
@@ -431,7 +388,8 @@ export class AlapLens implements CoordinatedRenderer {
 
     if (link.description) {
       const desc = document.createElement('p');
-      desc.className = CSS.description;
+      desc.className = 'description';
+      desc.setAttribute('part', 'description');
       desc.textContent = link.description;
       panel.appendChild(desc);
     }
@@ -449,11 +407,12 @@ export class AlapLens implements CoordinatedRenderer {
     if (entries.length === 0) return;
 
     const separator = document.createElement('hr');
-    separator.className = CSS.separator;
+    separator.className = 'separator';
     panel.appendChild(separator);
 
     const metaSection = document.createElement('dl');
-    metaSection.className = CSS.meta;
+    metaSection.className = 'meta';
+    metaSection.setAttribute('part', 'meta');
 
     for (const [key, value] of entries) {
       if (value == null || value === '') continue;
@@ -472,20 +431,23 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderActions(panel: HTMLElement, link: ResolvedLink): void {
     const actions = document.createElement('div');
-    actions.className = CSS.actions;
+    actions.className = 'actions';
+    actions.setAttribute('part', 'actions');
 
     if (link.url) {
       const visitBtn = document.createElement('a');
-      visitBtn.className = CSS.visit;
+      visitBtn.className = 'visit';
+      visitBtn.setAttribute('part', 'visit');
       visitBtn.href = link.url;
-      visitBtn.target = link.targetWindow ?? DEFAULT_TARGET;
+      visitBtn.target = link.targetWindow ?? '_blank';
       visitBtn.rel = 'noopener noreferrer';
       visitBtn.textContent = this.visitLabel;
       actions.appendChild(visitBtn);
     }
 
     if (this.panelCloseButton) {
-      const closeBtn = this.createButton(CSS.closeBtn, this.closeLabel, ARIA.closeLabel, () => this.close());
+      const closeBtn = this.createButton('close-btn', this.closeLabel, 'Close', () => this.close());
+      closeBtn.setAttribute('part', 'close-btn');
       actions.appendChild(closeBtn);
     }
 
@@ -494,34 +456,37 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderNav(panel: HTMLElement, total: number): void {
     const nav = document.createElement('div');
-    nav.className = CSS.nav;
+    nav.className = 'nav';
+    nav.setAttribute('part', 'nav');
 
-    const prevBtn = this.createButton(CSS.navPrev, ICON_PREV, ARIA.prevLabel, () => {
-      this.navigate(-1);
-    });
+    const prevBtn = this.createButton('nav-prev', ICON_PREV, 'Previous', () => this.navigate(-1));
+    prevBtn.setAttribute('part', 'nav-prev');
     nav.appendChild(prevBtn);
 
-    // Counter wrap — holds counter text + set navigator popup
+    // Counter wrap
     const counterWrap = document.createElement('div');
-    counterWrap.className = CSS.counterWrap;
+    counterWrap.className = 'counter-wrap';
+    counterWrap.setAttribute('part', 'counter-wrap');
 
     const counterText = document.createElement('span');
-    counterText.className = CSS.counter;
+    counterText.className = 'counter';
+    counterText.setAttribute('part', 'counter');
     counterWrap.appendChild(counterText);
 
     // Set navigator popup
     const setNav = document.createElement('div');
-    setNav.className = CSS.setnav;
+    setNav.className = 'setnav';
+    setNav.setAttribute('part', 'setnav');
     setNav.setAttribute('tabindex', '-1');
 
     const setList = document.createElement('ul');
-    setList.className = CSS.setnavList;
+    setList.className = 'setnav-list';
     setList.setAttribute('role', 'listbox');
 
     for (let i = 0; i < this.links.length; i++) {
       const item = this.links[i];
       const li = document.createElement('li');
-      li.className = CSS.setnavItem;
+      li.className = 'setnav-item';
       li.setAttribute('role', 'option');
       li.setAttribute('data-index', String(i));
       li.textContent = item.label ?? item.id;
@@ -537,17 +502,18 @@ export class AlapLens implements CoordinatedRenderer {
 
     // Filter input
     const filterWrap = document.createElement('div');
-    filterWrap.className = CSS.setnavFilterWrap;
+    filterWrap.className = 'setnav-filter-wrap';
 
     const filterInput = document.createElement('input');
-    filterInput.className = CSS.setnavFilter;
+    filterInput.className = 'setnav-filter';
+    filterInput.setAttribute('part', 'setnav-filter');
     filterInput.type = 'text';
     filterInput.placeholder = 'Filter\u2026';
     filterInput.setAttribute('aria-label', 'Filter items');
     filterWrap.appendChild(filterInput);
 
     const clearBtn = document.createElement('button');
-    clearBtn.className = CSS.setnavClear;
+    clearBtn.className = 'setnav-clear';
     clearBtn.setAttribute('aria-label', 'Clear filter');
     clearBtn.textContent = ICON_CLOSE;
     clearBtn.style.display = 'none';
@@ -572,14 +538,14 @@ export class AlapLens implements CoordinatedRenderer {
       filterInput.dispatchEvent(new Event('input'));
     };
 
-    // Setnav keydown — Escape closes popup, typing focuses filter
+    // Setnav keydown
     setNav.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
         hideNav();
         return;
       }
-      if (document.activeElement === filterInput) return;
+      if (document.activeElement === filterInput || this.shadowRoot?.activeElement === filterInput) return;
       if (handleNavKeys(e)) return;
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         filterInput.focus();
@@ -637,7 +603,7 @@ export class AlapLens implements CoordinatedRenderer {
       const raw = filterInput.value.trim();
       clearBtn.style.display = raw ? '' : 'none';
 
-      const items = setList.querySelectorAll<HTMLElement>(`.${CSS.setnavItem}`);
+      const items = setList.querySelectorAll<HTMLElement>('.setnav-item');
       if (!raw) {
         for (const item of items) item.style.display = '';
         return;
@@ -662,11 +628,11 @@ export class AlapLens implements CoordinatedRenderer {
     let highlightIdx = -1;
 
     const getVisibleItems = (): HTMLElement[] =>
-      Array.from(setList.querySelectorAll<HTMLElement>(`.${CSS.setnavItem}`))
+      Array.from(setList.querySelectorAll<HTMLElement>('.setnav-item'))
         .filter((el) => el.style.display !== 'none');
 
     const updateHighlight = (visible: HTMLElement[]) => {
-      for (const item of setList.querySelectorAll<HTMLElement>(`.${CSS.setnavItem}`)) {
+      for (const item of setList.querySelectorAll<HTMLElement>('.setnav-item')) {
         item.classList.remove('highlighted');
       }
       if (highlightIdx >= 0 && highlightIdx < visible.length) {
@@ -699,7 +665,6 @@ export class AlapLens implements CoordinatedRenderer {
       return false;
     };
 
-    // Reset highlight when filter changes
     filterInput.addEventListener('input', () => {
       highlightIdx = -1;
     });
@@ -712,9 +677,8 @@ export class AlapLens implements CoordinatedRenderer {
 
     nav.appendChild(counterWrap);
 
-    const nextBtn = this.createButton(CSS.navNext, ICON_NEXT, ARIA.nextLabel, () => {
-      this.navigate(1);
-    });
+    const nextBtn = this.createButton('nav-next', ICON_NEXT, 'Next', () => this.navigate(1));
+    nextBtn.setAttribute('part', 'nav-next');
     nav.appendChild(nextBtn);
 
     panel.appendChild(nav);
@@ -722,7 +686,6 @@ export class AlapLens implements CoordinatedRenderer {
 
   // --- Navigation transitions ---
 
-  /** Read a CSS custom property as seconds → ms, with fallback. */
   private getCssDuration(el: HTMLElement, prop: string, fallback: number): number {
     const raw = getComputedStyle(el).getPropertyValue(prop);
     const parsed = parseFloat(raw) * 1000;
@@ -734,85 +697,67 @@ export class AlapLens implements CoordinatedRenderer {
 
     const nextIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
 
-    if (this.transition === 'none') {
+    if (this.transitionMode === 'none') {
       this.currentIndex = nextIndex;
       this.render();
       return;
     }
 
-    if (this.transition === 'resize') {
+    if (this.transitionMode === 'resize') {
       this.navigateResize(nextIndex);
       return;
     }
 
-    // Default: fade
     this.navigateFade(nextIndex);
   }
 
-  /**
-   * Fade transition (lightbox style): fade content out via opacity,
-   * swap, fade back in. No reflow — only compositing.
-   */
   private navigateFade(nextIndex: number): void {
-    const panel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+    const panel = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!panel) return;
 
     this.transitioning = true;
-    panel.classList.add(CSS.panelFading);
+    panel.classList.add('panel-fading');
 
     const duration = this.getCssDuration(panel, FADE_DURATION_PROP, FADE_DURATION_FALLBACK);
 
     setTimeout(() => {
       this.currentIndex = nextIndex;
       this.render();
-      // render() rebuilds the panel, so grab it again
-      const newPanel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+      const newPanel = this.overlay?.querySelector('.panel') as HTMLElement | null;
       if (newPanel) {
-        newPanel.classList.add(CSS.panelFading);
-        // Force reflow so the browser registers the fading state before removing it
+        newPanel.classList.add('panel-fading');
         void newPanel.offsetHeight;
-        newPanel.classList.remove(CSS.panelFading);
+        newPanel.classList.remove('panel-fading');
       }
       setTimeout(() => { this.transitioning = false; }, duration);
     }, duration);
   }
 
-  /**
-   * Resize transition (TTT style): lock current height, swap content,
-   * measure new scrollHeight, animate height to new value.
-   */
   private navigateResize(nextIndex: number): void {
-    const panel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+    const panel = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!panel) return;
 
     this.transitioning = true;
     const duration = this.getCssDuration(panel, RESIZE_DURATION_PROP, RESIZE_DURATION_FALLBACK);
 
-    // Lock current height
     const currentHeight = panel.scrollHeight;
     panel.style.height = `${currentHeight}px`;
     panel.style.overflow = 'hidden';
 
-    // Swap content
     this.currentIndex = nextIndex;
     this.render();
 
-    // Measure new content and animate
-    const newPanel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+    const newPanel = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!newPanel) { this.transitioning = false; return; }
 
-    // Keep locked height so we can transition from it
     newPanel.style.height = `${currentHeight}px`;
     newPanel.style.overflow = 'hidden';
 
     requestAnimationFrame(() => {
-      // Temporarily remove height constraint to measure natural height
       newPanel.style.height = 'auto';
       const targetHeight = newPanel.scrollHeight;
 
-      // Snap back to old height, then animate to new
       newPanel.style.height = `${currentHeight}px`;
-      // Force reflow
       void newPanel.offsetHeight;
       newPanel.style.height = `${targetHeight}px`;
 
@@ -824,11 +769,27 @@ export class AlapLens implements CoordinatedRenderer {
       };
       newPanel.addEventListener('transitionend', onEnd, { once: true });
 
-      // Safety fallback in case transitionend doesn't fire
       setTimeout(() => {
         if (this.transitioning) onEnd();
       }, duration + TRANSITION_SAFETY_BUFFER);
     });
+  }
+
+  private jumpTo(index: number): void {
+    if (index === this.currentIndex || this.transitioning) return;
+
+    if (this.transitionMode === 'none') {
+      this.currentIndex = index;
+      this.render();
+      return;
+    }
+
+    if (this.transitionMode === 'resize') {
+      this.navigateResize(index);
+      return;
+    }
+
+    this.navigateFade(index);
   }
 
   // --- Meta field rendering ---
@@ -863,7 +824,13 @@ export class AlapLens implements CoordinatedRenderer {
   }
 
   private formatMetaKey(key: string): string {
-    if (this.metaLabels[key]) return this.metaLabels[key];
+    const metaLabels = this.getAttribute('meta-labels');
+    if (metaLabels) {
+      try {
+        const labels = JSON.parse(metaLabels);
+        if (labels[key]) return labels[key];
+      } catch { /* ignore */ }
+    }
     return key
       .replace(/_/g, ' ')
       .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -878,15 +845,15 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderKeyValue(label: string, value: string): HTMLElement {
     const row = document.createElement('div');
-    row.className = CSS.metaRow;
+    row.className = 'meta-row';
 
     const dt = document.createElement('dt');
-    dt.className = CSS.metaKey;
+    dt.className = 'meta-key';
     dt.textContent = label;
     row.appendChild(dt);
 
     const dd = document.createElement('dd');
-    dd.className = CSS.metaValue;
+    dd.className = 'meta-value';
     dd.textContent = value;
     row.appendChild(dd);
 
@@ -895,18 +862,18 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderChips(label: string, values: string[]): HTMLElement {
     const row = document.createElement('div');
-    row.className = CSS.metaRow;
+    row.className = 'meta-row';
 
     const dt = document.createElement('dt');
-    dt.className = CSS.metaKey;
+    dt.className = 'meta-key';
     dt.textContent = label;
     row.appendChild(dt);
 
     const dd = document.createElement('dd');
-    dd.className = CSS.metaChips;
+    dd.className = 'meta-chips';
     for (const v of values) {
       const chip = document.createElement('span');
-      chip.className = CSS.metaChip;
+      chip.className = 'meta-chip';
       chip.textContent = v;
       dd.appendChild(chip);
     }
@@ -917,22 +884,22 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderLinks(label: string, urls: string[]): HTMLElement {
     const row = document.createElement('div');
-    row.className = `${CSS.metaRow} ${CSS.metaRowLinks}`;
+    row.className = 'meta-row meta-row-links';
 
     const dt = document.createElement('dt');
-    dt.className = CSS.metaKey;
+    dt.className = 'meta-key';
     dt.textContent = `${label} (${urls.length})`;
     row.appendChild(dt);
 
     const dd = document.createElement('dd');
-    dd.className = CSS.metaLinks;
+    dd.className = 'meta-links';
 
     const visible = urls.slice(0, MAX_VISIBLE_LINKS);
     for (const url of visible) {
       const a = document.createElement('a');
-      a.className = CSS.metaLink;
+      a.className = 'meta-link';
       a.href = url;
-      a.target = DEFAULT_TARGET;
+      a.target = '_blank';
       a.rel = 'noopener noreferrer';
       try {
         const parsed = new URL(url);
@@ -945,7 +912,7 @@ export class AlapLens implements CoordinatedRenderer {
 
     if (urls.length > MAX_VISIBLE_LINKS) {
       const more = document.createElement('span');
-      more.className = CSS.metaMore;
+      more.className = 'meta-more';
       more.textContent = `+${urls.length - MAX_VISIBLE_LINKS} more`;
       dd.appendChild(more);
     }
@@ -956,47 +923,36 @@ export class AlapLens implements CoordinatedRenderer {
 
   private renderTextBlock(label: string, text: string): HTMLElement {
     const row = document.createElement('div');
-    row.className = `${CSS.metaRow} ${CSS.metaRowText}`;
+    row.className = 'meta-row meta-row-text';
 
     const dt = document.createElement('dt');
-    dt.className = CSS.metaKey;
+    dt.className = 'meta-key';
     dt.textContent = label;
     row.appendChild(dt);
 
     const dd = document.createElement('dd');
-    dd.className = CSS.metaText;
+    dd.className = 'meta-text';
     dd.textContent = text;
     row.appendChild(dd);
 
     return row;
   }
 
-  // --- Utilities ---
-
-  private createButton(className: string, text: string, ariaLabel: string, onClick: () => void): HTMLButtonElement {
-    const btn = document.createElement('button');
-    btn.className = className;
-    btn.setAttribute('aria-label', ariaLabel);
-    btn.textContent = text;
-    btn.addEventListener('click', onClick);
-    return btn;
-  }
-
   // --- Copy to clipboard ---
 
-  private renderCopyButton(panel: HTMLElement, link: ResolvedLink): void {
-    const btn = this.createButton(CSS.copyBtn, ICON_COPY, ARIA.copyLabel, () => {
+  private renderCopyButton(container: HTMLElement, link: ResolvedLink): void {
+    const btn = this.createButton('copy-btn', ICON_COPY, 'Copy to clipboard', () => {
       const text = this.buildClipboardText(link);
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = COPY_DONE_LABEL;
-        btn.classList.add(CSS.copyDone);
+        btn.classList.add('done');
         setTimeout(() => {
           btn.textContent = ICON_COPY;
-          btn.classList.remove(CSS.copyDone);
+          btn.classList.remove('done');
         }, COPY_DONE_DURATION);
       });
     });
-    panel.appendChild(btn);
+    container.appendChild(btn);
   }
 
   private buildClipboardText(link: ResolvedLink): string {
@@ -1039,23 +995,20 @@ export class AlapLens implements CoordinatedRenderer {
   // --- Tag switch tooltip ---
 
   private showTagTooltip(tag: string): void {
-    const counter = this.overlay?.querySelector(`.${CSS.counter}`) as HTMLElement | null;
+    const counter = this.overlay?.querySelector('.counter') as HTMLElement | null;
     if (!counter) return;
 
     const HALF = 500;
     const original = counter.textContent;
 
-    // Fade out
     counter.style.opacity = '0';
 
-    // Midway: swap text, fade in
     setTimeout(() => {
       if (!counter.isConnected) return;
       counter.textContent = `switching to .${tag}`;
       counter.classList.add('tag-tooltip');
       counter.style.opacity = '1';
 
-      // Hold, then fade out and restore
       setTimeout(() => {
         if (!counter.isConnected) return;
         counter.style.opacity = '0';
@@ -1070,56 +1023,22 @@ export class AlapLens implements CoordinatedRenderer {
     }, HALF);
   }
 
-  // --- Keyboard ---
+  // --- Image zoom ---
 
-  private onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      this.close();
-    } else if (e.key === 'ArrowLeft') {
-      this.navigate(-1);
-    } else if (e.key === 'ArrowRight') {
-      this.navigate(1);
-    }
-  }
-
-  /**
-   * Jump directly to an item by index (used by set navigator).
-   * Applies the current transition mode.
-   */
-  private jumpTo(index: number): void {
-    if (index === this.currentIndex || this.transitioning) return;
-
-    if (this.transition === 'none') {
-      this.currentIndex = index;
-      this.render();
-      return;
-    }
-
-    if (this.transition === 'resize') {
-      this.navigateResize(index);
-      return;
-    }
-
-    this.navigateFade(index);
-  }
-
-  /**
-   * Open a fullscreen zoom overlay for an image.
-   * Escape closes zoom without closing the lens (capture-phase handler).
-   */
   private openZoom(src: string): void {
     const zoomOverlay = document.createElement('div');
-    zoomOverlay.className = CSS.zoomOverlay;
+    zoomOverlay.className = 'zoom-overlay';
+    zoomOverlay.setAttribute('part', 'zoom-overlay');
 
     const zoomImg = document.createElement('img');
-    zoomImg.className = CSS.zoomImage;
+    zoomImg.className = 'zoom-image';
     zoomImg.src = src;
 
     const dismissZoom = () => {
       document.removeEventListener('keydown', zoomKeyHandler, true);
-      zoomOverlay.classList.remove(CSS.zoomVisible);
-      const duration = parseFloat(getComputedStyle(zoomOverlay).transitionDuration);
-      if (duration > 0) {
+      zoomOverlay.classList.remove('visible');
+      const dur = parseFloat(getComputedStyle(zoomOverlay).transitionDuration);
+      if (dur > 0) {
         zoomOverlay.addEventListener('transitionend', () => zoomOverlay.remove(), { once: true });
       } else {
         zoomOverlay.remove();
@@ -1136,23 +1055,43 @@ export class AlapLens implements CoordinatedRenderer {
     zoomOverlay.addEventListener('click', dismissZoom);
     document.addEventListener('keydown', zoomKeyHandler, true);
 
-    document.body.appendChild(zoomOverlay);
+    this.shadowRoot!.appendChild(zoomOverlay);
     zoomOverlay.appendChild(zoomImg);
 
     void zoomOverlay.offsetHeight;
-    zoomOverlay.classList.add(CSS.zoomVisible);
+    zoomOverlay.classList.add('visible');
   }
 
-  /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
-  setPlacement(placement: Placement | null): void {
-    this.placement = placement;
-  }
+  // --- Keyboard ---
 
-  destroy(): void {
-    this.close();
-    const triggers = document.querySelectorAll<HTMLElement>(this.selector);
-    for (const trigger of triggers) {
-      trigger.removeAttribute('role');
+  private onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      this.close();
+    } else if (e.key === 'ArrowLeft') {
+      this.navigate(-1);
+    } else if (e.key === 'ArrowRight') {
+      this.navigate(1);
     }
+  }
+
+  // --- Utilities ---
+
+  private createButton(className: string, text: string, ariaLabel: string, onClick: () => void): HTMLButtonElement {
+    const btn = document.createElement('button');
+    if (className) btn.className = className;
+    btn.setAttribute('aria-label', ariaLabel);
+    btn.textContent = text;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+}
+
+/**
+ * Define the custom element. Call this once at startup.
+ * Safe to call multiple times — subsequent calls are no-ops.
+ */
+export function defineAlapLens(tagName = 'alap-lens'): void {
+  if (!customElements.get(tagName)) {
+    customElements.define(tagName, AlapLensElement);
   }
 }

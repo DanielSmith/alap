@@ -266,36 +266,36 @@ describe('AlapLens', () => {
       expect(desc!.textContent).toContain('hackers and technology');
     });
 
-    it('renders thumbnail from thumbnail field', () => {
+    it('renders image from thumbnail field', () => {
       const trigger = createTrigger('t1', 'mrrobot');
       lens = new AlapLens(lensTestConfig);
       clickTrigger(trigger);
 
-      const img = getPanel()!.querySelector('.alap-lens-thumbnail') as HTMLImageElement;
+      const img = getPanel()!.querySelector('.alap-lens-image') as HTMLImageElement;
       expect(img).not.toBeNull();
       expect(img.src).toBe('https://example.com/images/mrrobot.jpg');
       expect(img.alt).toBe('Mr. Robot');
     });
 
-    it('renders thumbnail from image field when thumbnail is absent', () => {
+    it('renders image from image field when thumbnail is absent', () => {
       const trigger = createTrigger('t1', 'banana');
       lens = new AlapLens(lensTestConfig);
       clickTrigger(trigger);
 
-      const img = getPanel()!.querySelector('.alap-lens-thumbnail') as HTMLImageElement;
+      const img = getPanel()!.querySelector('.alap-lens-image') as HTMLImageElement;
       expect(img).not.toBeNull();
       expect(img.src).toBe('https://example.com/images/banana.jpg');
       expect(img.alt).toBe('A frozen banana stand');
     });
 
-    it('adds empty class to thumb wrap when no image', () => {
+    it('adds empty class to image wrap when no image', () => {
       const trigger = createTrigger('t1', 'minimal');
       lens = new AlapLens(lensTestConfig);
       clickTrigger(trigger);
 
-      const thumbWrap = getPanel()!.querySelector('.alap-lens-thumb-wrap');
+      const thumbWrap = getPanel()!.querySelector('.alap-lens-image-wrap');
       expect(thumbWrap).not.toBeNull();
-      expect(thumbWrap!.classList.contains('alap-lens-thumb-wrap-empty')).toBe(true);
+      expect(thumbWrap!.classList.contains('alap-lens-image-wrap-empty')).toBe(true);
       expect(thumbWrap!.querySelector('img')).toBeNull();
     });
 

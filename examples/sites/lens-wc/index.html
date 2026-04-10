@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Lens Web Component</title>
+  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/nav.css">
+  <style>
+    alap-lens {
+      color: #88bbff;
+      text-decoration: underline;
+      text-decoration-color: rgba(136, 187, 255, 0.3);
+      cursor: pointer;
+    }
+    alap-lens:hover {
+      color: #fff;
+      text-decoration-color: #fff;
+    }
+  </style>
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+  <h1>Lens Web Component</h1>
+  <p>The <code>&lt;alap-lens&gt;</code> custom element renders the same detail panel
+    as the DOM lens, but uses shadow DOM for style encapsulation.
+    Same config, same data, fully stylable via CSS custom properties and <code>::part()</code>.</p>
+
+  <h2>Cities &amp; Landmarks</h2>
+  <div class="example">
+    <p>Inspect
+      <alap-lens query=".landmark">all landmarks</alap-lens>,
+      just the
+      <alap-lens query=".bridge">bridges</alap-lens>,
+      or
+      <alap-lens query=".park">parks</alap-lens>.
+    </p>
+  </div>
+
+  <h3>By City</h3>
+  <div class="example">
+    <p>
+      <alap-lens query=".nyc">NYC</alap-lens> &middot;
+      <alap-lens query=".sf">SF</alap-lens> &middot;
+      <alap-lens query=".london">London</alap-lens> &middot;
+      <alap-lens query=".paris">Paris</alap-lens> &middot;
+      <alap-lens query=".berlin">Berlin</alap-lens> &middot;
+      <alap-lens query=".chicago">Chicago</alap-lens> &middot;
+      <alap-lens query=".la">LA</alap-lens> &middot;
+      <alap-lens query=".sydney">Sydney</alap-lens> &middot;
+      <alap-lens query=".seattle">Seattle</alap-lens> &middot;
+      <alap-lens query=".portland">Portland</alap-lens> &middot;
+      <alap-lens query=".tokyo">Tokyo</alap-lens> &middot;
+      <alap-lens query=".seoul">Seoul</alap-lens> &middot;
+      <alap-lens query=".melbourne">Melbourne</alap-lens> &middot;
+      <alap-lens query=".shanghai">Shanghai</alap-lens> &middot;
+      <alap-lens query=".mumbai">Mumbai</alap-lens> &middot;
+      <alap-lens query=".detroit">Detroit</alap-lens>
+    </p>
+  </div>
+
+  <h3>Expressions</h3>
+  <div class="example">
+    <p>
+      <alap-lens query=".bridge + .landmark">landmark bridges</alap-lens> &middot;
+      <alap-lens query=".park - .nyc">parks outside NYC</alap-lens> &middot;
+      <alap-lens query=".nyc | .sf">NYC + SF combined</alap-lens> &middot;
+      <alap-lens query="@everything">everything</alap-lens>
+    </p>
+  </div>
+
+  <h2>Pok&eacute;mon</h2>
+  <div class="example">
+    <p>
+      <alap-lens query=".pokemon">all Pok&eacute;mon</alap-lens> &middot;
+      <alap-lens query=".fire">fire type</alap-lens> &middot;
+      <alap-lens query=".ghost">ghost type</alap-lens> &middot;
+      <alap-lens query=".normal">normal type</alap-lens>
+    </p>
+    <p class="section-note">Stats, types, abilities, and flavor text from PokeAPI.</p>
+  </div>
+
+  <h2>NASA Astronomy Picture of the Day</h2>
+  <div class="example">
+    <p>
+      <alap-lens query=".nasa">all NASA</alap-lens> &middot;
+      <alap-lens query=".galaxy">galaxies</alap-lens> &middot;
+      <alap-lens query=".nebula">nebulae</alap-lens> &middot;
+      <alap-lens query=".meteor">meteors</alap-lens> &middot;
+      <alap-lens query=".comet">comets</alap-lens>
+    </p>
+    <p class="section-note">Real data from NASA's public API.</p>
+  </div>
+
+  <h2>Coffee</h2>
+  <div class="example">
+    <p>
+      <alap-lens query=".coffee">all roasters</alap-lens>
+    </p>
+  </div>
+
+  <h2>Fruit Data (no URLs)</h2>
+  <div class="example">
+    <p>Browse
+      <alap-lens query=".fruit">all fruit</alap-lens>
+      or just
+      <alap-lens query=".rosaceae">rosaceae family</alap-lens>.
+    </p>
+    <p class="section-note">These items have no destination URL &mdash; the data itself is the content.</p>
+  </div>
+
+  <h2>TV Shows</h2>
+  <div class="example">
+    <p>
+      <alap-lens query=".tv">TV shows</alap-lens>
+      with booleans, long descriptions, and link arrays.
+    </p>
+  </div>
+
+  <h2>Options via Attributes</h2>
+  <div class="example">
+    <p>With close button:
+      <alap-lens query=".tv" panel-close-button>TV shows</alap-lens>
+    </p>
+    <p>Custom visit label:
+      <alap-lens query="mrrobot" visit-label="Open &rarr;">Mr. Robot</alap-lens>
+    </p>
+    <p>No copy button:
+      <alap-lens query=".coffee" copyable="false">coffee</alap-lens>
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
