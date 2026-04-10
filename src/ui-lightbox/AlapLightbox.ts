@@ -18,10 +18,26 @@ import { AlapEngine } from '../core/AlapEngine';
 import type { AlapConfig, ResolvedLink } from '../core/types';
 import { RENDERER_LIGHTBOX } from '../ui/shared/coordinatedRenderer';
 import type { CoordinatedRenderer, OpenPayload } from '../ui/shared/coordinatedRenderer';
+import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
+import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
+import { openImageZoom } from '../ui/shared/imageZoom';
+import type { Placement } from '../ui/shared/placement';
+import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { createSetNavigator } from '../ui/shared/setNavigator';
+import type { SetNavHandle } from '../ui/shared/setNavigator';
 
 export interface AlapLightboxOptions {
   /** CSS selector for trigger elements. Default: '.alap' */
   selector?: string;
+  /**
+   * Viewport placement for the overlay panel. Uses compass directions.
+   * - 'C': centered (default)
+   * - 'N': anchored to top
+   * - 'S': anchored to bottom
+   * - 'NE', 'NW', 'SE', 'SW': corner anchoring
+   * - 'E', 'W': vertically centered, horizontally anchored
+   */
+  placement?: Placement;
 }
 
 /**
@@ -37,16 +53,19 @@ export class AlapLightbox implements CoordinatedRenderer {
 
   private engine: AlapEngine;
   private selector: string;
+  private placement: Placement | null;
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
   private currentIndex = 0;
   private activeTrigger: HTMLElement | null = null;
+  private setNavHandle: SetNavHandle | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
   constructor(config: AlapConfig, options: AlapLightboxOptions = {}) {
     this.engine = new AlapEngine(config);
     this.selector = options.selector ?? '.alap';
+    this.placement = options.placement ?? null;
     this.handleKeydown = this.onKeydown.bind(this);
     this.init();
   }
@@ -99,16 +118,17 @@ export class AlapLightbox implements CoordinatedRenderer {
     this.overlay.setAttribute('aria-modal', 'true');
     this.overlay.setAttribute('aria-label', 'Link preview');
 
+    if (this.placement) {
+      this.overlay.style.alignItems = OVERLAY_ALIGN[this.placement];
+      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[this.placement];
+    }
+
     this.overlay.addEventListener('click', (e) => {
       if (e.target === this.overlay) this.close();
     });
 
     this.render();
-    document.body.appendChild(this.overlay);
-
-    // Fade in
-    void this.overlay.offsetHeight;
-    this.overlay.classList.add('alap-lightbox-visible');
+    fadeIn(this.overlay, document.body, 'alap-lightbox-visible');
 
     document.addEventListener('keydown', this.handleKeydown);
   }
@@ -119,14 +139,7 @@ export class AlapLightbox implements CoordinatedRenderer {
       const overlay = this.overlay;
       this.overlay = null;
 
-      // Fade out, then remove
-      overlay.classList.remove('alap-lightbox-visible');
-      const duration = parseFloat(getComputedStyle(overlay).transitionDuration);
-      if (duration > 0) {
-        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-      } else {
-        overlay.remove();
-      }
+      fadeOut(overlay, 'alap-lightbox-visible');
     }
     document.removeEventListener('keydown', this.handleKeydown);
     this.activeTrigger = null;
@@ -197,193 +210,23 @@ export class AlapLightbox implements CoordinatedRenderer {
     counterWrap.appendChild(counterText);
 
     if (this.links.length > 1) {
-      const setNav = document.createElement('div');
-      setNav.className = 'alap-lightbox-setnav';
-
-      const setList = document.createElement('ul');
-      setList.className = 'alap-lightbox-setnav-list';
-      setList.setAttribute('role', 'listbox');
-
-      for (let i = 0; i < this.links.length; i++) {
-        const item = this.links[i];
-        const li = document.createElement('li');
-        li.className = 'alap-lightbox-setnav-item';
-        li.setAttribute('role', 'option');
-        li.setAttribute('data-index', String(i));
-        li.textContent = item.label ?? item.id;
-        li.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.jumpTo(i);
-        });
-        setList.appendChild(li);
-      }
-
-      setNav.appendChild(setList);
-
-      // Filter input — below the menu so it stays in a fixed position
-      const filterWrap = document.createElement('div');
-      filterWrap.className = 'alap-lightbox-setnav-filter-wrap';
-
-      const filterInput = document.createElement('input');
-      filterInput.className = 'alap-lightbox-setnav-filter';
-      filterInput.type = 'text';
-      filterInput.placeholder = 'Filter\u2026';
-      filterInput.setAttribute('aria-label', 'Filter items');
-      filterWrap.appendChild(filterInput);
-
-      const clearBtn = document.createElement('button');
-      clearBtn.className = 'alap-lightbox-setnav-clear';
-      clearBtn.setAttribute('aria-label', 'Clear filter');
-      clearBtn.textContent = '\u00d7';
-      clearBtn.style.display = 'none';
-      clearBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        filterInput.value = '';
-        filterInput.dispatchEvent(new Event('input'));
-        filterInput.focus();
+      this.setNavHandle = createSetNavigator({
+        counterWrap,
+        counterText,
+        links: this.links,
+        currentIndex: this.currentIndex,
+        onJump: (i) => this.jumpTo(i),
+        css: {
+          setnav: 'alap-lightbox-setnav',
+          list: 'alap-lightbox-setnav-list',
+          item: 'alap-lightbox-setnav-item',
+          filterWrap: 'alap-lightbox-setnav-filter-wrap',
+          filter: 'alap-lightbox-setnav-filter',
+          clear: 'alap-lightbox-setnav-clear',
+        },
+        closeIcon: '\u00d7',
+        hoverHint: 'swap',
       });
-      filterWrap.appendChild(clearBtn);
-
-      setNav.appendChild(filterWrap);
-      counterWrap.appendChild(setNav);
-
-      // Make setnav focusable so it can capture keystrokes directly
-      setNav.setAttribute('tabindex', '-1');
-
-      const counterLabel = () => `${this.currentIndex + 1} / ${this.links.length}`;
-
-      const hideNav = () => {
-        setNav.classList.remove('open');
-        counterText.textContent = counterLabel();
-        filterInput.value = '';
-        filterInput.dispatchEvent(new Event('input'));
-      };
-
-      setNav.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          e.stopPropagation();
-          hideNav();
-          return;
-        }
-        if (document.activeElement === filterInput) return;
-        if (handleNavKeys(e)) return;
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-          filterInput.focus();
-        }
-      });
-
-      // Hover hints "menu...", click opens the popup
-      counterText.style.cursor = 'pointer';
-      counterWrap.addEventListener('mouseenter', () => {
-        if (!setNav.classList.contains('open')) {
-          counterText.textContent = 'menu\u2026';
-        }
-      });
-      counterWrap.addEventListener('mouseleave', () => {
-        if (!setNav.classList.contains('open')) {
-          counterText.textContent = counterLabel();
-        }
-      });
-      counterText.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (setNav.classList.contains('open')) {
-          hideNav();
-        } else {
-          setNav.classList.add('open');
-          setNav.focus();
-        }
-      });
-
-      // Dismiss delay when leaving the open popup so mouse can cross gaps
-      let dismissTimer: ReturnType<typeof setTimeout> | null = null;
-      const DISMISS_DELAY = 300;
-
-      setNav.addEventListener('mouseleave', () => {
-        if (dismissTimer) clearTimeout(dismissTimer);
-        dismissTimer = setTimeout(hideNav, DISMISS_DELAY);
-      });
-      setNav.addEventListener('mouseenter', () => {
-        if (dismissTimer) { clearTimeout(dismissTimer); dismissTimer = null; }
-      });
-
-      // Greedy regex filter — matches against label, id, tags, description
-      filterInput.addEventListener('input', () => {
-        const raw = filterInput.value.trim();
-        clearBtn.style.display = raw ? '' : 'none';
-
-        const items = setList.querySelectorAll<HTMLElement>('.alap-lightbox-setnav-item');
-        if (!raw) {
-          for (const item of items) item.style.display = '';
-          return;
-        }
-
-        let re: RegExp;
-        try {
-          re = new RegExp(raw, 'i');
-        } catch {
-          re = new RegExp(raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-        }
-
-        for (const item of items) {
-          const idx = Number(item.getAttribute('data-index'));
-          const link = this.links[idx];
-          const searchable = link.label ?? link.id;
-          item.style.display = re.test(searchable) ? '' : 'none';
-        }
-      });
-
-      // Keyboard navigation — shared by setnav and filter keydown
-      let highlightIdx = -1;
-
-      const getVisibleItems = (): HTMLElement[] =>
-        Array.from(setList.querySelectorAll<HTMLElement>('.alap-lightbox-setnav-item'))
-          .filter((el) => el.style.display !== 'none');
-
-      const updateHighlight = (visible: HTMLElement[]) => {
-        for (const item of setList.querySelectorAll<HTMLElement>('.alap-lightbox-setnav-item')) {
-          item.classList.remove('highlighted');
-        }
-        if (highlightIdx >= 0 && highlightIdx < visible.length) {
-          visible[highlightIdx].classList.add('highlighted');
-          visible[highlightIdx].scrollIntoView({ block: 'nearest' });
-        }
-      };
-
-      const handleNavKeys = (e: KeyboardEvent): boolean => {
-        const visible = getVisibleItems();
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          highlightIdx = Math.min(highlightIdx + 1, visible.length - 1);
-          updateHighlight(visible);
-          return true;
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          highlightIdx = Math.max(highlightIdx - 1, 0);
-          updateHighlight(visible);
-          return true;
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          const target = highlightIdx >= 0 ? highlightIdx : (visible.length === 1 ? 0 : -1);
-          if (target >= 0 && target < visible.length) {
-            const idx = Number(visible[target].getAttribute('data-index'));
-            this.jumpTo(idx);
-          }
-          return true;
-        }
-        return false;
-      };
-
-      // Reset highlight when filter changes
-      filterInput.addEventListener('input', () => {
-        highlightIdx = -1;
-      });
-
-      filterInput.addEventListener('keydown', (e) => {
-        e.stopPropagation();
-        if (handleNavKeys(e)) return;
-        if (e.key === 'Escape') hideNav();
-      });
-
     }
 
     body.appendChild(counterWrap);
@@ -474,14 +317,12 @@ export class AlapLightbox implements CoordinatedRenderer {
     visitBtn.href = link.url;
     visitBtn.target = link.targetWindow ?? '_blank';
 
-    // Counter
-    counter.textContent = total > 1 ? `${this.currentIndex + 1} / ${total}` : '';
-
-    // Highlight active item in set navigator
-    const setNavItems = card.querySelectorAll<HTMLElement>('.alap-lightbox-setnav-item');
-    for (const item of setNavItems) {
-      const idx = Number(item.getAttribute('data-index'));
-      item.classList.toggle('active', idx === this.currentIndex);
+    // Counter + set navigator
+    if (this.setNavHandle) {
+      this.setNavHandle.updateCounter(this.currentIndex, total);
+      this.setNavHandle.setActive(this.currentIndex);
+    } else {
+      counter.textContent = total > 1 ? `${this.currentIndex + 1} / ${total}` : '';
     }
   }
 
@@ -513,49 +354,26 @@ export class AlapLightbox implements CoordinatedRenderer {
   }
 
   private onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      this.close();
-    } else if (e.key === 'ArrowLeft') {
-      this.navigate(-1);
-    } else if (e.key === 'ArrowRight') {
-      this.navigate(1);
-    }
+    handleOverlayKeydown(e, {
+      close: () => this.close(),
+      prev: () => this.navigate(-1),
+      next: () => this.navigate(1),
+    });
   }
 
   private openZoom(src: string): void {
-    const zoomOverlay = document.createElement('div');
-    zoomOverlay.className = 'alap-lightbox-zoom-overlay';
+    openImageZoom({
+      container: document.body,
+      src,
+      overlayClass: 'alap-lightbox-zoom-overlay',
+      imageClass: 'alap-lightbox-zoom-image',
+      visibleClass: 'alap-lightbox-zoom-visible',
+    });
+  }
 
-    const zoomImg = document.createElement('img');
-    zoomImg.className = 'alap-lightbox-zoom-image';
-    zoomImg.src = src;
-
-    const dismissZoom = () => {
-      document.removeEventListener('keydown', zoomKeyHandler, true);
-      zoomOverlay.classList.remove('alap-lightbox-zoom-visible');
-      const duration = parseFloat(getComputedStyle(zoomOverlay).transitionDuration);
-      if (duration > 0) {
-        zoomOverlay.addEventListener('transitionend', () => zoomOverlay.remove(), { once: true });
-      } else {
-        zoomOverlay.remove();
-      }
-    };
-
-    const zoomKeyHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        dismissZoom();
-      }
-    };
-
-    zoomOverlay.addEventListener('click', dismissZoom);
-    document.addEventListener('keydown', zoomKeyHandler, true);
-
-    document.body.appendChild(zoomOverlay);
-    zoomOverlay.appendChild(zoomImg);
-
-    void zoomOverlay.offsetHeight;
-    zoomOverlay.classList.add('alap-lightbox-zoom-visible');
+  /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
+  setPlacement(placement: Placement | null): void {
+    this.placement = placement;
   }
 
   destroy(): void {

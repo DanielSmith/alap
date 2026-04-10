@@ -17,6 +17,43 @@
       color: #fff;
       text-decoration-color: #fff;
     }
+
+    .placement-details {
+      margin: 1.5rem 0;
+      border: 1px solid #2e48a0;
+      border-radius: 10px;
+      background: rgba(21, 37, 112, 0.4);
+      padding: 0;
+    }
+    .placement-details summary {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      color: #aac4f0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      list-style: none;
+    }
+    .placement-details summary::before {
+      content: '\25b6';
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-size: 0.7rem;
+      transition: transform 0.2s;
+    }
+    .placement-details[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .placement-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .placement-details[open] > .compass-section {
+      padding: 0 1.25rem 1.25rem;
+    }
+    .compass-section p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body class="has-site-nav">
@@ -125,6 +162,22 @@
       with booleans, long descriptions, and link arrays.
     </p>
   </div>
+
+  <details class="placement-details">
+    <summary>Panel Placement</summary>
+    <div class="compass-section">
+      <p>The <code>placement</code> attribute anchors the panel to a viewport edge.
+        Compass directions: N, NE, E, SE, S, SW, W, NW, C (centered, the default).</p>
+      <p>
+        <alap-lens query=".landmark" placement="N">top</alap-lens> &middot;
+        <alap-lens query=".landmark" placement="NE">top-right</alap-lens> &middot;
+        <alap-lens query=".landmark" placement="S">bottom</alap-lens> &middot;
+        <alap-lens query=".landmark" placement="SW">bottom-left</alap-lens> &middot;
+        <alap-lens query=".landmark" placement="W">left</alap-lens> &middot;
+        <alap-lens query=".landmark">centered (default)</alap-lens>
+      </p>
+    </div>
+  </details>
 
   <h2>Options via Attributes</h2>
   <div class="example">

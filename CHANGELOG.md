@@ -4,6 +4,25 @@ All notable changes to Alap will be documented in this file.
 
 ## [3.1.0-dev] — 2026-04-09
 
+### Shared code refactoring: lightbox + lens (2026-04-09)
+
+- Extracted 5 shared modules from lightbox and lens (DOM + WC = 4 consumer files) into `src/ui/shared/`:
+  - `overlayKeyboard.ts` — Escape/Arrow key dispatch for overlay components
+  - `overlayTransition.ts` — fadeIn/fadeOut with reflow trick and transitionend cleanup
+  - `imageZoom.ts` — full-viewport image zoom overlay with click/Escape dismiss
+  - `setNavigator.ts` — counter display + filterable popup list for set navigation
+  - `overlayPlacement.ts` — compass-direction → flexbox alignment maps for viewport placement
+- CSS transition helpers (`cssTransition.ts`) evaluated and intentionally kept inline — lightbox and lens transition logic differs enough to not benefit from extraction
+- All shared modules support both `document.body` (DOM) and `ShadowRoot` (WC) via `Node`-typed container parameters
+- Set navigator factory accepts configurable CSS class names, `::part()` attributes, hover hint style (`'swap'` vs `'crossfade'`), and shadow DOM `activeElement` callback
+
+### Lightbox placement parity (2026-04-09)
+
+- `AlapLightbox` (DOM) now accepts `placement` option and `setPlacement()` method for viewport positioning
+- `AlapLightboxElement` (WC) now accepts `placement` attribute — same compass directions as lens (N/NE/E/SE/S/SW/W/NW/C)
+- Both use shared `OVERLAY_ALIGN`/`OVERLAY_JUSTIFY` maps from `overlayPlacement.ts`
+- Previously placement was lens-only; now all overlay components support it
+
 ### Lens web component (2026-04-09)
 
 - New `<alap-lens>` custom element (`src/ui-lens/AlapLensElement.ts`)

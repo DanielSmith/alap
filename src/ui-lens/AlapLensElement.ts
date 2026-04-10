@@ -17,6 +17,12 @@
 import type { ResolvedLink } from '../core/types';
 import { warn } from '../core/logger';
 import { getEngine } from '../ui/shared/configRegistry';
+import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
+import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
+import { openImageZoom } from '../ui/shared/imageZoom';
+import { createSetNavigator } from '../ui/shared/setNavigator';
+import type { SetNavHandle } from '../ui/shared/setNavigator';
 import { STYLES } from './lens-element.css';
 
 // --- Constants ---
@@ -71,6 +77,7 @@ export class AlapLensElement extends HTMLElement {
   private justClosed = false;
   private transitioning = false;
   private activeTag: string | null = null;
+  private setNavHandle: SetNavHandle | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
@@ -208,19 +215,9 @@ export class AlapLensElement extends HTMLElement {
 
     // Apply placement
     const p = this.placement;
-    if (p) {
-      const alignMap: Record<string, string> = {
-        N: 'flex-start', NE: 'flex-start', NW: 'flex-start',
-        S: 'flex-end',   SE: 'flex-end',   SW: 'flex-end',
-        E: 'center',     W: 'center',      C: 'center',
-      };
-      const justifyMap: Record<string, string> = {
-        N: 'center',     S: 'center',      C: 'center',
-        NE: 'flex-end',  E: 'flex-end',    SE: 'flex-end',
-        NW: 'flex-start', W: 'flex-start', SW: 'flex-start',
-      };
-      if (alignMap[p]) this.overlay.style.alignItems = alignMap[p];
-      if (justifyMap[p]) this.overlay.style.justifyContent = justifyMap[p];
+    if (p && p in OVERLAY_ALIGN) {
+      this.overlay.style.alignItems = OVERLAY_ALIGN[p as keyof typeof OVERLAY_ALIGN];
+      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[p as keyof typeof OVERLAY_JUSTIFY];
     }
 
     this.overlay.addEventListener('click', (e) => {
@@ -228,10 +225,7 @@ export class AlapLensElement extends HTMLElement {
     });
 
     this.render();
-    this.shadowRoot!.appendChild(this.overlay);
-
-    void this.overlay.offsetHeight;
-    this.overlay.classList.add('visible');
+    fadeIn(this.overlay, this.shadowRoot!, 'visible');
 
     this.isOpen = true;
     this.setAttribute('aria-expanded', 'true');
@@ -247,13 +241,7 @@ export class AlapLensElement extends HTMLElement {
     this.justClosed = true;
     requestAnimationFrame(() => { this.justClosed = false; });
 
-    overlay.classList.remove('visible');
-    const duration = parseFloat(getComputedStyle(overlay).transitionDuration);
-    if (duration > 0) {
-      overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-    } else {
-      overlay.remove();
-    }
+    fadeOut(overlay, 'visible');
     this.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', this.handleKeydown);
   }
@@ -463,7 +451,6 @@ export class AlapLensElement extends HTMLElement {
     prevBtn.setAttribute('part', 'nav-prev');
     nav.appendChild(prevBtn);
 
-    // Counter wrap
     const counterWrap = document.createElement('div');
     counterWrap.className = 'counter-wrap';
     counterWrap.setAttribute('part', 'counter-wrap');
@@ -473,206 +460,24 @@ export class AlapLensElement extends HTMLElement {
     counterText.setAttribute('part', 'counter');
     counterWrap.appendChild(counterText);
 
-    // Set navigator popup
-    const setNav = document.createElement('div');
-    setNav.className = 'setnav';
-    setNav.setAttribute('part', 'setnav');
-    setNav.setAttribute('tabindex', '-1');
-
-    const setList = document.createElement('ul');
-    setList.className = 'setnav-list';
-    setList.setAttribute('role', 'listbox');
-
-    for (let i = 0; i < this.links.length; i++) {
-      const item = this.links[i];
-      const li = document.createElement('li');
-      li.className = 'setnav-item';
-      li.setAttribute('role', 'option');
-      li.setAttribute('data-index', String(i));
-      li.textContent = item.label ?? item.id;
-      if (i === this.currentIndex) li.classList.add('active');
-      li.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.jumpTo(i);
-      });
-      setList.appendChild(li);
-    }
-
-    setNav.appendChild(setList);
-
-    // Filter input
-    const filterWrap = document.createElement('div');
-    filterWrap.className = 'setnav-filter-wrap';
-
-    const filterInput = document.createElement('input');
-    filterInput.className = 'setnav-filter';
-    filterInput.setAttribute('part', 'setnav-filter');
-    filterInput.type = 'text';
-    filterInput.placeholder = 'Filter\u2026';
-    filterInput.setAttribute('aria-label', 'Filter items');
-    filterWrap.appendChild(filterInput);
-
-    const clearBtn = document.createElement('button');
-    clearBtn.className = 'setnav-clear';
-    clearBtn.setAttribute('aria-label', 'Clear filter');
-    clearBtn.textContent = ICON_CLOSE;
-    clearBtn.style.display = 'none';
-    clearBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      filterInput.value = '';
-      filterInput.dispatchEvent(new Event('input'));
-      filterInput.focus();
-    });
-    filterWrap.appendChild(clearBtn);
-
-    setNav.appendChild(filterWrap);
-    counterWrap.appendChild(setNav);
-
-    const counterLabel = () => `${this.currentIndex + 1} / ${total}`;
-    counterText.textContent = counterLabel();
-
-    const hideNav = () => {
-      setNav.classList.remove('open');
-      counterText.textContent = counterLabel();
-      filterInput.value = '';
-      filterInput.dispatchEvent(new Event('input'));
-    };
-
-    // Setnav keydown
-    setNav.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        hideNav();
-        return;
-      }
-      if (document.activeElement === filterInput || this.shadowRoot?.activeElement === filterInput) return;
-      if (handleNavKeys(e)) return;
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        filterInput.focus();
-      }
-    });
-
-    // Hover hints — crossfade between counter label and "Menu"
-    counterText.style.cursor = 'pointer';
-    const HOVER_FADE = 250;
-
-    const crossfadeCounter = (text: string) => {
-      counterText.style.opacity = '0';
-      setTimeout(() => {
-        counterText.textContent = text;
-        counterText.style.opacity = '1';
-      }, HOVER_FADE);
-    };
-
-    counterWrap.addEventListener('mouseenter', () => {
-      if (!setNav.classList.contains('open')) {
-        crossfadeCounter('Menu');
-      }
-    });
-    counterWrap.addEventListener('mouseleave', () => {
-      if (!setNav.classList.contains('open')) {
-        crossfadeCounter(counterLabel());
-      }
-    });
-
-    // Click-to-open counter
-    counterText.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (setNav.classList.contains('open')) {
-        hideNav();
-      } else {
-        setNav.classList.add('open');
-        setNav.focus();
-      }
-    });
-
-    // Dismiss delay on mouseleave
-    let dismissTimer: ReturnType<typeof setTimeout> | null = null;
-    const DISMISS_DELAY = 300;
-
-    setNav.addEventListener('mouseleave', () => {
-      if (dismissTimer) clearTimeout(dismissTimer);
-      dismissTimer = setTimeout(hideNav, DISMISS_DELAY);
-    });
-    setNav.addEventListener('mouseenter', () => {
-      if (dismissTimer) { clearTimeout(dismissTimer); dismissTimer = null; }
-    });
-
-    // Filter — greedy regex match against label/id
-    filterInput.addEventListener('input', () => {
-      const raw = filterInput.value.trim();
-      clearBtn.style.display = raw ? '' : 'none';
-
-      const items = setList.querySelectorAll<HTMLElement>('.setnav-item');
-      if (!raw) {
-        for (const item of items) item.style.display = '';
-        return;
-      }
-
-      let re: RegExp;
-      try {
-        re = new RegExp(raw, 'i');
-      } catch {
-        re = new RegExp(raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      }
-
-      for (const item of items) {
-        const idx = Number(item.getAttribute('data-index'));
-        const link = this.links[idx];
-        const searchable = link.label ?? link.id;
-        item.style.display = re.test(searchable) ? '' : 'none';
-      }
-    });
-
-    // Keyboard navigation
-    let highlightIdx = -1;
-
-    const getVisibleItems = (): HTMLElement[] =>
-      Array.from(setList.querySelectorAll<HTMLElement>('.setnav-item'))
-        .filter((el) => el.style.display !== 'none');
-
-    const updateHighlight = (visible: HTMLElement[]) => {
-      for (const item of setList.querySelectorAll<HTMLElement>('.setnav-item')) {
-        item.classList.remove('highlighted');
-      }
-      if (highlightIdx >= 0 && highlightIdx < visible.length) {
-        visible[highlightIdx].classList.add('highlighted');
-        visible[highlightIdx].scrollIntoView({ block: 'nearest' });
-      }
-    };
-
-    const handleNavKeys = (e: KeyboardEvent): boolean => {
-      const visible = getVisibleItems();
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        highlightIdx = Math.min(highlightIdx + 1, visible.length - 1);
-        updateHighlight(visible);
-        return true;
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        highlightIdx = Math.max(highlightIdx - 1, 0);
-        updateHighlight(visible);
-        return true;
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const target = highlightIdx >= 0 ? highlightIdx : (visible.length === 1 ? 0 : -1);
-        if (target >= 0 && target < visible.length) {
-          const idx = Number(visible[target].getAttribute('data-index'));
-          this.jumpTo(idx);
-        }
-        return true;
-      }
-      return false;
-    };
-
-    filterInput.addEventListener('input', () => {
-      highlightIdx = -1;
-    });
-
-    filterInput.addEventListener('keydown', (e) => {
-      e.stopPropagation();
-      if (handleNavKeys(e)) return;
-      if (e.key === 'Escape') hideNav();
+    this.setNavHandle = createSetNavigator({
+      counterWrap,
+      counterText,
+      links: this.links,
+      currentIndex: this.currentIndex,
+      onJump: (i) => this.jumpTo(i),
+      css: {
+        setnav: 'setnav',
+        list: 'setnav-list',
+        item: 'setnav-item',
+        filterWrap: 'setnav-filter-wrap',
+        filter: 'setnav-filter',
+        clear: 'setnav-clear',
+      },
+      closeIcon: ICON_CLOSE,
+      hoverHint: 'crossfade',
+      parts: { setnav: 'setnav', filter: 'setnav-filter' },
+      getActiveElement: () => this.shadowRoot?.activeElement ?? null,
     });
 
     nav.appendChild(counterWrap);
@@ -1026,52 +831,24 @@ export class AlapLensElement extends HTMLElement {
   // --- Image zoom ---
 
   private openZoom(src: string): void {
-    const zoomOverlay = document.createElement('div');
-    zoomOverlay.className = 'zoom-overlay';
-    zoomOverlay.setAttribute('part', 'zoom-overlay');
-
-    const zoomImg = document.createElement('img');
-    zoomImg.className = 'zoom-image';
-    zoomImg.src = src;
-
-    const dismissZoom = () => {
-      document.removeEventListener('keydown', zoomKeyHandler, true);
-      zoomOverlay.classList.remove('visible');
-      const dur = parseFloat(getComputedStyle(zoomOverlay).transitionDuration);
-      if (dur > 0) {
-        zoomOverlay.addEventListener('transitionend', () => zoomOverlay.remove(), { once: true });
-      } else {
-        zoomOverlay.remove();
-      }
-    };
-
-    const zoomKeyHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        dismissZoom();
-      }
-    };
-
-    zoomOverlay.addEventListener('click', dismissZoom);
-    document.addEventListener('keydown', zoomKeyHandler, true);
-
-    this.shadowRoot!.appendChild(zoomOverlay);
-    zoomOverlay.appendChild(zoomImg);
-
-    void zoomOverlay.offsetHeight;
-    zoomOverlay.classList.add('visible');
+    openImageZoom({
+      container: this.shadowRoot!,
+      src,
+      overlayClass: 'zoom-overlay',
+      imageClass: 'zoom-image',
+      visibleClass: 'visible',
+      overlayPart: 'zoom-overlay',
+    });
   }
 
   // --- Keyboard ---
 
   private onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      this.close();
-    } else if (e.key === 'ArrowLeft') {
-      this.navigate(-1);
-    } else if (e.key === 'ArrowRight') {
-      this.navigate(1);
-    }
+    handleOverlayKeydown(e, {
+      close: () => this.close(),
+      prev: () => this.navigate(-1),
+      next: () => this.navigate(1),
+    });
   }
 
   // --- Utilities ---
