@@ -205,6 +205,7 @@ export class AlapLens implements CoordinatedRenderer {
   private transition: TransitionMode;
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
+  private originalLinks: ResolvedLink[] = [];
   private currentIndex = 0;
   private transitioning = false;
   private activeTrigger: HTMLElement | null = null;
@@ -252,6 +253,7 @@ export class AlapLens implements CoordinatedRenderer {
     this.links = this.engine.resolve(expression, anchorId);
     if (this.links.length === 0) return;
 
+    this.originalLinks = [...this.links];
     this.currentIndex = 0;
     this.activeTag = null;
     this.open();
@@ -267,7 +269,9 @@ export class AlapLens implements CoordinatedRenderer {
   openWith(payload: OpenPayload): void {
     if (payload.links.length === 0) return;
     this.links = payload.links;
+    this.originalLinks = [...payload.links];
     this.currentIndex = payload.initialIndex ?? 0;
+    this.activeTag = null;
     this.open();
     this.activeTrigger = payload.triggerElement ?? null;
   }
@@ -407,6 +411,14 @@ export class AlapLens implements CoordinatedRenderer {
           chip.style.cursor = 'pointer';
           chip.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (this.activeTag === tag) {
+              // Toggle off — restore original set
+              this.links = [...this.originalLinks];
+              this.currentIndex = 0;
+              this.activeTag = null;
+              this.render();
+              return;
+            }
             const resolved = this.engine.resolve(`.${tag}`);
             if (resolved.length === 0) return;
             this.links = resolved;

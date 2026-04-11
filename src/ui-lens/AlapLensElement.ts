@@ -72,6 +72,7 @@ const INTERNAL_META_KEYS = new Set([
 export class AlapLensElement extends HTMLElement {
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
+  private originalLinks: ResolvedLink[] = [];
   private currentIndex = 0;
   private isOpen = false;
   private justClosed = false;
@@ -189,6 +190,7 @@ export class AlapLensElement extends HTMLElement {
     this.links = engine.resolve(query, anchorId);
     if (this.links.length === 0) return;
 
+    this.originalLinks = [...this.links];
     this.currentIndex = 0;
     this.activeTag = null;
     this.open();
@@ -351,6 +353,14 @@ export class AlapLensElement extends HTMLElement {
           chip.textContent = tag;
           chip.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (this.activeTag === tag) {
+              // Toggle off — restore original set
+              this.links = [...this.originalLinks];
+              this.currentIndex = 0;
+              this.activeTag = null;
+              this.render();
+              return;
+            }
             const configName = this.getAttribute('config') ?? DEFAULT_CONFIG_KEY;
             const engine = getEngine(configName);
             if (!engine) return;

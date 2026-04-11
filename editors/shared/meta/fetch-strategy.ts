@@ -109,6 +109,7 @@ export const parseOembedResponse = (data: unknown): RawMeta => {
   const raw: RawMeta = {};
 
   if (typeof obj.title === 'string') raw.oembed_title = obj.title;
+  if (typeof obj.description === 'string') raw.oembed_description = obj.description;
   if (typeof obj.author_name === 'string') raw.oembed_author = obj.author_name;
   if (typeof obj.author_url === 'string') raw.oembed_author_url = obj.author_url;
   if (typeof obj.provider_name === 'string') raw.og_site_name = obj.provider_name;
