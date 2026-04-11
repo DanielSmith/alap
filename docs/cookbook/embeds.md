@@ -2,7 +2,7 @@
 
 **[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Lens Renderer](lens.md) · **This Page** | [All docs](../README.md)
 
-Alap's embed module renders sandboxed iframes for known providers with per-domain consent management. It works standalone or integrates with the lightbox and lens renderers.
+Alap's embed module renders iframes for known providers with per-domain consent management. It works standalone or integrates with the lightbox and lens renderers.
 
 > Live version: https://examples.alap.info/embed/
 
@@ -174,6 +174,6 @@ The `sandbox` attribute is intentionally omitted — YouTube and Spotify embed p
 
 Depending on policy, provider, and consent state, `createEmbed()` returns one of three elements:
 
-1. **`.alap-embed-wrap`** — sandboxed iframe for allowlisted domains with consent
+1. **`.alap-embed-wrap`** — iframe for allowlisted domains with consent
 2. **`.alap-embed-placeholder`** — clickable consent prompt with "Load" and "Always allow" buttons
 3. **`.alap-embed-link`** — plain `<a>` fallback for unknown domains or `block` policy

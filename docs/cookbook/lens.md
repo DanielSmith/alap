@@ -162,7 +162,7 @@ allLinks: {
 
 ## Embed rendering
 
-If an item has `meta.embed`, the lens renders a sandboxed iframe (or consent placeholder) in the meta zone, above the field list. The `embed` and `embedType` keys are filtered from the displayed fields. See [Embeds](embeds.md) for full details on providers, policies, and security.
+If an item has `meta.embed`, the lens renders an iframe (or consent placeholder) in the meta zone, above the field list. The `embed` and `embedType` keys are filtered from the displayed fields. See [Embeds](embeds.md) for full details on providers, policies, and security.
 
 ## Meta field auto-detection
 

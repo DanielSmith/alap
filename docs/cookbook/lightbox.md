@@ -42,7 +42,7 @@ Each item in the lightbox displays:
 - **Description** text
 - **Visit button** linking to the item's URL
 
-Items without an image but with `meta.embed` show a sandboxed iframe in the image area (see [Embeds](embeds.md)). Items with neither show a text-only panel with a transparent card background.
+Items without an image but with `meta.embed` show an iframe in the image area (see [Embeds](embeds.md)). Items with neither show a text-only panel with a transparent card background.
 
 ## Navigation
 

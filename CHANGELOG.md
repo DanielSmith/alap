@@ -6,10 +6,10 @@ All notable changes to Alap will be documented in this file.
 
 ### Embed module (2026-04-10)
 
-- New `src/ui-embed/` module for sandboxed iframe rendering with consent management
+- New `src/ui-embed/` module for iframe embedding with consent management
   - `embedAllowlist.ts` — provider registry with URL transforms for YouTube, Vimeo, Spotify, CodePen, CodeSandbox
   - `embedConsent.ts` — per-domain consent tracking via localStorage with three policies: `prompt` (default), `allow`, `block`
-  - `AlapEmbed.ts` — DOM builder producing one of three outputs: sandboxed iframe, consent placeholder, or plain link fallback
+  - `AlapEmbed.ts` — DOM builder producing one of three outputs: iframe wrapper, consent placeholder, or plain link fallback
   - `embed.css` — fully tokenized with 12 CSS custom properties (`--alap-embed-*`)
 - Security: Permissions Policy via `allow` attribute (matches YouTube/Spotify oembed specs), `referrerpolicy="strict-origin-when-cross-origin"`, `loading="lazy"`. No `sandbox` attribute — embed players (YouTube, Spotify) fail with Error 153 in sandboxed iframes
 - YouTube URLs transformed to `youtube-nocookie.com` for privacy

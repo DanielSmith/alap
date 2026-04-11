@@ -6,7 +6,7 @@
  * returns an HTMLElement that the caller (lens or lightbox) appends.
  *
  * Three possible outputs:
- *   1. Iframe wrapper — sandboxed iframe for allowlisted domains with consent
+ *   1. Iframe wrapper — iframe for allowlisted domains with consent
  *   2. Placeholder — clickable consent prompt, replaces itself with iframe on click
  *   3. Plain link — fallback for unknown domains or blocked policy
  */
@@ -85,7 +85,7 @@ function extractDomain(url: string): string {
 }
 
 /**
- * Build a sandboxed iframe element.
+ * Build an iframe element with Permissions Policy.
  */
 function createIframe(src: string, height: number, maxWidth: number): HTMLElement {
   const wrap = document.createElement('div');
