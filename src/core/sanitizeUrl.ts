@@ -36,3 +36,30 @@ export function sanitizeUrl(url: string): string {
 
   return url;
 }
+
+/**
+ * Sanitize a URL with configurable allowed schemes.
+ *
+ * First applies the standard dangerous-scheme blocklist via sanitizeUrl().
+ * Then, if allowedSchemes is provided, verifies the URL's scheme is in the list.
+ * Relative URLs (no scheme) always pass through.
+ *
+ * Default allowedSchemes: ['http', 'https']
+ */
+export function sanitizeUrlWithSchemes(url: string, allowedSchemes?: string[]): string {
+  const base = sanitizeUrl(url);
+  if (base === 'about:blank') return base;
+  if (!base) return base;
+
+  const schemes = allowedSchemes ?? ['http', 'https'];
+
+  // Check for a scheme in the URL
+  const schemeMatch = base.match(/^([a-zA-Z][a-zA-Z0-9+\-.]*)\s*:/);
+  if (schemeMatch) {
+    const scheme = schemeMatch[1].toLowerCase();
+    if (!schemes.includes(scheme)) return 'about:blank';
+  }
+
+  // Relative URLs pass through (no scheme to check)
+  return base;
+}

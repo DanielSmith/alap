@@ -15,7 +15,7 @@
  */
 
 import type { AlapLink } from '../core/types';
-import { DEFAULT_GENERATE_CACHE_TTL } from '../constants';
+import { DEFAULT_GENERATE_CACHE_TTL, MAX_CACHE_ENTRIES } from '../constants';
 
 interface CacheEntry {
   links: AlapLink[];
@@ -53,6 +53,20 @@ export class ProtocolCache {
   set(key: string, links: AlapLink[], ttlMinutes?: number): void {
     const ttl = ttlMinutes ?? this.defaultTTL;
     if (ttl <= 0) return;
+
+    // Evict oldest entry if at capacity
+    if (this.entries.size >= MAX_CACHE_ENTRIES && !this.entries.has(key)) {
+      let oldestKey: string | undefined;
+      let oldestExpiry = Infinity;
+      for (const [k, entry] of this.entries) {
+        if (entry.expiry < oldestExpiry) {
+          oldestExpiry = entry.expiry;
+          oldestKey = k;
+        }
+      }
+      if (oldestKey) this.entries.delete(oldestKey);
+    }
+
     this.entries.set(key, {
       links,
       expiry: Date.now() + ttl * 60 * 1000,

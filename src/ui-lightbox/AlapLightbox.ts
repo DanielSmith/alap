@@ -25,6 +25,8 @@ import type { Placement } from '../ui/shared/placement';
 import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
+import { createEmbed } from '../ui-embed/AlapEmbed';
+import type { EmbedPolicy } from '../ui-embed/embedConsent';
 
 export interface AlapLightboxOptions {
   /** CSS selector for trigger elements. Default: '.alap' */
@@ -38,6 +40,10 @@ export interface AlapLightboxOptions {
    * - 'E', 'W': vertically centered, horizontally anchored
    */
   placement?: Placement;
+  /** Embed consent policy. 'prompt' (default) asks before loading, 'allow' auto-loads, 'block' never loads. */
+  embedPolicy?: EmbedPolicy;
+  /** Override default embed provider allowlist. Only these domains will render as iframes. */
+  embedAllowlist?: string[];
 }
 
 /**
@@ -59,6 +65,9 @@ export class AlapLightbox implements CoordinatedRenderer {
   private currentIndex = 0;
   private activeTrigger: HTMLElement | null = null;
   private setNavHandle: SetNavHandle | null = null;
+  private transitioning = false;
+  private embedPolicy: EmbedPolicy;
+  private embedAllowlist: string[] | undefined;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
@@ -66,6 +75,8 @@ export class AlapLightbox implements CoordinatedRenderer {
     this.engine = new AlapEngine(config);
     this.selector = options.selector ?? '.alap';
     this.placement = options.placement ?? null;
+    this.embedPolicy = options.embedPolicy ?? 'prompt';
+    this.embedAllowlist = options.embedAllowlist;
     this.handleKeydown = this.onKeydown.bind(this);
     this.init();
   }
@@ -275,13 +286,28 @@ export class AlapLightbox implements CoordinatedRenderer {
     const visitBtn = card.querySelector('.alap-lightbox-visit') as HTMLAnchorElement;
     const counter = card.querySelector('.alap-lightbox-counter') as HTMLElement;
 
-    // Image
+    // Remove any previous embed from the image wrap
+    const prevEmbed = imageWrap.querySelector('.alap-embed-wrap, .alap-embed-placeholder, .alap-embed-link');
+    if (prevEmbed) prevEmbed.remove();
+
+    // Image or embed
+    const embedUrl = link.meta?.embed;
     if (hasImage) {
       img.src = link.image ?? link.thumbnail!;
       img.alt = link.altText ?? link.label ?? '';
       img.style.display = '';
       imageWrap.classList.remove('no-image');
       card.style.background = '';
+    } else if (typeof embedUrl === 'string' && embedUrl) {
+      img.style.display = 'none';
+      imageWrap.classList.remove('no-image');
+      card.style.background = '';
+      const embedType = link.meta?.embedType as 'video' | 'audio' | 'interactive' | undefined;
+      const embedEl = createEmbed(embedUrl, embedType, {
+        embedPolicy: this.embedPolicy,
+        embedAllowlist: this.embedAllowlist,
+      });
+      imageWrap.appendChild(embedEl);
     } else {
       img.style.display = 'none';
       imageWrap.classList.add('no-image');
@@ -327,29 +353,34 @@ export class AlapLightbox implements CoordinatedRenderer {
   }
 
   private jumpTo(index: number): void {
-    if (index === this.currentIndex) return;
+    if (index === this.currentIndex || this.transitioning) return;
     const card = this.overlay?.querySelector('.alap-lightbox-panel') as HTMLElement | null;
     if (!card) return;
 
+    this.transitioning = true;
     card.classList.add('fading');
     const duration = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
     setTimeout(() => {
       this.currentIndex = index;
       this.update();
       card.classList.remove('fading');
+      this.transitioning = false;
     }, duration);
   }
 
   private navigate(delta: number): void {
+    if (this.transitioning) return;
     const card = this.overlay?.querySelector('.alap-lightbox-panel') as HTMLElement | null;
     if (!card) return;
 
+    this.transitioning = true;
     card.classList.add('fading');
     const duration = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
     setTimeout(() => {
       this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
       this.update();
       card.classList.remove('fading');
+      this.transitioning = false;
     }, duration);
   }
 
@@ -374,6 +405,13 @@ export class AlapLightbox implements CoordinatedRenderer {
   /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
   setPlacement(placement: Placement | null): void {
     this.placement = placement;
+  }
+
+  /**
+   * Access the underlying engine for advanced operations like preResolve().
+   */
+  getEngine(): AlapEngine {
+    return this.engine;
   }
 
   destroy(): void {

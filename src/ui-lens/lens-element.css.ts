@@ -46,7 +46,7 @@ export const STYLES = `
     cursor: pointer;
     line-height: 1;
     opacity: var(--alap-lens-close-x-opacity, 0.7);
-    transition: opacity var(--alap-lens-transition, 0.15s);
+    transition: opacity var(--alap-lens-transition, 0.25s);
   }
 
   .close-x:hover {
@@ -93,7 +93,7 @@ export const STYLES = `
   .actions,
   .nav,
   .counter {
-    transition: opacity var(--alap-lens-transition, 0.15s) ease;
+    transition: opacity var(--alap-lens-transition, 0.25s) ease;
   }
 
   /* --- Top zone --- */
@@ -256,7 +256,7 @@ export const STYLES = `
     color: var(--alap-lens-meta-link-color, #88bbff);
     font-size: var(--alap-lens-meta-link-size, 0.85rem);
     text-decoration: none;
-    transition: color var(--alap-lens-transition, 0.15s);
+    transition: color var(--alap-lens-transition, 0.25s);
   }
 
   .meta-link:hover {
@@ -295,7 +295,7 @@ export const STYLES = `
     font-size: var(--alap-lens-visit-size, 0.9rem);
     font-weight: var(--alap-lens-visit-weight, 500);
     text-decoration: none;
-    transition: background var(--alap-lens-transition, 0.15s);
+    transition: background var(--alap-lens-transition, 0.25s);
   }
 
   .visit:hover {
@@ -310,7 +310,7 @@ export const STYLES = `
     border-radius: var(--alap-lens-visit-radius, 6px);
     font-size: var(--alap-lens-visit-size, 0.9rem);
     cursor: pointer;
-    transition: background var(--alap-lens-transition, 0.15s), color var(--alap-lens-transition, 0.15s);
+    transition: background var(--alap-lens-transition, 0.25s), color var(--alap-lens-transition, 0.25s);
   }
 
   .close-btn:hover {
@@ -344,7 +344,7 @@ export const STYLES = `
     align-items: center;
     justify-content: center;
     opacity: 0.25;
-    transition: background var(--alap-lens-transition, 0.15s), opacity 0.4s ease;
+    transition: background var(--alap-lens-transition, 0.25s), opacity 0.4s ease;
   }
 
   .nav:hover .nav-prev,
@@ -521,7 +521,7 @@ export const STYLES = `
     font-size: var(--alap-lens-copy-size, 1.2rem);
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--alap-lens-transition, 0.15s), color var(--alap-lens-transition, 0.15s);
+    transition: opacity var(--alap-lens-transition, 0.25s), color var(--alap-lens-transition, 0.25s);
   }
 
   .panel:hover .copy-btn {

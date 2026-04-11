@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>:json: Protocol — Menu</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info" target="alapExampleLaunch">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapExampleLaunch">&larr; Examples Gallery</a></p>
+
+  <h1>:json: + Menu</h1>
+  <p>External JSON APIs driving standard Alap menus. Click a trigger to see
+    live data from the API rendered as a navigable menu.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./menu.html" class="current">Menu</a>
+    <a href="./lightbox.html">Lightbox</a>
+    <a href="./lens.html">Lens</a>
+  </nav>
+
+  <!-- ===== REST Countries ===== -->
+
+  <h2>REST Countries</h2>
+  <p>Bare array response, nested field access (<code>name.common</code>,
+    <code>flags.png</code>), subregion as tags.</p>
+
+  <div class="example">
+    <p>Browse countries:
+      <a class="alap trigger" data-alap-linkitems=":json:countries_europe:">Europe</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:countries_americas:">Americas</a>
+    </p>
+  </div>
+
+  <!-- ===== iTunes Search ===== -->
+
+  <h2>iTunes Search</h2>
+  <p>Positional URL args &mdash; the search term is passed as <code>:json:itunes_albums:$miles_davis:</code>,
+    where <code>$miles_davis</code> resolves via protocol <code>vars</code>,
+    filling <code>${1}</code> in the URL template.</p>
+
+  <div class="example">
+    <p>Albums by:
+      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:$miles_davis:">Miles Davis</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:radiohead:">Radiohead</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:bjork:">Bjork</a>
+    </p>
+  </div>
+
+  <!-- ===== Composition ===== -->
+
+  <h2>Composition</h2>
+  <p><code>:json:</code> results compose with all Alap operators. Combine two
+    API sources, or mix API data with static links.</p>
+
+  <div class="example">
+    <p>
+      <a class="alap trigger" data-alap-linkitems=":json:countries_europe: | :json:countries_americas:">All countries (Europe + Americas)</a>
+    </p>
+    <p class="config-note">Uses <code>|</code> (OR) to merge two :json: sources.</p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

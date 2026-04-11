@@ -17,27 +17,7 @@
 import type { AlapConfig, AlapLink, GenerateHandler, WebKeyConfig } from '../core/types';
 import { MAX_GENERATED_LINKS, MAX_WEB_RESPONSE_BYTES, WEB_FETCH_TIMEOUT_MS } from '../constants';
 import { warn } from '../core/logger';
-
-/**
- * Get a nested value from an object using a dot-path string.
- * e.g. getPath({ a: { b: 1 } }, "a.b") => 1
- * Numeric path segments index into arrays: "author_name.0" => author_name[0]
- */
-const getPath = (obj: Record<string, unknown>, path: string): unknown => {
-  let current: unknown = obj;
-  for (const segment of path.split('.')) {
-    if (current === null || current === undefined) return undefined;
-    if (Array.isArray(current)) {
-      const idx = parseInt(segment, 10);
-      current = isNaN(idx) ? undefined : current[idx];
-    } else if (typeof current === 'object') {
-      current = (current as Record<string, unknown>)[segment];
-    } else {
-      return undefined;
-    }
-  }
-  return current;
-};
+import { getPath } from './shared';
 
 /**
  * Default field mapping — tries common API field names.

@@ -2,6 +2,26 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.1.0-dev] — 2026-04-10
+
+### Embed module (2026-04-10)
+
+- New `src/ui-embed/` module for sandboxed iframe rendering with consent management
+  - `embedAllowlist.ts` — provider registry with URL transforms for YouTube, Vimeo, Spotify, CodePen, CodeSandbox
+  - `embedConsent.ts` — per-domain consent tracking via localStorage with three policies: `prompt` (default), `allow`, `block`
+  - `AlapEmbed.ts` — DOM builder producing one of three outputs: sandboxed iframe, consent placeholder, or plain link fallback
+  - `embed.css` — fully tokenized with 12 CSS custom properties (`--alap-embed-*`)
+- Security: Permissions Policy via `allow` attribute (matches YouTube/Spotify oembed specs), `referrerpolicy="strict-origin-when-cross-origin"`, `loading="lazy"`. No `sandbox` attribute — embed players (YouTube, Spotify) fail with Error 153 in sandboxed iframes
+- YouTube URLs transformed to `youtube-nocookie.com` for privacy
+- Standalone usage: `createEmbed(url)` returns an HTMLElement — no renderer dependency
+- Lightbox integration: items with `meta.embed` (no image) show embed in the image area
+- Lens integration: items with `meta.embed` render embed in the meta zone above fields; `embed` and `embedType` filtered from field list
+- `embedAllowlist` option narrows the provider registry — cannot add domains not in the registry
+- 84 new tests across 3 files (`tests/ui/embed/`)
+- New example site (`examples/sites/embed/`) demonstrating standalone + menu + lightbox + lens usage
+- New cookbook page (`docs/cookbook/embeds.md`)
+- 7 new constants in `src/constants.ts`: `EMBED_ALLOW_POLICY`, `EMBED_REFERRER_POLICY`, `EMBED_CONSENT_KEY`, `EMBED_DEFAULT_MAX_WIDTH`, `EMBED_VIDEO_HEIGHT`, `EMBED_AUDIO_HEIGHT`, `EMBED_INTERACTIVE_HEIGHT`
+
 ## [3.1.0-dev] — 2026-04-09
 
 ### Shared code refactoring: lightbox + lens (2026-04-09)

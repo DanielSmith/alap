@@ -25,6 +25,8 @@ import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
 import { openImageZoom } from '../ui/shared/imageZoom';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
+import { createEmbed } from '../ui-embed/AlapEmbed';
+import type { EmbedPolicy } from '../ui-embed/embedConsent';
 
 // --- Options ---
 
@@ -61,6 +63,10 @@ export interface AlapLensOptions {
    * When omitted, the overlay uses CSS defaults (centered).
    */
   placement?: Placement;
+  /** Embed consent policy. 'prompt' (default) asks before loading, 'allow' auto-loads, 'block' never loads. */
+  embedPolicy?: EmbedPolicy;
+  /** Override default embed provider allowlist. Only these domains will render as iframes. */
+  embedAllowlist?: string[];
 }
 
 // --- Constants ---
@@ -74,7 +80,7 @@ const LONG_TEXT_THRESHOLD = 100;
 const MAX_VISIBLE_LINKS = 5;
 
 const FADE_DURATION_PROP = '--alap-lens-transition';
-const FADE_DURATION_FALLBACK = 150;
+const FADE_DURATION_FALLBACK = 250;
 const RESIZE_DURATION_PROP = '--alap-lens-resize-transition';
 const RESIZE_DURATION_FALLBACK = 350;
 const TRANSITION_SAFETY_BUFFER = 100;
@@ -164,6 +170,7 @@ const INTERNAL_META_KEYS = new Set([
   'source', 'sourceLabel', 'updated',
   'atUri', 'handle', 'did',
   'photoCredit', 'photoCreditUrl',
+  'embed', 'embedType',
 ]);
 
 // Display type hints
@@ -203,6 +210,8 @@ export class AlapLens implements CoordinatedRenderer {
   private activeTrigger: HTMLElement | null = null;
   private activeTag: string | null = null;
   private setNavHandle: SetNavHandle | null = null;
+  private embedPolicy: EmbedPolicy;
+  private embedAllowlist: string[] | undefined;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
@@ -217,6 +226,8 @@ export class AlapLens implements CoordinatedRenderer {
     this.tagSwitchTooltip = options.tagSwitchTooltip ?? DEFAULT_TAG_SWITCH_TOOLTIP;
     this.placement = options.placement ?? null;
     this.transition = options.transition ?? DEFAULT_TRANSITION;
+    this.embedPolicy = options.embedPolicy ?? 'prompt';
+    this.embedAllowlist = options.embedAllowlist;
     this.handleKeydown = this.onKeydown.bind(this);
     this.init();
   }
@@ -426,6 +437,17 @@ export class AlapLens implements CoordinatedRenderer {
   private renderMetaZone(panel: HTMLElement, link: ResolvedLink): void {
     const meta = link.meta;
     if (!meta) return;
+
+    // Embed — rendered between top zone and meta fields
+    const embedUrl = meta.embed;
+    if (typeof embedUrl === 'string' && embedUrl) {
+      const embedType = meta.embedType as 'video' | 'audio' | 'interactive' | undefined;
+      const embedEl = createEmbed(embedUrl, embedType, {
+        embedPolicy: this.embedPolicy,
+        embedAllowlist: this.embedAllowlist,
+      });
+      panel.appendChild(embedEl);
+    }
 
     const entries = Object.entries(meta).filter(
       ([key]) => !INTERNAL_META_KEYS.has(key)
@@ -920,6 +942,13 @@ export class AlapLens implements CoordinatedRenderer {
   /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
   setPlacement(placement: Placement | null): void {
     this.placement = placement;
+  }
+
+  /**
+   * Access the underlying engine for advanced operations like preResolve().
+   */
+  getEngine(): AlapEngine {
+    return this.engine;
   }
 
   destroy(): void {

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3.1 — :json: Protocol</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info" target="alapExampleLaunch">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapExampleLaunch">&larr; Examples Gallery</a></p>
+
+  <h1>:json: Protocol</h1>
+  <p>The <code>:json:</code> protocol fetches external JSON APIs and maps their
+    data to Alap link items. Unlike <code>:web:</code> which guesses field names,
+    <code>:json:</code> uses explicit configuration: a declared root path, precise
+    field mapping, envelope metadata extraction, and template interpolation.</p>
+
+  <nav class="page-nav">
+    <a href="./" class="current">Overview</a>
+    <a href="./menu.html">Menu</a>
+    <a href="./lightbox.html">Lightbox</a>
+    <a href="./lens.html">Lens</a>
+  </nav>
+
+  <h2>How It Works</h2>
+
+  <p>Every <code>:json:</code> source is defined in the config with three key parts:</p>
+
+  <ol>
+    <li><strong>url</strong> &mdash; where to fetch, with optional <code>${1}</code> template vars for dynamic queries</li>
+    <li><strong>root</strong> &mdash; dot-path to the data array in the response (omit for bare arrays)</li>
+    <li><strong>fieldMap</strong> &mdash; explicit mapping from API fields to AlapLink fields</li>
+  </ol>
+
+  <pre><code>sources: {
+  artic: {
+    url: 'https://api.artic.edu/api/v1/artworks/search?q=${1}&amp;limit=12',
+    root: 'data',
+    envelope: { iiif_url: 'config.iiif_url' },
+    fieldMap: {
+      label: 'title',
+      url: 'https://www.artic.edu/artworks/${id}',
+      image: '${_envelope.iiif_url}/${image_id}/full/843,/0/default.jpg',
+    },
+  },
+}</code></pre>
+
+  <h2>Sources in This Demo</h2>
+  <table>
+    <thead>
+      <tr><th>Source</th><th>API</th><th>Features Demonstrated</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>countries_europe</td>
+        <td>REST Countries</td>
+        <td>Bare array, nested fields (<code>name.common</code>), thumbnails</td>
+      </tr>
+      <tr>
+        <td>itunes_albums</td>
+        <td>iTunes Search</td>
+        <td>Positional URL args (<code>${1}</code>), root path, tags from string</td>
+      </tr>
+      <tr>
+        <td>artic</td>
+        <td>Art Institute of Chicago</td>
+        <td>Envelope template vars (<code>${_envelope.iiif_url}</code>), IIIF images</td>
+      </tr>
+      <tr>
+        <td>wikimedia</td>
+        <td>Wikimedia Commons</td>
+        <td>Nested image info (<code>imageinfo[0].thumburl</code>), HTML stripping on artist/description</td>
+      </tr>
+      <tr>
+        <td>openlibrary</td>
+        <td>Open Library</td>
+        <td>Template URLs for covers, author arrays</td>
+      </tr>
+      <tr>
+        <td>loc_search</td>
+        <td>Library of Congress (Search)</td>
+        <td>Rich metadata: dates, contributors, formats, locations</td>
+      </tr>
+      <tr>
+        <td>musicbrainz</td>
+        <td>MusicBrainz</td>
+        <td>Custom headers, hyphenated keys (<code>artist-credit</code>), tag extraction (<code>tags[].name</code>)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Three Renderers, One Config</h2>
+  <p>Each sub-page demonstrates the same <code>:json:</code> sources rendered through
+    a different Alap renderer. The config stays the same &mdash; only the UI changes.</p>
+  <ul>
+    <li><a href="./menu.html"><strong>Menu</strong></a> &mdash; quick navigation lists (REST Countries, iTunes)</li>
+    <li><a href="./lightbox.html"><strong>Lightbox</strong></a> &mdash; image galleries (Art Institute, Wikimedia Commons)</li>
+    <li><a href="./lens.html"><strong>Lens</strong></a> &mdash; detail inspection (Open Library, Library of Congress, MusicBrainz)</li>
+  </ul>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

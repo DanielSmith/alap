@@ -25,6 +25,8 @@ export { AlapLightboxElement, defineAlapLightbox } from './ui-lightbox/AlapLight
 export { AlapLensElement, defineAlapLens } from './ui-lens/AlapLensElement';
 export type { AlapConfig, AlapLink, AlapMacro, AlapSettings, AlapSearchPattern, AlapSearchOptions, AlapProtocol, ProtocolHandler, GenerateHandler, WebKeyConfig } from './core/types';
 export { webHandler } from './protocols/web';
+export { jsonHandler } from './protocols/json';
+export type { JsonSourceConfig } from './protocols/json';
 export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atproto';
 export type { AtUri } from './protocols/atproto';
 export { ProtocolCache } from './protocols/cache';
@@ -33,3 +35,5 @@ export { RendererCoordinator } from './ui/shared';
 export type { RendererCoordinatorOptions } from './ui/shared';
 export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './ui/shared';
 export type { RendererType, OpenPayload, CoordinatedRenderer } from './ui/shared';
+export { createEmbed, matchProvider, transformUrl, isAllowlisted, getEmbedHeight, shouldLoadEmbed, grantConsent, revokeConsent, hasConsent } from './ui-embed';
+export type { AlapEmbedOptions, EmbedProvider, EmbedType, EmbedPolicy } from './ui-embed';

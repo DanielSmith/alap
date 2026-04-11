@@ -56,6 +56,9 @@ export const WEB_FETCH_TIMEOUT_MS = 10_000;
 /** Maximum response body size in bytes for :web: protocol fetch requests (1 MB) */
 export const MAX_WEB_RESPONSE_BYTES = 1_048_576;
 
+/** Maximum entries in the generate protocol cache before oldest is evicted */
+export const MAX_CACHE_ENTRIES = 50;
+
 /** Default menu placement relative to the trigger */
 export const DEFAULT_PLACEMENT = 'SE' as const;
 
@@ -79,3 +82,24 @@ export const MENU_ITEM_CLASS = 'alapListElem';
 
 /** Default link target for menu item anchors */
 export const DEFAULT_LINK_TARGET = 'fromAlap';
+
+/** Permissions Policy for embed iframes — required by YouTube, Spotify, etc. */
+export const EMBED_ALLOW_POLICY = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+
+/** Referrer policy for embed iframes — matches YouTube's oembed recommendation */
+export const EMBED_REFERRER_POLICY = 'strict-origin-when-cross-origin';
+
+/** localStorage key for per-domain embed consent */
+export const EMBED_CONSENT_KEY = 'alap_embed_consent';
+
+/** Default maximum width in px for embed iframes */
+export const EMBED_DEFAULT_MAX_WIDTH = 560;
+
+/** Default height in px for video embeds (YouTube, Vimeo) */
+export const EMBED_VIDEO_HEIGHT = 315;
+
+/** Default height in px for audio embeds (Spotify tracks/albums) */
+export const EMBED_AUDIO_HEIGHT = 152;
+
+/** Default height in px for interactive embeds (CodePen, CodeSandbox) */
+export const EMBED_INTERACTIVE_HEIGHT = 400;

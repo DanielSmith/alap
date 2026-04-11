@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>:json: Protocol — Lens</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info" target="alapExampleLaunch">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapExampleLaunch">&larr; Examples Gallery</a></p>
+
+  <h1>:json: + Lens</h1>
+  <p>APIs with rich metadata rendered in Alap's detail-inspection panel. The
+    lens auto-detects field types: strings become key-value rows, arrays become
+    chips, numbers stay numbers.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./menu.html">Menu</a>
+    <a href="./lightbox.html">Lightbox</a>
+    <a href="./lens.html" class="current">Lens</a>
+  </nav>
+
+  <!-- ===== Open Library ===== -->
+
+  <h2>Open Library</h2>
+  <p>Book search with cover images constructed via template URL
+    (<code>https://covers.openlibrary.org/b/id/${cover_i}-M.jpg</code>).
+    Author names, publication year, and edition count in meta.</p>
+
+  <div class="example">
+    <p>Search books:
+      <a class="alap-lens trigger" data-alap-linkitems=":json:openlibrary:bridges:">Bridges</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:openlibrary:architecture:">Architecture</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:openlibrary:$jazz_history:">Jazz History</a>
+    </p>
+  </div>
+
+  <!-- ===== Library of Congress ===== -->
+
+  <h2>Library of Congress</h2>
+  <p>General collection search with subjects as tags, date, contributor,
+    and original format in meta. Demonstrates rich metadata without deep nesting.</p>
+
+  <div class="example">
+    <p>Search the collection:
+      <a class="alap-lens trigger" data-alap-linkitems=":json:loc_search:bridges:">Bridges</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:loc_search:photography:">Photography</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:loc_search:$jazz_history:">Jazz History</a>
+    </p>
+  </div>
+
+  <!-- ===== Two Sources, One Query ===== -->
+
+  <h2>Two Sources, One Query</h2>
+  <p>Compose Open Library and Library of Congress results with the <code>|</code> operator.
+    Same search term, different APIs, merged results.</p>
+
+  <div class="example">
+    <p>
+      <a class="alap-lens trigger" data-alap-linkitems=":json:openlibrary:bridges: | :json:loc_search:bridges:">Bridges (Open Library + LOC)</a>
+    </p>
+    <p class="config-note">Both sources feed the same lens. Each item carries
+      <code>meta.source = 'json'</code> plus its own envelope metadata.</p>
+  </div>
+
+  <!-- ===== MusicBrainz ===== -->
+
+  <h2>MusicBrainz</h2>
+  <p>Album search by artist with custom <code>User-Agent</code> header (required
+    by the MusicBrainz API). Artist from nested path
+    (<code>artist-credit[0].artist.name</code>), tags extracted via
+    <code>tags[].name</code>.</p>
+
+  <div class="example">
+    <p>Albums by:
+      <a class="alap-lens trigger" data-alap-linkitems=":json:musicbrainz:$miles_davis:">Miles Davis</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:musicbrainz:$nina_simone:">Nina Simone</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:musicbrainz:radiohead:">Radiohead</a>
+    </p>
+  </div>
+
+  <!-- ===== Art in Lens ===== -->
+
+  <h2>Art Institute in Lens</h2>
+  <p>Same <code>artic</code> source used in the lightbox page, but rendered in
+    the lens. Artist, date, classification, and department shown as meta fields.</p>
+
+  <div class="example">
+    <p>
+      <a class="alap-lens trigger" data-alap-linkitems=":json:artic:sculpture:">Sculpture</a> |
+      <a class="alap-lens trigger" data-alap-linkitems=":json:artic:japanese:">Japanese Art</a>
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

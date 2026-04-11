@@ -1,6 +1,6 @@
 # Lens Renderer
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Embeds](embeds.md) · **This Page** | [All docs](../README.md)
 
 The lens renderer shows a single item's full data in an overlay panel — label, description, thumbnail, tags, and all meta fields. Same config, different presentation.
 
@@ -35,6 +35,8 @@ Click the link to open the lens panel. If the expression resolves to multiple it
 | `panelCloseButton` | `boolean` | `false` | Show a Close button in the actions row |
 | `transition` | `'fade' \| 'resize' \| 'none'` | `'fade'` | Navigation transition between items |
 | `tagSwitchTooltip` | `number` | `3000` | Duration (ms) of "switching to .tag" tooltip on counter. `0` to disable |
+| `embedPolicy` | `EmbedPolicy` | `'prompt'` | Embed consent policy: `'prompt'`, `'allow'`, or `'block'` |
+| `embedAllowlist` | `string[]` | all providers | Narrow the default embed provider list |
 
 ## Photographer credits
 
@@ -82,9 +84,19 @@ Click any thumbnail to open a fullscreen zoom overlay. Click or press Escape to 
 
 Three modes for navigating between items:
 
-- **`fade`** (default) — opacity crossfade, no reflow. Content fades out, swaps, fades back in.
-- **`resize`** — animated height transition. Locks current height, swaps content, measures new height, animates smoothly. Good when items vary significantly in size.
+- **`fade`** (default) — opacity crossfade (250ms), no reflow. Content fades out, swaps, fades back in.
+- **`resize`** — animated height transition (350ms). Locks current height, swaps content, measures new height, animates smoothly. Good when items vary significantly in size.
 - **`none`** — instant swap, no animation.
+
+The overlay itself opens and closes with a separate 500ms fade. All durations are configurable via CSS custom properties:
+
+```css
+:root {
+  --alap-lens-transition: 0.25s;          /* item crossfade (fade mode) */
+  --alap-lens-resize-transition: 0.35s;   /* item height animation (resize mode) */
+  --alap-lens-fade: 0.5s;                 /* overlay open/close */
+}
+```
 
 ## CSS custom properties
 
@@ -148,6 +160,10 @@ allLinks: {
 }
 ```
 
+## Embed rendering
+
+If an item has `meta.embed`, the lens renders a sandboxed iframe (or consent placeholder) in the meta zone, above the field list. The `embed` and `embedType` keys are filtered from the displayed fields. See [Embeds](embeds.md) for full details on providers, policies, and security.
+
 ## Meta field auto-detection
 
 The lens inspects each meta value at render time and picks the appropriate presentation:
@@ -171,3 +187,70 @@ meta: {
   episodes_display: 'links', // force link list
 }
 ```
+
+## Web component
+
+The `<alap-lens>` custom element provides the same lens as an attribute-driven web component with Shadow DOM encapsulation.
+
+```typescript
+import { registerConfig } from 'alap';
+import { defineAlapLens } from 'alap/ui-lens';
+
+registerConfig(config);
+defineAlapLens();
+```
+
+```html
+<alap-lens query=".bridge">bridges</alap-lens>
+<alap-lens query=".fruit" transition="resize">fruit data</alap-lens>
+<alap-lens query=".tv" panel-close-button>TV shows</alap-lens>
+```
+
+### Attributes
+
+| Attribute | Description |
+|---|---|
+| `query` | Alap expression (`.tag`, `@macro`, item IDs) |
+| `config` | Named config key (default: `_default`) |
+| `placement` | Viewport anchor (`N`, `SE`, `C`, etc.) |
+| `transition` | Navigation mode: `fade` (default), `resize`, `none` |
+| `copyable` | Show copy-to-clipboard button (present = true) |
+| `panel-close-button` | Show a Close button in the actions row (present = true) |
+| `tag-switch-tooltip` | Duration (ms) of tag switch tooltip. `0` to disable |
+
+### Styling with `::part()`
+
+```css
+alap-lens::part(overlay) { /* backdrop */ }
+alap-lens::part(panel) { /* card container */ }
+alap-lens::part(close-x) { /* overlay close X */ }
+alap-lens::part(image-wrap) { /* image container */ }
+alap-lens::part(image) { /* the img element */ }
+alap-lens::part(title-row) { /* label + credit row */ }
+alap-lens::part(label) { /* item title */ }
+alap-lens::part(credit) { /* photographer credit */ }
+alap-lens::part(tags) { /* tag chips container */ }
+alap-lens::part(description) { /* description text */ }
+alap-lens::part(meta) { /* meta fields section */ }
+alap-lens::part(actions) { /* visit + close buttons */ }
+alap-lens::part(visit) { /* visit button */ }
+alap-lens::part(close-btn) { /* close button */ }
+alap-lens::part(nav) { /* navigation bar */ }
+alap-lens::part(nav-prev) { /* prev button */ }
+alap-lens::part(nav-next) { /* next button */ }
+alap-lens::part(counter) { /* item counter */ }
+alap-lens::part(counter-wrap) { /* counter container */ }
+```
+
+## Lens vs. Lightbox
+
+| | Lens | Lightbox |
+|---|---|---|
+| Focus | Inspect one item deeply | Browse multiple items visually |
+| Content | All fields: meta, tags, embeds | Image, label, description, credit |
+| Transition | Fade (250ms), resize, or none | Fade only (250ms) |
+| Tags | Clickable with drill-down | Not shown |
+| Meta fields | Auto-detected type rendering | Not shown |
+| Copy button | Yes | No |
+
+They compose: menu shows items, lightbox browses them visually, lens inspects one in detail.

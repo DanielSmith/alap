@@ -47,6 +47,7 @@ export class AlapLightboxElement extends HTMLElement {
   private currentIndex = 0;
   private isOpen = false;
   private justClosed = false;
+  private transitioning = false;
   private setNavHandle: SetNavHandle | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
@@ -398,10 +399,11 @@ export class AlapLightboxElement extends HTMLElement {
   // --- Navigation ---
 
   private jumpTo(index: number): void {
-    if (index === this.currentIndex) return;
+    if (index === this.currentIndex || this.transitioning) return;
     const card = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!card) return;
 
+    this.transitioning = true;
     card.classList.add('fading');
     const raw = getComputedStyle(card).getPropertyValue(FADE_DURATION_PROP);
     const duration = parseFloat(raw) * 1000;
@@ -411,13 +413,16 @@ export class AlapLightboxElement extends HTMLElement {
       this.currentIndex = index;
       this.update();
       card.classList.remove('fading');
+      this.transitioning = false;
     }, ms);
   }
 
   private navigate(delta: number): void {
+    if (this.transitioning) return;
     const card = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!card) return;
 
+    this.transitioning = true;
     card.classList.add('fading');
 
     const raw = getComputedStyle(card).getPropertyValue(FADE_DURATION_PROP);
@@ -428,6 +433,7 @@ export class AlapLightboxElement extends HTMLElement {
       this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
       this.update();
       card.classList.remove('fading');
+      this.transitioning = false;
     }, ms);
   }
 

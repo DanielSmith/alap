@@ -1,0 +1,120 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Embed module styles — iframe wrapper, consent placeholder, and plain link fallback.
+ * Uses CSS custom properties so host renderers (lens, lightbox) can theme consistently.
+ */
+
+:root {
+  --alap-embed-max-width: 560px;
+  --alap-embed-radius: 8px;
+  --alap-embed-placeholder-bg: rgba(255, 255, 255, 0.06);
+  --alap-embed-placeholder-color: #b8c4e8;
+  --alap-embed-placeholder-hover-bg: rgba(255, 255, 255, 0.1);
+  --alap-embed-btn-bg: #3a86ff;
+  --alap-embed-btn-bg-hover: #2d6fdb;
+  --alap-embed-btn-color: #fff;
+  --alap-embed-btn-radius: 6px;
+  --alap-embed-provider-color: #7888b8;
+  --alap-embed-provider-size: 0.8rem;
+  --alap-embed-link-color: #88bbff;
+  --alap-embed-link-hover-color: #ffd666;
+}
+
+/* --- Iframe wrapper --- */
+
+.alap-embed-wrap {
+  width: 100%;
+  max-width: var(--alap-embed-max-width);
+  border-radius: var(--alap-embed-radius);
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+
+.alap-embed-wrap iframe {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: var(--alap-embed-radius);
+}
+
+/* --- Consent placeholder --- */
+
+.alap-embed-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: var(--alap-embed-max-width);
+  padding: 2rem 1.5rem;
+  background: var(--alap-embed-placeholder-bg);
+  border-radius: var(--alap-embed-radius);
+  margin: 0.75rem 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.alap-embed-placeholder:hover {
+  background: var(--alap-embed-placeholder-hover-bg);
+}
+
+.alap-embed-placeholder-provider {
+  color: var(--alap-embed-provider-color);
+  font-size: var(--alap-embed-provider-size);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.alap-embed-placeholder-label {
+  color: var(--alap-embed-placeholder-color);
+  font-size: 0.95rem;
+}
+
+.alap-embed-load-btn {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: var(--alap-embed-btn-bg);
+  color: var(--alap-embed-btn-color);
+  border: none;
+  border-radius: var(--alap-embed-btn-radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.alap-embed-load-btn:hover {
+  background: var(--alap-embed-btn-bg-hover);
+}
+
+.alap-embed-always-btn {
+  background: none;
+  border: none;
+  color: var(--alap-embed-provider-color);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.alap-embed-always-btn:hover {
+  color: var(--alap-embed-placeholder-color);
+}
+
+/* --- Plain link fallback --- */
+
+.alap-embed-link {
+  display: inline-block;
+  color: var(--alap-embed-link-color);
+  font-size: 0.9rem;
+  text-decoration: none;
+  margin: 0.5rem 0;
+  transition: color 0.2s ease;
+}
+
+.alap-embed-link:hover {
+  color: var(--alap-embed-link-hover-color);
+  text-decoration: underline;
+}

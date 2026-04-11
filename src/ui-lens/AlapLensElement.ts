@@ -35,7 +35,7 @@ const LONG_TEXT_THRESHOLD = 100;
 const MAX_VISIBLE_LINKS = 5;
 
 const FADE_DURATION_PROP = '--alap-lens-transition';
-const FADE_DURATION_FALLBACK = 150;
+const FADE_DURATION_FALLBACK = 250;
 const RESIZE_DURATION_PROP = '--alap-lens-resize-transition';
 const RESIZE_DURATION_FALLBACK = 350;
 const TRANSITION_SAFETY_BUFFER = 100;

@@ -1023,8 +1023,8 @@ describe('AlapLens', () => {
         // Content not yet swapped
         expect(getPanel()!.querySelector('.alap-lens-label')!.textContent).toBe(label1);
 
-        // Advance past the fade-out duration (fallback 150ms in happy-dom)
-        vi.advanceTimersByTime(200);
+        // Advance past the fade-out duration (fallback 250ms in happy-dom)
+        vi.advanceTimersByTime(300);
 
         const label2 = getPanel()!.querySelector('.alap-lens-label')!.textContent;
         expect(label2).not.toBe(label1);

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap Embeds</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+  <h1>Embeds</h1>
+  <p>Alap's embed module renders sandboxed iframes for known providers
+    (YouTube, Vimeo, Spotify, CodePen, CodeSandbox) with consent management,
+    and falls back to plain links for everything else.</p>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <h2>Standalone Embeds</h2>
+  <p>No renderer needed. Call <code>createEmbed(url)</code> and append the result.
+    The default policy is <code>prompt</code> &mdash; you'll see a consent
+    placeholder first. Click "Load" or "Always allow" to load the iframe.</p>
+
+  <div class="example">
+    <h3>Video</h3>
+    <div id="standalone-video"></div>
+  </div>
+
+  <div class="example">
+    <h3>Audio</h3>
+    <div id="standalone-audio"></div>
+  </div>
+
+  <div class="example">
+    <h3>Interactive</h3>
+    <div id="standalone-interactive"></div>
+  </div>
+
+  <div class="example">
+    <h3>Auto-allow Policy</h3>
+    <p class="section-note">With <code>embedPolicy: 'allow'</code>, iframes load
+      immediately &mdash; no consent prompt.</p>
+    <div id="standalone-allow"></div>
+  </div>
+
+  <div class="example">
+    <h3>Unknown Provider</h3>
+    <p class="section-note">Domains not in the provider registry get a plain link fallback.</p>
+    <div id="standalone-unknown"></div>
+  </div>
+
+  <hr>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <h2>Menu Renderer</h2>
+  <p>Standard <code>AlapUI</code> dropdown. Items with <code>meta.embed</code>
+    resolve normally &mdash; embeds are a data-layer concept, not tied to the
+    menu renderer.</p>
+
+  <div class="example">
+    <p>Browse
+      <a class="alap-menu" data-alap-linkitems=".video">video links</a>,
+      <a class="alap-menu" data-alap-linkitems=".audio">audio links</a>,
+      <a class="alap-menu" data-alap-linkitems=".interactive">interactive links</a>,
+      or
+      <a class="alap-menu" data-alap-linkitems=".video, .audio, .interactive, .reference">everything</a>.
+    </p>
+    <p class="section-note">Menu items link to the public URL. The embed URL lives in
+      <code>meta.embed</code> for renderers that support it.</p>
+  </div>
+
+  <hr>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <h2>Lightbox Renderer</h2>
+  <p>When a link has <code>meta.embed</code> but no image, the lightbox shows the
+    embed in the image area. Navigate between items normally.</p>
+
+  <div class="example">
+    <p>Open the
+      <a class="alap-lightbox" data-alap-linkitems=".video">video collection</a>,
+      <a class="alap-lightbox" data-alap-linkitems=".audio">music</a>,
+      or
+      <a class="alap-lightbox" data-alap-linkitems=".video, .audio, .interactive">all embeddable content</a>.
+    </p>
+    <p class="section-note">Reference links (no embed, no image) show a text-only panel.</p>
+  </div>
+
+  <hr>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <h2>Lens Renderer</h2>
+  <p>The lens renders embeds in the meta zone alongside field data.
+    Great for inspecting embed metadata and previewing content.</p>
+
+  <div class="example">
+    <p>Inspect
+      <a class="alap-lens" data-alap-linkitems=".video">videos</a>,
+      <a class="alap-lens" data-alap-linkitems=".audio">audio</a>,
+      <a class="alap-lens" data-alap-linkitems=".interactive">interactive</a>,
+      <a class="alap-lens" data-alap-linkitems=".reference">reference</a>,
+      or
+      <a class="alap-lens" data-alap-linkitems=".video, .audio, .interactive, .reference">everything</a>.
+    </p>
+    <p class="section-note">The embed appears above the metadata fields.
+      <code>embed</code> and <code>embedType</code> are filtered from the field list.</p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

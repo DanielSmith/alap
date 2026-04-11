@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>:json: Protocol — Lightbox</title>
+  <link rel="stylesheet" href="./shared.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info" target="alapExampleLaunch">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapExampleLaunch">&larr; Examples Gallery</a></p>
+
+  <h1>:json: + Lightbox</h1>
+  <p>Image-heavy APIs rendered as fullscreen gallery overlays. The lightbox
+    shows images with navigation arrows and metadata from the API.</p>
+
+  <nav class="page-nav">
+    <a href="./">Overview</a>
+    <a href="./menu.html">Menu</a>
+    <a href="./lightbox.html" class="current">Lightbox</a>
+    <a href="./lens.html">Lens</a>
+  </nav>
+
+  <!-- ===== Art Institute of Chicago ===== -->
+
+  <h2>Art Institute of Chicago</h2>
+  <p>The showcase for envelope template vars. The API returns a <code>config.iiif_url</code>
+    base in its response envelope. The <code>fieldMap</code> uses
+    <code>${_envelope.iiif_url}</code> to construct image URLs from each item's
+    <code>image_id</code>.</p>
+
+  <div class="example">
+    <p>Browse artworks:
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:artic:monet:">Monet</a> |
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:artic:$van_gogh:">Van Gogh</a> |
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:artic:hokusai:">Hokusai</a> |
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:artic:sculpture:">Sculpture</a>
+    </p>
+    <p class="config-note">Envelope extracts <code>config.iiif_url</code> for IIIF image construction.
+      Artist, date, and classification in meta.</p>
+  </div>
+
+  <!-- ===== Wikimedia Commons ===== -->
+
+  <h2>Wikimedia Commons</h2>
+  <p>Public domain images from Wikipedia's media library. Artist and description
+    fields contain HTML (stripped automatically). Thumbnails requested at 800px width.</p>
+
+  <div class="example">
+    <p>Browse images:
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:wikimedia:bridges:">Bridges</a> |
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:wikimedia:$golden_gate:">Golden Gate</a> |
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:wikimedia:japanese+woodblock:">Japanese Woodblock</a>
+    </p>
+    <p class="config-note">Uses <code>formatversion=2</code> for array output.
+      Nested image info at <code>imageinfo[0].thumburl</code>.</p>
+  </div>
+
+  <!-- ===== Mixed ===== -->
+
+  <h2>Mixed: Art + Static Links</h2>
+  <p>Compose API results with static config links using operators.</p>
+
+  <div class="example">
+    <p>
+      <a class="alap-lightbox trigger" data-alap-linkitems=":json:artic:impressionism: | .art">Impressionism + reference links</a>
+    </p>
+    <p class="config-note">Static <code>.art</code> tagged links appended via <code>|</code> operator.</p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

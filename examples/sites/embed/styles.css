@@ -1,0 +1,28 @@
+@import '/shared/styles.css';
+
+hr {
+  border: none;
+  border-top: 1px solid #4470cc;
+  margin: 3rem 0;
+}
+
+a.alap-menu,
+a.alap-lightbox,
+a.alap-lens {
+  color: #88bbff;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+a.alap-menu:hover,
+a.alap-lightbox:hover,
+a.alap-lens:hover {
+  color: #ffd666;
+}
+
+.section-note {
+  font-size: 0.85rem;
+  color: #7888b8;
+  margin-top: 0.25rem;
+}
