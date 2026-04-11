@@ -18,6 +18,7 @@ import { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig, AlapLink, ResolvedLink } from '../../core/types';
 import { RENDERER_MENU } from '../shared/coordinatedRenderer';
 import type { CoordinatedRenderer, OpenPayload } from '../shared/coordinatedRenderer';
+import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_MENU_Z_INDEX, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
@@ -60,6 +61,8 @@ export class AlapUI implements CoordinatedRenderer {
   private lastPlacement: PlacementResult | null = null;
   private menuNaturalSize: Size | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
+  private instanceId: string;
+  private unsubscribeCoordinator: (() => void) | null = null;
 
   constructor(config: AlapConfig, options: AlapUIOptions = {}) {
     this.config = config;
@@ -77,6 +80,7 @@ export class AlapUI implements CoordinatedRenderer {
       ?? DEFAULT_MENU_TIMEOUT;
 
     this.timer = new DismissTimer(menuTimeout, () => this.closeMenu());
+    this.instanceId = `alapui_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 
     // Pre-bind handlers
     this.handleBodyClick = this.onBodyClick.bind(this);
@@ -94,6 +98,13 @@ export class AlapUI implements CoordinatedRenderer {
     this.createContainer();
     this.bindTriggers();
     this.bindGlobalEvents();
+
+    const coordinator = getInstanceCoordinator();
+    this.unsubscribeCoordinator = coordinator.subscribe(
+      this.instanceId,
+      RENDERER_MENU,
+      () => this.closeMenu(),
+    );
   }
 
   private createContainer(): void {
@@ -350,6 +361,9 @@ export class AlapUI implements CoordinatedRenderer {
       );
     }
 
+    // Notify coordinator — closes other menu instances (WC, framework, other DOM)
+    getInstanceCoordinator().notifyOpen(this.instanceId);
+
     // Focus first item
     const firstItem = this.container.querySelector<HTMLElement>('a[role="menuitem"]');
     if (firstItem) firstItem.focus();
@@ -526,6 +540,10 @@ export class AlapUI implements CoordinatedRenderer {
     this.closeMenu();
     document.removeEventListener('click', this.handleBodyClick);
     document.removeEventListener('keydown', this.handleBodyKeydown);
+    if (this.unsubscribeCoordinator) {
+      this.unsubscribeCoordinator();
+      this.unsubscribeCoordinator = null;
+    }
     if (this.container) {
       this.container.remove();
       this.container = null;

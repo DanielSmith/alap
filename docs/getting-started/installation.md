@@ -16,7 +16,8 @@ npm install alap
 
 | Import path | What it gives you | Peer dependencies |
 |---|---|---|
-| `alap` | Engine + DOM adapter + Web Component | None |
+| `alap` | Everything: engine, menus, lightbox, lens, embed, all protocols, coordinators | None |
+| `alap/slim` | Engine + menus (DOM + WC) + web/json protocols + coordinator | None |
 | `alap/core` | Engine + parser only (no DOM) | None |
 | `alap/react` | `<AlapProvider>`, `<AlapLink>`, `useAlap()` | `react`, `react-dom` |
 | `alap/vue` | `<AlapProvider>`, `<AlapLink>`, `useAlap()` | `vue` |
@@ -27,7 +28,16 @@ npm install alap
 | `alap/qwik` | `AlapProvider`, `AlapLink`, `useAlap()` | `@builder.io/qwik` |
 | `alap/storage` | IndexedDB + Remote + Hybrid persistence | `idb` (optional) |
 
-Your bundler tree-shakes everything you don't import.
+CSS files for renderers are imported separately:
+
+| Import path | What it styles |
+|---|---|
+| `alap/lightbox.css` | Lightbox overlay, image zoom, set navigation |
+| `alap/lens.css` | Lens panel, tags, metadata layout |
+| `alap/embed.css` | Embed iframes, consent prompt |
+| `alap/transitions.css` | Shared renderer transition animations |
+
+Your bundler tree-shakes everything you don't import. Start with `alap/slim` for the lightest footprint and upgrade to `alap` when you need renderers.
 
 ## CDN (no build step)
 
@@ -37,20 +47,38 @@ No npm, no bundler. Load the IIFE build from a CDN or local file:
 <script src="https://cdn.jsdelivr.net/npm/alap@3/dist/alap.iife.js"></script>
 ```
 
+For renderer CSS, add stylesheet links:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alap@3/dist/lightbox.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alap@3/dist/lens.css">
+```
+
 **What's on `window.Alap`:**
 
 | Export | What |
 |--------|------|
 | `defineAlapLink()` | Register the `<alap-link>` custom element |
+| `defineAlapLightbox()` | Register the `<alap-lightbox>` custom element |
+| `defineAlapLens()` | Register the `<alap-lens>` custom element |
 | `registerConfig(config, name?)` | Feed a config to the web component registry |
 | `updateRegisteredConfig(config, name?)` | Update a previously registered config |
-| `AlapLinkElement` | The custom element class |
-| `AlapUI` | DOM adapter — `new AlapUI(config, selector)` |
+| `AlapLinkElement` | Menu web component class |
+| `AlapLightboxElement` | Lightbox web component class |
+| `AlapLensElement` | Lens web component class |
+| `AlapUI` | DOM menu adapter — `new AlapUI(config)` |
+| `AlapLightbox` | DOM lightbox — `new AlapLightbox(config)` |
+| `AlapLens` | DOM lens — `new AlapLens(config)` |
 | `AlapEngine` | Programmatic engine — `new AlapEngine(config)` |
+| `RendererCoordinator` | Orchestrate transitions between renderers |
+| `getInstanceCoordinator()` | Cross-instance menu dismiss coordinator |
 | `validateConfig(raw)` | Sanitize untrusted configs |
 | `mergeConfigs(...configs)` | Compose multiple configs into one |
+| `webHandler`, `jsonHandler`, `atprotoHandler` | Built-in protocol handlers |
+| `ProtocolCache` | Cache for protocol results |
+| `createEmbed`, `grantConsent`, `revokeConsent` | Embed iframe rendering + consent |
 
-**Size:** ~27 KB (8.2 KB gzipped)
+**Size:** 142 KB (35.5 KB gzipped) — the full build with all renderers, protocols, and coordinators.
 
 Works with static HTML, WordPress, Drupal, Shopify, GitHub Pages, Hugo, Jekyll, CodePen — anywhere you can add a `<script>` tag.
 
@@ -73,7 +101,8 @@ All peer dependencies are optional. If you import an adapter without its framewo
 | Import | Browser | Node.js | Notes |
 |--------|---------|---------|-------|
 | `alap/core` | Yes | Yes | Pure logic, zero DOM references |
-| `alap` | Yes | No | Web component uses `HTMLElement`, `customElements` |
+| `alap/slim` | Yes | No | Menus use DOM APIs |
+| `alap` | Yes | No | Renderers and web components use DOM APIs |
 | `alap/react` | Yes | SSR* | Needs React DOM |
 | `alap/vue` | Yes | SSR* | Needs Vue runtime |
 | `alap/svelte` | Yes | SSR* | Needs Svelte runtime |

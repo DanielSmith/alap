@@ -14,31 +14,67 @@
  * limitations under the License.
  */
 
+/**
+ * alap/slim — lightweight entry point.
+ *
+ * Core engine + menus (DOM and web component) + built-in protocols
+ * (web, json) + coordinator. Everything you need for "links with
+ * menus" on any page, without renderers (lightbox/lens/embed) or
+ * the atproto protocol.
+ *
+ * ~15 KB gzipped.
+ */
+
+// --- Core ---
 export { AlapEngine } from './core/AlapEngine';
 export { ExpressionParser } from './core/ExpressionParser';
 export { mergeConfigs } from './core/mergeConfigs';
+export type {
+  AlapConfig,
+  AlapLink,
+  AlapMacro,
+  AlapSettings,
+  AlapSearchPattern,
+  AlapSearchOptions,
+  AlapProtocol,
+  ProtocolHandler,
+  GenerateHandler,
+  WebKeyConfig,
+  ResolvedLink,
+  ResolveResult,
+} from './core/types';
+
+// --- DOM menu ---
 export { AlapUI } from './ui/dom/AlapUI';
 export type { AlapUIOptions } from './ui/dom/AlapUI';
-export { AlapLinkElement, registerConfig, updateRegisteredConfig, defineAlapLink } from './ui/web-component/AlapLinkElement';
+
+// --- Web component menu ---
+export {
+  AlapLinkElement,
+  registerConfig,
+  updateRegisteredConfig,
+  defineAlapLink,
+} from './ui/web-component/AlapLinkElement';
 export { getEngine, getConfig } from './ui/shared';
-export { AlapLightbox } from './ui-lightbox/AlapLightbox';
-export type { AlapLightboxOptions } from './ui-lightbox/AlapLightbox';
-export { AlapLightboxElement, defineAlapLightbox } from './ui-lightbox/AlapLightboxElement';
-export { AlapLens } from './ui-lens/AlapLens';
-export type { AlapLensOptions } from './ui-lens/AlapLens';
-export { AlapLensElement, defineAlapLens } from './ui-lens/AlapLensElement';
-export type { AlapConfig, AlapLink, AlapMacro, AlapSettings, AlapSearchPattern, AlapSearchOptions, AlapProtocol, ProtocolHandler, GenerateHandler, WebKeyConfig } from './core/types';
+
+// --- Protocols (built-in) ---
 export { webHandler } from './protocols/web';
 export { jsonHandler } from './protocols/json';
 export type { JsonSourceConfig } from './protocols/json';
-export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atproto';
-export type { AtUri } from './protocols/atproto';
 export { ProtocolCache } from './protocols/cache';
-export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from './ui/shared';
+
+// --- Coordinators ---
+export { InstanceCoordinator, getInstanceCoordinator } from './ui/shared';
 export { RendererCoordinator } from './ui/shared';
 export type { RendererCoordinatorOptions } from './ui/shared';
-export { InstanceCoordinator, getInstanceCoordinator } from './ui/shared';
 export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './ui/shared';
 export type { RendererType, OpenPayload, CoordinatedRenderer } from './ui/shared';
-export { createEmbed, matchProvider, transformUrl, isAllowlisted, getEmbedHeight, shouldLoadEmbed, grantConsent, revokeConsent, hasConsent } from './ui-embed';
-export type { AlapEmbedOptions, EmbedProvider, EmbedType, EmbedPolicy } from './ui-embed';
+
+// --- Event hooks ---
+export type {
+  AlapEventHooks,
+  TriggerHoverDetail,
+  TriggerContextDetail,
+  ItemHoverDetail,
+  ItemContextDetail,
+} from './ui/shared';

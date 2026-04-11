@@ -17,6 +17,8 @@
 import { getContext } from 'svelte';
 import type { AlapEngine } from '../../core/AlapEngine';
 import type { AlapConfig } from '../../core/types';
+import { RENDERER_MENU } from '../shared/coordinatedRenderer';
+import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 
 const ALAP_KEY = Symbol.for('alap');
 
@@ -26,17 +28,13 @@ export interface MenuCoordinator {
 }
 
 export function createMenuCoordinator(): MenuCoordinator {
-  const listeners = new Map<string, () => void>();
-
+  const coordinator = getInstanceCoordinator();
   return {
     subscribe(id, close) {
-      listeners.set(id, close);
-      return () => { listeners.delete(id); };
+      return coordinator.subscribe(id, RENDERER_MENU, close);
     },
     notifyOpen(id) {
-      for (const [listenerId, close] of listeners) {
-        if (listenerId !== id) close();
-      }
+      coordinator.notifyOpen(id);
     },
   };
 }

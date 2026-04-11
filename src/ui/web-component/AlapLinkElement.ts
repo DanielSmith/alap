@@ -16,6 +16,8 @@
 
 import type { AlapConfig } from '../../core/types';
 import { warn } from '../../core/logger';
+import { RENDERER_MENU } from '../shared/coordinatedRenderer';
+import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
 import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, registerConfig, updateRegisteredConfig, getEngine, getConfig } from '../shared';
 import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
@@ -196,6 +198,8 @@ export class AlapLinkElement extends HTMLElement {
   private lastPlacement: PlacementResult | null = null;
   private menuNaturalSize: Size | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
+  private instanceId: string;
+  private unsubscribeCoordinator: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return ['query', 'config', 'href', 'placement'];
@@ -203,6 +207,7 @@ export class AlapLinkElement extends HTMLElement {
 
   constructor() {
     super();
+    this.instanceId = `wc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     const shadow = this.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
@@ -222,6 +227,13 @@ export class AlapLinkElement extends HTMLElement {
 
   connectedCallback(): void {
     this.timer = new DismissTimer(this.getMenuTimeout(), () => this.closeMenu());
+
+    const coordinator = getInstanceCoordinator();
+    this.unsubscribeCoordinator = coordinator.subscribe(
+      this.instanceId,
+      RENDERER_MENU,
+      () => this.closeMenu(),
+    );
 
     if (!this.getAttribute('role')) {
       this.setAttribute('role', 'button');
@@ -248,6 +260,10 @@ export class AlapLinkElement extends HTMLElement {
 
   disconnectedCallback(): void {
     this.timer?.stop();
+    if (this.unsubscribeCoordinator) {
+      this.unsubscribeCoordinator();
+      this.unsubscribeCoordinator = null;
+    }
     this.removeEventListener('click', this.onTriggerClick);
     this.removeEventListener('keydown', this.onTriggerKeydown);
     this.removeEventListener('mouseenter', this.onTriggerHover);
@@ -431,12 +447,8 @@ export class AlapLinkElement extends HTMLElement {
   private openMenu(): void {
     if (!this.menu) return;
 
-    // Close any other open alap-link menus
-    for (const el of document.querySelectorAll('alap-link[aria-expanded="true"]')) {
-      if (el !== this && 'closeMenu' in el) {
-        (el as any).closeMenu();
-      }
-    }
+    // Close other menu instances (DOM, WC, framework) via coordinator
+    getInstanceCoordinator().notifyOpen(this.instanceId);
 
     const config = this.getConfig();
     const adjustViewport = config?.settings?.viewportAdjust !== false;

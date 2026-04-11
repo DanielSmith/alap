@@ -36,4 +36,5 @@ export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './coordinatedRe
 export type { RendererType, OpenPayload, RendererStackEntry, CoordinatedRenderer } from './coordinatedRenderer';
 export { RendererCoordinator } from './rendererCoordinator';
 export type { RendererCoordinatorOptions } from './rendererCoordinator';
+export { InstanceCoordinator, getInstanceCoordinator } from './instanceCoordinator';
 export { registerConfig, updateRegisteredConfig, getEngine, getConfig } from './configRegistry';

@@ -17,11 +17,8 @@
 /**
  * IIFE entry point for script-tag usage.
  *
- * Exposes `window.Alap` with everything needed for zero-build Alap:
- *   - Web component registration + config
- *   - DOM adapter (class-based binding)
- *   - Engine (programmatic expression resolution)
- *   - Config utilities (validation, merging)
+ * Exposes `window.Alap` with everything: engine, menus (DOM + WC),
+ * renderers (lightbox, lens), embed, protocols, coordinators.
  *
  * @example
  * ```html
@@ -34,15 +31,37 @@
  * ```
  */
 
-// Web Component
-export { defineAlapLink, registerConfig, updateRegisteredConfig, AlapLinkElement } from './ui/web-component/AlapLinkElement';
+// --- Core ---
+export { AlapEngine } from './core/AlapEngine';
+export { ExpressionParser } from './core/ExpressionParser';
+export { mergeConfigs } from './core/mergeConfigs';
+export { validateConfig } from './core/validateConfig';
 
-// DOM Adapter
+// --- DOM menu ---
 export { AlapUI } from './ui/dom/AlapUI';
 
-// Engine
-export { AlapEngine } from './core/AlapEngine';
+// --- Web component menu ---
+export { AlapLinkElement, registerConfig, updateRegisteredConfig, defineAlapLink } from './ui/web-component/AlapLinkElement';
+export { getEngine, getConfig } from './ui/shared';
 
-// Config utilities
-export { validateConfig } from './core/validateConfig';
-export { mergeConfigs } from './core/mergeConfigs';
+// --- Lightbox ---
+export { AlapLightbox } from './ui-lightbox/AlapLightbox';
+export { AlapLightboxElement, defineAlapLightbox } from './ui-lightbox/AlapLightboxElement';
+
+// --- Lens ---
+export { AlapLens } from './ui-lens/AlapLens';
+export { AlapLensElement, defineAlapLens } from './ui-lens/AlapLensElement';
+
+// --- Embed ---
+export { createEmbed, matchProvider, transformUrl, isAllowlisted, getEmbedHeight, shouldLoadEmbed, grantConsent, revokeConsent, hasConsent } from './ui-embed';
+
+// --- Protocols ---
+export { webHandler } from './protocols/web';
+export { jsonHandler } from './protocols/json';
+export { atprotoHandler, parseAtUri, atUriToDestinations } from './protocols/atproto';
+export { ProtocolCache } from './protocols/cache';
+
+// --- Coordinators ---
+export { getInstanceCoordinator } from './ui/shared/instanceCoordinator';
+export { RendererCoordinator } from './ui/shared/rendererCoordinator';
+export { RENDERER_MENU, RENDERER_LIGHTBOX, RENDERER_LENS } from './ui/shared/coordinatedRenderer';

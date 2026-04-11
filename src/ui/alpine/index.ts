@@ -60,19 +60,17 @@ export interface AlapDirectiveValue {
   padding?: number;
 }
 
-// --- Menu coordinator (module-level singleton — all x-alap directives share it) ---
+// --- Menu coordinator (delegates to global InstanceCoordinator) ---
 
-const menuListeners = new Map<string, () => void>();
+import { RENDERER_MENU } from '../shared/coordinatedRenderer';
+import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 
 function subscribeMenu(id: string, close: () => void): () => void {
-  menuListeners.set(id, close);
-  return () => { menuListeners.delete(id); };
+  return getInstanceCoordinator().subscribe(id, RENDERER_MENU, close);
 }
 
 function notifyMenuOpen(id: string): void {
-  for (const [listenerId, close] of menuListeners) {
-    if (listenerId !== id) close();
-  }
+  getInstanceCoordinator().notifyOpen(id);
 }
 
 // --- Shared menu container ---

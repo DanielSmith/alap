@@ -23,6 +23,7 @@ import { resolve } from 'path';
 export default defineConfig({
   resolve: {
     alias: {
+      'alap/slim': resolve(__dirname, 'src/slim.ts'),
       'alap/core': resolve(__dirname, 'src/core/index.ts'),
       'alap/react': resolve(__dirname, 'src/ui/react/index.ts'),
       'alap/vue': resolve(__dirname, 'src/ui/vue/index.ts'),
@@ -40,6 +41,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
+        slim: resolve(__dirname, 'src/slim.ts'),
         'core/index': resolve(__dirname, 'src/core/index.ts'),
         'react/index': resolve(__dirname, 'src/ui/react/index.ts'),
         'vue/index': resolve(__dirname, 'src/ui/vue/index.ts'),

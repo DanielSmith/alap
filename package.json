@@ -12,6 +12,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./slim": {
+      "types": "./dist/slim.d.ts",
+      "import": "./dist/slim.js",
+      "require": "./dist/slim.cjs"
+    },
     "./core": {
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.js",
@@ -59,7 +64,11 @@
       "types": "./dist/ui/qwik/index.d.ts",
       "import": "./dist/qwik/index.js",
       "require": "./dist/qwik/index.cjs"
-    }
+    },
+    "./lightbox.css": "./dist/lightbox.css",
+    "./lens.css": "./dist/lens.css",
+    "./embed.css": "./dist/embed.css",
+    "./transitions.css": "./dist/rendererTransitions.css"
   },
   "peerDependencies": {
     "@builder.io/qwik": "^1.19.0",
@@ -107,8 +116,8 @@
   ],
   "scripts": {
     "dev": "vite serve examples/sites --config vite.config.ts",
-    "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
-    "build:lib": "vite build && vite build --config vite.config.iife.ts",
+    "build": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/ && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
+    "build:lib": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/",
     "build:all": "pnpm turbo run build",
     "test": "vitest run",
     "test:all": "turbo run test",
