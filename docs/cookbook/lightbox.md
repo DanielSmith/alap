@@ -44,16 +44,24 @@ Each item in the lightbox displays:
 
 Items without an image but with `meta.embed` show an iframe in the image area (see [Embeds](embeds.md)). Items with neither show a text-only panel with a transparent card background.
 
-## Navigation
+## Keyboard and mouse interactions
 
-When the resolved set contains multiple items:
+| Input | Action |
+|---|---|
+| **Escape** | Close the lightbox (or close zoom first if open) |
+| **ArrowLeft** | Previous item |
+| **ArrowRight** | Next item |
+| **ArrowUp** | Previous item |
+| **ArrowDown** | Next item |
+| **Click image** | Open fullscreen zoom |
+| **Click overlay backdrop** | Close the lightbox |
+| **Hover prev/next zones** | Show navigation arrows |
 
-- **Prev/next arrows** appear on hover, flanking the panel
-- **Arrow keys** (Left/Right) navigate between items
-- **Set navigator** on the counter (see below)
-- **Escape** closes the lightbox
+While the lightbox is open, page scrolling is locked — arrow keys and mousewheel affect only the overlay, preserving the user's scroll position on the page behind it.
 
-Navigation is guarded against rapid input — pressing arrow keys during a transition queues nothing, preventing stacked animations.
+### Rapid navigation
+
+Single arrow presses produce a smooth fade transition. When pressing rapidly, the fade duration halves for responsiveness. One navigation is queued during a fade — additional presses are absorbed. After 1 second of calm, the fade speed returns to normal.
 
 ## Set navigator
 
@@ -228,5 +236,7 @@ alap-lightbox::part(zoom-overlay) { /* zoom backdrop */ }
 | Tags | Not shown | Clickable with drill-down |
 | Meta fields | Not shown | Auto-detected type rendering |
 | Copy button | No | Yes |
+| Up/Down keys | Navigate prev/next | Expand/collapse drawer |
+| Details drawer | No | Yes (scrollable, slides over image) |
 
 They compose: menu shows items, lightbox browses them visually, lens inspects one in detail.

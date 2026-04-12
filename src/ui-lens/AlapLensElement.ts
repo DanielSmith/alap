@@ -343,19 +343,7 @@ export class AlapLensElement extends HTMLElement {
     handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
     handle.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.drawerExpanded = !this.drawerExpanded;
-
-      const imageWrap = panel.querySelector('.image-wrap') as HTMLElement | null;
-      if (imageWrap) {
-        imageWrap.classList.toggle('image-collapsed', this.drawerExpanded);
-      }
-      const drawer = panel.querySelector('.drawer') as HTMLElement | null;
-      if (drawer) {
-        drawer.classList.toggle('drawer-expanded', this.drawerExpanded);
-      }
-
-      toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
-      handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+      this.toggleDrawer();
     });
 
     handle.appendChild(toggle);
@@ -946,9 +934,45 @@ export class AlapLensElement extends HTMLElement {
     });
   }
 
+  // --- Drawer toggle ---
+
+  private toggleDrawer(expand?: boolean): void {
+    if (expand !== undefined && expand === this.drawerExpanded) return;
+    this.drawerExpanded = expand ?? !this.drawerExpanded;
+
+    const panel = this.overlay?.querySelector('.panel') as HTMLElement | null;
+    if (!panel) return;
+
+    const imageWrap = panel.querySelector('.image-wrap') as HTMLElement | null;
+    if (imageWrap) {
+      imageWrap.classList.toggle('image-collapsed', this.drawerExpanded);
+    }
+    const drawer = panel.querySelector('.drawer') as HTMLElement | null;
+    if (drawer) {
+      drawer.classList.toggle('drawer-expanded', this.drawerExpanded);
+    }
+
+    const handle = panel.querySelector('.drawer-handle') as HTMLElement | null;
+    if (handle) {
+      const toggle = handle.querySelector('.drawer-toggle');
+      if (toggle) toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
+      handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+    }
+  }
+
   // --- Keyboard ---
 
   private onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.toggleDrawer(true);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.toggleDrawer(false);
+      return;
+    }
     handleOverlayKeydown(e, {
       close: () => this.close(),
       prev: () => this.navigate(-1),

@@ -53,7 +53,10 @@ export function openImageZoom(options: ImageZoomOptions): void {
     }
   };
 
-  zoomOverlay.addEventListener('click', dismiss);
+  zoomOverlay.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dismiss();
+  });
   document.addEventListener('keydown', keyHandler, true);
 
   zoomOverlay.appendChild(zoomImg);

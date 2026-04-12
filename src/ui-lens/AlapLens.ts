@@ -411,19 +411,7 @@ export class AlapLens implements CoordinatedRenderer {
     handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
     handle.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.drawerExpanded = !this.drawerExpanded;
-
-      const imageWrap = panel.querySelector(`.${CSS.imageWrap}`) as HTMLElement | null;
-      if (imageWrap) {
-        imageWrap.classList.toggle(CSS.imageCollapsed, this.drawerExpanded);
-      }
-      const drawer = panel.querySelector(`.${CSS.drawer}`) as HTMLElement | null;
-      if (drawer) {
-        drawer.classList.toggle(CSS.drawerExpanded, this.drawerExpanded);
-      }
-
-      toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
-      handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+      this.toggleDrawer();
     });
 
     handle.appendChild(toggle);
@@ -1004,9 +992,45 @@ export class AlapLens implements CoordinatedRenderer {
     }, HALF);
   }
 
+  // --- Drawer toggle ---
+
+  private toggleDrawer(expand?: boolean): void {
+    if (expand !== undefined && expand === this.drawerExpanded) return;
+    this.drawerExpanded = expand ?? !this.drawerExpanded;
+
+    const panel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+    if (!panel) return;
+
+    const imageWrap = panel.querySelector(`.${CSS.imageWrap}`) as HTMLElement | null;
+    if (imageWrap) {
+      imageWrap.classList.toggle(CSS.imageCollapsed, this.drawerExpanded);
+    }
+    const drawer = panel.querySelector(`.${CSS.drawer}`) as HTMLElement | null;
+    if (drawer) {
+      drawer.classList.toggle(CSS.drawerExpanded, this.drawerExpanded);
+    }
+
+    const handle = panel.querySelector(`.${CSS.drawerHandle}`) as HTMLElement | null;
+    if (handle) {
+      const toggle = handle.querySelector(`.${CSS.drawerToggle}`);
+      if (toggle) toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
+      handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+    }
+  }
+
   // --- Keyboard ---
 
   private onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.toggleDrawer(true);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.toggleDrawer(false);
+      return;
+    }
     handleOverlayKeydown(e, {
       close: () => this.close(),
       prev: () => this.navigate(-1),

@@ -66,6 +66,36 @@ When you drill into a tag:
 
 This turns the lens into a browsable data explorer without leaving the panel.
 
+## Keyboard and mouse interactions
+
+| Input | Action |
+|---|---|
+| **Escape** | Close the lens (or close zoom first if open) |
+| **ArrowLeft** | Previous item |
+| **ArrowRight** | Next item |
+| **ArrowUp** | Expand drawer (slide details over the image) |
+| **ArrowDown** | Collapse drawer (restore the image) |
+| **Click image** | Open fullscreen zoom |
+| **Click tag** | Drill into that tag's full set |
+| **Click overlay backdrop** | Close the lens |
+| **Hover drawer handle** | Reveal the drawer toggle and highlight the handle row |
+| **Click drawer handle** | Toggle drawer expanded/collapsed |
+| **Hover panel** | Reveal scrollbar in the details area |
+
+While the lens is open, page scrolling is locked — arrow keys and mousewheel affect only the overlay, preserving the user's scroll position on the page behind it.
+
+### Rapid navigation
+
+Single arrow presses (Left/Right) produce a smooth fade transition. When pressing rapidly, the fade duration halves for responsiveness. One navigation is queued during a fade — additional presses are absorbed. After 1 second of calm, the fade speed returns to normal.
+
+## Details drawer
+
+When an item has more content than fits on screen, the details area (title, tags, description, meta fields) is a scrollable container. The scrollbar is hidden until hovering over the panel, then fades in smoothly (no layout jump).
+
+A drawer handle sits between the image and the details. Hover the handle row to reveal the toggle icon and a subtle background highlight. Click anywhere on the handle row (or press ArrowUp) to expand the drawer over the image, giving more room for metadata-heavy items. Click again (or press ArrowDown) to restore the image.
+
+The drawer state resets when the lens closes.
+
 ## Set navigator
 
 When viewing multiple items, the counter (e.g. "2 / 5") doubles as a navigation menu:
@@ -226,6 +256,9 @@ alap-lens::part(panel) { /* card container */ }
 alap-lens::part(close-x) { /* overlay close X */ }
 alap-lens::part(image-wrap) { /* image container */ }
 alap-lens::part(image) { /* the img element */ }
+alap-lens::part(drawer-handle) { /* drawer toggle row */ }
+alap-lens::part(drawer-toggle) { /* drawer toggle icon */ }
+alap-lens::part(drawer) { /* scrollable details container */ }
 alap-lens::part(title-row) { /* label + credit row */ }
 alap-lens::part(label) { /* item title */ }
 alap-lens::part(credit) { /* photographer credit */ }
@@ -252,5 +285,7 @@ alap-lens::part(counter-wrap) { /* counter container */ }
 | Tags | Clickable with drill-down | Not shown |
 | Meta fields | Auto-detected type rendering | Not shown |
 | Copy button | Yes | No |
+| Up/Down keys | Expand/collapse drawer | Navigate prev/next |
+| Details drawer | Yes (scrollable, slides over image) | No |
 
 They compose: menu shows items, lightbox browses them visually, lens inspects one in detail.

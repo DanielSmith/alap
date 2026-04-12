@@ -2,7 +2,24 @@
 
 All notable changes to Alap will be documented in this file.
 
-## [3.1.0-dev] — 2026-04-10
+## [3.1.0-dev] — 2026-04-11
+
+### Lens drawer and overlay polish (2026-04-11)
+
+- Lens details drawer: scrollable container for detail content (title, tags, description, meta fields) with toggle to slide over the photo
+  - ArrowUp/ArrowDown keyboard shortcuts to expand/collapse the drawer
+  - Drawer handle: full-width click target, subtle background highlight on hover, toggle icon visible only on handle hover
+  - Scrollbar hidden until hover (transparent → visible color transition, no layout jump)
+  - Image and footer (actions, navigation) remain outside the scrollable area
+- Rapid navigation queue for lightbox and lens (DOM + WC): queues one pending nav during a fade, halves fade duration when clicking fast, resets to normal speed after 1s of calm
+- Body scroll lock: prevents page scrolling (keyboard arrows + mousewheel) while any overlay is open, with refcount for stacked overlays (e.g. zoom over lightbox/lens)
+- Image zoom bug fixes:
+  - Zoom now uses balanced `fadeIn`/`fadeOut` so body scroll lock persists through zoom open/dismiss
+  - Zoom dismiss click `stopPropagation` prevents tag deselection in lens WC (shadow DOM click bubbling)
+- Drawer handle hit target: floats over image bottom edge with `z-index`, 2x height for easier targeting
+- Shared `overlayKeyboard.ts`: added ArrowUp/ArrowDown mapping (prev/next for lightbox, drawer toggle for lens)
+- New CSS classes: `alap-lens-drawer`, `alap-lens-drawer-handle`, `alap-lens-drawer-toggle`, `alap-lens-drawer-expanded`, `alap-lens-image-collapsed`
+- New WC `::part()` attributes: `drawer`, `drawer-handle`, `drawer-toggle`
 
 ### Embed module (2026-04-10)
 
