@@ -1032,23 +1032,23 @@ describe('AlapLens', () => {
         vi.useRealTimers();
       });
 
-      it('blocks navigation while transitioning', () => {
+      it('queues navigation during fade and drains on completion', () => {
         vi.useFakeTimers();
 
         const trigger = createTrigger('t1', '@shows');
         lens = new AlapLens(lensTestConfig, { transition: 'fade' });
         clickTrigger(trigger);
 
+        // First navigate starts a fade (index 0→1)
         pressKey('ArrowRight');
 
-        // Second navigate should be ignored while first is in flight
-        pressKey('ArrowRight');
+        // Second navigate queues delta +1 while first is in flight
         pressKey('ArrowRight');
 
-        // After first completes, should only have advanced one step
-        vi.advanceTimersByTime(500);
+        // After first fade lands at 1, queued delta +1 advances to 0 (wraps in 2-item set)
+        vi.advanceTimersByTime(1000);
 
-        expect(document.querySelector('.alap-lens-counter')!.textContent).toBe('2 / 2');
+        expect(document.querySelector('.alap-lens-counter')!.textContent).toBe('1 / 2');
 
         vi.useRealTimers();
       });

@@ -99,6 +99,8 @@ const DEFAULT_TAG_SWITCH_TOOLTIP = 3000;
 const ICON_CLOSE = '\u00d7';
 const ICON_PREV = '\u2039';
 const ICON_NEXT = '\u203a';
+const ICON_DRAWER_UP = '\u25b2';
+const ICON_DRAWER_DOWN = '\u25bc';
 const ICON_COPY = '\u2398';
 
 type TransitionMode = 'fade' | 'resize' | 'none';
@@ -147,6 +149,11 @@ const CSS = {
   setnavFilterWrap: 'alap-lens-setnav-filter-wrap',
   setnavFilter: 'alap-lens-setnav-filter',
   setnavClear: 'alap-lens-setnav-clear',
+  drawer: 'alap-lens-drawer',
+  drawerExpanded: 'alap-lens-drawer-expanded',
+  drawerHandle: 'alap-lens-drawer-handle',
+  drawerToggle: 'alap-lens-drawer-toggle',
+  imageCollapsed: 'alap-lens-image-collapsed',
   zoomOverlay: 'alap-lens-zoom-overlay',
   zoomVisible: 'alap-lens-zoom-visible',
   zoomImage: 'alap-lens-zoom-image',
@@ -208,9 +215,13 @@ export class AlapLens implements CoordinatedRenderer {
   private originalLinks: ResolvedLink[] = [];
   private currentIndex = 0;
   private transitioning = false;
+  private pendingDelta: number | null = null;
+  private rapidMode = false;
+  private rapidResetTimer: ReturnType<typeof setTimeout> | null = null;
   private activeTrigger: HTMLElement | null = null;
   private activeTag: string | null = null;
   private setNavHandle: SetNavHandle | null = null;
+  private drawerExpanded = false;
   private embedPolicy: EmbedPolicy;
   private embedAllowlist: string[] | undefined;
 
@@ -312,6 +323,7 @@ export class AlapLens implements CoordinatedRenderer {
     }
     document.removeEventListener('keydown', this.handleKeydown);
     this.activeTrigger = null;
+    this.drawerExpanded = false;
     return trigger;
   }
 
@@ -331,8 +343,24 @@ export class AlapLens implements CoordinatedRenderer {
     const panel = document.createElement('div');
     panel.className = CSS.panel;
 
-    this.renderTopZone(panel, link);
-    this.renderMetaZone(panel, link);
+    // Image stays directly on panel (outside the drawer)
+    this.renderImage(panel, link);
+
+    // Handle sits between image and drawer, outside the scrollable area
+    this.renderDrawerHandle(panel);
+
+    // Scrollable details drawer
+    const drawer = document.createElement('div');
+    drawer.className = this.drawerExpanded
+      ? `${CSS.drawer} ${CSS.drawerExpanded}`
+      : CSS.drawer;
+
+    this.renderDetails(drawer, link);
+    this.renderMetaZone(drawer, link);
+
+    panel.appendChild(drawer);
+
+    // Actions and nav stay outside the drawer (fixed footer)
     this.renderActions(panel, link);
 
     if (total > 1) {
@@ -342,10 +370,12 @@ export class AlapLens implements CoordinatedRenderer {
     this.overlay.appendChild(panel);
   }
 
-  private renderTopZone(panel: HTMLElement, link: ResolvedLink): void {
+  private renderImage(panel: HTMLElement, link: ResolvedLink): void {
     const thumbSrc = link.thumbnail || link.image;
     const imageWrap = document.createElement('div');
-    imageWrap.className = thumbSrc ? CSS.imageWrap : `${CSS.imageWrap} ${CSS.imageWrapEmpty}`;
+    let className = thumbSrc ? CSS.imageWrap : `${CSS.imageWrap} ${CSS.imageWrapEmpty}`;
+    if (this.drawerExpanded) className += ` ${CSS.imageCollapsed}`;
+    imageWrap.className = className;
     if (thumbSrc) {
       const img = document.createElement('img');
       img.className = CSS.image;
@@ -355,7 +385,9 @@ export class AlapLens implements CoordinatedRenderer {
       img.addEventListener('load', () => {
         if (img.naturalHeight > img.naturalWidth) {
           img.style.objectFit = 'contain';
-          imageWrap.style.maxHeight = 'var(--alap-lens-image-portrait-max-height)';
+          imageWrap.style.maxHeight = this.drawerExpanded
+            ? '0'
+            : 'var(--alap-lens-image-portrait-max-height)';
         }
       });
       img.addEventListener('click', (e) => {
@@ -365,6 +397,41 @@ export class AlapLens implements CoordinatedRenderer {
       imageWrap.appendChild(img);
     }
     panel.appendChild(imageWrap);
+  }
+
+  private renderDrawerHandle(panel: HTMLElement): void {
+    const handle = document.createElement('div');
+    handle.className = CSS.drawerHandle;
+
+    const toggle = document.createElement('span');
+    toggle.className = CSS.drawerToggle;
+    toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
+
+    handle.setAttribute('role', 'button');
+    handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+    handle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.drawerExpanded = !this.drawerExpanded;
+
+      const imageWrap = panel.querySelector(`.${CSS.imageWrap}`) as HTMLElement | null;
+      if (imageWrap) {
+        imageWrap.classList.toggle(CSS.imageCollapsed, this.drawerExpanded);
+      }
+      const drawer = panel.querySelector(`.${CSS.drawer}`) as HTMLElement | null;
+      if (drawer) {
+        drawer.classList.toggle(CSS.drawerExpanded, this.drawerExpanded);
+      }
+
+      toggle.textContent = this.drawerExpanded ? ICON_DRAWER_DOWN : ICON_DRAWER_UP;
+      handle.setAttribute('aria-label', this.drawerExpanded ? 'Show image' : 'Expand details');
+    });
+
+    handle.appendChild(toggle);
+    panel.appendChild(handle);
+  }
+
+  private renderDetails(container: HTMLElement, link: ResolvedLink): void {
+    const thumbSrc = link.thumbnail || link.image;
 
     // Title row — label + photo credit on the same line
     const creditName = link.meta?.photoCredit as string | undefined;
@@ -396,7 +463,7 @@ export class AlapLens implements CoordinatedRenderer {
         titleRow.appendChild(creditEl);
       }
 
-      panel.appendChild(titleRow);
+      container.appendChild(titleRow);
     }
 
     if ((link.tags && link.tags.length > 0) || this.copyable) {
@@ -435,14 +502,14 @@ export class AlapLens implements CoordinatedRenderer {
       if (this.copyable) {
         this.renderCopyButton(tagsWrap, link);
       }
-      panel.appendChild(tagsWrap);
+      container.appendChild(tagsWrap);
     }
 
     if (link.description) {
       const desc = document.createElement('p');
       desc.className = CSS.description;
       desc.textContent = link.description;
-      panel.appendChild(desc);
+      container.appendChild(desc);
     }
   }
 
@@ -566,7 +633,7 @@ export class AlapLens implements CoordinatedRenderer {
   }
 
   private navigate(delta: number): void {
-    if (this.transitioning || this.links.length <= 1) return;
+    if (this.links.length <= 1) return;
 
     const nextIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
 
@@ -577,17 +644,35 @@ export class AlapLens implements CoordinatedRenderer {
     }
 
     if (this.transition === 'resize') {
+      if (this.transitioning) return;
       this.navigateResize(nextIndex);
       return;
     }
 
-    // Default: fade
+    // Fade: if mid-fade, queue the delta and mark rapid
+    if (this.transitioning) {
+      this.pendingDelta = delta;
+      this.markRapid();
+      return;
+    }
+
+    this.markRapid();
     this.navigateFade(nextIndex);
   }
 
+  /** Track rapid navigation — halves fade duration until 1s of calm. */
+  private markRapid(): void {
+    if (this.rapidResetTimer !== null) clearTimeout(this.rapidResetTimer);
+    this.rapidResetTimer = setTimeout(() => {
+      this.rapidMode = false;
+      this.rapidResetTimer = null;
+    }, 1000);
+  }
+
   /**
-   * Fade transition (lightbox style): fade content out via opacity,
-   * swap, fade back in. No reflow — only compositing.
+   * Fade transition: fade content out via opacity, swap, fade back in.
+   * Uses half duration in rapid mode for responsive feel.
+   * On completion, drains any queued navigation.
    */
   private navigateFade(nextIndex: number): void {
     const panel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
@@ -596,21 +681,34 @@ export class AlapLens implements CoordinatedRenderer {
     this.transitioning = true;
     panel.classList.add(CSS.panelFading);
 
-    const duration = this.getCssDuration(panel, FADE_DURATION_PROP, FADE_DURATION_FALLBACK);
+    const full = this.getCssDuration(panel, FADE_DURATION_PROP, FADE_DURATION_FALLBACK);
+    const duration = this.rapidMode ? full / 2 : full;
 
     setTimeout(() => {
       this.currentIndex = nextIndex;
       this.render();
-      // render() rebuilds the panel, so grab it again
       const newPanel = this.overlay?.querySelector(`.${CSS.panel}`) as HTMLElement | null;
       if (newPanel) {
         newPanel.classList.add(CSS.panelFading);
-        // Force reflow so the browser registers the fading state before removing it
         void newPanel.offsetHeight;
         newPanel.classList.remove(CSS.panelFading);
       }
-      setTimeout(() => { this.transitioning = false; }, duration);
+      setTimeout(() => {
+        this.transitioning = false;
+        this.drainPending();
+      }, duration);
     }, duration);
+    this.rapidMode = true;
+  }
+
+  /** If a nav was queued during a fade, start it now. */
+  private drainPending(): void {
+    if (this.pendingDelta !== null) {
+      const delta = this.pendingDelta;
+      this.pendingDelta = null;
+      const nextIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
+      this.navigateFade(nextIndex);
+    }
   }
 
   /**
@@ -921,7 +1019,7 @@ export class AlapLens implements CoordinatedRenderer {
    * Applies the current transition mode.
    */
   private jumpTo(index: number): void {
-    if (index === this.currentIndex || this.transitioning) return;
+    if (index === this.currentIndex) return;
 
     if (this.transition === 'none') {
       this.currentIndex = index;
@@ -930,9 +1028,12 @@ export class AlapLens implements CoordinatedRenderer {
     }
 
     if (this.transition === 'resize') {
+      if (this.transitioning) return;
       this.navigateResize(index);
       return;
     }
+
+    if (this.transitioning) return;
 
     this.navigateFade(index);
   }

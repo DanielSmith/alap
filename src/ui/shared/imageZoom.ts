@@ -6,7 +6,7 @@
  * Creates a zoom overlay with fade-in/out, dismissible via click or Escape.
  */
 
-import { fadeOut } from './overlayTransition';
+import { fadeIn, fadeOut } from './overlayTransition';
 
 export interface ImageZoomOptions {
   /** The container to append the zoom overlay to. */
@@ -56,10 +56,6 @@ export function openImageZoom(options: ImageZoomOptions): void {
   zoomOverlay.addEventListener('click', dismiss);
   document.addEventListener('keydown', keyHandler, true);
 
-  container.appendChild(zoomOverlay);
   zoomOverlay.appendChild(zoomImg);
-
-  // Force reflow so the browser registers the initial state before transitioning
-  void zoomOverlay.offsetHeight;
-  zoomOverlay.classList.add(visibleClass);
+  fadeIn(zoomOverlay, container, visibleClass);
 }

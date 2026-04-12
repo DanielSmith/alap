@@ -62,7 +62,7 @@ export const STYLES = `
     max-width: var(--alap-lens-max-width, 520px);
     width: 90vw;
     max-height: 85vh;
-    overflow-y: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     box-shadow: var(--alap-lens-shadow, 0 24px 80px rgba(0, 0, 0, 0.5));
@@ -73,27 +73,100 @@ export const STYLES = `
   /* Fade transition — content fades out/in, panel stays put */
 
   .panel-fading .image-wrap,
-  .panel-fading .label,
-  .panel-fading .tags,
-  .panel-fading .description,
-  .panel-fading .separator,
-  .panel-fading .meta,
+  .panel-fading .drawer,
   .panel-fading .actions,
   .panel-fading .nav,
   .panel-fading .counter {
     opacity: 0;
   }
 
-  .image-wrap,
-  .label,
-  .tags,
-  .description,
-  .separator,
-  .meta,
-  .actions,
-  .nav,
-  .counter {
-    transition: opacity var(--alap-lens-transition, 0.25s) ease;
+  /* opacity transition for fade is merged into each element's own transition rule */
+
+  /* --- Drawer (scrollable details container) --- */
+
+  .drawer {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: opacity var(--alap-lens-transition, 0.25s) ease,
+                flex var(--alap-lens-resize-transition, 0.35s) ease-in-out,
+                scrollbar-color 0.3s ease;
+  }
+
+  .drawer::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .drawer::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .drawer::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+
+  .panel:hover .drawer {
+    scrollbar-color: var(--alap-lens-drawer-scrollbar-color, rgba(255, 255, 255, 0.2)) transparent;
+  }
+
+  .panel:hover .drawer::-webkit-scrollbar-thumb {
+    background: var(--alap-lens-drawer-scrollbar-color, rgba(255, 255, 255, 0.2));
+  }
+
+  .drawer-expanded {
+    flex: 1 1 100%;
+  }
+
+  .drawer-handle {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    margin-top: -1.5rem;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    text-decoration: none;
+    outline: none;
+    -webkit-text-decoration: none;
+    transition: opacity var(--alap-lens-transition, 0.25s), background 0.25s ease-in-out;
+  }
+
+  .drawer-handle:hover {
+    opacity: 1;
+  }
+
+  .drawer-toggle {
+    background: none;
+    border: none;
+    color: var(--alap-lens-drawer-toggle-color, rgba(255, 255, 255, 0.4));
+    font-size: 0.65rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    pointer-events: none;
+    text-decoration: none;
+    transition: color var(--alap-lens-transition, 0.25s);
+  }
+
+  .drawer-handle:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .drawer-handle:hover .drawer-toggle {
+    color: var(--alap-lens-drawer-toggle-hover, rgba(255, 255, 255, 0.8));
+  }
+
+  /* Image collapse when drawer is expanded */
+
+  .image-collapsed {
+    max-height: 0 !important;
+    margin-bottom: 0;
+    overflow: hidden;
   }
 
   /* --- Top zone --- */
@@ -105,6 +178,9 @@ export const STYLES = `
     border-radius: var(--alap-lens-image-radius, 8px);
     margin-bottom: 1rem;
     background: #111;
+    transition: opacity var(--alap-lens-transition, 0.25s) ease,
+                max-height var(--alap-lens-resize-transition, 0.35s) ease-in-out,
+                margin-bottom var(--alap-lens-resize-transition, 0.35s) ease-in-out;
   }
 
   .image-wrap-empty {
@@ -284,6 +360,7 @@ export const STYLES = `
     justify-content: center;
     margin-top: 1.25rem;
     flex-shrink: 0;
+    transition: opacity var(--alap-lens-transition, 0.25s) ease;
   }
 
   .visit {
@@ -327,6 +404,7 @@ export const STYLES = `
     gap: var(--alap-lens-meta-row-gap, 1rem);
     margin-top: 1rem;
     flex-shrink: 0;
+    transition: opacity var(--alap-lens-transition, 0.25s) ease;
   }
 
   .nav-prev,

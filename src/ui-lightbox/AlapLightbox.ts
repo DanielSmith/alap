@@ -66,6 +66,9 @@ export class AlapLightbox implements CoordinatedRenderer {
   private activeTrigger: HTMLElement | null = null;
   private setNavHandle: SetNavHandle | null = null;
   private transitioning = false;
+  private pendingDelta: number | null = null;
+  private rapidMode = false;
+  private rapidResetTimer: ReturnType<typeof setTimeout> | null = null;
   private embedPolicy: EmbedPolicy;
   private embedAllowlist: string[] | undefined;
 
@@ -368,19 +371,41 @@ export class AlapLightbox implements CoordinatedRenderer {
     }, duration);
   }
 
+  private markRapid(): void {
+    if (this.rapidResetTimer !== null) clearTimeout(this.rapidResetTimer);
+    this.rapidResetTimer = setTimeout(() => {
+      this.rapidMode = false;
+      this.rapidResetTimer = null;
+    }, 1000);
+  }
+
   private navigate(delta: number): void {
-    if (this.transitioning) return;
+    if (this.transitioning) {
+      this.pendingDelta = delta;
+      this.markRapid();
+      return;
+    }
+
+    this.markRapid();
+
     const card = this.overlay?.querySelector('.alap-lightbox-panel') as HTMLElement | null;
     if (!card) return;
 
     this.transitioning = true;
     card.classList.add('fading');
-    const duration = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
+    const full = parseFloat(getComputedStyle(card).getPropertyValue('--alap-lightbox-transition')) * 1000;
+    const duration = this.rapidMode ? full / 2 : full;
     setTimeout(() => {
       this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
       this.update();
       card.classList.remove('fading');
       this.transitioning = false;
+      this.rapidMode = true;
+      if (this.pendingDelta !== null) {
+        const next = this.pendingDelta;
+        this.pendingDelta = null;
+        this.navigate(next);
+      }
     }, duration);
   }
 

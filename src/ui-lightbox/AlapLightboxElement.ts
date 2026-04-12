@@ -48,6 +48,9 @@ export class AlapLightboxElement extends HTMLElement {
   private isOpen = false;
   private justClosed = false;
   private transitioning = false;
+  private pendingDelta: number | null = null;
+  private rapidMode = false;
+  private rapidResetTimer: ReturnType<typeof setTimeout> | null = null;
   private setNavHandle: SetNavHandle | null = null;
 
   private handleKeydown: (e: KeyboardEvent) => void;
@@ -417,8 +420,23 @@ export class AlapLightboxElement extends HTMLElement {
     }, ms);
   }
 
+  private markRapid(): void {
+    if (this.rapidResetTimer !== null) clearTimeout(this.rapidResetTimer);
+    this.rapidResetTimer = setTimeout(() => {
+      this.rapidMode = false;
+      this.rapidResetTimer = null;
+    }, 1000);
+  }
+
   private navigate(delta: number): void {
-    if (this.transitioning) return;
+    if (this.transitioning) {
+      this.pendingDelta = delta;
+      this.markRapid();
+      return;
+    }
+
+    this.markRapid();
+
     const card = this.overlay?.querySelector('.panel') as HTMLElement | null;
     if (!card) return;
 
@@ -426,15 +444,22 @@ export class AlapLightboxElement extends HTMLElement {
     card.classList.add('fading');
 
     const raw = getComputedStyle(card).getPropertyValue(FADE_DURATION_PROP);
-    const duration = parseFloat(raw) * 1000;
-    const ms = Number.isFinite(duration) && duration > 0 ? duration : FADE_DURATION_FALLBACK;
+    const full = parseFloat(raw) * 1000;
+    const ms = Number.isFinite(full) && full > 0 ? full : FADE_DURATION_FALLBACK;
+    const duration = this.rapidMode ? ms / 2 : ms;
 
     setTimeout(() => {
       this.currentIndex = (this.currentIndex + delta + this.links.length) % this.links.length;
       this.update();
       card.classList.remove('fading');
       this.transitioning = false;
-    }, ms);
+      this.rapidMode = true;
+      if (this.pendingDelta !== null) {
+        const next = this.pendingDelta;
+        this.pendingDelta = null;
+        this.navigate(next);
+      }
+    }, duration);
   }
 
   // --- Keyboard ---

@@ -15,17 +15,24 @@ export interface OverlayKeyboardActions {
 /**
  * Handle a keydown event on an overlay.
  * Returns true if the event was handled (caller can skip further processing).
+ * Prevents default on all arrow keys to stop page scrolling behind the overlay.
  */
 export function handleOverlayKeydown(e: KeyboardEvent, actions: OverlayKeyboardActions): boolean {
-  if (e.key === 'Escape') {
-    actions.close();
-    return true;
-  } else if (e.key === 'ArrowLeft') {
-    actions.prev();
-    return true;
-  } else if (e.key === 'ArrowRight') {
-    actions.next();
-    return true;
+  switch (e.key) {
+    case 'Escape':
+      actions.close();
+      return true;
+    case 'ArrowLeft':
+    case 'ArrowUp':
+      e.preventDefault();
+      actions.prev();
+      return true;
+    case 'ArrowRight':
+    case 'ArrowDown':
+      e.preventDefault();
+      actions.next();
+      return true;
+    default:
+      return false;
   }
-  return false;
 }
