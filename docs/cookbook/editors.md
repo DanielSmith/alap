@@ -1,6 +1,6 @@
 # Editors
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · **This Page** · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · **This Page** · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
 Visual tools for building and managing Alap link configurations.
 

@@ -1,6 +1,6 @@
 # Lightbox API
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · **This Page** · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Config Registry](config-registry.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · **This Page** · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Config Registry](config-registry.md)
 
 Full-screen overlay carousel for browsing link collections with images, metadata, and embeds.
 

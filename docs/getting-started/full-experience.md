@@ -1,6 +1,6 @@
 # Full Experience — Lightbox, Lens, and Beyond
 
-**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · [Bare Minimum](bare-minimum.md) · [With a Framework](with-framework.md) · **This Page** | [All docs](../README.md)
+**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · [Bare Minimum](bare-minimum.md) · [With a Framework](with-framework.md) · **This Page**
 
 Menus are the starting point. The full Alap build adds three more renderers — lightbox, lens, and embed — plus the AT Protocol for live feeds. This guide shows how to wire them up.
 

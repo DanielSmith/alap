@@ -1,7 +1,5 @@
 # Frequently Asked Questions
 
-**[All docs](README.md)**
-
 ---
 
 ## General

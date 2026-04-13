@@ -1,6 +1,6 @@
 # Markdown, HTML & MDX Integration
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · **This Page** · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · **This Page** · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
 Alap works in Markdown, raw HTML from CMSs, and MDX. Three plugins cover the content pipeline:
 

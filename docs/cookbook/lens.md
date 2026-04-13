@@ -1,6 +1,6 @@
 # Lens Renderer
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Embeds](embeds.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Embeds](embeds.md) · **This Page**
 
 The lens renderer shows a single item's full data in an overlay panel — label, description, thumbnail, tags, and all meta fields. Same config, different presentation.
 

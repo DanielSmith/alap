@@ -1,6 +1,6 @@
 # What is Alap?
 
-**[Getting Started](README.md):** **Casual Mode** · [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) | [All docs](../README.md)
+**[Getting Started](README.md):** **Casual Mode** · [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md)
 
 ## What if a link could offer <alap-link query=".coffee">choices?</alap-link>
 

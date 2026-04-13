@@ -4,8 +4,6 @@ This guide covers install, framework setup, configuration, storage, and integrat
 
 For the concepts, expression grammar, and editors, see [START-Creators.md](START-Creators.md).
 
----
-
 ## Install
 
 ```bash

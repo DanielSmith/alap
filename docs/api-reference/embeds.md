@@ -1,6 +1,6 @@
 # Embeds API
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · **This Page** · [Coordinators](coordinators.md) · [Config Registry](config-registry.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · **This Page** · [Coordinators](coordinators.md) · [Config Registry](config-registry.md)
 
 Iframe rendering for rich media (YouTube, Vimeo, Spotify, CodePen, CodeSandbox) with consent management and provider detection.
 

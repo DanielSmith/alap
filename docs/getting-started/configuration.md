@@ -1,6 +1,6 @@
 # Configuration
 
-**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · **This Page** | [All docs](../README.md)
+**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · **This Page**
 
 Every Alap instance starts with a config object. At minimum you need `allLinks` — a dictionary of your links. Everything else is optional.
 

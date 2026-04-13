@@ -1,6 +1,6 @@
 # Refiners
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · **This Page** · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · **This Page** · [Styling](styling.md)
 
 Everything else in the expression language — tags, operators, protocols — decides *what you're looking for*. Refiners decide *which ones you keep, and in what order*.
 

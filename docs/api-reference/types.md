@@ -1,6 +1,6 @@
 # Types
 
-**[API Reference](README.md):** [Engine](engine.md) · **This Page** · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · **This Page** · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md)
 
 All TypeScript interfaces for the Alap configuration and engine.
 

@@ -104,3 +104,9 @@ The same query that drives a menu can also drive richer presentations:
 
 - [Lightbox](cookbook/lightbox.md) — full-screen carousel with images, embeds, and set navigation
 - [Lens](cookbook/lens.md) — detail panel with metadata, tags, image zoom, and copy-to-clipboard
+
+## Packages
+
+Projects in the Alap ecosystem that consume `alap` as a dependency.
+
+- [alap-gather](packages/gather.md) — drag menu items into a collection tray, organize with folders, export or view in lightbox/lens. Includes HighNotes floating cards.

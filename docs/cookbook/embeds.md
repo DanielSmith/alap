@@ -1,6 +1,6 @@
 # Embeds
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Lens Renderer](lens.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lightbox Renderer](lightbox.md) · [Lens Renderer](lens.md) · **This Page**
 
 Alap's embed module renders iframes for known providers with per-domain consent management. It works standalone or integrates with the lightbox and lens renderers.
 

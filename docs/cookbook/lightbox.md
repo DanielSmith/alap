@@ -1,6 +1,6 @@
 # Lightbox Renderer
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lens Renderer](lens.md) · [Embeds](embeds.md) · **This Page** | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images and Media](images-and-media.md) · [Placement](placement.md) · [Lens Renderer](lens.md) · [Embeds](embeds.md) · **This Page**
 
 The lightbox renderer presents resolved links as a fullscreen overlay carousel instead of a dropdown menu. Same config, different presentation.
 

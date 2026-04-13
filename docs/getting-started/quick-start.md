@@ -1,6 +1,6 @@
 # Quick Start
 
-**[Getting Started](README.md):** [Installation](installation.md) · **This Page** · [Configuration](configuration.md) | [All docs](../README.md)
+**[Getting Started](README.md):** [Installation](installation.md) · **This Page** · [Configuration](configuration.md)
 
 Build a working Alap link in 2 minutes.
 

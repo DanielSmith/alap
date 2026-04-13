@@ -1,6 +1,6 @@
 # Using Alap with a Framework
 
-**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · [Bare Minimum](bare-minimum.md) · **This Page** | [All docs](../README.md)
+**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · [Bare Minimum](bare-minimum.md) · **This Page**
 
 Alap has native adapters for Vue, Svelte, React, SolidJS, Qwik, Alpine, and Astro. They all follow the same pattern: wrap your app in a Provider, drop in Link components, style with your framework's tools.
 

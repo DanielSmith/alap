@@ -1,6 +1,6 @@
 # Styling the Menu
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · **This Page** | [All docs](../README.md)
+**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · **This Page**
 
 > Live version with interactive examples: https://alap.info/core-concepts/styling
 

@@ -1,6 +1,6 @@
 # Expressions
 
-**[Core Concepts](README.md):** **This Page** · [Expression Spec](spec.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** **This Page** · [Expression Spec](spec.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md)
 
 Every Alap link has a query — a short expression that says which menu items to show. Expressions go in the `query` attribute of an `<alap-link>` (or `data-alap-linkitems` for vanilla mode).
 

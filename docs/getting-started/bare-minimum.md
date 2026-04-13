@@ -1,6 +1,6 @@
 # Bare Minimum Setup
 
-**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · **This Page** | [All docs](../README.md)
+**[Getting Started](README.md):** [Installation](installation.md) · [Quick Start](quick-start.md) · [Configuration](configuration.md) · **This Page**
 
 The simplest possible Alap: one script tag, a few links, done.
 

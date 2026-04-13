@@ -1,6 +1,6 @@
 # Protocol Expressions
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · **This Page** · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · **This Page** · [Refiners](refiners.md) · [Styling](styling.md)
 
 Tags are categories. A link is either tagged `coffee` or it isn't. That works for most queries — but some questions don't fit into categories:
 

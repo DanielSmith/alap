@@ -1,6 +1,6 @@
 # Installation
 
-**[Getting Started](README.md):** **This Page** · [Quick Start](quick-start.md) · [Configuration](configuration.md) | [All docs](../README.md)
+**[Getting Started](README.md):** **This Page** · [Quick Start](quick-start.md) · [Configuration](configuration.md)
 
 Alap is a single package with **zero required dependencies**. Framework adapters are included but only activate when you import them — bring your own framework.
 

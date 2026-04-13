@@ -1,6 +1,6 @@
 # Macros
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · **This Page** · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** [Expressions](expressions.md) · **This Page** · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md)
 
 A macro is a named query. You define it once in your config, and use it anywhere with `@`.
 

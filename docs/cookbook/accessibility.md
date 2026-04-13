@@ -1,6 +1,6 @@
 # Accessibility
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · **This Page** · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · **This Page** · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
 Alap menus are keyboard-navigable, screen-reader-announced, and focus-managed out of the box. You don't configure this — it's built into every adapter.
 

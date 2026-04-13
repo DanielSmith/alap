@@ -1,6 +1,6 @@
 # Search Patterns
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · **This Page** · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** [Expressions](expressions.md) · [Macros](macros.md) · **This Page** · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md)
 
 Tags work when you know what you're looking for — you tagged things deliberately, and you query those tags by name. But sometimes you want to ask a different kind of question: "what in my library matches this pattern?"
 

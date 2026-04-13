@@ -1,6 +1,6 @@
 # Rich-Text Editors
 
-**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · **This Page** · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md) | [All docs](../README.md)
+**[Cookbook](README.md):** [Language Ports](language-ports.md) · [Editors](editors.md) · [Markdown](markdown.md) · **This Page** · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
 Alap links can live inside rich-text editors. The `@alap/tiptap` extension adds `<alap-link>` as an inline node in Tiptap/ProseMirror, so content authors can insert multi-target links while they write.
 

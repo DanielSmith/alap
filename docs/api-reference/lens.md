@@ -1,6 +1,6 @@
 # Lens API
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · **This Page** · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Config Registry](config-registry.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · **This Page** · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Config Registry](config-registry.md)
 
 Detail panel overlay for inspecting individual links with full metadata, tags, images, and embeds.
 

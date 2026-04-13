@@ -1,6 +1,6 @@
 # Coordinators API
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · **This Page** · [Config Registry](config-registry.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · **This Page** · [Config Registry](config-registry.md)
 
 Two coordinators manage how renderers interact: one orchestrates transitions between renderer types (menu, lightbox, lens), the other ensures only one instance of a type is open at a time.
 
