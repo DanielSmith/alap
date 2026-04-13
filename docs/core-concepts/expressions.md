@@ -1,6 +1,6 @@
 # Expressions
 
-**[Core Concepts](README.md):** **This Page** · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
+**[Core Concepts](README.md):** **This Page** · [Expression Spec](spec.md) · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md) | [All docs](../README.md)
 
 Every Alap link has a query — a short expression that says which menu items to show. Expressions go in the `query` attribute of an `<alap-link>` (or `data-alap-linkitems` for vanilla mode).
 
@@ -131,6 +131,8 @@ atom    = ITEM_ID | CLASS | REGEX | MACRO | PROTOCOL | REFINER
 ```
 
 Every expression is one or more comma-separated segments. Each segment is a chain of terms joined by operators. A term is either a parenthesized sub-expression or a single atom.
+
+For the full formal specification with operator semantics and worked input/output examples, see the [Expression Spec](spec.md).
 
 ## Beyond selection
 

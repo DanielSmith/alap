@@ -267,3 +267,10 @@ The jump from slim to full is ~14 KB gzipped — the renderers, embed, and atpro
 - [Configuration](configuration.md) — the full config object
 - [Expressions](../core-concepts/expressions.md) — the query language
 - [Framework Guides](../framework-guides/) — use renderers with Vue, React, Svelte, etc.
+
+## API reference
+
+- [Lightbox API](../api-reference/lightbox.md) — full options, CSS custom properties, `::part()` selectors
+- [Lens API](../api-reference/lens.md) — full options, transitions, meta fields
+- [Embeds API](../api-reference/embeds.md) — providers, consent management
+- [Coordinators API](../api-reference/coordinators.md) — transitions, back stack, View Transitions

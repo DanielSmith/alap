@@ -118,6 +118,7 @@
     "dev": "vite serve examples/sites --config vite.config.ts",
     "build": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/ && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
     "build:lib": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/",
+    "copy:iife": "for dir in examples/sites/*/; do [ -f \"${dir}alap.iife.js\" ] && cp dist/alap.iife.js \"$dir\"; done; true",
     "build:all": "pnpm turbo run build",
     "test": "vitest run",
     "test:all": "turbo run test",

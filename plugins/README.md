@@ -10,6 +10,7 @@ Content-level transforms and platform-specific packages that bring Alap into dif
 | [tiptap-alap/](tiptap-alap/) | Tiptap/ProseMirror | Inline `<alap-link>` node extension for rich-text editors | 11 |
 | [wordpress/](wordpress/) | WordPress | `[alap query=".tag"]` shortcode, SQLite containers (instant demo + fresh install) | — |
 
+
 ## Quick Start
 
 ```bash

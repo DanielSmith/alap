@@ -216,3 +216,18 @@ The menu appears centered at the click point. CSS can add a context-menu visual 
 Simply don't set the `placement` attribute. Without it, the engine doesn't run — the menu is positioned with static CSS (`top: 100%; left: 0` or equivalent) with no viewport awareness. This is tier 0, the default.
 
 You can also set `viewportAdjust: false` in config settings to explicitly disable the engine globally.
+
+## Placement inside constrained containers
+
+When an Alap link lives inside a container with `overflow: auto` or `overflow: hidden` (tables, scrollable panels, card grids), the menu can get clipped by the container's overflow boundary.
+
+The fix: use placement to direct the menu *away* from the container's clipping edge.
+
+```html
+<!-- Inside a table cell — menu opens below the table, not clipped by it -->
+<alap-link query=".bridge" placement="S, clamp">bridges</alap-link>
+```
+
+This works because the web component renders the menu as a fixed-position overlay outside the table's flow. The `S, clamp` placement positions it below and constrains it to the viewport — the table's `overflow` never comes into play.
+
+This is especially useful in documentation sites (VitePress, MkDocs, Docusaurus) where tables and code blocks often have `overflow: auto`. A per-element `placement` attribute gives you fine-grained control without changing the site's CSS.

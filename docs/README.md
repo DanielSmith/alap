@@ -1,12 +1,18 @@
 # Alap v3 Documentation
 
-Alap turns links into contextual menus. One link, one query, many destinations.
+**A query language for hyperlinks.** Every Alap link has a query that selects from a library of destinations. One link, one expression, many options for the reader.
+
+```html
+<alap-link query=".coffee + .nyc">NYC coffee spots</alap-link>
+```
 
 > Interactive version with live demos: https://alap.info
 
+**[Casual Mode](getting-started/casual.md)** — just want to know what Alap is? Start here. No jargon, no setup, just the idea.
+
 ## Getting Started
 
-New to Alap? Start here.
+Ready to build? Start here.
 
 - [Installation](getting-started/installation.md) — npm, CDN, peer dependencies
 - [Quick Start](getting-started/quick-start.md) — first working link in 2 minutes
@@ -17,7 +23,8 @@ New to Alap? Start here.
 
 How the expression language works.
 
-- [Expressions](core-concepts/expressions.md) — tags, operators, parentheses, the full query grammar
+- [Expressions](core-concepts/expressions.md) — tags, operators, parentheses — the tutorial
+- [Expression Spec](core-concepts/spec.md) — formal grammar, operator semantics, worked examples
 - [Macros](core-concepts/macros.md) — name and reuse expressions with `@`
 - [Search Patterns](core-concepts/search-patterns.md) — regex-based discovery with `/pattern/`
 - [Protocols](core-concepts/protocols.md) — dimensional queries (time, location, price) with `:protocol:args:`
@@ -64,6 +71,12 @@ Types, methods, and contracts.
 
 - [Engine](api-reference/engine.md) — `AlapEngine`, `ExpressionParser`, utility functions
 - [Types](api-reference/types.md) — `AlapConfig`, `AlapLink`, `AlapSettings`, all interfaces
+- [Config Registry](api-reference/config-registry.md) — `registerConfig`, named configs, `getEngine`
+- [Placement](api-reference/placement.md) — `computePlacement`, strategies, fallback order
+- [Lightbox](api-reference/lightbox.md) — `AlapLightbox`, `<alap-lightbox>`, CSS custom properties
+- [Lens](api-reference/lens.md) — `AlapLens`, `<alap-lens>`, transitions, meta fields
+- [Embeds](api-reference/embeds.md) — `createEmbed`, providers, consent management
+- [Coordinators](api-reference/coordinators.md) — `RendererCoordinator`, `InstanceCoordinator`, View Transitions
 - [Storage](api-reference/storage.md) — IndexedDB, Remote, Hybrid persistence
 - [Events](api-reference/events.md) — event types, keyboard navigation, hooks
 - [Security](api-reference/security.md) — URL sanitization, ReDoS protection, parser limits
@@ -83,4 +96,11 @@ Advanced topics and integrations.
 - [Existing URLs](cookbook/existing-urls.md) — progressive enhancement with `existingUrl`
 - [Images and Media](cookbook/images-and-media.md) — image items, thumbnails, hover previews
 - [Placement](cookbook/placement.md) — compass-based positioning, viewport containment, Alap vs. CSS
-- [Lens Renderer](cookbook/lens.md) — detail-inspection overlay, clickable tags, image zoom, meta auto-detection
+- [Embeds](cookbook/embeds.md) — YouTube, Vimeo, Spotify, CodePen iframes with consent
+
+### Beyond menus
+
+The same query that drives a menu can also drive richer presentations:
+
+- [Lightbox](cookbook/lightbox.md) — full-screen carousel with images, embeds, and set navigation
+- [Lens](cookbook/lens.md) — detail panel with metadata, tags, image zoom, and copy-to-clipboard

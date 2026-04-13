@@ -1,6 +1,6 @@
 # Servers
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · **This Page** | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · **This Page** | [All docs](../README.md)
 
 10 server examples implementing the same REST API contract. Swap backends without code changes — clients (editors, web apps, `RemoteStore`) work with any of them.
 

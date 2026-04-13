@@ -4,7 +4,8 @@ How the Alap expression language works — from simple tag queries to protocol f
 
 | Page | What it covers |
 |------|----------------|
-| [Expressions](expressions.md) | Tags, operators (`+` `\|` `-`), parentheses, commas, the full grammar |
+| [Expressions](expressions.md) | Tags, operators (`+` `\|` `-`), parentheses, commas — the tutorial |
+| [Expression Spec](spec.md) | Formal grammar, operator semantics, machine-friendly worked examples |
 | [Macros](macros.md) | Named queries with `@`, nesting, the bare `@`, Markdown escape hatch |
 | [Search Patterns](search-patterns.md) | Regex search with `/pattern/`, field codes, age/sort/limit options |
 | [Protocols](protocols.md) | Dimensional queries (`:time:30d:`, `:loc:args:`), handler contract, source chains |

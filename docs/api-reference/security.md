@@ -1,6 +1,6 @@
 # Security
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · **This Page** · [Servers](servers.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · **This Page** · [Servers](servers.md) | [All docs](../README.md)
 
 Alap's security model covers URL sanitization, regex validation, config validation, and parser resource limits. Although this considers some common attack vectors, it should not be taken as, or confused with, a professional third-party security audit. If you're deploying Alap in a high-trust environment, engage a security professional to review your specific integration.
 

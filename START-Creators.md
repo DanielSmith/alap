@@ -2,11 +2,8 @@
 
 This guide is for people who use Alap, not build it. You want to understand what Alap does, how the expression language works, and where to manage your links.
 
-> **Status: 3.0 Beta 1** — The core library, expression language, and framework adapters are very far along and well-tested. Editors, server examples, and some integrations are proof-of-concept implementations that show what's possible but may change before 3.0
-
 For install instructions, framework setup, and API details, see [START-Dev.md](START-Dev.md).
 
----
 
 ## What Alap Does
 

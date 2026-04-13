@@ -1,6 +1,6 @@
 # Types
 
-**[API Reference](README.md):** [Engine](engine.md) · **This Page** · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · **This Page** · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
 
 All TypeScript interfaces for the Alap configuration and engine.
 
@@ -233,6 +233,18 @@ interface ConfigMeta {
   createdAt: string;                   // ISO 8601
 }
 ```
+
+## Renderer and UI types
+
+These types are documented on their own pages:
+
+| Type | Page | Description |
+|------|------|-------------|
+| `Placement`, `PlacementStrategy`, `PlacementInput`, `PlacementResult` | [Placement](placement.md) | Compass positioning and strategies |
+| `AlapLightboxOptions` | [Lightbox](lightbox.md) | Lightbox constructor options |
+| `AlapLensOptions` | [Lens](lens.md) | Lens constructor options (transitions, meta labels, copy) |
+| `EmbedType`, `EmbedPolicy`, `EmbedProvider`, `AlapEmbedOptions` | [Embeds](embeds.md) | Embed rendering and consent |
+| `RendererType`, `OpenPayload`, `CoordinatedRenderer`, `RendererCoordinatorOptions` | [Coordinators](coordinators.md) | Renderer transitions and cross-instance dismiss |
 
 ## Constants
 

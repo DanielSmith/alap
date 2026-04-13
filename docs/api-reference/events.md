@@ -1,6 +1,6 @@
 # Events
 
-**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Storage](storage.md) · **This Page** · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
+**[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · **This Page** · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
 
 Event model, keyboard navigation, and hook filtering across all adapters.
 
@@ -110,3 +110,21 @@ Menus auto-dismiss via three channels:
 1. **Mouse leave timeout** — configurable via `settings.menuTimeout` (default: 5000ms)
 2. **Click outside** — clicking anywhere outside the menu closes it
 3. **Escape key** — returns focus to the trigger
+
+## Lightbox and lens keyboard navigation
+
+Lightbox and lens have their own keyboard bindings, separate from menus:
+
+| Key | Action |
+|-----|--------|
+| `ArrowLeft` | Previous item |
+| `ArrowRight` | Next item |
+| `Escape` | Back one step (coordinator stack), or close if stack is empty |
+
+When a [RendererCoordinator](coordinators.md) is active, Escape triggers `back()` instead of a direct close. This means Escape from a lightbox that was opened from a menu returns to the menu, not to the page.
+
+## Cross-instance coordination
+
+The [InstanceCoordinator](coordinators.md) ensures only one renderer of a given type is open at a time. When a menu opens, all other open menus close automatically. This happens across all framework adapters — a React menu and a web component menu on the same page coordinate with each other.
+
+No custom events are emitted for coordination. The coordinator calls each instance's close callback directly. See [Coordinators](coordinators.md) for the full API.

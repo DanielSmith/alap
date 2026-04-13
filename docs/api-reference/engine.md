@@ -1,14 +1,24 @@
 # Engine API
 
-**[API Reference](README.md):** **This Page** · [Types](types.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
+**[API Reference](README.md):** **This Page** · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md) | [All docs](../README.md)
 
 Core engine classes and helper functions. No DOM dependency — safe for Node.js.
 
 > Live version: https://alap.info/api-reference/engine
 
-## Entry points
+## Which import do I use?
 
-### `alap` (main entry)
+Alap has two entry points. Pick the one that matches your environment:
+
+- **`alap`** — you're building a website. This gives you the engine, the UI, the web component, and the DOM layer. **Use this when there's a browser.**
+
+- **`alap/core`** — you're writing a server, a build tool, a test, or a library that processes Alap configs without rendering anything. No DOM, no window, no CSS. **Use this when there's no browser.**
+
+Think of it this way: `alap/core` is the brain. `alap` is the brain plus the body. If you don't need hands and eyes (DOM, events, UI), just import the brain.
+
+### `alap` (browser)
+
+Everything you need to render Alap on a page:
 
 ```typescript
 import {
@@ -23,9 +33,9 @@ import {
 } from 'alap';
 ```
 
-### `alap/core`
+### `alap/core` (no DOM)
 
-Engine and utilities only. No DOM. Safe for Node.js, tests, and build tools.
+Engine and utilities only. Safe for Node.js, tests, and build tools:
 
 ```typescript
 import {
@@ -51,6 +61,7 @@ const engine = new AlapEngine(config);
 | `query()` | `(expression: string, anchorId?: string) => string[]` | Expression to deduplicated array of item IDs |
 | `resolve()` | `(expression: string, anchorId?: string) => ResolvedLink[]` | Expression to full link objects |
 | `resolveAsync()` | `(expression: string, anchorId?: string) => Promise<ResolvedLink[]>` | Pre-resolves generate protocols, then evaluates |
+| `preResolve()` | `(expressions: string[]) => Promise<void>` | Pre-resolve multiple expressions (warm the cache for generate protocols) |
 | `getLinks()` | `(ids: string[]) => ResolvedLink[]` | IDs to full link objects |
 | `updateConfig()` | `(config: AlapConfig) => void` | Replace configuration |
 | `clearCache()` | `() => void` | Clear cached generate protocol results |
@@ -73,6 +84,9 @@ const fromMacro = engine.query('@', 'nycbridges');
 
 // Async: expressions with generate protocols (e.g. :web:)
 const books = await engine.resolveAsync(':web:books:architecture:limit=5:');
+
+// Pre-resolve: warm the cache for multiple expressions at once
+await engine.preResolve([':web:books:', ':web:music:', ':atproto:feed:']);
 
 // Update config at runtime
 engine.updateConfig(newConfig);
