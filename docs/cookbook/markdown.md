@@ -110,7 +110,7 @@ See [Eleventy](../framework-guides/eleventy.md) for the full guide.
 
 ## Live editing
 
-The example app at [`examples/sites/markdown/`](../../examples/sites/markdown/) is a live sandbox:
+The example app at [`examples/sites/markdown/`](https://examples.alap.info/markdown/) is a live sandbox:
 
 - **Editable markdown** on the left — type `[text](alap:query)` and the preview updates instantly
 - **Editable config** below the source — add links, change tags, create macros, and see the effect immediately. `registerConfig()` accepts being called again to replace the active config.
@@ -175,19 +175,17 @@ For expressions with operators (`.nyc + .bridge`), define a macro in your config
 
 ### Interactive demo
 
-The example at [`examples/sites/cms-content/`](../../examples/sites/cms-content/) is a live editor — type HTML on the left, see working Alap menus on the right, with the transformed HTML displayed in between.
+The example at [`examples/sites/cms-content/`](https://examples.alap.info/cms-content/) is a live editor — type HTML on the left, see working Alap menus on the right, with the transformed HTML displayed in between.
 
 ## MDX (@alap/mdx)
 
-For MDX content, `@alap/mdx` provides a remark transform plus a React-compatible `AlapMDXProvider`:
+For MDX content, `@alap/mdx` provides a remark transform plus a React-compatible `AlapMDXProvider`.
 
-```bash
-npm install @alap/mdx
-```
+> `@alap/mdx` is available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `plugins/mdx/`. To use it, clone the repo and reference it via pnpm workspace.
 
 The remark transform handles `[text](alap:query)` syntax in MDX files (same as `remark-alap`). The provider wraps your MDX content and makes `<AlapLink>` available as a React component.
 
-See [`plugins/mdx/`](../../plugins/mdx/) for the full API.
+See [`plugins/mdx/`](../plugins/mdx.md) for the full API.
 
 ## WordPress
 
@@ -199,4 +197,4 @@ For WordPress sites, the Alap WordPress plugin provides a `[alap]` shortcode:
 
 No Markdown or rehype pipeline needed — the shortcode is processed by WordPress's built-in shortcode engine.
 
-See [`plugins/wordpress/`](../../plugins/wordpress/) for install instructions, Docker setup (SQLite, single container), and the instant demo.
+See [`plugins/wordpress/`](../integrations/wordpress.md) for install instructions, Docker setup (SQLite, single container), and the instant demo.

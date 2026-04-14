@@ -5,8 +5,10 @@
 ## Install
 
 ```bash
-npm install alap eleventy-alap
+npm install alap
 ```
+
+> `eleventy-alap` is available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/eleventy-alap/`. To use it, clone the repo and reference it via pnpm workspace.
 
 ## Setup
 
@@ -119,4 +121,4 @@ Static mode outputs plain HTML — style `.alap-menu` and `.alap-item` with regu
 
 ## Example
 
-See [`examples/sites/eleventy/`](../../examples/sites/eleventy/) for a working example with both interactive and static modes.
+See [`examples/sites/eleventy/`](https://examples.alap.info/eleventy/) for a working example with both interactive and static modes.

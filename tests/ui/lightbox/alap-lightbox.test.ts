@@ -411,8 +411,8 @@ describe('AlapLightbox', () => {
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
 
-      const prevBtn = document.querySelector('.alap-lightbox-nav-prev button')!;
-      const nextBtn = document.querySelector('.alap-lightbox-nav-next button')!;
+      const prevBtn = document.querySelector('button.alap-lightbox-nav-prev')!;
+      const nextBtn = document.querySelector('button.alap-lightbox-nav-next')!;
       expect(prevBtn).not.toBeNull();
       expect(nextBtn).not.toBeNull();
       expect(prevBtn.getAttribute('aria-label')).toBe('Previous');
@@ -477,7 +477,7 @@ describe('AlapLightbox', () => {
       lightbox = new AlapLightbox(lightboxTestConfig);
       clickTrigger(trigger);
 
-      const nextBtn = document.querySelector('.alap-lightbox-nav-next button') as HTMLButtonElement;
+      const nextBtn = document.querySelector('button.alap-lightbox-nav-next') as HTMLButtonElement;
       nextBtn.click();
       // Navigate uses setTimeout — content changes after timeout
     });

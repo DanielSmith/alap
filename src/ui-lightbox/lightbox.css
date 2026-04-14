@@ -10,6 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--alap-lightbox-overlay-padding, 2rem);
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
   opacity: 0;
@@ -164,7 +165,6 @@
 
 .alap-lightbox-counter-wrap {
   position: relative;
-  margin-top: 1rem;
   text-align: center;
   z-index: 2;
 }
@@ -175,6 +175,9 @@
   color: var(--alap-lightbox-counter-color, #666);
   font-size: var(--alap-lightbox-counter-size, 0.85rem);
   cursor: default;
+  white-space: nowrap;
+  min-width: var(--alap-lightbox-counter-min-width, 7em);
+  text-align: center;
 }
 
 .alap-lightbox-counter-wrap:hover .alap-lightbox-counter {
@@ -286,42 +289,41 @@
 }
 
 .alap-lightbox-nav {
-  position: absolute;
-  top: calc(50% + 9.5rem);
-  opacity: 0;
-  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--alap-lightbox-nav-gap, 1rem);
+  margin-top: 1rem;
+  flex-shrink: 0;
+  transition: opacity var(--alap-lightbox-transition, 0.25s) ease;
 }
 
-.alap-lightbox-panel:hover ~ .alap-lightbox-nav,
-.alap-lightbox-nav:hover {
-  opacity: 1;
-}
-
-.alap-lightbox-nav button {
-  background: rgba(255, 255, 255, 0.1);
+.alap-lightbox-nav-prev,
+.alap-lightbox-nav-next {
+  background: var(--alap-lightbox-nav-bg, rgba(255, 255, 255, 0.1));
   border: none;
-  color: #fff;
-  font-size: 2rem;
+  color: var(--alap-lightbox-nav-color, #fff);
+  font-size: var(--alap-lightbox-nav-icon-size, 1.5rem);
   cursor: pointer;
   line-height: 1;
-  width: 48px;
-  height: 48px;
+  width: var(--alap-lightbox-nav-btn-size, 36px);
+  height: var(--alap-lightbox-nav-btn-size, 36px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.25;
+  transition: background var(--alap-lightbox-transition, 0.25s), opacity 0.4s ease;
 }
 
-.alap-lightbox-nav button:hover {
-  background: rgba(255, 255, 255, 0.2);
+.alap-lightbox-nav:hover .alap-lightbox-nav-prev,
+.alap-lightbox-nav:hover .alap-lightbox-nav-next {
+  opacity: 1;
 }
 
-.alap-lightbox-nav-prev {
-  left: calc(50% - 340px);
-}
-
-.alap-lightbox-nav-next {
-  right: calc(50% - 340px);
+.alap-lightbox-nav-prev:hover,
+.alap-lightbox-nav-next:hover {
+  background: var(--alap-lightbox-nav-bg-hover, rgba(255, 255, 255, 0.2));
 }
 
 /* --- Image zoom popup --- */

@@ -24,7 +24,7 @@ Ready to build? Start here.
 How the expression language works.
 
 - [Expressions](core-concepts/expressions.md) — tags, operators, parentheses — the tutorial
-- [Expression Spec](core-concepts/spec.md) — formal grammar, operator semantics, worked examples
+- [Expression Spec](api-reference/spec.md) — formal grammar, operator semantics, worked examples
 - [Macros](core-concepts/macros.md) — name and reuse expressions with `@`
 - [Search Patterns](core-concepts/search-patterns.md) — regex-based discovery with `/pattern/`
 - [Protocols](core-concepts/protocols.md) — dimensional queries (time, location, price) with `:protocol:args:`
@@ -52,17 +52,17 @@ Ship with `alap` — import from `alap/react`, `alap/vue`, etc.
 Separate packages for specific platforms and content pipelines.
 
 - [Eleventy](framework-guides/eleventy.md) — `eleventy-alap` plugin with shortcodes and filters
-- [Next.js](../integrations/next-alap/) — App Router layout + `'use client'` components
-- [Nuxt](../integrations/nuxt-alap/) — client plugin + Nuxt Content markdown
-- [Astro Integration](../integrations/astro-alap/) — zero-config setup
-- [Hugo](../integrations/hugo-alap/) — shortcodes + web component
-- [VitePress](../integrations/vitepress-alap/) — Vite plugin for `<alap-link>` in markdown docs
-- [WordPress](../plugins/wordpress/) — `[alap]` shortcode, SQLite containers
-- [Markdown](../plugins/remark-alap/) — `remark-alap` for any remark pipeline
-- [HTML / CMS](../plugins/rehype-alap/) — `rehype-alap` for headless CMS output
-- [MDX](../plugins/mdx/) — `@alap/mdx` for React-based MDX
-- [Tiptap](../plugins/tiptap-alap/) — Alap links in Tiptap rich-text editors
-- [htmx](../../examples/sites/htmx/) — `<alap-link>` auto-initializes after swaps
+- [Next.js](integrations/next.md) — App Router layout + `'use client'` components
+- [Nuxt](integrations/nuxt.md) — client plugin + Nuxt Content markdown
+- [Astro Integration](integrations/astro.md) — zero-config setup
+- [Hugo](integrations/hugo.md) — shortcodes + web component
+- [VitePress](integrations/vitepress.md) — Vite plugin for `<alap-link>` in markdown docs
+- [WordPress](integrations/wordpress.md) — `[alap]` shortcode, SQLite containers
+- [Markdown](plugins/remark-alap.md) — `remark-alap` for any remark pipeline
+- [HTML / CMS](plugins/rehype-alap.md) — `rehype-alap` for headless CMS output
+- [MDX](plugins/mdx.md) — `@alap/mdx` for React-based MDX
+- [Tiptap](plugins/tiptap-alap.md) — Alap links in Tiptap rich-text editors
+- [htmx](https://examples.alap.info/htmx/) — `<alap-link>` auto-initializes after swaps
 - [CDN / IIFE](getting-started/installation.md) — `<script>` tag, no bundler
 
 ## API Reference

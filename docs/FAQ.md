@@ -54,21 +54,21 @@ Alap links render as web components or ARIA-attributed spans, not as traditional
 
 ### What about WordPress, Hugo, CMSs, and other platforms?
 
-- **WordPress** — the [WordPress plugin](../plugins/wordpress/) adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing. See the [WordPress demo](../plugins/wordpress/demo/).
-- **Hugo** — the [Hugo integration](../integrations/hugo-alap/) provides shortcodes and partials that output `<alap-link>` web components. See the [Hugo example](../examples/sites/hugo/).
-- **Eleventy** — the [`eleventy-alap`](../integrations/eleventy-alap/) plugin resolves expressions at build time or renders interactive web components. See the [Eleventy example](../examples/sites/eleventy/).
-- **Next.js** — the [`next-alap`](../integrations/next-alap/) integration handles `'use client'` boundaries and provides a layout component. See the [Next.js example](../examples/sites/next/).
-- **Nuxt** — the [`nuxt-alap`](../integrations/nuxt-alap/) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
-- **Astro** — the [`astro-alap`](../integrations/astro-alap/) integration provides zero-config setup. See the [Astro example](../examples/sites/astro-integration/).
-- **Qwik City** — the [`qwik-alap`](../integrations/qwik-alap/) integration provides a Vite plugin.
-- **VitePress** — the [`vitepress-alap`](../integrations/vitepress-alap/) integration registers `<alap-link>` as a custom element and optionally injects config.
-- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](../plugins/rehype-alap/) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components. See the [cms-content example](../examples/sites/cms-content/).
-- **Markdown-based CMSs** — use [`remark-alap`](../plugins/remark-alap/) for `[text](alap:query)` syntax. See the [markdown example](../examples/sites/markdown/).
-- **MDX** — use [`@alap/mdx`](../plugins/mdx/) for React-based MDX content. See the [MDX example](../examples/sites/mdx/).
-- **Tiptap / Rich Text** — use [`tiptap-alap`](../plugins/tiptap-alap/) to insert Alap links as inline nodes. See the [Tiptap example](../examples/sites/tiptap/).
-- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](../examples/sites/htmx/).
-- **Bluesky / AT Protocol** — the `:atproto:` protocol fetches live feeds, profiles, and search results. See the [Bluesky example](../examples/sites/bluesky-atproto/).
-- **Any platform with a `<script>` tag** — the [CDN / IIFE build](getting-started/installation.md) works everywhere. See the [CDN example](../examples/sites/cdn/).
+- **WordPress** — the [WordPress plugin](integrations/wordpress.md) adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing.
+- **Hugo** — the [Hugo integration](integrations/hugo.md) provides shortcodes and partials that output `<alap-link>` web components. See the [Hugo example](https://examples.alap.info/hugo/).
+- **Eleventy** — the [`eleventy-alap`](integrations/eleventy.md) plugin resolves expressions at build time or renders interactive web components. See the [Eleventy example](https://examples.alap.info/eleventy/).
+- **Next.js** — the [`next-alap`](integrations/next.md) integration handles `'use client'` boundaries and provides a layout component. See the [Next.js example](https://examples.alap.info/next/).
+- **Nuxt** — the [`nuxt-alap`](integrations/nuxt.md) integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
+- **Astro** — the [`astro-alap`](integrations/astro.md) integration provides zero-config setup. See the [Astro example](https://examples.alap.info/astro-integration/).
+- **Qwik City** — the [`qwik-alap`](integrations/qwik-city.md) integration provides a Vite plugin.
+- **VitePress** — the [`vitepress-alap`](integrations/vitepress.md) integration registers `<alap-link>` as a custom element and optionally injects config.
+- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [`rehype-alap`](plugins/rehype-alap.md) in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components. See the [cms-content example](https://examples.alap.info/cms-content/).
+- **Markdown-based CMSs** — use [`remark-alap`](plugins/remark-alap.md) for `[text](alap:query)` syntax. See the [markdown example](https://examples.alap.info/markdown/).
+- **MDX** — use [`@alap/mdx`](plugins/mdx.md) for React-based MDX content. See the [MDX example](https://examples.alap.info/mdx/).
+- **Tiptap / Rich Text** — use [`tiptap-alap`](plugins/tiptap-alap.md) to insert Alap links as inline nodes. See the [Tiptap example](https://examples.alap.info/tiptap/).
+- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](https://examples.alap.info/htmx/).
+- **Bluesky / AT Protocol** — the `:atproto:` protocol fetches live feeds, profiles, and search results. See the [Bluesky example](https://examples.alap.info/bluesky-atproto/).
+- **Any platform with a `<script>` tag** — the [CDN / IIFE build](getting-started/installation.md) works everywhere. See the [CDN example](https://examples.alap.info/cdn/).
 
 ### What about Angular / Lit / Preact / Ember?
 

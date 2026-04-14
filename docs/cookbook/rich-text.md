@@ -13,8 +13,10 @@ The editor treats Alap links as first-class inline nodes — not marks, not deco
 ## Setup
 
 ```bash
-npm install @alap/tiptap @tiptap/core @tiptap/starter-kit
+npm install alap @tiptap/core @tiptap/starter-kit
 ```
+
+> `@alap/tiptap` is available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `plugins/tiptap-alap/`. To use it, clone the repo and reference it via pnpm workspace.
 
 ```js
 import { Editor } from '@tiptap/core';
@@ -131,4 +133,4 @@ The tag and macro lists update dynamically when the config changes.
 
 ## Example
 
-See [`examples/sites/tiptap/`](../../examples/sites/tiptap/) for the working demo.
+See [`examples/sites/tiptap/`](https://examples.alap.info/tiptap/) for the working demo.

@@ -2,7 +2,7 @@
 
 This guide is for people who use Alap, not build it. You want to understand what Alap does, how the expression language works, and where to manage your links.
 
-For install instructions, framework setup, and API details, see [START-Dev.md](START-Dev.md).
+For install instructions, framework setup, and API details, see [For Developers](start-dev.md).
 
 
 ## What Alap Does
@@ -73,7 +73,7 @@ When tags aren't enough, you can search across item IDs, labels, URLs, and descr
 /car_.*/                    matches item IDs like car_toyota, car_nissan, car_bmw
 ```
 
-Patterns are defined in the config — you reference them by name. See [Search Patterns](docs/core-concepts/search-patterns.md) for more.
+Patterns are defined in the config — you reference them by name. See [Search Patterns](core-concepts/search-patterns.md) for more.
 
 ### Item IDs
 
@@ -86,7 +86,7 @@ golden, .coffee             one specific item plus all coffee items
 
 ### There's More
 
-The expression language also supports [protocols](docs/core-concepts/protocols.md) that gather data dynamically — filtering by time, location, or pulling live results from external APIs and Bluesky — and [refiners](docs/core-concepts/refiners.md) that sort, limit, and shuffle results. You don't need these to get started, but they're there when your queries outgrow tags.
+The expression language also supports [protocols](core-concepts/protocols.md) that gather data dynamically — filtering by time, location, or pulling live results from external APIs and Bluesky — and [refiners](core-concepts/refiners.md) that sort, limit, and shuffle results. You don't need these to get started, but they're there when your queries outgrow tags.
 
 ---
 
@@ -119,7 +119,7 @@ Use the Alap button or `Mod-Shift-A` to insert a link, then type your expression
 [alap query=".bridge"]bridges[/alap]
 ```
 
-These are just the most common entry points. Alap also works with htmx, Hugo shortcodes, MDX, Astro components, and more. If your environment can render HTML, chances are very good it can handle an Alap link. See [START-Dev.md](START-Dev.md#integrations) for the full list.
+These are just the most common entry points. Alap also works with htmx, Hugo shortcodes, MDX, Astro components, and more. If your environment can render HTML, chances are very good it can handle an Alap link. See [For Developers](start-dev.md#integrations) for the full list.
 
 ---
 
@@ -152,14 +152,14 @@ Each cookbook covers a specific topic:
 
 | Cookbook | What it covers |
 |---------|---------------|
-| [Accessibility](docs/cookbook/accessibility.md) | Keyboard navigation, ARIA, screen readers |
-| [Editors](docs/cookbook/editors.md) | Setting up and using the visual editors |
-| [Existing URLs](docs/cookbook/existing-urls.md) | Preserving `href` when Alap enhances a link |
-| [Images & Media](docs/cookbook/images-and-media.md) | Image items, thumbnails, media in menus |
-| [Markdown & CMS Content](docs/cookbook/markdown.md) | Alap in markdown, MDX, and HTML from headless CMSs |
-| [Rich-Text Editors](docs/cookbook/rich-text.md) | Tiptap/ProseMirror integration |
-| [Placement](docs/cookbook/placement.md) | Compass-based menu positioning |
-| [Language Ports](docs/cookbook/language-ports.md) | Server-side ports in Rust, Python, Go, PHP |
+| [Accessibility](cookbook/accessibility.md) | Keyboard navigation, ARIA, screen readers |
+| [Editors](cookbook/editors.md) | Setting up and using the visual editors |
+| [Existing URLs](cookbook/existing-urls.md) | Preserving `href` when Alap enhances a link |
+| [Images & Media](cookbook/images-and-media.md) | Image items, thumbnails, media in menus |
+| [Markdown & CMS Content](cookbook/markdown.md) | Alap in markdown, MDX, and HTML from headless CMSs |
+| [Rich-Text Editors](cookbook/rich-text.md) | Tiptap/ProseMirror integration |
+| [Placement](cookbook/placement.md) | Compass-based menu positioning |
+| [Language Ports](cookbook/language-ports.md) | Server-side ports in Rust, Python, Go, PHP |
 
 ---
 

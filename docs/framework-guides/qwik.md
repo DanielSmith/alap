@@ -105,11 +105,9 @@ Qwik callbacks use the `$` suffix convention — they're QRL (Qwik Resource Loca
 
 ## Qwik City Integration
 
-For Qwik City projects, the `qwik-alap` integration auto-injects web component registration and config loading into every page:
+For Qwik City projects, the `qwik-alap` integration auto-injects web component registration and config loading into every page.
 
-```bash
-npm install qwik-alap
-```
+> `qwik-alap` is available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/qwik-alap/`. To use it, clone the repo and reference it via pnpm workspace.
 
 ```ts
 // vite.config.ts

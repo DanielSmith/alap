@@ -50,6 +50,8 @@ The simplest possible Alap: one script tag, a few links, done.
 
 That's it. Click any link, get a menu. No npm, no build step, no framework.
 
+Try it: <alap-link query=".coffee">Have some coffee</alap-link>
+
 ## npm — with a bundler
 
 If you have a project with Vite, Webpack, or any bundler:
@@ -115,6 +117,8 @@ Start with `alap/slim`. Move to the full `alap` import when you need:
 | AT Protocol (Bluesky feeds) | — | Yes |
 
 Switching is a one-line import change — your config and HTML stay the same.
+
+See the difference: <alap-lightbox query=".bridge">browse bridges in lightbox</alap-lightbox>
 
 ## Next
 

@@ -2,7 +2,7 @@
 
 **[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · **This Page** · [Events](events.md) · [Security](security.md) · [Servers](servers.md)
 
-Persistent config storage with local, remote, and hybrid strategies.
+Alap configs are plain JavaScript objects. If you include them directly on the page — in a `<script>` tag or an import — you don't need storage at all. But when configs are managed separately (built in an editor, served from a backend, or shared across pages), they need to live somewhere. The storage layer lets editors save configs that servers can load, and lets sites persist user preferences across sessions. Use IndexedDB for local-only, a REST server for shared access, or the hybrid store for offline-resilient sync between the two.
 
 > Live version: https://alap.info/api-reference/storage
 

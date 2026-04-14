@@ -288,27 +288,29 @@ export class AlapLightboxElement extends HTMLElement {
       });
     }
 
-    body.appendChild(counterWrap);
+    // Navigation row: prev + counter + next inside body (like lens)
+    if (this.links.length > 1) {
+      const nav = document.createElement('div');
+      nav.className = 'nav';
+      nav.setAttribute('part', 'nav');
+
+      const prevBtn = this.createButton('nav-prev', ICON_PREV, 'Previous', () => this.navigate(-1));
+      prevBtn.setAttribute('part', 'nav-prev');
+      nav.appendChild(prevBtn);
+
+      nav.appendChild(counterWrap);
+
+      const nextBtn = this.createButton('nav-next', ICON_NEXT, 'Next', () => this.navigate(1));
+      nextBtn.setAttribute('part', 'nav-next');
+      nav.appendChild(nextBtn);
+
+      body.appendChild(nav);
+    } else {
+      body.appendChild(counterWrap);
+    }
 
     card.appendChild(body);
     this.overlay.appendChild(card);
-
-    // Navigation
-    if (this.links.length > 1) {
-      const prevZone = document.createElement('div');
-      prevZone.className = 'nav nav-prev';
-      prevZone.setAttribute('part', 'nav-prev');
-      const prevBtn = this.createButton('', ICON_PREV, 'Previous', () => this.navigate(-1));
-      prevZone.appendChild(prevBtn);
-      this.overlay.appendChild(prevZone);
-
-      const nextZone = document.createElement('div');
-      nextZone.className = 'nav nav-next';
-      nextZone.setAttribute('part', 'nav-next');
-      const nextBtn = this.createButton('', ICON_NEXT, 'Next', () => this.navigate(1));
-      nextZone.appendChild(nextBtn);
-      this.overlay.appendChild(nextZone);
-    }
 
     // Overlay click-to-close
     this.overlay.addEventListener('click', (e) => {

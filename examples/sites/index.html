@@ -27,30 +27,78 @@
     }
     .site-nav .nav-links a:hover { background: none; color: #ffd666; }
     .site-nav .nav-links a.current { color: #ffd666; }
-    body { padding-top: 60px; }
 
-    ul { list-style: none; padding: 0; margin: 1rem 0; }
-    li { margin: 0.75rem 0; }
-    a {
-      display: inline-block;
-      padding: 0.4rem 0.9rem;
-      color: #88bbff;
-      text-decoration: none;
-      border: 1px solid #4470cc;
-      border-radius: 6px;
-      transition: background 0.15s, color 0.15s;
+    body { padding-top: 60px; max-width: 960px !important; }
+
+    h1 { margin-bottom: 0.25rem; }
+    h1 + p { margin-top: 0; }
+
+    .section { margin-top: 2rem; }
+    .section h2 { margin-bottom: 0.5rem; }
+
+    .row {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(46, 72, 160, 0.4);
     }
-    a:hover { background: #2240a8; color: #ffd666; }
-    .desc { color: #7888b8; font-size: 0.85rem; margin-left: 0.5rem; }
-    .start-here a { border-color: #ffd666; background: #2240a8; color: #ffd666; font-weight: 500; }
-    .start-here a:hover { background: #3366d6; }
+    .row:last-child { border-bottom: none; }
+
+    .row:hover { background: rgba(34, 64, 168, 0.25); border-radius: 4px; }
+
+    .row-name {
+      flex: 0 0 180px;
+    }
+    .row-name a {
+      display: inline;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      color: #88bbff;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .row:hover .row-name a { color: #ffd666; }
+
+    .row-desc {
+      flex: 1;
+      color: #7888b8;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .row.featured .row-name a { color: #ffd666; font-weight: 600; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      background: #ffd666;
+      color: #1a2f8a;
+    }
+
     .note { font-size: 0.8rem; color: #7888b8; margin-top: 0.25rem; }
+
     .copy-btn {
       background: none; border: 1px solid #4470cc; color: #7888b8; border-radius: 4px;
       padding: 0.1rem 0.4rem; margin-left: 0.4rem; cursor: pointer; font-size: 0.75rem;
       transition: color 0.15s, border-color 0.15s;
     }
     .copy-btn:hover { color: #ffd666; border-color: #ffd666; }
+
+    @media (max-width: 640px) {
+      .row { flex-direction: column; gap: 0.25rem; }
+      .row-name { flex: none; }
+    }
   </style>
 </head>
 <body>
@@ -66,166 +114,174 @@
   <h1>Alap v3 Examples</h1>
   <p>Self-contained demos showing off the library.</p>
 
-  <h2>Start Here</h2>
-  <p>New to Alap? Go through these three in order.</p>
-  <ul>
-    <li class="start-here">
-      <a href="./basic/" target="alapExampleLaunch">1. Basic</a>
-      <span class="desc">Item IDs, class queries, operators, parentheses, macros — the fundamentals</span>
-    </li>
-    <li class="start-here">
-      <a href="./react/" target="alapExampleLaunch">2. React Adapter</a>
-      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — framework integration pattern</span>
-    </li>
-    <li class="start-here">
-      <a href="./web-component/" target="alapExampleLaunch">3. Web Component</a>
-      <span class="desc">&lt;alap-link&gt; custom element — zero-framework, works everywhere</span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Start Here</h2>
+    <div class="row featured">
+      <div class="row-name"><a href="./basic/" target="alapExampleLaunch">1. Basic</a></div>
+      <div class="row-desc">Item IDs, class queries, operators, parentheses, macros — the fundamentals</div>
+    </div>
+    <div class="row featured">
+      <div class="row-name"><a href="./react/" target="alapExampleLaunch">2. React Adapter</a></div>
+      <div class="row-desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — framework integration pattern</div>
+    </div>
+    <div class="row featured">
+      <div class="row-name"><a href="./web-component/" target="alapExampleLaunch">3. Web Component</a></div>
+      <div class="row-desc">&lt;alap-link&gt; custom element — zero-framework, works everywhere</div>
+    </div>
+  </div>
 
-  <h2>Theming</h2>
-  <ul>
-    <li>
-      <a href="./styling/" target="alapExampleLaunch">Styling</a>
-      <span class="desc">Offsets, per-anchor themes, custom item classes, image triggers</span>
-    </li>
-    <li>
-      <a href="./tailwind/" target="alapExampleLaunch">Tailwind CSS</a>
-      <span class="desc">Menu styled entirely with Tailwind utilities</span>
-    </li>
-    <li>
-      <a href="./advanced-css-dom/" target="alapExampleLaunch">Advanced CSS — DOM Mode</a>
-      <span class="desc">Advanced CSS effects using light DOM mode with standard &lt;a class="alap"&gt; elements</span>
-    </li>
-    <li>
-      <a href="./advanced-css-wc/" target="alapExampleLaunch">Advanced CSS — Web Component</a>
-      <span class="desc">55+ CSS custom properties on &lt;alap-link&gt; for full theming and visual customization</span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Theming</h2>
+    <div class="row">
+      <div class="row-name"><a href="./styling/" target="alapExampleLaunch">Styling</a></div>
+      <div class="row-desc">Offsets, per-anchor themes, custom item classes, image triggers</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./tailwind/" target="alapExampleLaunch">Tailwind CSS</a></div>
+      <div class="row-desc">Menu styled entirely with Tailwind utilities</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./advanced-css-dom/" target="alapExampleLaunch">Advanced CSS — DOM</a></div>
+      <div class="row-desc">Advanced CSS effects using light DOM mode with standard &lt;a class="alap"&gt; elements</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./advanced-css-wc/" target="alapExampleLaunch">Advanced CSS — WC</a></div>
+      <div class="row-desc">55+ CSS custom properties on &lt;alap-link&gt; for full theming and visual customization</div>
+    </div>
+  </div>
 
-  <h2>Framework Adapters</h2>
-  <ul>
-    <li>
-      <a href="./react/" target="alapExampleLaunch">React</a>
-      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() hook — all rendering modes</span>
-    </li>
-    <li>
-      <a href="./vue/" target="alapExampleLaunch">Vue</a>
-      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() composable — SFC templates</span>
-    </li>
-    <li>
-      <a href="./svelte/" target="alapExampleLaunch">Svelte</a>
-      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — Svelte 5 runes</span>
-    </li>
-    <li>
-      <a href="./solid/" target="alapExampleLaunch">SolidJS</a>
-      <span class="desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — fine-grained reactivity</span>
-    </li>
-    <li>
-      <a href="./alpine/" target="alapExampleLaunch">Alpine.js</a>
-      <span class="desc">x-alap directive — no build step, sprinkle onto HTML</span>
-    </li>
-    <li>
-      <a href="./htmx/" target="alapExampleLaunch">htmx</a>
-      <span class="desc">HTML fragment swaps via htmx — &lt;alap-link&gt; self-initializes after each swap, no framework</span>
-    </li>
-    <li>
-      <a href="./next/" target="alapExampleLaunch">Next.js</a>
-      <span class="desc">App Router pattern — Alap in a Next.js application</span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Framework Adapters</h2>
+    <div class="row">
+      <div class="row-name"><a href="./react/" target="alapExampleLaunch">React</a></div>
+      <div class="row-desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() hook — all rendering modes</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./vue/" target="alapExampleLaunch">Vue</a></div>
+      <div class="row-desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() composable — SFC templates</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./svelte/" target="alapExampleLaunch">Svelte</a></div>
+      <div class="row-desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — Svelte 5 runes</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./solid/" target="alapExampleLaunch">SolidJS</a></div>
+      <div class="row-desc">&lt;AlapProvider&gt; + &lt;AlapLink&gt; + useAlap() — fine-grained reactivity</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./alpine/" target="alapExampleLaunch">Alpine.js</a></div>
+      <div class="row-desc">x-alap directive — no build step, sprinkle onto HTML</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./htmx/" target="alapExampleLaunch">htmx</a></div>
+      <div class="row-desc">HTML fragment swaps — &lt;alap-link&gt; self-initializes after each swap</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./next/" target="alapExampleLaunch">Next.js</a></div>
+      <div class="row-desc">App Router pattern — Alap in a Next.js application</div>
+    </div>
+  </div>
 
-  <h2>Positioning</h2>
-  <ul>
-    <li>
-      <a href="./placement/" target="alapExampleLaunch">Placement</a>
-      <span class="desc">All 9 compass placements (N, NE, E, SE, S, SW, W, NW, C), viewport fallback, center popover — DOM + web component</span>
-    </li>
-    <li>
-      <a href="./ui-sandbox/" target="alapExampleLaunch">Placement Sandbox</a>
-      <span class="desc">Visual test pages for the placement engine — verify menus never overflow the viewport across every adapter</span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Positioning</h2>
+    <div class="row">
+      <div class="row-name"><a href="./placement/" target="alapExampleLaunch">Placement</a></div>
+      <div class="row-desc">All 9 compass placements, viewport fallback, center popover — DOM + web component</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./ui-sandbox/" target="alapExampleLaunch">Placement Sandbox</a></div>
+      <div class="row-desc">Visual test pages for the placement engine — verify menus never overflow the viewport</div>
+    </div>
+  </div>
 
-  <h2>Advanced</h2>
-  <ul>
-    <li>
-      <a href="./hooks-and-media/" target="alapExampleLaunch">Hooks &amp; Media</a>
-      <span class="desc">Image triggers, div triggers, image menu items, hover preview, context popup, event log</span>
-    </li>
-    <li>
-      <a href="./regex-search/" target="alapExampleLaunch">Regex Search</a>
-      <span class="desc">/key/opts syntax — field filtering, sorting, age limits, composition with operators</span>
-    </li>
-    <li>
-      <a href="./markdown/" target="alapExampleLaunch">Markdown (remark-alap)</a>
-      <span class="desc">[text](alap:@macro) in Markdown → &lt;alap-link&gt; via remark plugin</span>
-    </li>
-    <li>
-      <a href="./tiptap/" target="alapExampleLaunch">Tiptap Rich-Text</a>
-      <span class="desc">Inline &lt;alap-link&gt; nodes in a Tiptap editor — side-by-side with live preview</span>
-    </li>
-    <li>
-      <a href="./external-data/" target="alapExampleLaunch">External Data</a>
-      <span class="desc">Load config from JSON files or remote endpoints</span>
-    </li>
-    <li>
-      <a href="./bluesky-atproto/" target="alapExampleLaunch">Bluesky / AT Protocol</a>
-      <span class="desc">:atproto: protocol — live profiles, feeds, people search, post search, plus a combined page mixing allLinks + :web: + :atproto: in one expression</span>
-    </li>
-    <li>
-      <a href="./json-protocol/" target="alapExampleLaunch">:json: Protocol</a>
-      <span class="desc">Fetch external JSON APIs with explicit field mapping — 7 real APIs across menu, lightbox, and lens renderers</span>
-    </li>
-    <li>
-      <a href="./cms-content/" target="alapExampleLaunch">CMS Content Transform</a>
-      <span class="desc">rehype-alap plugin — transforms CMS HTML with &lt;a href="alap:query"&gt; links into &lt;alap-link&gt; web components</span>
-    </li>
-    <li>
-      <a href="./cdn/" target="alapExampleLaunch">CDN / Script Tag</a>
-      <span class="desc">Zero npm, zero build step — load Alap via a &lt;script&gt; tag and go</span>
-    </li>
-    <li>
-      <a href="./lightbox/" target="alapExampleLaunch">Lightbox Renderer</a>
-      <span class="desc">Alternative renderer — menu items displayed in a lightbox overlay instead of a dropdown</span>
-    </li>
-    <li>
-      <a href="./lightbox-wc/" target="alapExampleLaunch">Lightbox Web Component</a>
-      <span class="desc"><code>&lt;alap-lightbox&gt;</code> custom element with ::part() styling and layout rearrangement</span>
-    </li>
-    <li>
-      <a href="./lens/" target="alapExampleLaunch">Lens Renderer</a>
-      <span class="desc">Detail inspection renderer — click to view full metadata, tags, descriptions instead of navigating</span>
-    </li>
-    <li>
-      <a href="./lens-wc/" target="alapExampleLaunch">Lens Web Component</a>
-      <span class="desc"><code>&lt;alap-lens&gt;</code> custom element — same lens panel with shadow DOM encapsulation and ::part() styling</span>
-    </li>
-    <li>
-      <a href="./embed/" target="alapExampleLaunch">Embeds</a>
-      <span class="desc">Embedded iframes for YouTube, Vimeo, Spotify, CodePen, CodeSandbox — consent management, standalone + menu + lightbox + lens</span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Renderers</h2>
+    <div class="row">
+      <div class="row-name"><a href="./lightbox/" target="alapExampleLaunch">Lightbox</a></div>
+      <div class="row-desc">Menu items displayed in a lightbox overlay instead of a dropdown</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./lightbox-wc/" target="alapExampleLaunch">Lightbox WC</a></div>
+      <div class="row-desc">&lt;alap-lightbox&gt; custom element with ::part() styling and layout rearrangement</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./lens/" target="alapExampleLaunch">Lens</a></div>
+      <div class="row-desc">Detail inspection — click to view full metadata, tags, descriptions instead of navigating</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./lens-wc/" target="alapExampleLaunch">Lens WC</a></div>
+      <div class="row-desc">&lt;alap-lens&gt; custom element — shadow DOM encapsulation and ::part() styling</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./embed/" target="alapExampleLaunch">Embeds</a></div>
+      <div class="row-desc">YouTube, Vimeo, Spotify, CodePen, CodeSandbox — consent management, all renderer modes</div>
+    </div>
+  </div>
 
-  <h2>Static Site Generators</h2>
-  <p class="note">These examples use their own build tools and run locally from your checkout — they are not available on examples.alap.info.</p>
-  <ul>
-    <li>
-      <a href="http://localhost:9990/">Eleventy</a>
-      <span class="desc">Run first: <code>cd examples/sites/eleventy && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/eleventy && pnpm dev')">copy</button> (port 9990)</span>
-    </li>
-    <li>
-      <a href="http://localhost:9010/">Astro Integration</a>
-      <span class="desc">Run first: <code>cd examples/sites/astro-integration && ./serve.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/astro-integration && ./serve.sh')">copy</button> (port 9010)</span>
-    </li>
-    <li>
-      <a href="http://localhost:9170/">Hugo</a>
-      <span class="desc">Run first: <code>cd examples/sites/hugo && ./run.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/hugo && ./run.sh')">copy</button> (port 9170, requires Podman)</span>
-    </li>
-    <li>
-      <a href="http://localhost:5173/">VitePress</a>
-      <span class="desc">Run first: <code>cd examples/sites/vitepress && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/vitepress && pnpm dev')">copy</button></span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Advanced</h2>
+    <div class="row">
+      <div class="row-name"><a href="./hooks-and-media/" target="alapExampleLaunch">Hooks &amp; Media</a></div>
+      <div class="row-desc">Image triggers, div triggers, image menu items, hover preview, context popup, event log</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./regex-search/" target="alapExampleLaunch">Regex Search</a></div>
+      <div class="row-desc">/key/opts syntax — field filtering, sorting, age limits, composition with operators</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./markdown/" target="alapExampleLaunch">Markdown</a></div>
+      <div class="row-desc">[text](alap:@macro) in Markdown becomes &lt;alap-link&gt; via remark-alap plugin</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./tiptap/" target="alapExampleLaunch">Tiptap Rich-Text</a></div>
+      <div class="row-desc">Inline &lt;alap-link&gt; nodes in a Tiptap editor — side-by-side with live preview</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./external-data/" target="alapExampleLaunch">External Data</a></div>
+      <div class="row-desc">Load config from JSON files or remote endpoints</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./cdn/" target="alapExampleLaunch">CDN / Script Tag</a></div>
+      <div class="row-desc">Zero npm, zero build step — load Alap via a &lt;script&gt; tag and go</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Protocols</h2>
+    <div class="row">
+      <div class="row-name"><a href="./bluesky-atproto/" target="alapExampleLaunch">Bluesky / AT Proto</a></div>
+      <div class="row-desc">:atproto: protocol — live profiles, feeds, people search, post search, plus combined expressions</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./json-protocol/" target="alapExampleLaunch">:json: Protocol</a></div>
+      <div class="row-desc">Fetch external JSON APIs with field mapping — 7 real APIs across menu, lightbox, and lens</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="./cms-content/" target="alapExampleLaunch">CMS Content</a></div>
+      <div class="row-desc">rehype-alap plugin — transforms CMS HTML with &lt;a href="alap:query"&gt; into &lt;alap-link&gt;</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Static Site Generators</h2>
+    <p class="note">These run locally from your checkout — not available on examples.alap.info.</p>
+    <div class="row">
+      <div class="row-name"><a href="http://localhost:9990/">Eleventy</a></div>
+      <div class="row-desc"><code>cd examples/sites/eleventy && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/eleventy && pnpm dev')">copy</button> (port 9990)</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="http://localhost:9010/">Astro</a></div>
+      <div class="row-desc"><code>cd examples/sites/astro-integration && ./serve.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/astro-integration && ./serve.sh')">copy</button> (port 9010)</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="http://localhost:9170/">Hugo</a></div>
+      <div class="row-desc"><code>cd examples/sites/hugo && ./run.sh</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/hugo && ./run.sh')">copy</button> (port 9170)</div>
+    </div>
+    <div class="row">
+      <div class="row-name"><a href="http://localhost:5173/">VitePress</a></div>
+      <div class="row-desc"><code>cd examples/sites/vitepress && pnpm dev</code><button class="copy-btn" onclick="navigator.clipboard.writeText('cd examples/sites/vitepress && pnpm dev')">copy</button></div>
+    </div>
+  </div>
+
 </body>
 </html>

@@ -23,8 +23,8 @@ When the reader clicks "landmarks," they get a menu. Your sentence stays clean. 
 
 | You are... | Start here |
 |------------|-----------|
-| A **developer** building with Alap | [START-Dev.md](START-Dev.md) — install, framework setup, configuration, storage |
-| A **writer, editor, or designer** using Alap | [START-Creators.md](START-Creators.md) — concepts, expression language, editors, cookbooks |
+| A **developer** building with Alap | [For Developers](docs/start-dev.md) — install, framework setup, configuration, storage |
+| A **writer, editor, or designer** using Alap | [For Creators](docs/start-creators.md) — concepts, expression language, editors, cookbooks |
 
 ## The Expression Language
 

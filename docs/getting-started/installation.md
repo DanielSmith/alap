@@ -118,23 +118,23 @@ All peer dependencies are optional. If you import an adapter without its framewo
 
 ## Plugins & Integrations
 
-Separate packages for specific platforms and content pipelines:
+Separate packages for specific platforms and content pipelines. Available in the [Alap monorepo](https://github.com/DanielSmith/alap) under `plugins/` and `integrations/`. To use them, clone the repo and reference them via pnpm workspace.
 
-| Package | What | Install |
-|---------|------|---------|
-| `remark-alap` | Markdown → `<alap-link>` | `npm install remark-alap` |
-| `rehype-alap` | HTML/CMS content → `<alap-link>` | `npm install rehype-alap` |
-| `@alap/mdx` | MDX with React provider | `npm install @alap/mdx` |
-| `@alap/tiptap` | Tiptap/ProseMirror extension | `npm install @alap/tiptap` |
-| `astro-alap` | Astro integration (zero-config) | `npm install astro-alap` |
-| `eleventy-alap` | Eleventy plugin (shortcodes + filters) | `npm install eleventy-alap` |
-| `qwik-alap` | Qwik City integration (Vite plugin) | `npm install qwik-alap` |
-| `next-alap` | Next.js App Router (`'use client'` + layout) | `npm install next-alap` |
-| `nuxt-alap` | Nuxt 3 (client plugin + Nuxt Content) | `npm install nuxt-alap` |
-| `vitepress-alap` | VitePress (Vite plugin + custom element) | `npm install vitepress-alap` |
+| Package | What |
+|---------|------|
+| `remark-alap` | Markdown → `<alap-link>` (workspace) |
+| `rehype-alap` | HTML/CMS content → `<alap-link>` (workspace) |
+| `@alap/mdx` | MDX with React provider (workspace) |
+| `@alap/tiptap` | Tiptap/ProseMirror extension (workspace) |
+| `astro-alap` | Astro integration (zero-config) (workspace) |
+| `eleventy-alap` | Eleventy plugin (shortcodes + filters) (workspace) |
+| `qwik-alap` | Qwik City integration (Vite plugin) (workspace) |
+| `next-alap` | Next.js App Router (`'use client'` + layout) (workspace) |
+| `nuxt-alap` | Nuxt 3 (client plugin + Nuxt Content) (workspace) |
+| `vitepress-alap` | VitePress (Vite plugin + custom element) (workspace) |
 
-For WordPress, see the [WordPress plugin](../../plugins/wordpress/) (no npm — PHP plugin with Docker containers).
-For Hugo, see the [Hugo integration](../../integrations/hugo-alap/) (shortcodes + web component).
+For WordPress, see the [WordPress plugin](../integrations/wordpress.md) (no npm — PHP plugin with Docker containers).
+For Hugo, see the [Hugo integration](../integrations/hugo.md) (shortcodes + web component).
 
 ## For contributors
 

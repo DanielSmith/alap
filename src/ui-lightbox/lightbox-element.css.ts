@@ -21,6 +21,7 @@ export const STYLES = `
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: var(--alap-lightbox-overlay-padding, 2rem);
     background: var(--alap-lightbox-overlay-bg, rgba(0, 0, 0, 0.85));
     backdrop-filter: blur(var(--alap-lightbox-overlay-blur, 4px));
     opacity: 0;
@@ -205,7 +206,6 @@ export const STYLES = `
 
   .counter-wrap {
     position: relative;
-    margin-top: var(--alap-lightbox-counter-margin, 1rem);
     text-align: center;
     z-index: 2;
   }
@@ -215,6 +215,9 @@ export const STYLES = `
     color: var(--alap-lightbox-counter-color, #666);
     font-size: var(--alap-lightbox-counter-size, 0.85rem);
     cursor: default;
+    white-space: nowrap;
+    min-width: var(--alap-lightbox-counter-min-width, 7em);
+    text-align: center;
     transition: opacity var(--alap-lightbox-transition, 0.25s) ease;
   }
 
@@ -356,42 +359,41 @@ export const STYLES = `
   /* --- Navigation --- */
 
   .nav {
-    position: absolute;
-    top: calc(50% + 9.5rem);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .overlay:hover .nav {
-    opacity: 1;
-  }
-
-  .nav button {
-    background: var(--alap-lightbox-nav-bg, rgba(255, 255, 255, 0.1));
-    border: none;
-    color: var(--alap-lightbox-nav-color, #fff);
-    font-size: var(--alap-lightbox-nav-icon-size, 2rem);
-    cursor: pointer;
-    line-height: 1;
-    width: var(--alap-lightbox-nav-btn-size, 48px);
-    height: var(--alap-lightbox-nav-btn-size, 48px);
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background var(--alap-lightbox-transition, 0.25s);
+    gap: var(--alap-lightbox-nav-gap, 1rem);
+    margin-top: 1rem;
+    flex-shrink: 0;
+    transition: opacity var(--alap-lightbox-transition, 0.25s) ease;
   }
 
-  .nav button:hover {
-    background: var(--alap-lightbox-nav-bg-hover, rgba(255, 255, 255, 0.2));
-  }
-
-  .nav-prev {
-    left: var(--alap-lightbox-nav-offset, calc(50% - 340px));
-  }
-
+  .nav-prev,
   .nav-next {
-    right: var(--alap-lightbox-nav-offset, calc(50% - 340px));
+    background: var(--alap-lightbox-nav-bg, rgba(255, 255, 255, 0.1));
+    border: none;
+    color: var(--alap-lightbox-nav-color, #fff);
+    font-size: var(--alap-lightbox-nav-icon-size, 1.5rem);
+    width: var(--alap-lightbox-nav-btn-size, 36px);
+    height: var(--alap-lightbox-nav-btn-size, 36px);
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.25;
+    transition: background var(--alap-lightbox-transition, 0.25s), opacity 0.4s ease;
+  }
+
+  .nav:hover .nav-prev,
+  .nav:hover .nav-next {
+    opacity: 1;
+  }
+
+  .nav-prev:hover,
+  .nav-next:hover {
+    background: var(--alap-lightbox-nav-bg-hover, rgba(255, 255, 255, 0.2));
   }
 
   /* --- Fade transition --- */

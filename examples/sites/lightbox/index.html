@@ -6,6 +6,88 @@
   <title>Alap Lightbox Renderer</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="../shared/nav.css">
+  <style>
+    .placement-details {
+      margin: 1.5rem 0;
+      border: 1px solid #2e48a0;
+      border-radius: 10px;
+      background: rgba(21, 37, 112, 0.4);
+      padding: 0;
+    }
+    .placement-details summary {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      color: #aac4f0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      list-style: none;
+    }
+    .placement-details summary::before {
+      content: '\25b6';
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-size: 0.7rem;
+      transition: transform 0.2s;
+    }
+    .placement-details[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .placement-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .placement-details[open] > .compass-section {
+      padding: 0 1.25rem 1.25rem;
+    }
+    .compass-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    .compass-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .compass-info p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .compass-rose {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 2rem;
+      background: #152570;
+      border: 1px solid #2e48a0;
+      border-radius: 12px;
+    }
+    .compass-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #2240a8;
+      color: #aac4f0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+    }
+    .compass-btn:hover {
+      background: #2d50c0;
+      color: #fff;
+    }
+    .compass-btn.active {
+      background: #3a6aff;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 0 16px rgba(58, 134, 255, 0.3);
+    }
+  </style>
 </head>
 <body class="has-site-nav">
   <nav class="site-nav">
@@ -21,6 +103,17 @@
   <h1>Lightbox Renderer</h1>
   <p>Same Alap config, different renderer. Click any link to open a
     fullscreen lightbox instead of a dropdown menu.</p>
+
+  <details class="placement-details">
+    <summary>Panel Placement</summary>
+    <div class="compass-section">
+      <div class="compass-info">
+        <p>Select a compass direction to anchor the lightbox panel in the viewport.</p>
+        <p>Click a direction again to deselect. With no direction selected, the panel defaults to centered.</p>
+      </div>
+      <div id="compass" class="compass-rose"></div>
+    </div>
+  </details>
 
   <h2>Bridges</h2>
   <div class="example">

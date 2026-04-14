@@ -243,31 +243,34 @@ export class AlapLightbox implements CoordinatedRenderer {
       });
     }
 
-    body.appendChild(counterWrap);
-
-    card.appendChild(body);
-    this.overlay.appendChild(card);
-
-    // Navigation zones
+    // Navigation row: prev + counter + next inside body (like lens)
     if (this.links.length > 1) {
-      const prevZone = document.createElement('div');
-      prevZone.className = 'alap-lightbox-nav alap-lightbox-nav-prev';
+      const nav = document.createElement('div');
+      nav.className = 'alap-lightbox-nav';
+
       const prevBtn = document.createElement('button');
+      prevBtn.className = 'alap-lightbox-nav-prev';
       prevBtn.setAttribute('aria-label', 'Previous');
       prevBtn.textContent = '\u2039';
       prevBtn.addEventListener('click', () => this.navigate(-1));
-      prevZone.appendChild(prevBtn);
-      this.overlay.appendChild(prevZone);
+      nav.appendChild(prevBtn);
 
-      const nextZone = document.createElement('div');
-      nextZone.className = 'alap-lightbox-nav alap-lightbox-nav-next';
+      nav.appendChild(counterWrap);
+
       const nextBtn = document.createElement('button');
+      nextBtn.className = 'alap-lightbox-nav-next';
       nextBtn.setAttribute('aria-label', 'Next');
       nextBtn.textContent = '\u203a';
       nextBtn.addEventListener('click', () => this.navigate(1));
-      nextZone.appendChild(nextBtn);
-      this.overlay.appendChild(nextZone);
+      nav.appendChild(nextBtn);
+
+      body.appendChild(nav);
+    } else {
+      body.appendChild(counterWrap);
     }
+
+    card.appendChild(body);
+    this.overlay.appendChild(card);
 
     this.update();
   }

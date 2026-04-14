@@ -49,10 +49,54 @@
     .placement-details[open] > .compass-section {
       padding: 0 1.25rem 1.25rem;
     }
-    .compass-section p {
+    .compass-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    .compass-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .compass-info p {
+      margin: 0;
       color: rgba(255, 255, 255, 0.5);
       font-size: 0.9rem;
       line-height: 1.6;
+    }
+    .compass-rose {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 2rem;
+      background: #152570;
+      border: 1px solid #2e48a0;
+      border-radius: 12px;
+    }
+    .compass-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #2240a8;
+      color: #aac4f0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+    }
+    .compass-btn:hover {
+      background: #2d50c0;
+      color: #fff;
+    }
+    .compass-btn.active {
+      background: #3a6aff;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 0 16px rgba(58, 134, 255, 0.3);
     }
   </style>
 </head>
@@ -71,6 +115,17 @@
   <p>The <code>&lt;alap-lens&gt;</code> custom element renders the same detail panel
     as the DOM lens, but uses shadow DOM for style encapsulation.
     Same config, same data, fully stylable via CSS custom properties and <code>::part()</code>.</p>
+
+  <details class="placement-details">
+    <summary>Panel Placement</summary>
+    <div class="compass-section">
+      <div class="compass-info">
+        <p>Select a compass direction to anchor the lens panel in the viewport.</p>
+        <p>Click a direction again to deselect. With no direction selected, the panel defaults to centered.</p>
+      </div>
+      <div id="compass" class="compass-rose"></div>
+    </div>
+  </details>
 
   <h2>Cities &amp; Landmarks</h2>
   <div class="example">
@@ -162,22 +217,6 @@
       with booleans, long descriptions, and link arrays.
     </p>
   </div>
-
-  <details class="placement-details">
-    <summary>Panel Placement</summary>
-    <div class="compass-section">
-      <p>The <code>placement</code> attribute anchors the panel to a viewport edge.
-        Compass directions: N, NE, E, SE, S, SW, W, NW, C (centered, the default).</p>
-      <p>
-        <alap-lens query=".landmark" placement="N">top</alap-lens> &middot;
-        <alap-lens query=".landmark" placement="NE">top-right</alap-lens> &middot;
-        <alap-lens query=".landmark" placement="S">bottom</alap-lens> &middot;
-        <alap-lens query=".landmark" placement="SW">bottom-left</alap-lens> &middot;
-        <alap-lens query=".landmark" placement="W">left</alap-lens> &middot;
-        <alap-lens query=".landmark">centered (default)</alap-lens>
-      </p>
-    </div>
-  </details>
 
   <h2>Options via Attributes</h2>
   <div class="example">

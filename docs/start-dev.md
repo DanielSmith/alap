@@ -2,7 +2,7 @@
 
 This guide covers install, framework setup, configuration, storage, and integrations.
 
-For the concepts, expression grammar, and editors, see [START-Creators.md](START-Creators.md).
+For the concepts, expression grammar, and editors, see [For Creators](start-creators.md).
 
 ## Install
 
@@ -30,7 +30,7 @@ Import only what you need — unused adapters are tree-shaken:
 <script src="https://cdn.jsdelivr.net/npm/alap@3/dist/alap.iife.js"></script>
 ```
 
-See [Installation](docs/getting-started/installation.md) for full details.
+See [Installation](getting-started/installation.md) for full details.
 
 ---
 
@@ -268,9 +268,9 @@ Refiners shape and order the result set:
 (.nyc *limit:3*) | (.sf *limit:3*)   3 from each city
 ```
 
-See [Protocols](docs/core-concepts/protocols.md) and [Refiners](docs/core-concepts/refiners.md).
+See [Protocols](core-concepts/protocols.md) and [Refiners](core-concepts/refiners.md).
 
-See [Configuration](docs/getting-started/configuration.md) for full details.
+See [Configuration](getting-started/configuration.md) for full details.
 
 ---
 
@@ -294,7 +294,7 @@ await store.save('my-config', config);
 const loaded = await store.load('my-config');
 ```
 
-To use remote storage, run any [Alap config server](examples/servers/). See [Servers](docs/api-reference/servers.md).
+To use remote storage, run any [Alap config server](examples/servers/). See [Servers](api-reference/servers.md).
 
 ---
 
@@ -302,11 +302,9 @@ To use remote storage, run any [Alap config server](examples/servers/). See [Ser
 
 ### Markdown (remark-alap)
 
-Transform `[text](alap:query)` links in markdown into `<alap-link>` web components:
+Transform `[text](alap:query)` links in markdown into `<alap-link>` web components.
 
-```bash
-npm install remark-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `plugins/remark-alap/`. See [full setup instructions](plugins/remark-alap.md).
 
 ```md
 Check out the [best bridges](alap:@nycBridges) in the city.
@@ -317,31 +315,25 @@ Works with Astro, Next.js, Nuxt, or any remark pipeline. See [remark-alap](plugi
 
 ### HTML / CMS Content (rehype-alap)
 
-Transform `<a href="alap:query">` links from headless CMSs into `<alap-link>` web components:
+Transform `<a href="alap:query">` links from headless CMSs into `<alap-link>` web components.
 
-```bash
-npm install rehype-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `plugins/rehype-alap/`. See [full setup instructions](plugins/rehype-alap.md).
 
 For content from Contentful, Sanity, Strapi, WordPress API, Ghost. See [rehype-alap](plugins/rehype-alap/) (`plugins/rehype-alap/`) and the [rehype-alap example](examples/sites/cms-content/) (`examples/sites/cms-content/`).
 
 ### Tiptap (Rich Text)
 
-Insert `<alap-link>` as an inline node in Tiptap editors:
+Insert `<alap-link>` as an inline node in Tiptap editors.
 
-```bash
-npm install @alap/tiptap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `plugins/tiptap-alap/`. See [full setup instructions](plugins/tiptap-alap.md).
 
 See [tiptap-alap](plugins/tiptap-alap/) (`plugins/tiptap-alap/`) and the [tiptap-alap example](examples/sites/tiptap/) (`examples/sites/tiptap/`).
 
 ### Astro Integration
 
-Zero-config setup — one line in your Astro config:
+Zero-config setup — one line in your Astro config.
 
-```bash
-npm install astro-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/astro-alap/`. See [full setup instructions](integrations/astro.md).
 
 ```js
 // astro.config.mjs
@@ -358,51 +350,41 @@ See [astro-alap](integrations/astro-alap/) (`integrations/astro-alap/`) and the 
 
 ### Eleventy Plugin
 
-Static or interactive link menus for Eleventy sites:
+Static or interactive link menus for Eleventy sites.
 
-```bash
-npm install eleventy-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/eleventy-alap/`. See [full setup instructions](integrations/eleventy.md).
 
 See [eleventy-alap](integrations/eleventy-alap/) (`integrations/eleventy-alap/`) and the [eleventy-alap example](examples/sites/eleventy/) (`examples/sites/eleventy/`).
 
 ### Next.js Integration
 
-`'use client'` component re-exports + layout component for the App Router:
+`'use client'` component re-exports + layout component for the App Router.
 
-```bash
-npm install next-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/next-alap/`. See [full setup instructions](integrations/next.md).
 
 See [next-alap](integrations/next-alap/) (`integrations/next-alap/`) and the [next-alap example](examples/sites/next/) (`examples/sites/next/`).
 
 ### Nuxt Integration
 
-Client plugin factory + Vue component re-exports + Nuxt Content markdown:
+Client plugin factory + Vue component re-exports + Nuxt Content markdown.
 
-```bash
-npm install nuxt-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/nuxt-alap/`. See [full setup instructions](integrations/nuxt.md).
 
 See [nuxt-alap](integrations/nuxt-alap/) (`integrations/nuxt-alap/`).
 
 ### Qwik City Integration
 
-Vite plugin for Qwik City projects:
+Vite plugin for Qwik City projects.
 
-```bash
-npm install qwik-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/qwik-alap/`. See [full setup instructions](integrations/qwik-city.md).
 
 See [qwik-alap](integrations/qwik-alap/) (`integrations/qwik-alap/`).
 
 ### VitePress Integration
 
-Vite plugin for VitePress documentation sites:
+Vite plugin for VitePress documentation sites.
 
-```bash
-npm install vitepress-alap
-```
+> Available in the [Alap monorepo](https://github.com/DanielSmith/alap) at `integrations/vitepress-alap/`. See [full setup instructions](integrations/vitepress.md).
 
 See [vitepress-alap](integrations/vitepress-alap/) (`integrations/vitepress-alap/`).
 
@@ -451,9 +433,9 @@ pnpm turbo run build --filter=./integrations/*        # all integrations
 
 | Doc | What |
 |-----|------|
-| [Getting Started](docs/getting-started/) | Installation, quick start, configuration |
-| [Core Concepts](docs/core-concepts/) | Expressions, macros, search patterns, refiners, styling |
-| [Framework Guides](docs/framework-guides/) | 9 adapters (React, Vue, Svelte, Qwik, Astro, Alpine, Solid, Web Component, Vanilla DOM) + integrations (Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more) |
-| [API Reference](docs/api-reference/) | Engine, types, events, storage, servers, security |
-| [Cookbooks](docs/cookbook/) | Accessibility, editors, existing URLs, images, markdown, language ports |
-| [FAQ](docs/FAQ.md) | Common questions |
+| [Getting Started](getting-started/) | Installation, quick start, configuration |
+| [Core Concepts](core-concepts/) | Expressions, macros, search patterns, refiners, styling |
+| [Framework Guides](framework-guides/) | 9 adapters (React, Vue, Svelte, Qwik, Astro, Alpine, Solid, Web Component, Vanilla DOM) + integrations (Eleventy, Next.js, Nuxt, Hugo, WordPress, htmx, and more) |
+| [API Reference](api-reference/) | Engine, types, events, storage, servers, security |
+| [Cookbooks](cookbook/) | Accessibility, editors, existing URLs, images, markdown, language ports |
+| [FAQ](FAQ.md) | Common questions |

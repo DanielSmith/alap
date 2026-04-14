@@ -1,8 +1,8 @@
 # Expression Language Spec
 
-**[Core Concepts](README.md):** [Expressions](expressions.md) · **This Page** · [Macros](macros.md) · [Search Patterns](search-patterns.md) · [Protocols](protocols.md) · [Refiners](refiners.md) · [Styling](styling.md)
+**[API Reference](README.md):** **This Page** · [Engine](engine.md) · [Types](types.md) · [Events](events.md) · [Security](security.md) · [Servers](servers.md)
 
-Formal specification of the Alap expression language. For a tutorial introduction, see [Expressions](expressions.md).
+Formal specification of the Alap expression language. For a tutorial introduction, see [Expressions](../core-concepts/expressions.md).
 
 ## Design principle
 

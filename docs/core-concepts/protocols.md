@@ -202,7 +202,7 @@ books: { url: "...", cache: 60 }    // cache for 1 hour
 bridges: { url: "...", cache: 0 }   // always refetch
 ```
 
-See the [external-data example](../../examples/sites/external-data/) (`examples/sites/external-data/`).
+See the [external-data example](https://examples.alap.info/external-data/) (`examples/sites/external-data/`).
 
 ### `:atproto:` — live data from Bluesky
 
@@ -232,7 +232,7 @@ protocols: {
 
 Then use the alias in expressions: `:atproto:people:open_source:limit=5:`. Single-word queries work directly.
 
-A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](../../examples/sites/bluesky-atproto/combined.html) for a live demo.
+A single expression can mix static `allLinks`, `:web:` results, and `:atproto:` data into one menu — see the [bluesky-atproto combined page](https://examples.alap.info/bluesky-atproto/combined.html) for a live demo.
 
 ### Source indicators
 
@@ -250,7 +250,7 @@ This lets you visually distinguish where each menu item came from in mixed-sourc
 
 The `meta.source` field is also available in hooks like `onItemHover` for displaying provenance tooltips.
 
-See the [bluesky-atproto example](../../examples/sites/bluesky-atproto/) (`examples/sites/bluesky-atproto/`).
+See the [bluesky-atproto example](https://examples.alap.info/bluesky-atproto/) (`examples/sites/bluesky-atproto/`).
 
 ## Custom protocols
 

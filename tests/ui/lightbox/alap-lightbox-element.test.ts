@@ -378,8 +378,8 @@ describe('Web Component — <alap-lightbox>', () => {
       clickElement(el);
 
       const overlay = getOverlay(el)!;
-      const prevBtn = overlay.querySelector('.nav-prev button')!;
-      const nextBtn = overlay.querySelector('.nav-next button')!;
+      const prevBtn = overlay.querySelector('button.nav-prev')!;
+      const nextBtn = overlay.querySelector('button.nav-next')!;
       expect(prevBtn).not.toBeNull();
       expect(nextBtn).not.toBeNull();
       expect(prevBtn.getAttribute('aria-label')).toBe('Previous');
