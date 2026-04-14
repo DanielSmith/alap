@@ -28,6 +28,13 @@ npm install alap
 | `alap/qwik` | `AlapProvider`, `AlapLink`, `useAlap()` | `@builder.io/qwik` |
 | `alap/storage` | IndexedDB + Remote + Hybrid persistence | `idb` (optional) |
 
+**Framework adapters are just the adapter.** Paths like `alap/react` or `alap/vue` export only the Provider, Link component, and composable/hook — they don't re-export the engine, lightbox, lens, protocols, or anything else. The Provider creates an engine internally, so basic menu usage works with just the adapter import. But if you need a renderer or protocol alongside framework components, import it from `alap` separately:
+
+```tsx
+import { AlapProvider, AlapLink } from 'alap/vue';   // adapter only
+import { AlapLightbox } from 'alap';                  // renderer from main package
+```
+
 CSS files for renderers are imported separately:
 
 | Import path | What it styles |

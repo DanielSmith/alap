@@ -10,12 +10,38 @@ Every Alap instance starts with a config object. At minimum you need `allLinks` 
 
 ```typescript
 interface AlapConfig {
+  // --- Data layer (pure JSON, serializable) ---
   allLinks: Record<string, AlapLink>;                          // required
   settings?: AlapSettings;
   macros?: Record<string, AlapMacro>;
   searchPatterns?: Record<string, AlapSearchPattern | string>;
+
+  // --- Code layer (JavaScript only) ---
   protocols?: Record<string, AlapProtocol>;
 }
+```
+
+The config has two layers:
+
+- **Data** — `allLinks`, `macros`, `settings`, `searchPatterns`. Pure JSON. This is what editors produce, what gets saved to a database, and what can be loaded from a `<script type="application/json">` block or a remote endpoint.
+- **Code** — `protocols`. Custom protocol handlers are functions, so they can only be defined in JavaScript/TypeScript. They are part of your application code, not your stored data.
+
+You can define everything at the code layer — write your entire config in a `.ts` file, skip JSON entirely, and be done. But you can't go the other direction: a pure JSON config gives you links, tags, macros, expressions, and access to Alap's built-in protocols (`:web:`, `:atproto:`, `:json:`, etc.), but no *custom* protocols. Custom protocols require code.
+
+Most projects land somewhere in between: data lives in JSON (portable, editor-friendly, storable), and the code layer wraps it with any protocols the project needs:
+
+```typescript
+// alap-config.ts
+import linkData from './links.json';           // data layer — from editor, DB, API
+
+export const config: AlapConfig = {
+  ...linkData,                                  // allLinks, macros, settings
+  protocols: {                                  // code layer — defined in your app
+    price: {
+      handler: (segments, link) => { /* ... */ },
+    },
+  },
+};
 ```
 
 ## `allLinks` — your link library
@@ -149,20 +175,38 @@ A plain string is shorthand for `{ pattern: "..." }` with default options. See [
 
 ## `protocols` — dimensional queries
 
-Protocol expressions extend the query language with domain-specific filtering — time, location, price, or any custom dimension:
+Protocol expressions extend the query language with domain-specific filtering — time, location, or any custom dimension. Because protocol handlers are functions, they can't live in a JSON config — they must be defined in a JS/TS module (e.g. `alap-config.ts`), alongside `allLinks`, `macros`, and `settings`:
 
 ```typescript
-protocols: {
-  price: {
-    handler: (segments, link) => {
-      if (!link.meta?.price) return false;
-      const min = parseFloat(segments[0]);
-      const max = parseFloat(segments[1]);
-      return link.meta.price >= min && link.meta.price <= max;
+const config: AlapConfig = {
+  allLinks: {
+    bluebottle: {
+      label: 'Blue Bottle',
+      url: 'https://bluebottlecoffee.com',
+      tags: ['coffee', 'sf'],
+      meta: { price: 5 },
+    },
+    stumptown: {
+      label: 'Stumptown',
+      url: 'https://stumptowncoffee.com',
+      tags: ['coffee', 'portland'],
+      meta: { price: 4 },
     },
   },
-}
+  protocols: {
+    price: {
+      handler: (segments, link) => {
+        if (!link.meta?.price) return false;
+        const min = parseFloat(segments[0]);
+        const max = parseFloat(segments[1]);
+        return link.meta.price >= min && link.meta.price <= max;
+      },
+    },
+  },
+};
 ```
+
+The `:price:0:10:` syntax in an expression invokes the `price` protocol handler, filtering items by their `meta.price` value:
 
 ```html
 <alap-link query=".coffee + :price:0:10:">affordable cafes</alap-link>

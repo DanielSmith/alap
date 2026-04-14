@@ -86,7 +86,6 @@ Keep expressions simple in `href` values. CMS sanitizers and WYSIWYG editors may
 
 - [remark-alap](remark-alap.md) — the Markdown equivalent (`[text](alap:query)`)
 - [CMS content example](https://examples.alap.info/cms-content/) — interactive demo
-- [Alap documentation](https://alap.info)
 
 ## License
 

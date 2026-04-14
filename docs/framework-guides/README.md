@@ -37,6 +37,19 @@ Separate packages that connect Alap to specific platforms, build tools, and cont
 | [CDN / IIFE](../getting-started/installation.md) | — | `<script>` tag, no bundler, no npm |
 | [htmx](https://examples.alap.info/htmx/) | — | `<alap-link>` auto-initializes after htmx swaps |
 
+## What adapters include (and don't)
+
+Framework adapters export only the Provider, Link component, and hook/composable. They don't re-export the engine, renderers, or protocols. The Provider creates an engine internally, so menus work with just the adapter import. If you also need lightbox, lens, or a protocol, import it from `alap` separately:
+
+```vue
+<script setup>
+import { AlapProvider, AlapLink } from 'alap/vue';   // adapter only
+import { AlapLightbox } from 'alap';                  // add renderer
+</script>
+```
+
+This keeps your bundle small — you only pay for what you import.
+
 ## Which one should I use?
 
 - **No framework?** Start with [Web Component](web-component.md) — it works in plain HTML

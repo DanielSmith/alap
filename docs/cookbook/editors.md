@@ -59,11 +59,7 @@ npm install
 npm run dev
 ```
 
-For drag-and-drop metadata extraction (requires serverless functions):
-
-```bash
-netlify dev
-```
+Drag-and-drop metadata extraction works automatically in dev mode — a built-in Vite plugin serves the `/api/meta` endpoint locally. No external services needed.
 
 ## Workflow
 

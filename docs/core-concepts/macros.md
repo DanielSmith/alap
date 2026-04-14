@@ -101,5 +101,4 @@ If an expression is used in exactly one place and it's short, a macro adds indir
 
 ## Next steps
 
-- [Expressions](expressions.md) — the full query language
-- [Configuration](../getting-started/configuration.md) — macro syntax in the config object
+- [Search Patterns](search-patterns.md) — regex-based discovery with `/pattern/`

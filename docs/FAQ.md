@@ -22,7 +22,7 @@ No — the concept dates back to the 1990s:
 - **2012:** Originally called "MultiLinks," built with jQuery.
 - **2021 (v1):** Rewritten as an ES6 library, no dependencies. Published on npm as `alap`.
 - **2021 (v2):** Introduced an API mode so frameworks like Vue and React could use Alap for data without Alap touching the DOM.
-- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, Server and Parser implementations in Node / Bun, Rust, Go, PHP, Python, and Java. 990+ tests.
+- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, server and parser implementations in Node / Bun, Rust, Go, PHP, Python, and Java. Alternative renderers — lightbox (fullscreen image/text overlay) and lens (detail inspection panel) — alongside the original dropdown menu. The beginnings of a broader ecosystem with Gather (ad-hoc collection building) and HighNotes (floating detail cards). 1460+ tests.
 
 ### How is this different from a dropdown menu or a tooltip?
 
@@ -86,7 +86,15 @@ Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alp
 
 ### How big is the library?
 
-The IIFE build is ~27 KB (8.2 KB gzipped). The core (`alap/core`) has zero runtime dependencies and is fully tree-shakeable. See [Installation](getting-started/installation.md) for the full import table.
+Depends on what you import:
+
+| Entry point | Raw | Gzipped | What's included |
+|-------------|-----|---------|-----------------|
+| `alap` (IIFE) | 147 KB | 36 KB | Everything — engine, all renderers, protocols, coordinators |
+| `alap/slim` | 30 KB | 8.6 KB | Engine + menus (DOM + WC) + web/json protocols |
+| `alap/core` | 27 KB | 8 KB | Engine + parser only (no DOM) |
+
+The core has zero runtime dependencies and is fully tree-shakeable. Most projects should start with `alap/slim` and add renderers as needed. See [Installation](getting-started/installation.md) for the full import table.
 
 ### Which browsers are supported?
 
@@ -156,7 +164,7 @@ Yes. Protocol expressions extend the query language with dimensional filtering:
 (:time:7d: + .featured), .pinned  → featured from last week, plus pinned
 ```
 
-Create custom handlers for any dimension — `:price:10:50:`, `:beds:2:4:`, anything. See [Protocols](core-concepts/protocols.md).
+Create custom handlers for any dimension your app needs. See [Protocols](core-concepts/protocols.md).
 
 ### Can I sort, limit, or shuffle results?
 
@@ -215,7 +223,7 @@ Every Alap [editor](cookbook/editors.md) includes a live query tester. Type an e
 
 ### Is this AI-generated code?
 
-The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 990+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
+The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 1460+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
 
 ### Why Apache 2.0 license?
 

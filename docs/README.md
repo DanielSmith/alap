@@ -27,7 +27,7 @@ How the expression language works.
 - [Expression Spec](api-reference/spec.md) — formal grammar, operator semantics, worked examples
 - [Macros](core-concepts/macros.md) — name and reuse expressions with `@`
 - [Search Patterns](core-concepts/search-patterns.md) — regex-based discovery with `/pattern/`
-- [Protocols](core-concepts/protocols.md) — dimensional queries (time, location, price) with `:protocol:args:`
+- [Protocols](core-concepts/protocols.md) — dimensional queries (time, location, live data sources) with `:protocol:args:`
 - [Refiners](core-concepts/refiners.md) — sort, limit, shuffle results with `*refiner*`
 - [Styling](core-concepts/styling.md) — CSS custom properties, `::part()`, dark mode, effects
 

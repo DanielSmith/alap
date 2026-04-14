@@ -126,7 +126,6 @@ This integration does not support webpack. Next.js has supported Vite as a bundl
 
 - [React adapter](../framework-guides/react.md) — the underlying component library (source: `src/ui/react/`)
 - [Next.js example](https://examples.alap.info/next/) — interactive demo
-- [Alap documentation](https://alap.info)
 
 ## License
 

@@ -71,8 +71,6 @@ The expression parser enforces hard limits to prevent denial-of-service:
 
 ## Positive patterns
 
-These are already done right — no action needed:
-
 | Pattern | Where |
 |---------|-------|
 | `textContent` for labels (no `innerHTML` with user data) | `buildMenuList.ts` |
@@ -139,16 +137,16 @@ When `linkBase` is used to prepend a base URL to relative paths, slashes are nor
 
 ## Cross-language security parity
 
-Alap's parser exists in five languages. All share the same security baseline:
+Alap's parser exists in six languages. All share the same security baseline:
 
-| Feature | TypeScript | Rust | Python | PHP | Go |
-|---------|-----------|------|--------|-----|-----|
-| URL sanitization | yes | yes | yes | yes | yes |
-| Prototype pollution defense | yes | yes | yes (+ dunders) | yes | yes |
-| Resource limits (depth/tokens) | yes | yes | yes | yes | yes |
-| ReDoS detection | syntactic | N/A (safe engine) | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2 engine) |
-| `validateConfig` | yes | yes | yes | yes | yes |
-| SSRF guard | yes | yes | yes | yes | yes |
+| Feature | TypeScript | Rust | Python | PHP | Go | Java |
+|---------|-----------|------|--------|-----|-----|------|
+| URL sanitization | yes | yes | yes | yes | yes | yes |
+| Prototype pollution defense | yes | yes | yes (+ dunders) | yes | yes | yes |
+| Resource limits (depth/tokens) | yes | yes | yes | yes | yes | yes |
+| ReDoS detection | syntactic | N/A (safe engine) | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2 engine) | syntactic |
+| `validateConfig` | yes | yes | yes | yes | yes | yes |
+| SSRF guard | yes | yes | yes | yes | yes | yes |
 
 **Language-specific defenses:**
 
@@ -156,6 +154,7 @@ Alap's parser exists in five languages. All share the same security baseline:
 - **PHP:** Rejects non-array input to `validateConfig()` — enforces `json_decode($json, true)` to prevent PHP Object Injection. Wraps regex execution with a temporary `pcre.backtrack_limit` (10,000) as a circuit breaker in case the syntactic ReDoS check misses an edge case.
 - **Go:** Explicitly handles IPv4-mapped IPv6 addresses (`::ffff:127.0.0.1`) in the SSRF guard via `net.IP.To4()` conversion before CIDR checking.
 - **Rust/Go:** Regex engines are inherently safe from ReDoS (finite automata, no backtracking). Syntactic validation still checks for compilation errors.
+- **Java:** SSRF guard uses `InetAddress` for resolution with loopback/link-local/site-local checks.
 
 **Known limitation (TypeScript/Python):** The `REGEX_TIMEOUT_MS` constant is checked between loop iterations, not during a single `RegExp.exec()` call. JavaScript and Python have no built-in mechanism to interrupt a running regex. The syntactic `validateRegex()` check is the primary defense.
 

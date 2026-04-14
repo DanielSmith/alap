@@ -136,7 +136,7 @@ For the full formal specification with operator semantics and worked input/outpu
 
 ## Beyond selection
 
-Expressions can also include [protocol filters](protocols.md) for dimensional queries (time, location, price) and [refiners](refiners.md) for shaping results (sort, limit, shuffle). Together, the three phases — selection, gathering, and refining — give you full control over what appears and in what order.
+Expressions can also include [protocol filters](protocols.md) for dimensional queries (time, location, live data sources) and [refiners](refiners.md) for shaping results (sort, limit, shuffle). Together, the three phases — selection, gathering, and refining — give you full control over what appears and in what order.
 
 ## Next steps
 

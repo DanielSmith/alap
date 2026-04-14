@@ -108,7 +108,6 @@ When `webComponent: true` (default), the client plugin registers `<alap-link>`. 
 
 - [Vue adapter](../framework-guides/vue.md) — the underlying component library (source: `src/ui/vue/`)
 - [Eleventy integration](eleventy.md) — another SSG integration pattern
-- [Alap documentation](https://alap.info)
 
 ## License
 

@@ -2,7 +2,7 @@
 
 **[Cookbook](README.md):** **This Page** · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
-Native ports of the Alap expression parser for Python, PHP, Go, and Rust. These enable server-side expression resolution without a Node.js sidecar.
+Native ports of the Alap expression parser for Python, PHP, Go, Rust, and Java. These enable server-side expression resolution without a Node.js sidecar.
 
 > Live version: https://alap.info/cookbook/language-ports
 
@@ -10,14 +10,14 @@ Source: `src/other-languages/`
 
 ## What's included
 
-| Module | Python | PHP | Go | Rust |
-|--------|--------|-----|-----|------|
-| Expression parser | `expression_parser.py` | `ExpressionParser.php` | `alap.go` | `alap-core` crate |
-| Regex validator | `validate_regex.py` | Built-in | Built-in | Built-in |
-| URL sanitizer | `sanitize_url.py` | Built-in | Built-in | Built-in |
-| Config validator | Built-in | Built-in | Built-in | `validate_config.rs` |
-| SSRF guard | `ssrf_guard.py` | Built-in | Built-in | `ssrf_guard.rs` |
-| Config merger | Built-in | Built-in | Built-in | Built-in |
+| Module | Python | PHP | Go | Rust | Java |
+|--------|--------|-----|-----|------|------|
+| Expression parser | `expression_parser.py` | `ExpressionParser.php` | `alap.go` | `alap-core` crate | `ExpressionParser.java` |
+| Regex validator | `validate_regex.py` | Built-in | Built-in | Built-in | `ValidateRegex.java` |
+| URL sanitizer | `sanitize_url.py` | Built-in | Built-in | Built-in | `SanitizeUrl.java` |
+| Config validator | Built-in | Built-in | Built-in | `validate_config.rs` | `ValidateConfig.java` |
+| SSRF guard | `ssrf_guard.py` | Built-in | Built-in | `ssrf_guard.rs` | `SsrfGuard.java` |
+| Config merger | Built-in | Built-in | Built-in | Built-in | Built-in |
 
 All ports support the full expression grammar including:
 - Item IDs, tags (`.coffee`), macros (`@favorites`)
@@ -33,20 +33,21 @@ All ports share the `\w` identifier constraint — item IDs, macro names, and ta
 
 All ports include the same security layers as the TypeScript implementation:
 
-| Feature | Python | PHP | Go | Rust |
-|---------|--------|-----|-----|------|
-| URL sanitization | yes | yes | yes | yes |
-| Prototype-pollution defense | yes (+ dunders) | yes | yes | yes |
-| Resource limits (depth/tokens) | yes | yes | yes | yes |
-| ReDoS detection | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2) | N/A (safe engine) |
-| `validateConfig` | yes | yes | yes | yes |
-| SSRF guard | yes | yes | yes | yes |
+| Feature | Python | PHP | Go | Rust | Java |
+|---------|--------|-----|-----|------|------|
+| URL sanitization | yes | yes | yes | yes | yes |
+| Prototype-pollution defense | yes (+ dunders) | yes | yes | yes | yes |
+| Resource limits (depth/tokens) | yes | yes | yes | yes | yes |
+| ReDoS detection | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2) | N/A (safe engine) | syntactic |
+| `validateConfig` | yes | yes | yes | yes | yes |
+| SSRF guard | yes | yes | yes | yes | yes |
 
 **Language-specific defenses:**
 - **Python:** Blocks dunder keys (`__class__`, `__bases__`, `__mro__`, `__subclasses__`) in `validate_config` — prevents downstream exploits if configs are passed to Jinja2 or logging formatters.
 - **PHP:** Rejects non-array input to `validateConfig()` (enforces `json_decode($json, true)`). Wraps regex execution with `pcre.backtrack_limit` as a circuit breaker.
 - **Go:** SSRF guard handles IPv4-mapped IPv6 addresses (`::ffff:127.0.0.1`) via `net.IP.To4()`.
 - **Rust:** SSRF guard blocks hex/octal/integer IP obfuscation (`0x7f.0.0.1`, `0177.0.0.1`, `2130706433`).
+- **Java:** SSRF guard uses `InetAddress` for resolution with loopback/link-local/site-local checks.
 
 See [Security](../api-reference/security.md) for the full cross-language matrix.
 
@@ -121,6 +122,19 @@ let ids = parser.query(".coffee + .nyc");
 
 Tests: Full test suite via `cargo test`. The Rust port uses edition 2024.
 
+## Java
+
+```java
+import alap.ExpressionParser;
+import alap.Config;
+
+Config config = loadConfig();
+ExpressionParser parser = new ExpressionParser(config);
+List<String> ids = parser.query(".coffee + .nyc");
+```
+
+Tests: 90+ tests via JUnit.
+
 ## Used by the server examples
 
 The language ports power expression resolution in the non-Node servers:
@@ -131,6 +145,7 @@ The language ports power expression resolution in the non-Node servers:
 | Laravel | PHP port |
 | Gin | Go port |
 | Axum | Rust port |
+| Spring Boot | Java port |
 | Express, Hono, Bun | TypeScript `alap/core` |
 
 See [Servers](../api-reference/servers.md) for the full server matrix.

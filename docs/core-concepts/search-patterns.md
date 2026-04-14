@@ -66,7 +66,7 @@ Search patterns support options that tags don't need:
 
 **`sort`** — Order results by `alpha`, `newest`, or `oldest`. Tags return items in config order; search results can be sorted by relevance to time or alphabet.
 
-**`limit`** — Cap the results. `"limit": 5` means "the five best matches." Useful when a broad pattern could return dozens of hits.
+**`limit`** — Cap the results. `"limit": 5` returns the first five matches. Useful when a broad pattern could return dozens of hits.
 
 ## It composes with everything
 
@@ -93,6 +93,5 @@ IDs for precision, tags for structure, search for serendipity. And because all t
 
 ## Next steps
 
-- [Expressions](expressions.md) — the full query language
-- [Configuration](../getting-started/configuration.md) — `searchPatterns` in the config object
-- [Security](../api-reference/security.md) — regex validation and ReDoS protection
+- [Protocols](protocols.md) — dimensional queries with `:protocol:args:`
+- [Refiners](refiners.md) — sort, limit, shuffle results with `*refiner*`
