@@ -113,6 +113,7 @@ export function AlapLink({
 
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<ResolvedLink[]>([]);
+  const openedViaKeyboard = useRef(false);
 
   const triggerId = useId();
   const menuId = useId();
@@ -157,8 +158,10 @@ export function AlapLink({
   // --- Open / close ---
 
   const closeMenu = useCallback(() => {
-    setIsOpen(false);
-    triggerRef.current?.focus();
+    setIsOpen((prev) => {
+      if (prev) triggerRef.current?.focus();
+      return false;
+    });
   }, []);
 
   const openMenu = useCallback(() => {
@@ -183,8 +186,11 @@ export function AlapLink({
   // --- Focus first item on open ---
 
   useEffect(() => {
-    if (isOpen && itemRefs.current[0]) {
-      itemRefs.current[0].focus();
+    if (isOpen) {
+      if (openedViaKeyboard.current && itemRefs.current[0]) {
+        itemRefs.current[0].focus();
+      }
+      openedViaKeyboard.current = false;
       startTimer();
     }
   }, [isOpen, startTimer]);
@@ -267,6 +273,7 @@ export function AlapLink({
   const handleTriggerKeyDown = (e: ReactKeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      openedViaKeyboard.current = true;
       if (mode === 'popover' && !isOpen) {
         openMenu();
       } else {

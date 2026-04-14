@@ -130,9 +130,9 @@ alap-link:hover {
 }
 
 .alapelem a:hover,
-.alapelem a:focus,
+.alapelem a:focus-visible,
 .alapListElem a:hover,
-.alapListElem a:focus {
+.alapListElem a:focus-visible {
   background: #3366d6;
   color: #ffd666;
   outline: none;

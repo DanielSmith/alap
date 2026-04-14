@@ -116,6 +116,7 @@ settings: {
 | `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
 | `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
 | `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment |
+| `preventFocusScroll` | `boolean` | `true` | Prevent viewport scrolling when focus moves to menu items on keyboard open |
 | `hooks` | `string[]` | — | Default hooks for all items (per-link `hooks` overrides) |
 
 ### Placement

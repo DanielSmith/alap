@@ -61,6 +61,7 @@ export class AlapUI implements CoordinatedRenderer {
   private lastPlacement: PlacementResult | null = null;
   private menuNaturalSize: Size | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
+  private openedViaKeyboard = false;
   private instanceId: string;
   private unsubscribeCoordinator: (() => void) | null = null;
 
@@ -126,6 +127,15 @@ export class AlapUI implements CoordinatedRenderer {
     for (const trigger of triggers) {
       trigger.removeEventListener('click', this.onTriggerClick);
       trigger.addEventListener('click', this.onTriggerClick.bind(this));
+
+      // Keyboard activation: Space/Enter open the menu (role="button" contract)
+      trigger.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.openedViaKeyboard = true;
+          trigger.click();
+        }
+      });
 
       // Event hooks: hover and context menu on triggers
       if (this.hooks.onTriggerHover) {
@@ -198,9 +208,14 @@ export class AlapUI implements CoordinatedRenderer {
   /** Build the trigger rect for the placement engine. Images use click coords as a point rect. */
   private getTriggerRect(trigger: HTMLElement, event: MouseEvent): DOMRect | { top: number; left: number; bottom: number; right: number; width: number; height: number } {
     if (trigger.tagName.toLowerCase() === 'img') {
-      // Synthetic 0×0 rect at click point for images
-      const x = event.clientX;
-      const y = event.clientY;
+      let x = event.clientX;
+      let y = event.clientY;
+      // Keyboard-initiated click has clientX/Y = 0 — use image center instead
+      if (x === 0 && y === 0) {
+        const rect = trigger.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      }
       return { top: y, left: x, bottom: y, right: x, width: 0, height: 0 };
     }
     return trigger.getBoundingClientRect();
@@ -364,9 +379,12 @@ export class AlapUI implements CoordinatedRenderer {
     // Notify coordinator — closes other menu instances (WC, framework, other DOM)
     getInstanceCoordinator().notifyOpen(this.instanceId);
 
-    // Focus first item
-    const firstItem = this.container.querySelector<HTMLElement>('a[role="menuitem"]');
-    if (firstItem) firstItem.focus();
+    // Focus first item on keyboard open only
+    if (this.openedViaKeyboard) {
+      const firstItem = this.container.querySelector<HTMLElement>('a[role="menuitem"]');
+      if (firstItem) firstItem.focus();
+    }
+    this.openedViaKeyboard = false;
 
     // Start dismiss timer
     this.timer.stop();

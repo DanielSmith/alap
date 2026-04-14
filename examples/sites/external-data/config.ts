@@ -82,7 +82,7 @@ export const demoConfig: AlapConfig = {
         },
         posts: {
           url: 'https://jsonplaceholder.typicode.com/posts',
-          linkBase: 'https://jsonplaceholder.typicode.com',
+          linkBase: 'https://jsonplaceholder.typicode.com/posts',
           searches: {
             recent: { _limit: 8 },
           },

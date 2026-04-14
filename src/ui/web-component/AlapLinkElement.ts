@@ -194,6 +194,7 @@ export class AlapLinkElement extends HTMLElement {
   private menu: HTMLElement | null = null;
   private timer: DismissTimer | null = null;
   private isOpen = false;
+  private openedViaKeyboard = false;
   private scrollHandler: (() => void) | null = null;
   private lastPlacement: PlacementResult | null = null;
   private menuNaturalSize: Size | null = null;
@@ -347,6 +348,7 @@ export class AlapLinkElement extends HTMLElement {
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
+      this.openedViaKeyboard = true;
       this.click();
     }
   };
@@ -454,11 +456,18 @@ export class AlapLinkElement extends HTMLElement {
     const adjustViewport = config?.settings?.viewportAdjust !== false;
 
     this.isOpen = true;
-    this.menu.setAttribute('aria-hidden', 'false');
     this.setAttribute('aria-expanded', 'true');
 
     if (adjustViewport) {
-      // Measure the menu's natural size
+      // Measure off-screen to get natural size without causing scroll or flicker
+      this.menu.style.position = 'fixed';
+      this.menu.style.visibility = 'hidden';
+      this.menu.style.top = '-9999px';
+      this.menu.style.left = '-9999px';
+      this.menu.style.maxHeight = 'none';
+      this.menu.style.overflow = 'visible';
+      this.menu.setAttribute('aria-hidden', 'false');
+
       const menuRect = this.menu.getBoundingClientRect();
       this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
 
@@ -478,6 +487,11 @@ export class AlapLinkElement extends HTMLElement {
       });
 
       this.lastPlacement = result;
+
+      // Reset off-screen styles, then apply final position in one step
+      this.menu.style.position = '';
+      this.menu.style.visibility = '';
+      this.menu.style.overflow = '';
       this.applyPlacement(result);
       applyPlacementClass(this.menu, result.placement);
 
@@ -485,6 +499,8 @@ export class AlapLinkElement extends HTMLElement {
       if (result.scrollY) {
         this.startScrollTracking();
       }
+    } else {
+      this.menu.setAttribute('aria-hidden', 'false');
     }
 
     // Observe trigger for scroll-away detection
@@ -494,8 +510,11 @@ export class AlapLinkElement extends HTMLElement {
       () => this.closeMenu(),
     );
 
-    const first = this.menu.querySelector<HTMLElement>('a[role="menuitem"]');
-    if (first) first.focus();
+    if (this.openedViaKeyboard) {
+      const first = this.menu.querySelector<HTMLElement>('a[role="menuitem"]');
+      if (first) first.focus({ preventScroll: true });
+    }
+    this.openedViaKeyboard = false;
 
     this.timer?.start();
   }
@@ -544,6 +563,7 @@ export class AlapLinkElement extends HTMLElement {
 
   closeMenu(): void {
     if (!this.menu) return;
+    const wasOpen = this.isOpen;
     this.isOpen = false;
     this.menu.setAttribute('aria-hidden', 'true');
     this.menu.style.top = '';
@@ -563,7 +583,7 @@ export class AlapLinkElement extends HTMLElement {
     this.stopScrollTracking();
     this.stopIntersectionObserver();
     this.timer?.stop();
-    this.focus();
+    if (wasOpen) this.focus();
   }
 
   // --- Menu keyboard navigation ---

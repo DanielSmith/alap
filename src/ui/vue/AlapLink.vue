@@ -58,6 +58,7 @@ const ctx = useAlapContext();
 
 const isOpen = ref(false);
 const items = ref<ResolvedLink[]>([]);
+let openedViaKeyboard = false;
 
 let idCounter = 0;
 const uid = ++idCounter + Math.random().toString(36).slice(2, 8);
@@ -115,8 +116,9 @@ onUnmounted(() => {
 // --- Open / close ---
 
 function closeMenu() {
+  const wasOpen = isOpen.value;
   isOpen.value = false;
-  triggerRef.value?.focus();
+  if (wasOpen) triggerRef.value?.focus();
 }
 
 function openMenu() {
@@ -143,7 +145,8 @@ const { startTimer, stopTimer } = useMenuDismiss(
 watch(isOpen, async (open) => {
   if (open) {
     await nextTick();
-    itemEls[0]?.focus();
+    if (openedViaKeyboard) itemEls[0]?.focus();
+    openedViaKeyboard = false;
     startTimer();
   }
 });
@@ -229,6 +232,7 @@ function handleTriggerClick(e: MouseEvent) {
 function handleTriggerKeyDown(e: KeyboardEvent) {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
+    openedViaKeyboard = true;
     if (props.mode === 'popover' && !isOpen.value) {
       openMenu();
     } else {

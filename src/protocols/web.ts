@@ -52,6 +52,7 @@ const mapToLink = (item: Record<string, unknown>, map?: WebKeyConfig['map'], lin
   if (map?.url) {
     const val = getPath(item, map.url);
     if (typeof val === 'string') url = val;
+    else if (typeof val === 'number') url = String(val);
   } else {
     for (const candidate of URL_CANDIDATES) {
       const val = getPath(item, candidate);

@@ -85,6 +85,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   const itemRefs = useSignal<HTMLAnchorElement[]>([]);
 
   const timerId = useSignal(0);
+  const openedViaKeyboard = useSignal(false);
 
   const mode = props.mode ?? 'dom';
   const resolvedListType = props.listType ?? ctx.defaultListType;
@@ -109,17 +110,19 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   });
 
   const closeMenu = $(() => {
+    const wasOpen = isOpen.value;
     isOpen.value = false;
     stopTimer();
-    triggerRef.value?.focus();
+    if (wasOpen) triggerRef.value?.focus();
   });
 
   const startTimer = $(() => {
     stopTimer();
     timerId.value = window.setTimeout(() => {
+      const wasOpen = isOpen.value;
       isOpen.value = false;
       timerId.value = 0;
-      triggerRef.value?.focus();
+      if (wasOpen) triggerRef.value?.focus();
     }, ctx.menuTimeout);
   });
 
@@ -145,11 +148,12 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
     const open = track(() => isOpen.value);
     if (!open) return;
 
-    // Focus first item
+    // Focus first item on keyboard open only
     requestAnimationFrame(() => {
       const firstItem = itemRefs.value[0];
       if (firstItem) {
-        firstItem.focus();
+        if (openedViaKeyboard.value) firstItem.focus();
+        openedViaKeyboard.value = false;
         startTimer();
       }
     });
@@ -246,6 +250,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   const handleTriggerKeyDown = $((e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      openedViaKeyboard.value = true;
       if (mode === 'popover' && !isOpen.value) {
         openMenu();
       } else {

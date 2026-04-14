@@ -106,6 +106,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
   Alpine.directive('alap', (el, { expression }, { evaluate, cleanup }) => {
     let menuEl: HTMLElement | null = null;
     let isOpen = false;
+    let openedViaKeyboard = false;
     let timer: DismissTimer | null = null;
     let engine: AlapEngine | null = null;
     let currentConfig: AlapConfig | null = null;
@@ -215,6 +216,12 @@ export function alapPlugin(Alpine: AlpineInstance): void {
             applyPlacementClass(menu, result.placement);
           }
           menu.style.visibility = 'visible';
+          // Focus after menu is visible and positioned
+          if (openedViaKeyboard) {
+            const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
+            if (first) first.focus();
+          }
+          openedViaKeyboard = false;
         });
       } else {
         // No placement engine — position directly below trigger
@@ -233,9 +240,12 @@ export function alapPlugin(Alpine: AlpineInstance): void {
       if (intersectionObserver) intersectionObserver.disconnect();
       intersectionObserver = observeTriggerOffscreen(el, closeMenu);
 
-      // Focus first item
-      const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
-      if (first) first.focus();
+      // Focus first item on keyboard open only (non-placement path)
+      if (!opts.placement && openedViaKeyboard) {
+        const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
+        if (first) first.focus();
+      }
+      if (!opts.placement) openedViaKeyboard = false;
 
       // Start dismiss timer
       const timeout = opts.menuTimeout
@@ -247,6 +257,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
 
     function closeMenu(): void {
       if (!menuEl) return;
+      const wasOpen = isOpen;
       menuEl.style.cssText = MENU_STYLES;
       clearPlacementClass(menuEl);
       menuEl.setAttribute('aria-hidden', 'true');
@@ -257,7 +268,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         intersectionObserver.disconnect();
         intersectionObserver = null;
       }
-      el.focus();
+      if (wasOpen) el.focus();
     }
 
     // --- Event handlers ---
@@ -284,6 +295,7 @@ export function alapPlugin(Alpine: AlpineInstance): void {
     function onTriggerKeydown(event: KeyboardEvent): void {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        openedViaKeyboard = true;
         el.click();
       }
     }

@@ -29,6 +29,7 @@ export const demoConfig: AlapConfig = {
       cache: 10,
       vars: {
         miles_davis: 'miles davis',
+        john_coltrane: 'john coltrane',
         van_gogh: 'van gogh',
         nina_simone: 'nina simone',
         jazz_history: 'jazz history',
@@ -74,25 +75,25 @@ export const demoConfig: AlapConfig = {
         },
 
         /**
-         * iTunes Search — music albums by artist.
-         * Object with `results` array.
-         * https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/
+         * TheAudioDB — music albums by artist.
+         * Object with `album` array. CORS enabled, free tier (key "2").
+         * https://www.theaudiodb.com/free_music_api
          */
-        itunes_albums: {
-          url: 'https://itunes.apple.com/search?term=${1}&entity=album&limit=10',
-          root: 'results',
+        music_albums: {
+          url: 'https://www.theaudiodb.com/api/v1/json/2/searchalbum.php?s=${1}',
+          root: 'album',
           fieldMap: {
-            label: 'collectionName',
-            url: 'collectionViewUrl',
-            thumbnail: 'artworkUrl100',
-            tags: 'primaryGenreName',
+            label: 'strAlbum',
+            url: 'idAlbum',
+            thumbnail: 'strAlbumThumb',
+            tags: 'strGenre',
             meta: {
-              artist: 'artistName',
-              tracks: 'trackCount',
-              price: 'collectionPrice',
-              release: 'releaseDate',
+              artist: 'strArtist',
+              year: 'intYearReleased',
+              style: 'strStyle',
             },
           },
+          linkBase: 'https://www.theaudiodb.com/album',
         },
 
         // ── Lightbox sources ────────────────────────────────────
@@ -131,7 +132,7 @@ export const demoConfig: AlapConfig = {
          * https://www.mediawiki.org/wiki/API:Main_page
          */
         wikimedia: {
-          url: 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${1}&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=800&format=json&formatversion=2',
+          url: 'https://commons.wikimedia.org/w/api.php?action=query&origin=*&generator=search&gsrsearch=${1}&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=800&format=json&formatversion=2',
           root: 'query.pages',
           fieldMap: {
             label: 'title',

@@ -71,6 +71,7 @@ export function AlapLink(props: AlapLinkProps) {
 
   let timerId = 0;
 
+  let openedViaKeyboard = false;
   const mode = () => props.mode ?? 'dom';
   const resolvedListType = () => props.listType ?? ctx.defaultListType;
   const resolvedMaxVisibleItems = () => props.maxVisibleItems ?? ctx.defaultMaxVisibleItems;
@@ -124,9 +125,10 @@ export function AlapLink(props: AlapLinkProps) {
   }
 
   function closeMenu() {
+    const wasOpen = isOpen();
     setIsOpen(false);
     stopTimer();
-    triggerEl?.focus();
+    if (wasOpen) triggerEl?.focus();
   }
 
   function toggleMenu() {
@@ -137,8 +139,9 @@ export function AlapLink(props: AlapLinkProps) {
   // --- Focus first item on open ---
 
   createEffect(() => {
-    if (isOpen() && itemEls[0]) {
-      itemEls[0].focus();
+    if (isOpen()) {
+      if (openedViaKeyboard && itemEls[0]) itemEls[0].focus();
+      openedViaKeyboard = false;
       startTimer();
     }
   });
@@ -283,6 +286,7 @@ export function AlapLink(props: AlapLinkProps) {
   function handleTriggerKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      openedViaKeyboard = true;
       if (mode() === 'popover' && !isOpen()) {
         openMenu();
       } else {

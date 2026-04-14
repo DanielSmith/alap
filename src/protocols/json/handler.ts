@@ -212,6 +212,7 @@ const mapItem = (
   if (fieldMap.url) {
     const raw = resolveField(fieldMap.url, item, envelopeData);
     if (typeof raw === 'string') url = raw;
+    else if (typeof raw === 'number') url = String(raw);
   }
 
   // Must have a URL — AlapLink requires it

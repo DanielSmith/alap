@@ -88,6 +88,12 @@ export class AlapLightbox implements CoordinatedRenderer {
     const triggers = document.querySelectorAll<HTMLElement>(this.selector);
     for (const trigger of triggers) {
       trigger.addEventListener('click', (e) => this.onTriggerClick(e, trigger));
+      trigger.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          trigger.click();
+        }
+      });
       trigger.setAttribute('role', 'button');
       trigger.setAttribute('tabindex', trigger.getAttribute('tabindex') ?? '0');
     }

@@ -45,16 +45,17 @@
 
   <!-- ===== iTunes Search ===== -->
 
-  <h2>iTunes Search</h2>
-  <p>Positional URL args &mdash; the search term is passed as <code>:json:itunes_albums:$miles_davis:</code>,
+  <h2>TheAudioDB Music Search</h2>
+  <p>Positional URL args &mdash; the search term is passed as <code>:json:music_albums:$miles_davis:</code>,
     where <code>$miles_davis</code> resolves via protocol <code>vars</code>,
     filling <code>${1}</code> in the URL template.</p>
 
   <div class="example">
     <p>Albums by:
-      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:$miles_davis:">Miles Davis</a> |
-      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:radiohead:">Radiohead</a> |
-      <a class="alap trigger" data-alap-linkitems=":json:itunes_albums:bjork:">Bjork</a>
+      <a class="alap trigger" data-alap-linkitems=":json:music_albums:$miles_davis:">Miles Davis</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:music_albums:$john_coltrane:">John Coltrane</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:music_albums:radiohead:">Radiohead</a> |
+      <a class="alap trigger" data-alap-linkitems=":json:music_albums:bjork:">Bjork</a>
     </p>
   </div>
 
@@ -71,6 +72,12 @@
     <p class="config-note">Uses <code>|</code> (OR) to merge two :json: sources.</p>
   </div>
 
-  <script type="module" src="./main.ts"></script>
+  <!-- Hover preview panel for thumbnails -->
+  <div id="hover-panel">
+    <img class="hover-img" alt="">
+    <div class="hover-label"></div>
+  </div>
+
+  <script type="module" src="./menu-main.ts"></script>
 </body>
 </html>

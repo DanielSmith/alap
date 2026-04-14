@@ -75,6 +75,7 @@ interface AlapSettings {
   placementGap?: number;
   viewportPadding?: number;
   viewportAdjust?: boolean;
+  preventFocusScroll?: boolean;
   targetWindow?: string;
 }
 ```
@@ -90,6 +91,7 @@ interface AlapSettings {
 | `placementGap` | `number` | `4` | Pixel gap between trigger edge and menu edge |
 | `viewportPadding` | `number` | `8` | Minimum distance the menu keeps from viewport edges |
 | `viewportAdjust` | `boolean` | `true` | Enable smart placement with viewport containment and fallback |
+| `preventFocusScroll` | `boolean` | `true` | Use `focus({ preventScroll: true })` when focusing menu items on keyboard open, preventing unwanted viewport scrolling in Shadow DOM contexts |
 | `targetWindow` | `string` | — | Global default for link targets |
 
 ### Placement string

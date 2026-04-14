@@ -243,7 +243,7 @@ describe('Alpine Adapter — x-alap directive', () => {
 
   it('navigates with ArrowDown', () => {
     const el = setupDirective('span', { query: '@cars', config: testConfig });
-    click(el);
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
 
     const menu = getMenu()!;
     const items = getMenuItems();
@@ -254,7 +254,7 @@ describe('Alpine Adapter — x-alap directive', () => {
 
   it('Home focuses first, End focuses last', () => {
     const el = setupDirective('span', { query: '.bridge', config: testConfig });
-    click(el);
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
 
     const menu = getMenu()!;
     const items = getMenuItems();

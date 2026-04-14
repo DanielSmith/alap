@@ -1,6 +1,6 @@
 # Alap
 
-## Version 3, Daniel Smith - April 2026
+## Version 3.1, Daniel Smith - April 2026
 
 **Turn any link into a curated menu of destinations.**
 

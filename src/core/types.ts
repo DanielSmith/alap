@@ -245,6 +245,14 @@ export interface AlapSettings {
   viewportPadding?: number;
 
   /**
+   * Prevent the browser from scrolling the page when focus moves to a menu item.
+   * When true, `focus({ preventScroll: true })` is used on menu open and
+   * keyboard navigation, so the viewport stays put if the menu already fits.
+   * @default true
+   */
+  preventFocusScroll?: boolean;
+
+  /**
    * What to do when the trigger scrolls off-screen while the menu is open.
    * - 'close': close the menu (default)
    * - 'flip': recompute placement to keep menu visible

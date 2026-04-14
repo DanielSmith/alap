@@ -2,6 +2,33 @@
 
 All notable changes to Alap will be documented in this file.
 
+## [3.1.0-dev] — 2026-04-14
+
+### Accessibility and focus management overhaul (2026-04-14)
+
+- DOM-mode triggers (AlapUI, AlapLightbox, AlapLens) now respond to Space and Enter keys, matching the web component and framework adapter behavior
+  - Fulfills the `role="button"` contract: triggers already declared `role="button"`, `aria-haspopup`, and `tabindex="0"`, but only handled click events
+  - Web components and all framework adapters (React, Vue, Svelte, Solid, Qwik, Alpine) already had this — the gap was only in the three vanilla DOM classes
+- **Focus-on-open now keyboard-only** — across all adapters (DOM, WC, React, Vue, Svelte, Solid, Qwik, Alpine), the first menu item is only focused when the menu is opened via keyboard (Space/Enter). Mouse clicks no longer auto-focus, preventing unwanted viewport scrolling and the first-item highlight flash
+- **Guarded focus-on-close** — `closeMenu()` across all adapters now checks whether the menu was actually open before calling `focus()` on the trigger. Previously, when the instance coordinator broadcast "close all", every `<alap-link>` / adapter on the page would call `focus()` on its trigger — including instances that were never open — causing the viewport to scroll to the last element on the page
+- **Web component off-screen measurement** — `AlapLinkElement.openMenu()` now measures the menu off-screen (`position: fixed; visibility: hidden; top: -9999px`) before showing it, matching the DOM adapter's approach. Eliminates the two-step flash where the menu briefly appeared at its CSS default position before placement repositioned it
+- **Image triggers: keyboard fallback to center** — when an image trigger is opened via keyboard (synthetic click with `clientX/Y = 0`), the menu now positions at the image's center instead of the top-left corner of the viewport
+- Example site shared CSS: changed `:focus` to `:focus-visible` on menu item hover styles so programmatic focus (menu open) no longer highlights the first item; keyboard focus still shows the highlight
+- New setting: `preventFocusScroll` (default `true`) — uses `focus({ preventScroll: true })` when moving focus to menu items, preventing the browser from scrolling the viewport in Shadow DOM contexts
+  - New constant: `DEFAULT_PREVENT_FOCUS_SCROLL`
+- **`:web:` protocol: numeric URL coercion** — `mapToLink` now coerces numeric values to strings when the mapped `url` field is a number (common with REST API integer IDs like JSONPlaceholder's `id: 1`). Previously these items were silently dropped
+- **Alpine.js: deferred focus on placement** — keyboard-open focus now fires inside the placement callback, after the menu is visible and positioned, fixing arrow-key navigation in Alpine menus with placement
+- **WC: off-screen measurement** — web component `openMenu()` measures the menu off-screen before showing, matching the DOM adapter pattern and eliminating position flicker
+
+### Example site improvements (2026-04-14)
+
+- Removed bootstrap example (CSS token copy-paste is not a real integration)
+- Tailwind example updated to show `@apply` as the primary integration path, with plain CSS as fallback
+- htmx example: expanded config from 12 to 30+ links so all menus show multiple items; added Seattle/Portland coffee, more bridges, parks, and food
+- Alpine example: fixed link colors (`#2563eb` → `#88bbff`) to be visible on dark background
+- Placement sandbox: centered page layout to match other examples
+- External data example: fixed JSONPlaceholder "Recent posts" (numeric `id` field was being dropped)
+
 ## [3.1.0-dev] — 2026-04-11
 
 ### Lens drawer and overlay polish (2026-04-11)

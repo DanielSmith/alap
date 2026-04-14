@@ -108,6 +108,8 @@
       : undefined
   );
 
+  let openedViaKeyboard = false;
+
   // --- Timer ---
 
   let timer = 0;
@@ -133,8 +135,9 @@
   // --- Open / close ---
 
   function closeMenu() {
+    const wasOpen = isOpen;
     isOpen = false;
-    triggerEl?.focus();
+    if (wasOpen) triggerEl?.focus();
   }
 
   function openMenu() {
@@ -156,7 +159,8 @@
     if (isOpen) {
       // Wait for DOM update
       requestAnimationFrame(() => {
-        itemEls[0]?.focus();
+        if (openedViaKeyboard) itemEls[0]?.focus();
+        openedViaKeyboard = false;
         startTimer();
       });
     }
@@ -258,6 +262,7 @@
   function handleTriggerKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      openedViaKeyboard = true;
       if (mode === 'popover' && !isOpen) {
         openMenu();
       } else {

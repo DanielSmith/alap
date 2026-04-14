@@ -219,10 +219,10 @@ describe('DOM Adapter — AlapUI', () => {
     const trigger = createTrigger('cars', '@cars');
     ui = new AlapUI(testConfig);
 
-    clickTrigger(trigger);
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     const items = getMenuItems();
 
-    // First item should be focused after open
+    // First item should be focused after keyboard open
     expect(document.activeElement).toBe(items[0]);
 
     getMenu()!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
@@ -278,6 +278,78 @@ describe('DOM Adapter — AlapUI', () => {
 
     getMenu()!.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
     expect(document.activeElement).toBe(items[items.length - 1]);
+  });
+
+  // --- Focus behavior ---
+
+  it('does not focus first item on mouse open', () => {
+    const trigger = createTrigger('cars', '@cars');
+    ui = new AlapUI(testConfig);
+
+    // Focus the trigger so we can detect focus NOT moving to menu item
+    trigger.focus();
+    clickTrigger(trigger);
+
+    const items = getMenuItems();
+    expect(items.length).toBeGreaterThan(0);
+    expect(document.activeElement).not.toBe(items[0]);
+  });
+
+  it('focuses first item on keyboard open', () => {
+    const trigger = createTrigger('cars', '@cars');
+    ui = new AlapUI(testConfig);
+
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    const items = getMenuItems();
+    expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('does not focus trigger when closing a menu that was never open', () => {
+    const t1 = createTrigger('cars', '@cars');
+    const t2 = createTrigger('bridges', '.bridge');
+    ui = new AlapUI(testConfig);
+
+    // Focus t1, then close menu (which was never opened for any trigger)
+    t1.focus();
+    expect(document.activeElement).toBe(t1);
+
+    // Close via escape — nothing is open, should not move focus
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    // Focus should stay on t1, not jump to t2
+    expect(document.activeElement).toBe(t1);
+  });
+
+  it('returns focus to trigger after closing an open menu', () => {
+    const trigger = createTrigger('cars', '@cars');
+    ui = new AlapUI(testConfig);
+
+    clickTrigger(trigger);
+    expect(getMenu()!.style.display).not.toBe('none');
+
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('positions image menu at center on keyboard open', () => {
+    const img = document.createElement('img');
+    img.className = 'alap';
+    img.id = 'testimg';
+    img.setAttribute('data-alap-linkitems', '.coffee');
+    // Mock getBoundingClientRect for the image
+    img.getBoundingClientRect = () => ({
+      top: 100, left: 200, bottom: 300, right: 400,
+      width: 200, height: 200, x: 200, y: 100, toJSON() {},
+    });
+    document.body.appendChild(img);
+    ui = new AlapUI(testConfig);
+
+    img.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    const menu = getMenu()!;
+    // Menu should be visible (not at 0,0 default)
+    expect(menu.style.display).not.toBe('none');
+    // The top value should be based on image center (y=200), not 0
+    const top = parseFloat(menu.style.top);
+    expect(top).toBeGreaterThan(0);
   });
 
   // --- Empty results ---

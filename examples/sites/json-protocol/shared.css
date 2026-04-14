@@ -75,3 +75,38 @@ pre {
   color: #64748b;
   margin-top: 0.5rem;
 }
+
+/* --- Hover preview panel (album art) --- */
+
+#hover-panel {
+  position: absolute;
+  width: 180px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+#hover-panel.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#hover-panel .hover-img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+}
+
+#hover-panel .hover-label {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  text-align: center;
+  line-height: 1.3;
+}

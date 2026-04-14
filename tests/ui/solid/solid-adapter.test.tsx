@@ -261,7 +261,8 @@ describe('AlapLink — keyboard', () => {
 
   it('ArrowDown navigates to next item', () => {
     renderWithProvider(() => <AlapLink query=".nyc + .bridge">bridges</AlapLink>);
-    fireEvent.click(screen.getByRole('button', { name: 'bridges' }));
+    const trigger = screen.getByRole('button', { name: 'bridges' });
+    fireEvent.keyDown(trigger, { key: 'Enter' });
 
     const items = screen.getAllByRole('menuitem');
     expect(document.activeElement).toBe(items[0]);
@@ -293,7 +294,8 @@ describe('AlapLink — keyboard', () => {
 
   it('ArrowUp wraps from first to last', () => {
     renderWithProvider(() => <AlapLink query=".nyc + .bridge">bridges</AlapLink>);
-    fireEvent.click(screen.getByRole('button', { name: 'bridges' }));
+    const trigger = screen.getByRole('button', { name: 'bridges' });
+    fireEvent.keyDown(trigger, { key: 'Enter' });
 
     const items = screen.getAllByRole('menuitem');
     fireEvent.keyDown(items[0], { key: 'ArrowUp' });

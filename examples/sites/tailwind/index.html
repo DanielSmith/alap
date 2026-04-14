@@ -21,7 +21,7 @@
   <div class="max-w-2xl mx-auto py-10 px-4">
     <p class="mb-4"><a href="/" target="alapDemo" class="text-[#ffe8a0] hover:text-[#ffd666]">&larr; Examples Gallery</a></p>
     <h1 class="text-2xl font-bold mb-2 text-[#ffd666]">Alap v3 — Tailwind CSS</h1>
-    <p class="text-[#b8c4e8] mb-8">Page layout uses Tailwind utilities. Alap menus are styled with plain CSS using Tailwind's design tokens (colors, radii, shadows).</p>
+    <p class="text-[#b8c4e8] mb-8">Page layout uses Tailwind utilities. Alap menus are styled via CSS targeting Alap's generated classes. In a real project with Tailwind's build step, use <code class="bg-[#1a2870] px-1 rounded text-xs text-[#88bbff]">@apply</code> to pull from your theme. Framework adapters also accept <code class="bg-[#1a2870] px-1 rounded text-xs text-[#88bbff]">menuClassName</code> for direct utility classes on the menu container.</p>
 
     <!-- DEFAULT -->
     <section class="mb-8">
@@ -32,15 +32,20 @@
           &mdash; base styles using Tailwind color values.
         </p>
       </div>
-      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alapelem {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;      /* gray-200 */
-  border-radius: 0.5rem;          /* rounded-lg */
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); /* shadow-lg */
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* With Tailwind @apply (requires build step): */
+.alapelem {
+  @apply bg-white border border-gray-200 rounded-lg shadow-lg min-w-[200px];
 }
 .alapelem a:hover {
-  background: #eff6ff;             /* blue-50 */
-  color: #2563eb;                  /* blue-600 */
+  @apply bg-blue-50 text-blue-600;
+}
+
+/* Without @apply (CDN / plain CSS): */
+.alapelem {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }</pre>
     </section>
 
@@ -53,14 +58,19 @@
           &mdash; green tint with bigger top offset.
         </p>
       </div>
-      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_bridges {
-  margin-top: 1rem;
-  background: #f0fdf4;            /* green-50 */
-  border-color: #86efac;          /* green-300 */
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* @apply version: */
+.alap_bridges {
+  @apply mt-4 bg-green-50 border-green-300;
 }
 .alap_bridges a:hover {
-  background: #dcfce7;            /* green-100 */
-  color: #166534;                 /* green-800 */
+  @apply bg-green-100 text-green-800;
+}
+
+/* Plain CSS: */
+.alap_bridges {
+  margin-top: 1rem;
+  background: #f0fdf4;
+  border-color: #86efac;
 }</pre>
     </section>
 
@@ -73,14 +83,19 @@
           &mdash; amber palette, shifted right with <code class="bg-[#1a2870] px-1 rounded text-xs text-[#88bbff]">margin-left: 2rem</code>.
         </p>
       </div>
-      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_coffee {
-  margin-left: 2rem;
-  background: #fffbeb;            /* amber-50 */
-  border-color: #fcd34d;          /* amber-300 */
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* @apply version: */
+.alap_coffee {
+  @apply ml-8 bg-amber-50 border-amber-300;
 }
 .alap_coffee a:hover {
-  background: #fef3c7;            /* amber-100 */
-  color: #92400e;                 /* amber-900 */
+  @apply bg-amber-100 text-amber-900;
+}
+
+/* Plain CSS: */
+.alap_coffee {
+  margin-left: 2rem;
+  background: #fffbeb;
+  border-color: #fcd34d;
 }</pre>
     </section>
 
@@ -93,16 +108,21 @@
           &mdash; slate background, light text.
         </p>
       </div>
-      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_nycspots {
-  background: #1e293b;            /* slate-800 */
-  border-color: #334155;          /* slate-700 */
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* @apply version: */
+.alap_nycspots {
+  @apply bg-slate-800 border-slate-700 shadow-xl;
 }
 .alap_nycspots a {
-  color: #e2e8f0;                 /* slate-200 */
+  @apply text-slate-200;
 }
 .alap_nycspots a:hover {
-  background: #334155;            /* slate-700 */
-  color: #60a5fa;                 /* blue-400 */
+  @apply bg-slate-700 text-blue-400;
+}
+
+/* Plain CSS: */
+.alap_nycspots {
+  background: #1e293b;
+  border-color: #334155;
 }</pre>
     </section>
 
@@ -115,26 +135,38 @@
           &mdash; rounded pill shape with indigo accent.
         </p>
       </div>
-      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">.alap_sfspots {
-  border-radius: 1rem;            /* rounded-2xl */
-  border: 2px solid #c7d2fe;      /* indigo-200 */
-  background: #eef2ff;            /* indigo-50 */
+      <pre class="mt-2 bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* @apply version: */
+.alap_sfspots {
+  @apply rounded-2xl border-2 border-indigo-200 bg-indigo-50;
 }
-.alap_sfspots li:first-child a { border-radius: 1rem 1rem 0 0; }
-.alap_sfspots li:last-child a  { border-radius: 0 0 1rem 1rem; }</pre>
+.alap_sfspots li:first-child a { @apply rounded-t-2xl; }
+.alap_sfspots li:last-child a  { @apply rounded-b-2xl; }
+
+/* Plain CSS: */
+.alap_sfspots {
+  border-radius: 1rem;
+  border: 2px solid #c7d2fe;
+  background: #eef2ff;
+}</pre>
     </section>
 
     <!-- PATTERN SUMMARY -->
     <section class="mb-8">
       <h2 class="text-lg font-semibold text-[#ffe8a0] mb-3">The Pattern</h2>
-      <pre class="bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* 1. Base — all menus */
-.alapelem { ... }
+      <pre class="bg-[#141e6a] text-[#b8c4e8] p-4 rounded-lg text-xs overflow-x-auto leading-relaxed border border-[#2e48a0]">/* Alap generates the menu markup — you style it via CSS.
+   With Tailwind's build step, @apply bridges the gap: */
+
+/* 1. Base — all menus */
+.alapelem { @apply bg-white border rounded-lg shadow-lg; }
 
 /* 2. Per-anchor — menu gets alap_{anchorId} */
-.alap_bridges { ... }
+.alap_bridges { @apply bg-green-50 border-green-300; }
 
 /* 3. Per-item — li gets cssClass from config */
-.highlight { ... }</pre>
+.highlight { @apply font-semibold; }
+
+/* Framework adapters also accept menuClassName: */
+&lt;AlapLink menuClassName="my-tw-classes" ... /&gt;</pre>
     </section>
   </div>
 

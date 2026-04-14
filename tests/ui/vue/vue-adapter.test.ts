@@ -283,7 +283,7 @@ describe('AlapLink — keyboard', () => {
 
   it('ArrowDown navigates to next item', async () => {
     const wrapper = mountAlapLink('.nyc + .bridge', 'bridges');
-    await wrapper.find('[role="button"]').trigger('click');
+    await wrapper.find('[role="button"]').trigger('keydown', { key: 'Enter' });
     await nextTick();
 
     const items = wrapper.findAll('[role="menuitem"]');
@@ -317,7 +317,7 @@ describe('AlapLink — keyboard', () => {
 
   it('ArrowUp wraps from first to last', async () => {
     const wrapper = mountAlapLink('.nyc + .bridge', 'bridges');
-    await wrapper.find('[role="button"]').trigger('click');
+    await wrapper.find('[role="button"]').trigger('keydown', { key: 'Enter' });
     await nextTick();
 
     const items = wrapper.findAll('[role="menuitem"]');

@@ -67,9 +67,9 @@
         <td>Bare array, nested fields (<code>name.common</code>), thumbnails</td>
       </tr>
       <tr>
-        <td>itunes_albums</td>
-        <td>iTunes Search</td>
-        <td>Positional URL args (<code>${1}</code>), root path, tags from string</td>
+        <td>music_albums</td>
+        <td>TheAudioDB</td>
+        <td>Positional URL args (<code>${1}</code>), root path, thumbnails, genre tags</td>
       </tr>
       <tr>
         <td>artic</td>
@@ -91,11 +91,6 @@
         <td>Library of Congress (Search)</td>
         <td>Rich metadata: dates, contributors, formats, locations</td>
       </tr>
-      <tr>
-        <td>musicbrainz</td>
-        <td>MusicBrainz</td>
-        <td>Custom headers, hyphenated keys (<code>artist-credit</code>), tag extraction (<code>tags[].name</code>)</td>
-      </tr>
     </tbody>
   </table>
 
@@ -103,9 +98,9 @@
   <p>Each sub-page demonstrates the same <code>:json:</code> sources rendered through
     a different Alap renderer. The config stays the same &mdash; only the UI changes.</p>
   <ul>
-    <li><a href="./menu.html"><strong>Menu</strong></a> &mdash; quick navigation lists (REST Countries, iTunes)</li>
+    <li><a href="./menu.html"><strong>Menu</strong></a> &mdash; quick navigation lists (REST Countries, TheAudioDB)</li>
     <li><a href="./lightbox.html"><strong>Lightbox</strong></a> &mdash; image galleries (Art Institute, Wikimedia Commons)</li>
-    <li><a href="./lens.html"><strong>Lens</strong></a> &mdash; detail inspection (Open Library, Library of Congress, MusicBrainz)</li>
+    <li><a href="./lens.html"><strong>Lens</strong></a> &mdash; detail inspection (Open Library, Library of Congress, Art Institute)</li>
   </ul>
 
   <script type="module" src="./main.ts"></script>

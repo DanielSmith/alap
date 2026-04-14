@@ -68,6 +68,9 @@ export const DEFAULT_PLACEMENT_GAP = 4;
 /** Default minimum pixel distance the menu keeps from viewport edges */
 export const DEFAULT_VIEWPORT_PADDING = 8;
 
+/** Whether focus() calls on menu items should suppress browser scroll. */
+export const DEFAULT_PREVENT_FOCUS_SCROLL = true;
+
 /** Default behavior when trigger scrolls off-screen while menu is open */
 export const DEFAULT_TRIGGER_OFFSCREEN = 'close' as const;
 

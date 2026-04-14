@@ -51,6 +51,10 @@ describe('Web Component — <alap-link>', () => {
     el.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
   }
 
+  function keyboardOpen(el: HTMLElement): void {
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
+  }
+
   beforeEach(() => {
     document.body.innerHTML = '';
     registerConfig(testConfig);
@@ -224,30 +228,31 @@ describe('Web Component — <alap-link>', () => {
 
   it('navigates with ArrowDown', () => {
     const el = createElement('@cars');
-    clickElement(el);
+    keyboardOpen(el);
 
     const items = getMenuItems(el);
     const menu = getMenu(el)!;
 
+    // Keyboard open focuses first item. ArrowDown moves to second.
     menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
     expect(el.shadowRoot!.activeElement).toBe(items[1]);
   });
 
   it('navigates with ArrowUp wrapping', () => {
     const el = createElement('@cars');
-    clickElement(el);
+    keyboardOpen(el);
 
     const items = getMenuItems(el);
     const menu = getMenu(el)!;
 
-    // First item is focused. ArrowUp should wrap to last.
+    // Keyboard open focuses first item. ArrowUp should wrap to last.
     menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
     expect(el.shadowRoot!.activeElement).toBe(items[items.length - 1]);
   });
 
   it('Home focuses first, End focuses last', () => {
     const el = createElement('.bridge');
-    clickElement(el);
+    keyboardOpen(el);
 
     const items = getMenuItems(el);
     const menu = getMenu(el)!;
@@ -281,6 +286,48 @@ describe('Web Component — <alap-link>', () => {
 
     clickElement(el);
     expect(isOpen(el)).toBe(false);
+  });
+
+  // --- Focus behavior ---
+
+  it('does not focus first item on mouse open', () => {
+    const el = createElement('.coffee');
+    clickElement(el);
+    expect(isOpen(el)).toBe(true);
+    // No menu item should have focus after mouse open
+    const items = getMenuItems(el);
+    expect(el.shadowRoot!.activeElement).not.toBe(items[0]);
+  });
+
+  it('focuses first item on keyboard open', () => {
+    const el = createElement('.coffee');
+    keyboardOpen(el);
+    expect(isOpen(el)).toBe(true);
+    const items = getMenuItems(el);
+    expect(el.shadowRoot!.activeElement).toBe(items[0]);
+  });
+
+  it('does not focus trigger when closeMenu is called on a never-opened instance', () => {
+    const el = createElement('.coffee');
+    const other = createElement('.bridge');
+
+    // Focus something else so we can detect unwanted focus steal
+    other.focus();
+    expect(document.activeElement).toBe(other);
+
+    // Close el (which was never opened) — should not steal focus
+    el.closeMenu();
+    expect(document.activeElement).toBe(other);
+  });
+
+  it('returns focus to trigger when closing a menu that was open', () => {
+    const el = createElement('.coffee');
+    clickElement(el);
+    expect(isOpen(el)).toBe(true);
+
+    el.closeMenu();
+    expect(isOpen(el)).toBe(false);
+    expect(document.activeElement).toBe(el);
   });
 
   // --- Attribute change ---
