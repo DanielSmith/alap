@@ -28,6 +28,10 @@ All notable changes to Alap will be documented in this file.
 - Alpine example: fixed link colors (`#2563eb` → `#88bbff`) to be visible on dark background
 - Placement sandbox: centered page layout to match other examples
 - External data example: fixed JSONPlaceholder "Recent posts" (numeric `id` field was being dropped)
+- `:json:` protocol: same numeric URL coercion as `:web:` — `resolveField` results that are numbers are now coerced to strings for the `url` field
+- JSON protocol example: replaced iTunes (CORS blocked) with TheAudioDB (free, CORS enabled, album art); added John Coltrane; added hover preview panel showing album cover art via `onItemHover` hook
+- JSON protocol example: fixed Wikimedia Commons CORS by adding `origin=*` parameter
+- JSON protocol example: removed MusicBrainz from lens page (duplicate data, unreliable results)
 
 ## [3.1.0-dev] — 2026-04-11
 

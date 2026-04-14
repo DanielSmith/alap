@@ -54,9 +54,11 @@ const { title } = Astro.props;
       padding: 0.5rem 1rem;
       color: #f0f2ff;
     }
-    alap-link::part(link):hover {
+    alap-link::part(link):hover,
+    alap-link::part(link):focus-visible {
       background: #3366d6;
       color: #ffd666;
+      outline: none;
     }
   </style>
   <!-- IIFE build for local dev. In production: npm install alap + use the integration. -->
