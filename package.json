@@ -1,6 +1,6 @@
 {
   "name": "alap",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Dynamic menus for links — one click, multiple destinations",
   "type": "module",
   "main": "./dist/index.cjs",
