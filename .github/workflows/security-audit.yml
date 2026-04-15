@@ -32,7 +32,8 @@ jobs:
           npx --yes npm@latest audit --omit=dev --audit-level=high || echo "::warning::Audit failed — pnpm audit endpoint issue (pnpm/pnpm#11265)"
 
       - name: Dev dependency audit (informational)
-        run: pnpm audit --audit-level=high || echo "::warning::Dev dependency vulnerabilities found — review above"
+        run: |
+          npx --yes npm@latest audit --audit-level=high || echo "::warning::Dev dependency vulnerabilities found — review above"
 
       - name: Security tests
         run: |
