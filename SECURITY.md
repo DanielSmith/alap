@@ -13,7 +13,7 @@ If you think you've found a security issue in Alap, please report it
 privately. Don't open a public GitHub issue — give me a chance to get
 a fix out before the details circulate.
 
-- Email **security@alap.info** (or the project maintainer directly).
+- Email **security at alap with a tld of info** (or the project maintainer directly).
 - A short description and a way to reproduce it locally is plenty.
 - Acknowledgement within 72 hours; coordinated disclosure timeline
   agreed with the reporter.
