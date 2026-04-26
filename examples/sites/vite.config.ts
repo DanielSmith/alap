@@ -78,7 +78,7 @@ export default defineConfig({
       'alap': resolve(alapRoot, 'src/index.ts'),
       'rehype-alap': resolve(alapRoot, 'plugins/rehype-alap/src/index.ts'),
       'remark-alap': resolve(alapRoot, 'plugins/remark-alap/src/index.ts'),
-      'tiptap-alap': resolve(alapRoot, 'plugins/tiptap-alap/src/index.ts'),
+      '@alap/tiptap': resolve(alapRoot, 'plugins/tiptap-alap/src/index.ts'),
     },
   },
   build: {
