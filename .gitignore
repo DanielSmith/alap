@@ -28,12 +28,17 @@ Thumbs.db
 docs/future/
 editors/old/
 
+# Python bytecode and test caches (anywhere in the tree)
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Obsidian app config inside example vaults (machine-specific UI state)
+.obsidian/
+
 # Other-languages parser ports
 src/other-languages/php/vendor/
 src/other-languages/php/.phpunit.result.cache
-src/other-languages/python/__pycache__/
-src/other-languages/python/tests/__pycache__/
-src/other-languages/python/.pytest_cache/
 src/other-languages/rust/target/
 
 # Server shared
