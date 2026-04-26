@@ -167,6 +167,6 @@ Each framework has a detailed guide with all props, events, hooks, and SSR notes
 
 ## Next
 
-- [Full experience](full-experience.md) — add lightbox, lens, and embed
+- [All together](all-together.md) — add lightbox, lens, and embed
 - [Configuration](configuration.md) — the full config object
 - [Expressions](../core-concepts/expressions.md) — the query language

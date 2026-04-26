@@ -15,7 +15,6 @@
  */
 
 import type { AlapConfig } from 'alap/core';
-import { atprotoHandler } from 'alap';
 
 /**
  * Bluesky / AT Protocol example config.
@@ -35,8 +34,21 @@ import { atprotoHandler } from 'alap';
  *
  * The example page blends both: static curated links alongside
  * live protocol results, all in the same expression grammar.
+ *
+ * Config is a factory because two bits change at runtime:
+ *   - `accessJwt` — set after optional login
+ *   - `searches`  — user-entered aliases for the custom search form
+ * The engine deep-freezes each config it receives, so both need to
+ * be baked into a fresh object and swapped in via engine.updateConfig.
  */
-export const demoConfig: AlapConfig = {
+export interface BuildDemoConfigOptions {
+  accessJwt?: string | null;
+  /** User-entered search aliases, merged on top of the baked-in presets. */
+  searches?: Record<string, string>;
+}
+
+export function buildDemoConfig(options: BuildDemoConfigOptions = {}): AlapConfig {
+  return {
   settings: {
     listType: 'ul',
     menuTimeout: 5000,
@@ -66,9 +78,8 @@ export const demoConfig: AlapConfig = {
   // ═══════════════════════════════════════════════════════════════
   protocols: {
     atproto: {
-      generate: atprotoHandler,
-      cache: 5,           // 5-minute TTL for all results
-      accessJwt: null,    // set at runtime after optional login
+      cache: 5,                              // 5-minute TTL for all results
+      accessJwt: options.accessJwt ?? null,  // set at runtime after optional login
 
       // Named search aliases for multi-word queries.
       // Single-word queries work directly in expressions (:atproto:people:atproto:).
@@ -78,6 +89,7 @@ export const demoConfig: AlapConfig = {
         creative_commons:   'creative commons',
         open_web:           'open web',
         decentralized_web:  'decentralized web',
+        ...options.searches,                 // user-entered aliases layered on top
       },
     },
   },
@@ -399,4 +411,5 @@ export const demoConfig: AlapConfig = {
       tags: ['atproto_profile', 'devtool'],
     },
   },
-};
+  };
+}

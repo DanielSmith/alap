@@ -15,7 +15,11 @@
  */
 
 import type { AlapLink } from '../../core/types';
-import { sanitizeUrl } from '../../core/sanitizeUrl';
+import {
+  sanitizeUrlByTier,
+  sanitizeCssClassByTier,
+  sanitizeTargetWindowByTier,
+} from '../../core/sanitizeByTier';
 import { REM_PER_MENU_ITEM } from '../../constants';
 
 export interface MenuListOptions {
@@ -64,8 +68,11 @@ export function buildMenuList(
     const li = document.createElement('li');
     li.setAttribute('role', 'none');
 
-    const cssClass = link.cssClass ? `alapListElem ${link.cssClass}` : 'alapListElem';
-    li.className = cssClass;
+    // Tier-aware cssClass: author keeps the author-written class; non-author
+    // tiers (protocol, storage, unstamped) drop it so an attacker can't pick
+    // a class that triggers CSS-selector-driven exfil or layout attacks.
+    const customClass = sanitizeCssClassByTier(link.cssClass, link);
+    li.className = customClass ? `alapListElem ${customClass}` : 'alapListElem';
 
     if (options.liAttributes) {
       for (const [key, value] of Object.entries(options.liAttributes)) {
@@ -76,8 +83,22 @@ export function buildMenuList(
     const a = document.createElement('a');
     a.setAttribute('role', 'menuitem');
     a.setAttribute('tabindex', '-1');
-    a.href = sanitizeUrl(link.url);
-    a.target = link.targetWindow ?? options.defaultTargetWindow ?? 'fromAlap';
+    // `noopener` blocks the new window from reaching back via
+    // `window.opener`; `noreferrer` drops the Referer header. Both apply
+    // to every menu anchor regardless of tier — matches the invariant
+    // lens and lightbox already enforce.
+    a.rel = 'noopener noreferrer';
+    // Tier-aware URL: author gets the loose sanitizer (permits mailto, tel,
+    // any scheme not explicitly dangerous); non-author gets strict
+    // (http/https/mailto only). Fail-closed on unstamped — a link with no
+    // provenance was written outside the validateConfig gate.
+    a.href = sanitizeUrlByTier(link.url, link);
+    // Tier-aware target: author's named-window defaults flow through the
+    // fallback chain; non-author is clamped to `_blank` unconditionally, so
+    // a protocol response can't inherit `options.defaultTargetWindow` and
+    // ride into a window the author reserved for their own links.
+    a.target = sanitizeTargetWindowByTier(link.targetWindow, link)
+      ?? options.defaultTargetWindow ?? 'fromAlap';
 
     if (options.aAttributes) {
       for (const [key, value] of Object.entries(options.aAttributes)) {
@@ -99,7 +120,7 @@ export function buildMenuList(
 
     if (link.image) {
       const img = document.createElement('img');
-      img.src = sanitizeUrl(link.image);
+      img.src = sanitizeUrlByTier(link.image, link);
       img.alt = link.altText ?? `image for ${link.id}`;
       if (options.imgAttributes) {
         for (const [key, value] of Object.entries(options.imgAttributes)) {

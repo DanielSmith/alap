@@ -15,7 +15,6 @@
  */
 
 import type { AlapConfig } from 'alap/core';
-import { jsonHandler } from '../../../src/protocols/json';
 
 export const demoConfig: AlapConfig = {
   settings: {
@@ -25,7 +24,6 @@ export const demoConfig: AlapConfig = {
 
   protocols: {
     json: {
-      generate: jsonHandler,
       cache: 10,
       vars: {
         miles_davis: 'miles davis',

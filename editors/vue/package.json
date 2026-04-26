@@ -24,11 +24,5 @@
     "vue-tsc": "^2.2.0"
   },
   "author": "Daniel Smith",
-  "license": "Apache-2.0",
-  "pnpm": {
-    "overrides": {
-      "picomatch": ">=4.0.4",
-      "brace-expansion": ">=2.0.3"
-    }
-  }
+  "license": "Apache-2.0"
 }

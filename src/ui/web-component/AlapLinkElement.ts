@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import type { AlapConfig } from '../../core/types';
+import type { AlapConfig, ResolvedLink, SourceState } from '../../core/types';
 import { warn } from '../../core/logger';
 import { RENDERER_MENU } from '../shared/coordinatedRenderer';
 import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, registerConfig, updateRegisteredConfig, getEngine, getConfig } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, registerConfig, updateRegisteredConfig, getEngine, getConfig, appendPlaceholders, ProgressiveRenderer, flipFromRect } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size, ProgressiveRenderContext } from '../shared';
 
 export { registerConfig, updateRegisteredConfig };
 
@@ -72,6 +72,43 @@ const STYLES = `
   .menu:hover {
     box-shadow: var(--alap-menu-hover-shadow, var(--alap-shadow, 0 4px 12px rgba(0, 0, 0, 0.1)));
     filter: var(--alap-menu-hover-drop-shadow, var(--alap-drop-shadow));
+  }
+
+  /* --- Progressive loading state --- */
+  /* Async fetch is still in flight: center the small "Loading…" menu over
+     the host rather than running the compass placement engine, since a tiny
+     placeholder would flip direction differently than the full menu.
+     Override the positioning variables from outside the shadow root:
+       alap-link {
+         --alap-loading-top: 0;
+         --alap-loading-transform: none;
+       } */
+  .menu[data-alap-loading-only] {
+    top: var(--alap-loading-top, 50%);
+    left: var(--alap-loading-left, 50%);
+    right: auto;
+    bottom: auto;
+    margin: 0;
+    max-height: none;
+    max-width: none;
+    overflow: var(--alap-loading-overflow, visible);
+    transform: var(--alap-loading-transform, translate(-50%, -50%));
+  }
+
+  /* Appear animation for placeholder rows — users override via CSS vars:
+       alap-link {
+         --alap-transition-duration: 400ms;
+         --alap-transition-easing: cubic-bezier(0.2, 0, 0, 1);
+       } */
+  .menu [data-alap-placeholder] {
+    animation: alap-placeholder-fade-in
+               var(--alap-transition-duration, 250ms)
+               var(--alap-transition-easing, ease-out);
+  }
+
+  @keyframes alap-placeholder-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   /* --- List --- */
@@ -201,6 +238,8 @@ export class AlapLinkElement extends HTMLElement {
   private intersectionObserver: IntersectionObserver | null = null;
   private instanceId: string;
   private unsubscribeCoordinator: (() => void) | null = null;
+  private progressive: ProgressiveRenderer | null = null;
+  private loadingRect: DOMRect | null = null;
 
   static get observedAttributes(): string[] {
     return ['query', 'config', 'href', 'placement'];
@@ -228,6 +267,13 @@ export class AlapLinkElement extends HTMLElement {
 
   connectedCallback(): void {
     this.timer = new DismissTimer(this.getMenuTimeout(), () => this.closeMenu());
+
+    this.progressive = new ProgressiveRenderer({
+      engine: () => this.getEngine() ?? undefined,
+      onRender: (ctx) => this.onProgressiveRender(ctx),
+      cancelFetchOnDismiss: () =>
+        this.getConfig()?.settings?.cancelFetchOnDismiss === true,
+    });
 
     const coordinator = getInstanceCoordinator();
     this.unsubscribeCoordinator = coordinator.subscribe(
@@ -320,27 +366,96 @@ export class AlapLinkElement extends HTMLElement {
       return;
     }
 
-    const anchorId = this.id || undefined;
-    let links = engine.resolve(query, anchorId);
-    if (links.length === 0) return;
+    // Progressive path — the renderer calls onProgressiveRender() on each
+    // pass (first paint, and again when each async source settles).
+    this.progressive?.start(this, query, event);
+  };
+
+  /**
+   * Per-pass render callback fired by ProgressiveRenderer.
+   *
+   * Three UX phases:
+   *   - loading-only (no resolved items yet) → center the menu over the host
+   *     via the `data-alap-loading-only` data attribute, whose styles come
+   *     from the shadow-DOM CSS block (all variables user-overridable).
+   *   - loaded (resolved items present) → normal compass placement.
+   *   - transitioning from loading → loaded → FLIP-animate the container
+   *     from where the loading placeholder was to its placed position,
+   *     using `--alap-transition-duration` / `--alap-transition-easing`.
+   */
+  private onProgressiveRender(ctx: ProgressiveRenderContext): void {
+    if (!this.menu) return;
 
     const config = this.getConfig();
     const existingMode = resolveExistingUrlMode(
       this,
       config?.settings?.existingUrl as 'prepend' | 'append' | 'ignore' | undefined,
     );
-    // Check for href on the element itself, or on a slotted <a>
     const hrefSource = this.getAttribute('href')
       ? this
-      : this.querySelector('a[href]') as HTMLElement | null;
-    if (hrefSource) {
-      links = injectExistingUrl(links, hrefSource, existingMode);
+      : (this.querySelector('a[href]') as HTMLElement | null);
+    const links: ResolvedLink[] = hrefSource
+      ? injectExistingUrl(ctx.state.resolved, hrefSource, existingMode)
+      : ctx.state.resolved;
+
+    // Capture prev rect BEFORE mutating — used by the FLIP animation below.
+    const prevRect = ctx.transitioningFromLoading
+      ? this.menu.getBoundingClientRect()
+      : null;
+
+    this.renderMenuWithPlaceholders(links, ctx.state.sources);
+    this.bindItemHooks(links);
+
+    if (ctx.isLoadingOnly) {
+      this.menu.setAttribute('data-alap-loading-only', '');
+    } else {
+      this.menu.removeAttribute('data-alap-loading-only');
     }
 
-    this.renderMenu(links);
-    this.bindItemHooks(links);
-    this.openMenu();
-  };
+    if (!ctx.isUpdate) {
+      // First paint: open the menu. openMenu() skips compass placement when
+      // loading-only (the shadow-DOM CSS positions the menu instead).
+      this.openMenu(ctx.isLoadingOnly);
+    } else if (ctx.transitioningFromLoading) {
+      // Transitioning from loading → real content: recompute placement now
+      // that the menu has its final size.
+      this.applyComputedPlacement();
+    }
+
+    if (ctx.transitioningFromLoading && prevRect) {
+      flipFromRect(this.menu, prevRect);
+    }
+  }
+
+  /**
+   * Like `renderMenu` but also appends progressive-loading placeholder rows
+   * (one per pending/errored/empty async source). Used by the progressive
+   * path; the plain `renderMenu` is kept for `openWith()` / legacy paths.
+   */
+  private renderMenuWithPlaceholders(
+    links: Array<{ id: string } & import('../../core/types').AlapLink>,
+    sources: readonly SourceState[],
+  ): void {
+    if (!this.menu) return;
+
+    const config = this.getConfig();
+    const listType = (config?.settings?.listType as string) ?? 'ul';
+    const maxVisibleItems = (config?.settings?.maxVisibleItems as number) ?? DEFAULT_MAX_VISIBLE_ITEMS;
+    const list = buildMenuList(links, {
+      listType,
+      maxVisibleItems,
+      defaultTargetWindow: config?.settings?.targetWindow as string | undefined,
+      listAttributes: { part: 'list' },
+      liAttributes: { part: 'item' },
+      aAttributes: { part: 'link' },
+      imgAttributes: { part: 'image' },
+    });
+
+    appendPlaceholders(list, sources);
+
+    this.menu.innerHTML = '';
+    this.menu.appendChild(list);
+  }
 
   private onTriggerKeydown = (event: KeyboardEvent): void => {
     // Don't intercept Enter/Space on menu items — let them navigate
@@ -446,7 +561,7 @@ export class AlapLinkElement extends HTMLElement {
 
   // --- Open / Close ---
 
-  private openMenu(): void {
+  private openMenu(loadingOnly: boolean = false): void {
     if (!this.menu) return;
 
     // Close other menu instances (DOM, WC, framework) via coordinator
@@ -457,6 +572,18 @@ export class AlapLinkElement extends HTMLElement {
 
     this.isOpen = true;
     this.setAttribute('aria-expanded', 'true');
+
+    // Loading-only state: the shadow-DOM CSS rule for `data-alap-loading-only`
+    // centers the menu on the host. Skip the compass placement engine —
+    // measuring a tiny placeholder would yield a different direction than
+    // the real menu will need.
+    if (loadingOnly) {
+      this.menu.setAttribute('aria-hidden', 'false');
+      this.stopIntersectionObserver();
+      this.intersectionObserver = observeTriggerOffscreen(this, () => this.closeMenu());
+      this.timer?.start();
+      return;
+    }
 
     if (adjustViewport) {
       // Measure off-screen to get natural size without causing scroll or flicker
@@ -519,6 +646,59 @@ export class AlapLinkElement extends HTMLElement {
     this.timer?.start();
   }
 
+  /**
+   * Recompute compass placement for the current menu contents and apply it.
+   * Used on re-render (e.g. transitioning from loading-only → resolved) where
+   * the menu is already open but its size has changed.
+   */
+  private applyComputedPlacement(): void {
+    if (!this.menu) return;
+    const config = this.getConfig();
+    const adjustViewport = config?.settings?.viewportAdjust !== false;
+    if (!adjustViewport) return;
+
+    // Measure off-screen so the natural size reflects the new content,
+    // not the loading-only box. The inline styles below are cleared again
+    // after the placement result is applied.
+    this.menu.style.position = 'fixed';
+    this.menu.style.visibility = 'hidden';
+    this.menu.style.top = '-9999px';
+    this.menu.style.left = '-9999px';
+    this.menu.style.transform = '';
+    this.menu.style.maxHeight = 'none';
+    this.menu.style.overflow = 'visible';
+
+    const menuRect = this.menu.getBoundingClientRect();
+    this.menuNaturalSize = { width: menuRect.width, height: menuRect.height };
+
+    const triggerRect = this.getBoundingClientRect();
+    const parsed = this.getPlacement();
+    const gap = this.getGap();
+    const padding = (config?.settings?.viewportPadding as number) ?? DEFAULT_VIEWPORT_PADDING;
+
+    const result = computePlacement({
+      triggerRect,
+      menuSize: this.menuNaturalSize,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      placement: parsed.compass,
+      strategy: parsed.strategy,
+      gap,
+      padding,
+    });
+
+    this.lastPlacement = result;
+    this.menu.style.position = '';
+    this.menu.style.visibility = '';
+    this.menu.style.overflow = '';
+    this.menu.style.transform = ''; // loading's translate no longer applies
+    this.applyPlacement(result);
+    applyPlacementClass(this.menu, result.placement);
+
+    if (result.scrollY) {
+      this.startScrollTracking();
+    }
+  }
+
   private startScrollTracking(): void {
     this.stopScrollTracking();
     const config = this.getConfig();
@@ -565,6 +745,10 @@ export class AlapLinkElement extends HTMLElement {
     if (!this.menu) return;
     const wasOpen = this.isOpen;
     this.isOpen = false;
+    // Stop any in-flight progressive render so late-arriving settles can't
+    // re-render a dismissed menu.
+    this.progressive?.stop();
+    this.menu.removeAttribute('data-alap-loading-only');
     this.menu.setAttribute('aria-hidden', 'true');
     this.menu.style.top = '';
     this.menu.style.left = '';
@@ -576,6 +760,7 @@ export class AlapLinkElement extends HTMLElement {
     this.menu.style.maxWidth = '';
     this.menu.style.overflowY = '';
     this.menu.style.overflowX = '';
+    this.menu.style.transform = '';
     clearPlacementClass(this.menu);
     this.lastPlacement = null;
     this.menuNaturalSize = null;

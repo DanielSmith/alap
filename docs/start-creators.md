@@ -2,7 +2,7 @@
 
 This guide is for people who use Alap, not build it. You want to understand what Alap does, how the expression language works, and where to manage your links.
 
-For install instructions, framework setup, and API details, see [For Developers](start-dev.md).
+For install instructions, framework setup, and API details, see [Getting Started](getting-started/).
 
 
 ## What Alap Does
@@ -119,7 +119,7 @@ Use the Alap button or `Mod-Shift-A` to insert a link, then type your expression
 [alap query=".bridge"]bridges[/alap]
 ```
 
-These are just the most common entry points. Alap also works with htmx, Hugo shortcodes, MDX, Astro components, and more. If your environment can render HTML, chances are very good it can handle an Alap link. See [For Developers](start-dev.md#integrations) for the full list.
+These are just the most common entry points. Alap also works with htmx, Hugo shortcodes, MDX, Astro components, and more. If your environment can render HTML, chances are very good it can handle an Alap link. See [Integrations](integrations/) for the full list.
 
 ---
 

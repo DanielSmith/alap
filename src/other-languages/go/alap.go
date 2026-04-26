@@ -70,6 +70,13 @@ type Macro struct {
 }
 
 // Link is a single link entry in allLinks.
+//
+// The Provenance field tracks which trust tier the link came from
+// (author code, storage adapter, or protocol handler). It is
+// deliberately JSON-excluded (`json:"-"`) so untrusted input cannot
+// pre-stamp a link as author-tier; stamps are set in-memory after the
+// ValidateConfig whitelist pass. See link_provenance.go for tier
+// semantics and the helper API.
 type Link struct {
 	Label        string         `json:"label,omitempty"`
 	URL          string         `json:"url"`
@@ -84,6 +91,7 @@ type Link struct {
 	GUID         string         `json:"guid,omitempty"`
 	CreatedAt    any            `json:"createdAt,omitempty"`
 	Meta         map[string]any `json:"meta,omitempty"`
+	Provenance   Tier           `json:"-"`
 }
 
 // LinkWithID is a Link with its ID attached.
@@ -329,9 +337,10 @@ func (p *ExpressionParser) expandMacros(expr string, anchorID string) string {
 		result = macroRe.ReplaceAllStringFunc(result, func(match string) string {
 			name := match[1:] // strip @
 			if name == "" {
-				name = anchorID
+				log.Print(`[alap] Bare "@" is no longer supported — use "@macroname" to reference a named macro in config.Macros`)
+				return ""
 			}
-			if name == "" || p.config.Macros == nil {
+			if p.config.Macros == nil {
 				return ""
 			}
 			macro, ok := p.config.Macros[name]
@@ -940,9 +949,22 @@ func toTimestamp(value any) float64 {
 var (
 	controlCharRe   = regexp.MustCompile(`[\x00-\x1f\x7f]`)
 	dangerousScheme = regexp.MustCompile(`(?i)^(javascript|data|vbscript|blob)\s*:`)
+	schemeMatch     = regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9+\-.]*)\s*:`)
 )
 
+// DefaultSchemes is the default allowlist used by SanitizeURLWithSchemes
+// when the caller passes nil. http and https only.
+var DefaultSchemes = []string{"http", "https"}
+
+// StrictSchemes is the allowlist used by SanitizeURLStrict.
+// http, https, and mailto only (plus relative URLs).
+var StrictSchemes = []string{"http", "https", "mailto"}
+
 // SanitizeURL returns the URL unchanged if safe, or "about:blank" if dangerous.
+//
+// Allows: http, https, mailto, tel, relative URLs, empty string.
+// Blocks: javascript, data, vbscript, blob (case-insensitive, control-char
+// stripped before the scheme check to defeat `java\nscript:` disguises).
 func SanitizeURL(url string) string {
 	if url == "" {
 		return url
@@ -952,6 +974,49 @@ func SanitizeURL(url string) string {
 		return "about:blank"
 	}
 	return url
+}
+
+// SanitizeURLStrict permits only http, https, and mailto (plus relative
+// URLs and empty string). Use for links whose origin has not been
+// verified as author-tier: protocol handler results, storage-loaded
+// configs, etc.
+func SanitizeURLStrict(url string) string {
+	return SanitizeURLWithSchemes(url, StrictSchemes)
+}
+
+// SanitizeURLWithSchemes sanitizes url against a configurable scheme
+// allowlist. Runs the dangerous-scheme blocklist first (defence in
+// depth: javascript: is blocked even when it appears in the
+// allowlist). Relative URLs pass through regardless of the allowlist.
+// Passing nil for allowedSchemes uses DefaultSchemes (http/https only).
+func SanitizeURLWithSchemes(url string, allowedSchemes []string) string {
+	base := SanitizeURL(url)
+	if base == "about:blank" || base == "" {
+		return base
+	}
+
+	schemes := allowedSchemes
+	if schemes == nil {
+		schemes = DefaultSchemes
+	}
+
+	normalized := strings.TrimSpace(controlCharRe.ReplaceAllString(base, ""))
+	m := schemeMatch.FindStringSubmatch(normalized)
+	if m != nil {
+		scheme := strings.ToLower(m[1])
+		found := false
+		for _, s := range schemes {
+			if s == scheme {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return "about:blank"
+		}
+	}
+
+	return base
 }
 
 func sanitizeLink(link Link) Link {
@@ -1058,212 +1123,6 @@ func MergeConfigs(configs ...*Config) *Config {
 	return merged
 }
 
-// ---------------------------------------------------------------------------
-// ValidateConfig
-// ---------------------------------------------------------------------------
-
-// ValidateConfig validates and sanitizes a raw JSON-decoded config map,
-// returning a newly allocated *Config or an error.
-func ValidateConfig(raw map[string]any) (*Config, error) {
-	if raw == nil {
-		return nil, fmt.Errorf("config is nil")
-	}
-
-	blocked := map[string]bool{
-		"__proto__":   true,
-		"constructor": true,
-		"prototype":   true,
-	}
-
-	allowedLinkFields := map[string]bool{
-		"url":          true,
-		"label":        true,
-		"tags":         true,
-		"cssClass":     true,
-		"image":        true,
-		"altText":      true,
-		"targetWindow": true,
-		"description":  true,
-		"thumbnail":    true,
-		"hooks":        true,
-		"guid":         true,
-		"createdAt":    true,
-	}
-
-	// allLinks must exist and be a map
-	allLinksRaw, ok := raw["allLinks"]
-	if !ok {
-		return nil, fmt.Errorf("config missing required field: allLinks")
-	}
-	allLinksMap, ok := allLinksRaw.(map[string]any)
-	if !ok {
-		return nil, fmt.Errorf("allLinks must be an object, not an array or primitive")
-	}
-
-	cfg := &Config{
-		Settings:       make(map[string]any),
-		Macros:         make(map[string]Macro),
-		AllLinks:       make(map[string]Link),
-		SearchPatterns: make(map[string]any),
-	}
-
-	// --- Settings ---
-	if settingsRaw, ok := raw["settings"]; ok {
-		if settingsMap, ok := settingsRaw.(map[string]any); ok {
-			for k, v := range settingsMap {
-				if !blocked[k] {
-					cfg.Settings[k] = v
-				}
-			}
-		}
-	}
-
-	// --- Macros ---
-	if macrosRaw, ok := raw["macros"]; ok {
-		if macrosMap, ok := macrosRaw.(map[string]any); ok {
-			for name, v := range macrosMap {
-				if blocked[name] {
-					log.Printf("ValidateConfig: skipping blocked macro name %q", name)
-					continue
-				}
-				if strings.Contains(name, "-") {
-					log.Printf("ValidateConfig: skipping macro name with hyphen %q", name)
-					continue
-				}
-				macroMap, ok := v.(map[string]any)
-				if !ok {
-					continue
-				}
-				m := Macro{}
-				if li, ok := macroMap["linkItems"]; ok {
-					if s, ok := li.(string); ok {
-						m.LinkItems = s
-					}
-				}
-				if c, ok := macroMap["config"]; ok {
-					if cm, ok := c.(map[string]any); ok {
-						m.Config = cm
-					}
-				}
-				cfg.Macros[name] = m
-			}
-		}
-	}
-
-	// --- AllLinks ---
-	for id, v := range allLinksMap {
-		if blocked[id] {
-			log.Printf("ValidateConfig: skipping blocked link ID %q", id)
-			continue
-		}
-		if strings.Contains(id, "-") {
-			log.Printf("ValidateConfig: skipping link ID with hyphen %q", id)
-			continue
-		}
-
-		linkMap, ok := v.(map[string]any)
-		if !ok {
-			continue
-		}
-
-		// url is required and must be a string
-		urlVal, hasURL := linkMap["url"]
-		urlStr, urlIsString := urlVal.(string)
-		if !hasURL || !urlIsString {
-			log.Printf("ValidateConfig: skipping allLinks[%q] — missing or invalid url", id)
-			continue
-		}
-
-		// Filter to allowed fields only
-		link := Link{}
-		for field := range linkMap {
-			if !allowedLinkFields[field] {
-				log.Printf("ValidateConfig: dropping unknown field %q from link %q", field, id)
-			}
-		}
-
-		link.URL = SanitizeURL(urlStr)
-		if s, ok := linkMap["label"].(string); ok {
-			link.Label = s
-		}
-		if s, ok := linkMap["cssClass"].(string); ok {
-			link.CSSClass = s
-		}
-		if s, ok := linkMap["image"].(string); ok {
-			link.Image = SanitizeURL(s)
-		}
-		if s, ok := linkMap["altText"].(string); ok {
-			link.AltText = s
-		}
-		if s, ok := linkMap["targetWindow"].(string); ok {
-			link.TargetWindow = s
-		}
-		if s, ok := linkMap["description"].(string); ok {
-			link.Description = s
-		}
-		if s, ok := linkMap["thumbnail"].(string); ok {
-			link.Thumbnail = s
-		}
-		if s, ok := linkMap["guid"].(string); ok {
-			link.GUID = s
-		}
-		if hooksRaw, ok := linkMap["hooks"]; ok {
-			if hooksSlice, ok := hooksRaw.([]any); ok {
-				for _, h := range hooksSlice {
-					if hookStr, ok := h.(string); ok {
-						link.Hooks = append(link.Hooks, hookStr)
-					}
-				}
-			}
-		}
-		if ca, ok := linkMap["createdAt"]; ok {
-			link.CreatedAt = ca
-		}
-
-		// Tags: validate each tag for hyphens
-		if tagsRaw, ok := linkMap["tags"]; ok {
-			if tagsSlice, ok := tagsRaw.([]any); ok {
-				for _, t := range tagsSlice {
-					if tagStr, ok := t.(string); ok {
-						if strings.Contains(tagStr, "-") {
-							log.Printf("ValidateConfig: skipping tag with hyphen %q in link %q", tagStr, id)
-							continue
-						}
-						link.Tags = append(link.Tags, tagStr)
-					}
-				}
-			}
-		}
-
-		cfg.AllLinks[id] = link
-	}
-
-	// --- SearchPatterns ---
-	if spRaw, ok := raw["searchPatterns"]; ok {
-		if spMap, ok := spRaw.(map[string]any); ok {
-			for k, v := range spMap {
-				if blocked[k] {
-					log.Printf("ValidateConfig: skipping blocked search pattern key %q", k)
-					continue
-				}
-				if strings.Contains(k, "-") {
-					log.Printf("ValidateConfig: skipping search pattern key with hyphen %q", k)
-					continue
-				}
-				if patStr, ok := v.(string); ok {
-					result := ValidateRegex(patStr)
-					if !result.Safe {
-						log.Printf("ValidateConfig: skipping unsafe regex pattern %q: %s", k, result.Reason)
-						continue
-					}
-				}
-				cfg.SearchPatterns[k] = v
-			}
-		}
-	}
-
-	return cfg, nil
-}
 
 // ---------------------------------------------------------------------------
 // SSRF guard — port of src/protocols/ssrf-guard.ts

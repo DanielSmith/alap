@@ -4,7 +4,7 @@
 
 The `AlapUI` class binds Alap menus to vanilla HTML. No framework required.
 
-> Live version with interactive examples: https://alap.info/framework-guides/vanilla-dom
+> Live version with interactive examples: https://docs.alap.info/framework-guides/vanilla-dom
 
 ## Setup
 

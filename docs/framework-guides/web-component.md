@@ -4,7 +4,7 @@
 
 The `<alap-link>` custom element. Works in any HTML — no framework required.
 
-> Live version with interactive examples: https://alap.info/framework-guides/web-component
+> Live version with interactive examples: https://docs.alap.info/framework-guides/web-component
 
 ## Setup
 

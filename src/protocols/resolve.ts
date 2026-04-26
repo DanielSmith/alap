@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
-import type { AlapConfig, ProtocolHandler } from '../core/types';
+import type { AlapConfig, GenerateHandler, ProtocolHandler } from '../core/types';
+import type { LinkCatalog } from '../core/linkCatalog';
+import { staticCatalog } from '../core/linkCatalog';
 import { warn } from '../core/logger';
 
 /**
  * Resolve a protocol expression against the link registry.
  *
- * For filter protocols: runs the predicate against every link, returns matching IDs.
+ * For filter protocols: runs the predicate against every link in the
+ * catalog, returns matching IDs. The catalog is author-config-first —
+ * protocol-generated overlay entries can't shadow an author id.
  * For generate protocols: looks up pre-resolved IDs from the generatedIds map.
  *
  * @param value - Token value: "name|arg1|arg2" (segments joined by |)
- * @param config - The active config
+ * @param config - The active config (data only; no handlers)
+ * @param catalog - Link lookup view (author links + engine overlay). When
+ *   omitted, a plain view over `config.allLinks` is used.
  * @param generatedIds - Map of pre-resolved generate protocol results (token value → temp IDs)
+ * @param getHandlers - Lookup into the engine's handler registry. Supplied by
+ *   ExpressionParser when constructed by an AlapEngine; undefined when the
+ *   parser is used standalone (no handlers available → filter protocols return []).
  * @returns Array of matching item IDs
  */
 export const resolveProtocol = (
   value: string,
   config: AlapConfig,
+  catalog?: LinkCatalog,
   generatedIds?: Map<string, string[]>,
+  getHandlers?: (name: string) => { generate?: GenerateHandler; filter?: ProtocolHandler } | undefined,
 ): string[] => {
   const segments = value.split('|');
   const protocolName = segments[0];
@@ -43,33 +54,31 @@ export const resolveProtocol = (
   }
 
   const protocol = config.protocols?.[protocolName];
-  if (!protocol) {
+  const entry = getHandlers?.(protocolName);
+  if (!protocol && !entry) {
     warn(`Protocol "${protocolName}" not found in config.protocols`);
     return [];
   }
 
-  // Resolve the filter function: filter > handler (deprecated)
   const filter: ProtocolHandler | undefined =
-    typeof protocol.filter === 'function' ? protocol.filter :
-    typeof protocol.handler === 'function' ? protocol.handler :
-    undefined;
+    typeof entry?.filter === 'function' ? entry.filter : undefined;
 
   if (!filter) {
     // Protocol exists but has no filter — might be generate-only.
-    // If we got here without generatedIds, the preResolve step was skipped.
-    if (protocol.generate) {
-      warn(`Protocol "${protocolName}" is a generate protocol but preResolve was not called. Use engine.resolveAsync() for external protocols.`);
-    } else {
+    // For generate protocols, reaching this branch just means the cache is
+    // cold for this token: the fetch is in flight and a subsequent call
+    // (after the promise in ProgressiveState.sources settles) will find the
+    // ids. That's normal progressive-rendering behavior, not an error.
+    if (!entry?.generate) {
       warn(`Protocol "${protocolName}" has no filter or generate handler`);
     }
     return [];
   }
 
-  const allLinks = config.allLinks;
-  if (!allLinks || typeof allLinks !== 'object') return [];
+  const view = catalog ?? staticCatalog(config.allLinks);
 
   const result: string[] = [];
-  for (const [id, link] of Object.entries(allLinks)) {
+  for (const [id, link] of view.entries()) {
     if (!link || typeof link !== 'object') continue;
     try {
       if (filter(args, link, id)) {

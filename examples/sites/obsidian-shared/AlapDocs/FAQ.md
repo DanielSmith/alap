@@ -1,0 +1,244 @@
+---
+source: FAQ.md
+modified: '2026-04-25T17:01:32Z'
+title: Frequently Asked Questions
+description: '---'
+---
+# Frequently Asked Questions
+
+---
+
+## General
+
+### What is Alap?
+
+Alap is a JavaScript library that turns links into contextual menus. Instead of "one link, one destination," each link opens a menu of curated targets selected by tags, expressions, macros, or search patterns. The reader chooses where to go.
+
+### What does "Alap" mean?
+
+The name started as a practical choice — "MultiLink," "ManyLinks," and "MenuLinks" were all taken. You can think of it as whatever acronym feels memorable — "A Link, All Places" works.
+
+There's also a tie-in to music: the **alap** is the opening section of a North Indian classical performance — a form of melodic improvisation that introduces and develops a raga. This fits the spirit: Alap is a means of dynamically introducing and developing a set of destinations, especially when the menu is assembled at runtime from a living config.
+
+### Is this a new project?
+
+No — the concept dates back to the 1990s:
+
+- **1990s:** The dissatisfaction with "one anchor, one destination" started here. Ted Nelson's Xanadu project imagined links as rich, bidirectional, context-carrying objects. But Xanadu required replacing the web's plumbing entirely. Alap shares some of Xanadu's premise (links should be richer than `<a href>`) while rejecting its approach — the richness comes from the configuration layer, not from rewriting how documents connect.
+- **2012:** Originally called "MultiLinks," built with jQuery.
+- **2021 (v1):** Rewritten as an ES6 library, no dependencies. Published on npm as `alap`.
+- **2021 (v2):** Introduced an API mode so frameworks like Vue and React could use Alap for data without Alap touching the DOM.
+- **2026 (v3):** Complete rewrite in TypeScript. 10 framework adapters (React, Vue, Svelte, Solid, Qwik, Astro, Alpine, Web Component, Vanilla DOM, Eleventy), expression parser with set-theory operators, regex search, storage layer, event hooks, security hardening, server and parser implementations in Node / Bun, Rust, Go, PHP, Python, and Java. Alternative renderers — lightbox (fullscreen image/text overlay) and lens (detail inspection panel) — alongside the original dropdown menu. The beginnings of a broader ecosystem with Gather (ad-hoc collection building) and HighNotes (floating detail cards). 1460+ tests.
+
+### How is this different from a dropdown menu or a tooltip?
+
+A dropdown is a navigation element — it's part of the page structure. An Alap link is inline — it lives inside your content, inside a sentence. The menu appears on click and disappears when you're done. It's closer to a footnote or a citation than a nav bar.
+
+### Won't users be confused by links that open menus?
+
+The `aria-haspopup="true"` attribute signals to screen readers that the link opens a menu. For sighted users, the cursor changes and the menu appears on click — the interaction is the same as any popup menu. The key is signaling intent: dotted underlines, subtle icons, or different link styling can distinguish Alap links from regular links. See [[core-concepts/styling|Styling]] for details.
+
+### How does Alap handle accessibility?
+
+Accessibility is built in, not bolted on. Every adapter (DOM, Web Component, React, Vue, Svelte, Solid, Qwik, Alpine, Astro, Eleventy) ships the same behavior out of the box:
+
+- **ARIA roles** — triggers announce as `role="button"` with `aria-haspopup="true"` and `aria-expanded`. Screen readers hear "Coffee shops, button, menu, collapsed" before any interaction.
+- **Keyboard navigation** — `Enter`/`Space` opens, `ArrowDown`/`ArrowUp` navigates items, `Escape` closes and returns focus to the trigger. `Home`/`End` jump to first/last item. No focus is ever lost.
+- **Menu structure** — follows the WAI-ARIA menu button pattern. List semantics are removed so screen readers see only the menu and its items.
+- **Auto-dismiss** — mouse leave timeout, click outside, `Escape`, `Tab` (moves focus forward, menu closes), and native Popover API dismissal.
+- **Viewport containment** — the placement engine prevents menus from overflowing the viewport. If a menu is taller than the available space, it's clamped with a scrollable region that keyboard navigation works within.
+
+You don't configure any of this. Render the component and it's there. See [[cookbook/accessibility|Accessibility]] for the full details.
+
+### Does this affect SEO?
+
+Alap links render as web components or ARIA-attributed spans, not as traditional `<a href>` elements in the page source. For SEO, use the `existingUrl` feature — anchors with an existing `href` include the original URL as the first menu item, so crawlers see a real link while humans get the full menu. The Astro and Eleventy integrations can also resolve expressions at build time for fully static output. See [[cookbook/existing-urls|Existing URLs]].
+
+---
+
+## Technical
+
+### What about WordPress, Hugo, CMSs, and other platforms?
+
+- **WordPress** — the [[integrations/wordpress|WordPress plugin]] adds an `[alap]` shortcode. Docker containers with SQLite (no MySQL needed) for testing.
+- **Hugo** — the [[integrations/hugo|Hugo integration]] provides shortcodes and partials that output `<alap-link>` web components. See the [Hugo example](https://examples.alap.info/hugo/).
+- **Eleventy** — the [[integrations/eleventy|`eleventy-alap`]] plugin resolves expressions at build time or renders interactive web components. See the [Eleventy example](https://examples.alap.info/eleventy/).
+- **Next.js** — the [[integrations/next|`next-alap`]] integration handles `'use client'` boundaries and provides a layout component. See the [Next.js example](https://examples.alap.info/next/).
+- **Nuxt** — the [[integrations/nuxt|`nuxt-alap`]] integration provides a client plugin factory, Vue component re-exports, and Nuxt Content markdown support.
+- **Astro** — the [[integrations/astro|`astro-alap`]] integration provides zero-config setup. See the [Astro example](https://examples.alap.info/astro-integration/).
+- **Qwik City** — the [[integrations/qwik-city|`qwik-alap`]] integration provides a Vite plugin.
+- **VitePress** — the [[integrations/vitepress|`vitepress-alap`]] integration registers `<alap-link>` as a custom element and optionally injects config.
+- **Headless CMSs** (Contentful, Sanity, Strapi, Ghost) — use [[plugins/rehype-alap|`rehype-alap`]] in your build pipeline. Authors link to `alap:.coffee` in the WYSIWYG editor, the plugin transforms the HTML output into web components. See the [cms-content example](https://examples.alap.info/cms-content/).
+- **Markdown-based CMSs** — use [[plugins/remark-alap|`remark-alap`]] for `[text](alap:query)` syntax. See the [markdown example](https://examples.alap.info/markdown/).
+- **MDX** — use [[plugins/mdx|`@alap/mdx`]] for React-based MDX content. See the [MDX example](https://examples.alap.info/mdx/).
+- **Tiptap / Rich Text** — use [[plugins/tiptap-alap|`tiptap-alap`]] to insert Alap links as inline nodes. See the [Tiptap example](https://examples.alap.info/tiptap/).
+- **htmx** — the `<alap-link>` web component auto-initializes after htmx swaps. No adapter needed. See the [htmx example](https://examples.alap.info/htmx/).
+- **Bluesky / AT Protocol** — the `:atproto:` protocol fetches live feeds, profiles, and search results. See the [Bluesky example](https://examples.alap.info/bluesky-atproto/).
+- **Any platform with a `<script>` tag** — the [[getting-started/installation|CDN / IIFE build]] works everywhere. See the [CDN example](https://examples.alap.info/cdn/).
+
+### What about Angular / Lit / Preact / Ember?
+
+The `<alap-link>` web component works in any framework that supports custom elements — which covers a lot of ground. No adapter needed:
+
+| Framework | How to use Alap |
+|-----------|----------------|
+| **Angular** | Add `CUSTOM_ELEMENTS_SCHEMA`, use `<alap-link>` directly in templates |
+| **Lit** | Native — Lit is a web component framework, `<alap-link>` is a web component |
+| **Preact** | `alap/react` works via Preact's React compatibility layer, or use the web component |
+| **Ember** | Ember supports custom elements natively |
+| **Stencil** | Web component to web component — works directly |
+
+Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [[framework-guides/web-component|Web Component]] covers the same surface with no adapter code.
+
+### How big is the library?
+
+Depends on what you import:
+
+| Entry point | Raw | Gzipped | What's included |
+|-------------|-----|---------|-----------------|
+| `alap` (IIFE) | 147 KB | 36 KB | Everything — engine, all renderers, protocols, coordinators |
+| `alap/slim` | 30 KB | 8.6 KB | Engine + menus (DOM + WC) + web/json protocols |
+| `alap/core` | 27 KB | 8 KB | Engine + parser only (no DOM) |
+
+The core has zero runtime dependencies and is fully tree-shakeable. Most projects should start with `alap/slim` and add renderers as needed. See [[getting-started/installation|Installation]] for the full import table.
+
+### Which browsers are supported?
+
+All modern browsers (Chrome, Firefox, Safari, Edge). The Popover API mode requires Chrome 114+, Firefox 125+, Safari 17+. Older browsers work fine with DOM and Web Component modes.
+
+### Does it work without JavaScript?
+
+The interactive menu requires JavaScript. However, expression resolution can happen without client-side JS. The Eleventy plugin resolves expressions at build time and outputs plain HTML lists as a no-JS fallback. The Python, Go, and Rust parser ports could serve as build-time pre-resolvers for other static generators. See [[cookbook/markdown|Markdown Integration]].
+
+### Can I use it with TypeScript?
+
+Yes. The library ships `.d.ts` type declarations for all exports. See [[api-reference/types|Types]] for the full interface reference.
+
+### How do I style the menus?
+
+Depends on the rendering mode:
+
+- **Web Component:** `--alap-*` CSS custom properties + `::part()` selectors
+- **DOM mode:** Style `#alapelem`, `.alapListElem`, and standard CSS
+- **Framework adapters:** Pass `menuClassName` and `menuStyle` props
+
+See [[core-concepts/styling|Styling]] for the full guide, and [[framework-guides/web-component|Web Component]] for all 55+ CSS custom properties.
+
+### What's the difference between DOM mode, Web Component mode, and Popover mode?
+
+| Mode | How it works | When to use |
+|------|-------------|-------------|
+| **DOM** | Single shared menu container, compass-based placement with viewport containment | Maximum compatibility, simplest CSS |
+| **Web Component** | Per-element Shadow DOM, same placement engine, `::part()` theming | Style isolation, third-party embedding |
+| **Popover** | HTML Popover API, browser-managed stacking | Modern browsers, no z-index management |
+
+DOM and Web Component modes support 9 compass positions (N, NE, E, SE, S, SW, W, NW, C) with three strategies: **flip** (default — tries fallback directions), **clamp** (flip + constrain to viewport with scroll), and **place** (pinned, no fallback). Popover mode skips the compass placement engine and relies on the browser's native positioning instead. See [[cookbook/placement|Placement]] for the full guide.
+
+### Can I have multiple configs on one page?
+
+Yes. Two approaches:
+
+**Named configs** — each link library is independent:
+
+```typescript
+registerConfig(blogConfig, 'blog');
+registerConfig(docsConfig, 'docs');
+```
+
+```html
+<alap-link query=".tutorial" config="docs">tutorials</alap-link>
+<alap-link query=".recipe" config="blog">recipes</alap-link>
+```
+
+**Merged configs** — combine libraries into one:
+
+```typescript
+import { mergeConfigs } from 'alap/core';
+
+const merged = mergeConfigs(baseConfig, teamConfig, userConfig);
+registerConfig(merged);
+```
+
+The merge is shallow per section: `allLinks`, `macros`, `settings`, and `searchPatterns` each merge independently. If two configs define the same item ID, the later one wins. See [[api-reference/engine|Engine]] for `mergeConfigs` details.
+
+### Can I filter links by time, location, or custom dimensions?
+
+Yes. Protocol expressions extend the query language with dimensional filtering:
+
+```
+.coffee + :location:radius:40.7,-74.0:5mi:    → coffee within 5 miles
+(:time:7d: + .featured), .pinned  → featured from last week, plus pinned
+```
+
+Create custom handlers for any dimension your app needs. See [[core-concepts/protocols|Protocols]].
+
+### Can I sort, limit, or shuffle results?
+
+Yes. Refiners shape the result set after selection:
+
+```
+.coffee *sort:label* *limit:5*           → top 5 alphabetically
+.coffee *shuffle* *limit:3*              → 3 random picks
+(.nyc *sort:label* *limit:3*) | (.sf *sort:label* *limit:3*)  → top 3 from each city
+```
+
+See [[core-concepts/refiners|Refiners]].
+
+### Is the expression language Turing complete?
+
+No, and deliberately so. It's a query language, not a programming language. No variables, no loops, no conditionals, no unbounded recursion. Every expression terminates. There's a max nesting depth (32), max token count (1024), and max macro expansion rounds (10). It's closer to CSS selectors or SQL's `WHERE` clause than to a general-purpose language.
+
+### How does the parser handle untrusted input?
+
+I'm not a security expert, and Alap hasn't had a third-party audit — it's a single-maintainer open source project. The parser is hardened against the usual concerns: URL sanitization, ReDoS protection, config validation, parser resource limits. See [[api-reference/security|Security]] for the full list of guardrails. Please do your own due diligence before deploying, especially when wiring up protocols on servers with local network access. How you deploy this is your responsibility.
+
+---
+
+## Content & Workflow
+
+### Who manages the link library?
+
+That depends on your team. The [[cookbook/editors|Editors]] page covers the visual tools for managing configs. Writers use expressions in their content. Developers set up the infrastructure.
+
+### How do I update a URL that changed?
+
+Update it once in the config. Every Alap link on every page that includes that item now points to the new URL. No articles need editing.
+
+### What happens when I delete an item?
+
+It disappears from every menu that included it. The expressions still work — they just return fewer results. If the item was referenced by ID, that reference silently returns nothing.
+
+### Can writers use Alap in Markdown?
+
+Yes, with the `remark-alap` plugin:
+
+```markdown
+Check out these [cafes](alap:.coffee).
+The [best bridges](alap:@nycBridges) are worth visiting.
+```
+
+Spaces in expressions break Markdown URL parsing, so use macros for complex expressions. See [[cookbook/markdown|Markdown]].
+
+### How do I test my expressions?
+
+Every Alap [[cookbook/editors|editor]] includes a live query tester. Type an expression, see which items it resolves to.
+
+---
+
+## Project
+
+### Is this AI-generated code?
+
+The codebase was built with AI assistance (Claude, Gemini) but every architectural decision, security measure, and design choice was directed and reviewed by Daniel Smith. The project has 1460+ tests organized into progressive tiers, zero-dependency core, hand-rolled recursive descent parser, consistent adapter contracts across 9 frameworks, and defensive guardrails — none of which are characteristics of unreviewed AI output.
+
+### Why Apache 2.0 license?
+
+It's permissive (use it anywhere, including commercial projects) while providing patent protection. Same license as Kubernetes, Android, and Swift.
+
+### Where can I report bugs or request features?
+
+Open an issue at [github.com/DanielSmith/alap](https://github.com/DanielSmith/alap/issues).
+
+### Can I extend the expression language with custom operand types?
+
+Yes. The protocol expression system is a plugin architecture. Register a handler function in `config.protocols` and your custom `:protocol:args:` syntax works immediately — composing with tags, operators, macros, parentheses, and refiners. See [[core-concepts/protocols|Protocols]].

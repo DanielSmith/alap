@@ -329,7 +329,7 @@ impl<'a> ExpressionParser<'a> {
 
     // ---- Macro expansion ----
 
-    fn expand_macros(&self, expr: &str, anchor_id: &str) -> String {
+    fn expand_macros(&self, expr: &str, _anchor_id: &str) -> String {
         let mut result = expr.to_owned();
         for _ in 0..MAX_MACRO_EXPANSIONS {
             if !result.contains('@') {
@@ -339,8 +339,10 @@ impl<'a> ExpressionParser<'a> {
             result = MACRO_RE
                 .replace_all(&before, |caps: &regex::Captures| {
                     let name = &caps[1];
-                    let name = if name.is_empty() { anchor_id } else { name };
                     if name.is_empty() {
+                        eprintln!(
+                            "Bare \"@\" is no longer supported — use \"@macroname\" to reference a named macro in config.macros"
+                        );
                         return String::new();
                     }
                     self.config

@@ -3,12 +3,19 @@
  * Extends the base fixture with meta fields, timestamps, and protocol handlers.
  */
 
-import type { AlapConfig } from '../../src/core/types';
+import type { AlapConfig, ProtocolHandlerRegistry } from '../../src/core/types';
 import { timeHandler } from '../../src/protocols/time';
+import { locationHandler } from '../../src/protocols/location';
 
 const now = Date.now();
 const DAY = 24 * 60 * 60 * 1000;
 
+/**
+ * Data-only config shared across the protocol/refiner tier tests.
+ * Pair with `protocolHandlers` at engine construction:
+ *
+ *   new AlapEngine(protocolConfig, { handlers: protocolHandlers })
+ */
 export const protocolConfig: AlapConfig = {
   settings: { listType: 'ul', menuTimeout: 5000 },
 
@@ -19,28 +26,9 @@ export const protocolConfig: AlapConfig = {
     top2_nyc: { linkItems: '.nyc *sort:label* *limit:2*' },
   },
 
-  protocols: {
-    time: {
-      handler: timeHandler,
-    },
-    price: {
-      handler: (segments, link) => {
-        const price = link.meta?.price as number | undefined;
-        if (price === undefined) return false;
-        const min = parseFloat(segments[0]);
-        const max = segments[1] !== undefined ? parseFloat(segments[1]) : Infinity;
-        return price >= min && price <= max;
-      },
-    },
-    loc: {
-      handler: (segments, link) => {
-        const loc = link.meta?.location as [number, number] | undefined;
-        if (!loc) return false;
-        // Simple: just check if location exists (real impl would do distance calc)
-        return true;
-      },
-    },
-  },
+  // All three protocols below are filter-only (no data to store in the
+  // config), so the `protocols` map is empty here. Filters live in
+  // `protocolHandlers` and are registered at engine construction.
 
   allLinks: {
     // Cars
@@ -132,4 +120,22 @@ export const protocolConfig: AlapConfig = {
       meta: { price: 4 },
     },
   },
+};
+
+/**
+ * Shared handler registry for protocol/refiner tier tests.
+ * Registers time + price + location filter handlers.
+ */
+export const protocolHandlers: ProtocolHandlerRegistry = {
+  time: { filter: timeHandler },
+  price: {
+    filter: (segments, link) => {
+      const price = link.meta?.price as number | undefined;
+      if (price === undefined) return false;
+      const min = parseFloat(segments[0]);
+      const max = segments[1] !== undefined ? parseFloat(segments[1]) : Infinity;
+      return price >= min && price <= max;
+    },
+  },
+  location: { filter: locationHandler },
 };

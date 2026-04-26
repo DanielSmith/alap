@@ -4,7 +4,7 @@
 
 Alap is a single package with **zero required dependencies**. Framework adapters are included but only activate when you import them — bring your own framework.
 
-> Live version with interactive examples: https://alap.info/getting-started/installation
+> Live version with interactive examples: https://docs.alap.info/getting-started/installation
 
 ## npm
 

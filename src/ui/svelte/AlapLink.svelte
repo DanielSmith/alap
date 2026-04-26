@@ -15,13 +15,27 @@
 -->
 
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import { getAlapContext, type AlapContextValue } from './context';
-  import type { AlapLink as AlapLinkType } from '../../core/types';
-  import { sanitizeUrl } from '../../core/sanitizeUrl';
-  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
-  import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-  import { REM_PER_MENU_ITEM } from '../../constants';
+  import type { AlapLink as AlapLinkType, SourceState } from '../../core/types';
+  import {
+    sanitizeUrlByTier,
+    sanitizeCssClassByTier,
+    sanitizeTargetWindowByTier,
+  } from '../../core/sanitizeByTier';
+
+  // Template helpers — keep per-item sanitization concise in the markup.
+  // (AlapLinkType is already imported above alongside SourceState.)
+  function classFor(item: AlapLinkType): string {
+    const safe = sanitizeCssClassByTier(item.cssClass, item);
+    return safe ? `alapListElem ${safe}` : 'alapListElem';
+  }
+  function targetFor(item: AlapLinkType): string {
+    return sanitizeTargetWindowByTier(item.targetWindow, item) ?? 'fromAlap';
+  }
+  import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
+  import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, placeholderDescriptor, installMenuDismiss, type MenuDismissHandle } from '../shared';
+  import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
   type ResolvedLink = { id: string } & AlapLinkType;
 
@@ -69,7 +83,19 @@
   const ctx: AlapContextValue = getAlapContext();
 
   let isOpen = $state(false);
-  let items = $state<ResolvedLink[]>([]);
+  // $state.raw so each ResolvedLink keeps its raw object identity. Svelte's
+  // default $state deep-proxies array elements, which would break the
+  // WeakMap-keyed provenance lookup that sanitizeByTier relies on — the
+  // proxied item is a different reference from the one validateConfig
+  // stamped, and getProvenance(proxy) returns undefined (fail-closed
+  // drops cssClass, clamps target). The items array is replaced as a
+  // whole on each resolve cycle, so raw state is enough.
+  let items = $state.raw<ResolvedLink[]>([]);
+  let sources = $state<SourceState[]>([]);
+  let isLoadingOnly = $state(false);
+  let progressive: ProgressiveRenderer | null = null;
+  let pendingFlipRect: DOMRect | null = null;
+  let lastClickEvent: MouseEvent | null = null;
 
   // IDs for ARIA
   const uid = Math.random().toString(36).slice(2, 8);
@@ -110,53 +136,67 @@
 
   let openedViaKeyboard = false;
 
-  // --- Timer ---
+  // --- Dismiss (timer, click-outside, Escape) ---
 
-  let timer = 0;
+  let dismissHandle: MenuDismissHandle | null = null;
 
-  function stopTimer() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = 0;
-    }
-  }
-
-  function startTimer() {
-    stopTimer();
-    timer = window.setTimeout(closeMenu, ctx.menuTimeout);
-  }
+  function startTimer() { dismissHandle?.startTimer(); }
+  function stopTimer() { dismissHandle?.stopTimer(); }
 
   // --- Menu coordinator (close others when this one opens) ---
 
   const unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    progressive?.stop();
     isOpen = false;
+    isLoadingOnly = false;
+  });
+
+  // --- Progressive rendering ---
+
+  onMount(() => {
+    progressive = new ProgressiveRenderer({
+      engine: ctx.engine,
+      onRender: (renderCtx: ProgressiveRenderContext) => {
+        if (renderCtx.transitioningFromLoading && menuEl) {
+          pendingFlipRect = menuEl.getBoundingClientRect();
+        }
+        if (!renderCtx.isUpdate) {
+          ctx.menuCoordinator.notifyOpen(triggerId);
+        }
+        items = renderCtx.state.resolved as ResolvedLink[];
+        sources = renderCtx.state.sources as SourceState[];
+        isLoadingOnly = renderCtx.isLoadingOnly;
+        isOpen = true;
+      },
+      cancelFetchOnDismiss: () => ctx.config?.settings?.cancelFetchOnDismiss === true,
+    });
   });
 
   // --- Open / close ---
 
   function closeMenu() {
+    progressive?.stop();
     const wasOpen = isOpen;
+    isLoadingOnly = false;
     isOpen = false;
     if (wasOpen) triggerEl?.focus();
   }
 
-  function openMenu() {
-    const resolved = ctx.engine.resolve(query, anchorId);
-    if (resolved.length === 0) return;
-    ctx.menuCoordinator.notifyOpen(triggerId);
-    items = resolved;
-    isOpen = true;
+  function openMenu(event: MouseEvent) {
+    if (!triggerEl) return;
+    lastClickEvent = event;
+    progressive?.start(triggerEl, query, event, anchorId);
   }
 
-  function toggleMenu() {
+  function toggleMenu(event: MouseEvent) {
     if (isOpen) closeMenu();
-    else openMenu();
+    else openMenu(event);
   }
 
   // --- Focus first item on open ---
 
   $effect(() => {
-    if (isOpen) {
+    if (isOpen && !isLoadingOnly) {
       // Wait for DOM update
       requestAnimationFrame(() => {
         if (openedViaKeyboard) itemEls[0]?.focus();
@@ -166,24 +206,57 @@
     }
   });
 
+  // --- Center-over-trigger while loading-only; FLIP on transition ---
+  //
+  // Loading-only uses CSS-var-driven inline styles from `centerOverTrigger`.
+  // A tiny "Loading…" box would flip direction differently from the resolved
+  // menu, so we skip compass placement until items arrive, then FLIP-animate.
+  $effect(() => {
+    // Touch reactive deps so this re-runs on state transitions.
+    void items; void sources;
+    const loading = isLoadingOnly;
+    const open = isOpen;
+
+    tick().then(() => {
+      if (!menuEl || !triggerEl) return;
+
+      if (open && loading && lastClickEvent) {
+        centerOverTrigger(menuEl, triggerEl, lastClickEvent, DEFAULT_MENU_Z_INDEX);
+        return;
+      }
+
+      if (pendingFlipRect && !loading) {
+        flipFromRect(menuEl, pendingFlipRect);
+        pendingFlipRect = null;
+      }
+    });
+  });
+
   // --- Compass placement ---
 
   let placementScrollHandler: (() => void) | null = null;
 
   $effect(() => {
+    // Re-run when items/sources change so we recompute placement as the
+    // menu grows past the loading-only phase.
+    void items; void sources;
+
     // Clean up previous
     if (placementScrollHandler) {
       window.removeEventListener('scroll', placementScrollHandler);
       placementScrollHandler = null;
     }
 
-    if (!isOpen || !placement || mode === 'popover') return;
+    if (!isOpen || isLoadingOnly || !placement || mode === 'popover') return;
     if (!triggerEl || !menuEl || !wrapperEl) return;
 
     const tEl = triggerEl;
     const mEl = menuEl;
     const wEl = wrapperEl;
     const p = placement;
+
+    // Clear any inline styles set by centerOverTrigger so placement can take over.
+    mEl.style.cssText = '';
 
     const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
       placement: p,
@@ -213,37 +286,33 @@
     return () => observer.disconnect();
   });
 
-  // --- Click outside + Escape (non-popover) ---
-
-  function handleClickOutside(e: MouseEvent) {
-    const target = e.target as Node;
-    if (
-      menuEl && !menuEl.contains(target) &&
-      triggerEl && !triggerEl.contains(target)
-    ) {
-      closeMenu();
-    }
-  }
-
-  function handleDocumentEscape(e: KeyboardEvent) {
-    if (e.key === 'Escape') closeMenu();
-  }
-
+  // Install dismiss primitive while open; tear down on close / unmount.
+  // `mode === 'popover'` short-circuits click-outside and Escape inside the
+  // helper (the browser's popover API owns dismissal there).
   $effect(() => {
-    if (isOpen && mode !== 'popover') {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('keydown', handleDocumentEscape);
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('keydown', handleDocumentEscape);
-      };
+    if (!isOpen) {
+      dismissHandle?.dispose();
+      dismissHandle = null;
+      return;
     }
+    dismissHandle = installMenuDismiss({
+      close: closeMenu,
+      getTrigger: () => triggerEl ?? null,
+      getMenu: () => menuEl ?? null,
+      mode,
+      timeoutMs: ctx.menuTimeout,
+    });
+    return () => {
+      dismissHandle?.dispose();
+      dismissHandle = null;
+    };
   });
 
-  // --- Cleanup timer ---
-
   onDestroy(() => {
-    stopTimer();
+    dismissHandle?.dispose();
+    dismissHandle = null;
+    progressive?.stop();
+    progressive = null;
     unsubscribe();
   });
 
@@ -253,9 +322,9 @@
     e.preventDefault();
     e.stopPropagation();
     if (mode === 'popover' && !isOpen) {
-      openMenu();
+      openMenu(e);
     } else {
-      toggleMenu();
+      toggleMenu(e);
     }
   }
 
@@ -263,10 +332,11 @@
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       openedViaKeyboard = true;
+      const synth = new MouseEvent('click', { bubbles: true, cancelable: true });
       if (mode === 'popover' && !isOpen) {
-        openMenu();
+        openMenu(synth);
       } else {
-        toggleMenu();
+        toggleMenu(synth);
       }
     }
   }
@@ -335,7 +405,9 @@
 
   function handlePopoverToggle(e: Event) {
     if ((e as ToggleEvent).newState === 'closed') {
+      progressive?.stop();
       isOpen = false;
+      isLoadingOnly = false;
     }
   }
 </script>
@@ -367,6 +439,7 @@
     aria-labelledby={triggerId}
     class={mergedMenuClassName}
     style={mergedMenuStyle ? Object.entries(mergedMenuStyle).map(([k, v]) => `${k}: ${v}`).join('; ') : undefined}
+    data-alap-loading-only={isLoadingOnly ? '' : undefined}
     popover="auto"
     onkeydown={handleMenuKeyDown}
     onmouseleave={startTimer}
@@ -378,23 +451,32 @@
         {#each items as item, i}
           <li
             role="none"
-            class={item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'}
+            class={classFor(item)}
           >
             <a
               bind:this={itemEls[i]}
-              href={sanitizeUrl(item.url)}
-              target={item.targetWindow ?? 'fromAlap'}
+              href={sanitizeUrlByTier(item.url, item)}
+              target={targetFor(item)}
+              rel="noopener noreferrer"
               role="menuitem"
               tabindex={-1}
               onmouseenter={() => handleItemMouseEnter(item)}
               oncontextmenu={(e) => handleItemContextMenu(e, item)}
             >
               {#if item.image}
-                <img src={sanitizeUrl(item.image)} alt={item.altText ?? `image for ${item.id}`} />
+                <img src={sanitizeUrlByTier(item.image, item)} alt={item.altText ?? `image for ${item.id}`} />
               {:else}
                 {item.label ?? item.id}
               {/if}
             </a>
+          </li>
+        {/each}
+        {#each sources as src (src.token)}
+          {@const desc = placeholderDescriptor(src)}
+          <!-- svelte-ignore a11y_role_supports_aria_props -->
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <li {...desc.attrs} class={desc.className}>
+            <a aria-disabled="true" tabindex={-1}>{desc.label}</a>
           </li>
         {/each}
       </svelte:element>
@@ -429,6 +511,7 @@
       aria-labelledby={triggerId}
       class={mergedMenuClassName}
       style={mergedMenuStyle ? Object.entries(mergedMenuStyle).map(([k, v]) => `${k}: ${v}`).join('; ') : undefined}
+      data-alap-loading-only={isLoadingOnly ? '' : undefined}
       onkeydown={handleMenuKeyDown}
       onmouseleave={startTimer}
       onmouseenter={stopTimer}
@@ -437,23 +520,32 @@
         {#each items as item, i}
           <li
             role="none"
-            class={item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'}
+            class={classFor(item)}
           >
             <a
               bind:this={itemEls[i]}
-              href={sanitizeUrl(item.url)}
-              target={item.targetWindow ?? 'fromAlap'}
+              href={sanitizeUrlByTier(item.url, item)}
+              target={targetFor(item)}
+              rel="noopener noreferrer"
               role="menuitem"
               tabindex={-1}
               onmouseenter={() => handleItemMouseEnter(item)}
               oncontextmenu={(e) => handleItemContextMenu(e, item)}
             >
               {#if item.image}
-                <img src={sanitizeUrl(item.image)} alt={item.altText ?? `image for ${item.id}`} />
+                <img src={sanitizeUrlByTier(item.image, item)} alt={item.altText ?? `image for ${item.id}`} />
               {:else}
                 {item.label ?? item.id}
               {/if}
             </a>
+          </li>
+        {/each}
+        {#each sources as src (src.token)}
+          {@const desc = placeholderDescriptor(src)}
+          <!-- svelte-ignore a11y_role_supports_aria_props -->
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <li {...desc.attrs} class={desc.className}>
+            <a aria-disabled="true" tabindex={-1}>{desc.label}</a>
           </li>
         {/each}
       </svelte:element>

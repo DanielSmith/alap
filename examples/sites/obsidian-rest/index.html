@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — Obsidian REST menus</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="/lightbox.css">
+  <link rel="stylesheet" href="/lens.css">
+</head>
+<body>
+  <main class="page">
+    <p class="mode-banner">
+      <strong>REST mode</strong> — talks to a running Obsidian Local REST API plugin.
+      Looking for the no-plugin version? Try
+      <a href="http://localhost:9178/">filesystem mode (<code>:obsidian:core:</code>)</a>.
+    </p>
+
+    <header>
+      <h1>Obsidian REST API &rarr; Alap menus</h1>
+      <p class="framing">
+        <em>Same protocol family as
+        <code>:obsidian:core:</code>, but the lookups go through the
+        <a href="https://github.com/coddingtonbear/obsidian-local-rest-api">Obsidian Local REST API</a>
+        plugin running inside the Obsidian app instead of reading
+        Markdown off disk. The Node server holds the API key and the
+        plugin URL &mdash; the browser just posts expression segments
+        and gets back a list of <code>AlapLink</code> objects. No
+        cert install, no key in the page, no direct browser-to-plugin
+        call.</em>
+      </p>
+    </header>
+
+    <section>
+      <h2>REST vs Core &mdash; which mode and why</h2>
+      <p>
+        Two ways to wire <code>:obsidian:</code> into a page. Same
+        expression syntax, very different operational shape.
+      </p>
+      <table class="mode-compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th>REST (this page)</th>
+            <th>Core (<a href="http://localhost:9178/">port 9178</a>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Reads from</th>
+            <td>The Obsidian app's Local REST API plugin.</td>
+            <td>Markdown files on disk.</td>
+          </tr>
+          <tr>
+            <th scope="row">Setup</th>
+            <td>Install the Local REST API plugin in Obsidian, configure an API key, and point the Node server at it.</td>
+            <td>Node server + vault path. Obsidian doesn't need to be installed or running.</td>
+          </tr>
+          <tr>
+            <th scope="row">Search</th>
+            <td>Obsidian's own search engine &mdash; relevance ranking, full-text, fuzzy matching, the metadata cache (backlinks, tag aliases, link graph).</td>
+            <td>Substring grep over <code>title</code>, <code>tags</code>, <code>body</code>, <code>path</code>.</td>
+          </tr>
+          <tr>
+            <th scope="row">Best for</th>
+            <td>When Obsidian is already running on the same machine and you want richer search (relevance ranking, full-text, fuzzy) or to leverage Obsidian's own indexes (backlinks, link graph, plugin-aware content like Dataview).</td>
+            <td>When you don't want the search server itself to depend on Obsidian running &mdash; the markdown directory might not even be an Obsidian vault. Simple substring matches are enough.</td>
+          </tr>
+          <tr>
+            <th scope="row">Click-through</th>
+            <td colspan="2">Same in both modes: results carry <code>obsidian://open?vault=…&amp;file=…</code> URIs, so clicking opens the note in Obsidian if you have it installed locally. Override <code>linkTemplate</code> in the protocol config to emit different URLs (e.g., a public-web preview).</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The expression syntax is identical &mdash;
+        <code>:obsidian:rest:foo:</code> here,
+        <code>:obsidian:core:foo:</code> over there. Switching modes
+        is changing one segment, not rewriting the page.
+      </p>
+    </section>
+
+    <section>
+      <h2>Three menus, three capabilities</h2>
+      <ul class="trigger-list">
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:protocol:">
+            Notes mentioning "protocol"
+          </a>
+          <p class="caption">Bare REST search &mdash; full-text query against the running vault, with Obsidian's relevance ranking.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:Hitchcock: *sort:label* *limit:5*">
+            First 5 "Hitchcock" notes
+          </a>
+          <p class="caption">REST search + refiners &mdash; sort alphabetically, cap at 5.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:cardinal: | :obsidian:rest:wren:">
+            Cardinal or wren
+          </a>
+          <p class="caption">Two REST searches unioned via <code>|</code>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Browse by topic</h2>
+      <p class="framing">
+        The vault includes five small topical collections converted
+        from different SSG sources under
+        <code>obsidian-shared/sources/</code>. Each menu pulls from
+        a single topic via a REST full-text query.
+      </p>
+      <ul class="trigger-list">
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:cardinal:">
+            Cardinal
+          </a>
+          <p class="caption">From <code>birds/</code>.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:carbonara:">
+            Carbonara
+          </a>
+          <p class="caption">From <code>cooking/</code>.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:Hitchcock:">
+            Hitchcock films
+          </a>
+          <p class="caption">From <code>films/</code>.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:Austen:">
+            Austen
+          </a>
+          <p class="caption">From <code>novels/</code>.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:rest:Goldberg:">
+            Goldberg Variations
+          </a>
+          <p class="caption">From <code>bach/</code>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Search the vault</h2>
+      <form id="search-form" class="search">
+        <input type="text" id="search-input" placeholder="search the running vault…" autocomplete="off">
+        <button type="submit">Search &rarr;</button>
+      </form>
+      <p class="chips">
+        Try:
+        <button type="button" class="chip" data-query="alap">alap</button>
+        <button type="button" class="chip" data-query="security">security</button>
+        <button type="button" class="chip" data-query="api">api</button>
+        <button type="button" class="chip" data-query="release">release</button>
+      </p>
+      <p class="search-launchers">
+        <a class="alap search-trigger" id="search-trigger"
+           data-alap-linkitems=":obsidian:rest::"
+           hidden>Open as menu</a>
+        <a class="alap-lens search-trigger" id="search-trigger-lens"
+           data-alap-linkitems=":obsidian:rest::"
+           hidden>Open as lens</a>
+      </p>
+    </section>
+
+    <section>
+      <h2>Powered by the Local REST API plugin</h2>
+      <p class="notes">
+        This page calls a Node server which proxies to
+        <code>http://127.0.0.1:27123/search/simple/</code> and
+        <code>/vault/{path}</code> with a Bearer token. Set
+        <code>ALAP_OBSIDIAN_REST_KEY</code> before starting the server &mdash;
+        see <code>README.md</code> for the rest of the prereqs.
+      </p>
+    </section>
+
+    <section>
+      <h2>Clicking a result</h2>
+      <p class="notes">
+        Each link's URL is an <code>obsidian://open?vault=&hellip;&amp;file=&hellip;</code>
+        URI. With Obsidian running and the vault registered, your
+        browser will hand the URL to it and the note will open in the
+        app.
+      </p>
+    </section>
+  </main>
+
+  <script src="/alap.iife.js"></script>
+  <script type="module" src="/main.mjs"></script>
+</body>
+</html>

@@ -2,29 +2,29 @@
 
 **[Cookbook](README.md):** **This Page** · [Editors](editors.md) · [Markdown](markdown.md) · [Rich-Text](rich-text.md) · [Accessibility](accessibility.md) · [Existing URLs](existing-urls.md) · [Images & Media](images-and-media.md)
 
-Native ports of the Alap expression parser for Python, PHP, Go, Rust, and Java. These enable server-side expression resolution without a Node.js sidecar.
+Native ports of the Alap expression parser for Python, PHP, Go, Rust, Ruby, and Java. These enable server-side expression resolution without a Node.js sidecar.
 
-> Live version: https://alap.info/cookbook/language-ports
+> Live version: https://docs.alap.info/cookbook/language-ports
 
 Source: `src/other-languages/`
 
 ## What's included
 
-| Module | Python | PHP | Go | Rust | Java |
-|--------|--------|-----|-----|------|------|
-| Expression parser | `expression_parser.py` | `ExpressionParser.php` | `alap.go` | `alap-core` crate | `ExpressionParser.java` |
-| Regex validator | `validate_regex.py` | Built-in | Built-in | Built-in | `ValidateRegex.java` |
-| URL sanitizer | `sanitize_url.py` | Built-in | Built-in | Built-in | `SanitizeUrl.java` |
-| Config validator | Built-in | Built-in | Built-in | `validate_config.rs` | `ValidateConfig.java` |
-| SSRF guard | `ssrf_guard.py` | Built-in | Built-in | `ssrf_guard.rs` | `SsrfGuard.java` |
-| Config merger | Built-in | Built-in | Built-in | Built-in | Built-in |
+| Module | Python | PHP | Go | Rust | Ruby | Java |
+|--------|--------|-----|-----|------|------|------|
+| Expression parser | `expression_parser.py` | `ExpressionParser.php` | `alap.go` | `alap-core` crate | `expression_parser.rb` | `ExpressionParser.java` |
+| Regex validator | `validate_regex.py` | Built-in | Built-in | Built-in | `validate_regex.rb` | `ValidateRegex.java` |
+| URL sanitizer | `sanitize_url.py` | Built-in | Built-in | Built-in | `sanitize_url.rb` | `SanitizeUrl.java` |
+| Config validator | Built-in | Built-in | Built-in | `validate_config.rs` | `validate_config.rb` | `ValidateConfig.java` |
+| SSRF guard | `ssrf_guard.py` | Built-in | Built-in | `ssrf_guard.rs` | `ssrf_guard.rb` | `SsrfGuard.java` |
+| Config merger | Built-in | Built-in | Built-in | Built-in | Built-in | Built-in |
 
 All ports support the full expression grammar including:
 - Item IDs, tags (`.coffee`), macros (`@favorites`)
 - Operators (`+`, `|`, `-`) with left-to-right evaluation
 - Parenthesized grouping (up to 32 levels)
 - Regex search (`/pattern/fields`)
-- Protocol expressions (`:time:30d:`, `:loc:args:`)
+- Protocol expressions (`:time:30d:`, `:location:radius:args:`)
 - Refiners (`*sort:label*`, `*limit:5*`)
 
 All ports share the `\w` identifier constraint — item IDs, macro names, and tag names cannot contain hyphens (the `-` character is the WITHOUT operator).
@@ -43,7 +43,7 @@ All ports include the same security layers as the TypeScript implementation:
 | SSRF guard | yes | yes | yes | yes | yes |
 
 **Language-specific defenses:**
-- **Python:** Blocks dunder keys (`__class__`, `__bases__`, `__mro__`, `__subclasses__`) in `validate_config` — prevents downstream exploits if configs are passed to Jinja2 or logging formatters.
+- **Python:** Blocks dunder keys (`__class__`, `__bases__`, `__mro__`, `__subclasses__`) in `validate_config` — keeps configs passed downstream to Jinja2 or logging formatters from carrying handles into Python internals.
 - **PHP:** Rejects non-array input to `validateConfig()` (enforces `json_decode($json, true)`). Wraps regex execution with `pcre.backtrack_limit` as a circuit breaker.
 - **Go:** SSRF guard handles IPv4-mapped IPv6 addresses (`::ffff:127.0.0.1`) via `net.IP.To4()`.
 - **Rust:** SSRF guard blocks hex/octal/integer IP obfuscation (`0x7f.0.0.1`, `0177.0.0.1`, `2130706433`).

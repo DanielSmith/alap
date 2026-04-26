@@ -1,0 +1,23 @@
+/**
+ * Copyright 2026 Daniel Smith
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+details.src {
+  margin: 0.5rem 0 1.5rem;
+}
+
+details.src summary {
+  cursor: pointer;
+  color: #7ca0ff;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+}
+
+details.src summary:hover {
+  color: #ffd666;
+}
+
+details.src pre {
+  margin: 0.5rem 0 0;
+}

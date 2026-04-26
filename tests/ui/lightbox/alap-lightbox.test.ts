@@ -1074,4 +1074,64 @@ describe('AlapLightbox', () => {
       expect(items.length).toBe(3);
     });
   });
+
+  // ===========================================================================
+  // Placement
+  // ===========================================================================
+
+  describe('placement', () => {
+    it('reads data-alap-placement from the trigger', () => {
+      const trigger = createTrigger('t1', 'brooklyn');
+      trigger.setAttribute('data-alap-placement', 'NW');
+      lightbox = new AlapLightbox(lightboxTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+      expect(overlay.style.justifyContent).toBe('flex-start');
+    });
+
+    it('parses strategy suffix and applies compass only', () => {
+      const trigger = createTrigger('t1', 'brooklyn');
+      trigger.setAttribute('data-alap-placement', 'SE, clamp');
+      lightbox = new AlapLightbox(lightboxTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('flex-end');
+    });
+
+    it('trigger attribute wins over constructor option', () => {
+      const trigger = createTrigger('t1', 'brooklyn');
+      trigger.setAttribute('data-alap-placement', 'N');
+      lightbox = new AlapLightbox(lightboxTestConfig, { placement: 'SE' });
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+      expect(overlay.style.justifyContent).toBe('center');
+    });
+
+    it('falls back to config.settings.placement when no trigger attr', () => {
+      const trigger = createTrigger('t1', 'brooklyn');
+      const config = { ...lightboxTestConfig, settings: { ...lightboxTestConfig.settings, placement: 'S' } };
+      lightbox = new AlapLightbox(config);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('center');
+    });
+
+    it('falls back to centered default when nothing is configured', () => {
+      const trigger = createTrigger('t1', 'brooklyn');
+      lightbox = new AlapLightbox(lightboxTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('');
+      expect(overlay.style.justifyContent).toBe('');
+    });
+  });
 });

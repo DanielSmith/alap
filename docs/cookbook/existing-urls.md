@@ -6,7 +6,7 @@ What happens when a link already has an `href`?
 
 Most menu libraries would ignore it — the link becomes a trigger now, not a destination. Alap takes a different approach: **the original URL is still a valid choice.**
 
-> Live version: https://alap.info/cookbook/existing-urls
+> Live version: https://docs.alap.info/cookbook/existing-urls
 
 ## The problem
 

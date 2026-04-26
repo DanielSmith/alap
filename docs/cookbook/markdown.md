@@ -16,7 +16,7 @@ All three produce `<alap-link>` web components. The Alap engine still needs to b
 
 Write a standard Markdown link with an `alap:` prefix, and it becomes a multi-target menu in the rendered page.
 
-> Live version: https://alap.info/cookbook/markdown
+> Live version: https://docs.alap.info/cookbook/markdown
 
 ## What you write
 

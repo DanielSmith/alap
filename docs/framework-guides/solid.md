@@ -2,7 +2,7 @@
 
 **[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · [Svelte](svelte.md) · **This Page** · [Astro](astro.md) · [Alpine.js](alpine.md) · [Eleventy](eleventy.md)
 
-> Live version with interactive examples: https://alap.info/framework-guides/solid
+> Live version with interactive examples: https://docs.alap.info/framework-guides/solid
 
 ## Install
 
@@ -46,7 +46,7 @@ Same Provider/Link/Hook pattern as React. SolidJS-specific differences:
 |------|------|---------|-------------|
 | `query` | `string` | required | Expression to evaluate |
 | `children` | `JSX.Element` | required | Trigger content |
-| `anchorId` | `string` | — | Anchor ID for bare `@` macro |
+| `anchorId` | `string` | — | Identifier forwarded to `onTriggerHover` / `onTriggerContext` event details |
 | `mode` | `'dom' \| 'webcomponent' \| 'popover'` | `'dom'` | Rendering mode |
 | `menuClassName` | `string` | — | CSS class on menu container |
 | `listType` | `'ul' \| 'ol'` | from config | List element type |

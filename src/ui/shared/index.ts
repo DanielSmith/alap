@@ -19,9 +19,20 @@ export type { MenuListOptions } from './buildMenuList';
 export { handleMenuKeyboard } from './menuKeyboard';
 export type { MenuKeyboardOptions } from './menuKeyboard';
 export { DismissTimer } from './dismissTimer';
+export { installMenuDismiss } from './baseMenuDismiss';
+export type { InstallMenuDismissOptions, MenuDismissHandle } from './baseMenuDismiss';
 export { resolveExistingUrlMode, injectExistingUrl } from './existingUrl';
 export { computePlacement, parsePlacement, FALLBACK_ORDER } from './placement';
 export type { Placement, PlacementStrategy, ParsedPlacement, Rect, Size, PlacementInput, PlacementResult } from './placement';
+export {
+  OVERLAY_ALIGN,
+  OVERLAY_JUSTIFY,
+  computeOverlayLayout,
+  applyOverlayLayout,
+  clearOverlayLayout,
+  viewportSize,
+} from './overlayPlacement';
+export type { OverlayLayout } from './overlayPlacement';
 export { calcPlacementState, applyPlacementToMenu, applyPlacementAfterLayout, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from './usePlacement';
 export type { CalcPlacementOptions, PlacementState } from './usePlacement';
 export type {
@@ -38,3 +49,19 @@ export { RendererCoordinator } from './rendererCoordinator';
 export type { RendererCoordinatorOptions } from './rendererCoordinator';
 export { InstanceCoordinator, getInstanceCoordinator } from './instanceCoordinator';
 export { registerConfig, updateRegisteredConfig, getEngine, getConfig } from './configRegistry';
+export {
+  buildMenuPlaceholder,
+  buildPanelPlaceholder,
+  buildPlaceholderItem,
+  appendPlaceholders,
+  placeholderLabel,
+  placeholderDescriptor,
+  PLACEHOLDER_LABEL_LOADING,
+  PLACEHOLDER_LABEL_ERROR,
+  PLACEHOLDER_LABEL_EMPTY,
+} from './progressivePlaceholder';
+export type { PlaceholderDescriptor } from './progressivePlaceholder';
+export { flipFromRect } from './flipAnimation';
+export { centerOverTrigger } from './loadingPlacement';
+export { ProgressiveRenderer } from './progressiveRenderer';
+export type { ProgressiveRenderContext, ProgressiveRendererOptions } from './progressiveRenderer';

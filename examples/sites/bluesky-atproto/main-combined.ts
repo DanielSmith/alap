@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { AlapUI } from 'alap';
-import { combinedConfig } from './config-combined';
+import { AlapUI, atprotoHandler, webHandler } from 'alap';
+import { buildCombinedConfig } from './config-combined';
 
 /**
  * Three sources, one menu.
@@ -39,27 +39,18 @@ function loadSession(): { handle: string; accessJwt: string } | null {
 }
 
 async function init() {
-  // Restore session if available (shared with main atproto page)
+  // Restore session *before* building the config — the engine deep-freezes
+  // the config after validation, so the accessJwt has to be baked in at
+  // construction time, not patched in later.
   const saved = loadSession();
-  if (saved) {
-    const protocol = combinedConfig.protocols?.atproto;
-    if (protocol) {
-      protocol.accessJwt = saved.accessJwt;
-    }
-  }
+  const config = buildCombinedConfig({ accessJwt: saved?.accessJwt ?? null });
 
-  const ui = new AlapUI(combinedConfig);
-  const engine = ui.getEngine();
+  new AlapUI(config, {
+    handlers: { web: webHandler, atproto: atprotoHandler },
+  });
 
-  // Pre-resolve all protocol expressions
-  const triggers = document.querySelectorAll<HTMLElement>('[data-alap-linkitems]');
-  const expressions = Array.from(triggers)
-    .map(el => el.dataset.alapLinkitems ?? '')
-    .filter(expr => expr.includes(':web:') || expr.includes(':atproto:'));
-
-  if (expressions.length > 0) {
-    await engine.preResolve(expressions);
-  }
+  // Async protocols (:web:, :atproto:) render progressively on trigger-click
+  // (3.2+), so no preResolve wiring is needed here.
 
   document.body.classList.add('loaded');
 

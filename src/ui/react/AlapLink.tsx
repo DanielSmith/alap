@@ -18,6 +18,7 @@ import {
   useState,
   useRef,
   useEffect,
+  useLayoutEffect,
   useCallback,
   useId,
   useMemo,
@@ -29,10 +30,14 @@ import {
 import { useAlapContext } from './AlapContext';
 import { useMenuDismiss } from './useMenuDismiss';
 import { createMenuKeyHandler } from './useMenuKeyboard';
-import type { AlapLink as AlapLinkType } from '../../core/types';
-import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
-import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { AlapLink as AlapLinkType, SourceState } from '../../core/types';
+import {
+  sanitizeUrlByTier,
+  sanitizeCssClassByTier,
+  sanitizeTargetWindowByTier,
+} from '../../core/sanitizeByTier';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, placeholderDescriptor } from '../shared';
 import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -113,6 +118,8 @@ export function AlapLink({
 
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<ResolvedLink[]>([]);
+  const [sources, setSources] = useState<SourceState[]>([]);
+  const [isLoadingOnly, setIsLoadingOnly] = useState(false);
   const openedViaKeyboard = useRef(false);
 
   const triggerId = useId();
@@ -121,6 +128,10 @@ export function AlapLink({
   const menuRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  const progressiveRef = useRef<ProgressiveRenderer | null>(null);
+  const pendingFlipRect = useRef<DOMRect | null>(null);
+  const lastClickEvent = useRef<MouseEvent | null>(null);
 
   const resolvedListType = listType ?? defaultListType;
   const resolvedMaxVisibleItems = maxVisibleItems ?? defaultMaxVisibleItems;
@@ -148,7 +159,9 @@ export function AlapLink({
   // --- Coordinate with other AlapLinks (only one menu open at a time) ---
 
   const closeMenuSilent = useCallback(() => {
+    progressiveRef.current?.stop();
     setIsOpen(false);
+    setIsLoadingOnly(false);
   }, []);
 
   useEffect(() => {
@@ -158,23 +171,58 @@ export function AlapLink({
   // --- Open / close ---
 
   const closeMenu = useCallback(() => {
+    progressiveRef.current?.stop();
+    setIsLoadingOnly(false);
     setIsOpen((prev) => {
       if (prev) triggerRef.current?.focus();
       return false;
     });
   }, []);
 
-  const openMenu = useCallback(() => {
-    const resolved = engine.resolve(query, anchorId);
-    if (resolved.length === 0) return;
-    menuCoordinator.notifyOpen(triggerId);
-    setItems(resolved);
+  // --- Progressive rendering ---
+  //
+  // `ProgressiveRenderer` invokes `onRender` synchronously on first paint and
+  // again each time a pending async source settles. We mirror its payload into
+  // reactive state; React re-renders the menu with items + placeholders.
+  //
+  // The FLIP animation (loading-only → resolved) is driven by capturing the
+  // menu's box *before* `setState` runs (we're still in the renderer's
+  // microtask) and applying `flipFromRect` in a `useLayoutEffect` after React
+  // commits the new DOM.
+  const onProgressiveRender = useCallback((ctx: ProgressiveRenderContext) => {
+    if (ctx.transitioningFromLoading && menuRef.current) {
+      pendingFlipRect.current = menuRef.current.getBoundingClientRect();
+    }
+    if (!ctx.isUpdate) {
+      menuCoordinator.notifyOpen(triggerId);
+    }
+    setItems(ctx.state.resolved as ResolvedLink[]);
+    setSources(ctx.state.sources as SourceState[]);
+    setIsLoadingOnly(ctx.isLoadingOnly);
     setIsOpen(true);
-  }, [engine, query, anchorId, menuCoordinator, triggerId]);
+  }, [menuCoordinator, triggerId]);
 
-  const toggleMenu = useCallback(() => {
+  useEffect(() => {
+    progressiveRef.current = new ProgressiveRenderer({
+      engine,
+      onRender: onProgressiveRender,
+      cancelFetchOnDismiss: () => config?.settings?.cancelFetchOnDismiss === true,
+    });
+    return () => {
+      progressiveRef.current?.stop();
+      progressiveRef.current = null;
+    };
+  }, [engine, config, onProgressiveRender]);
+
+  const openMenu = useCallback((event: MouseEvent) => {
+    if (!triggerRef.current) return;
+    lastClickEvent.current = event;
+    progressiveRef.current?.start(triggerRef.current, query, event, anchorId);
+  }, [query, anchorId]);
+
+  const toggleMenu = useCallback((event: MouseEvent) => {
     if (isOpen) closeMenu();
-    else openMenu();
+    else openMenu(event);
   }, [isOpen, closeMenu, openMenu]);
 
   // --- Dismiss (timer, click outside, escape) ---
@@ -186,20 +234,51 @@ export function AlapLink({
   // --- Focus first item on open ---
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isLoadingOnly) {
       if (openedViaKeyboard.current && itemRefs.current[0]) {
         itemRefs.current[0].focus();
       }
       openedViaKeyboard.current = false;
       startTimer();
     }
-  }, [isOpen, startTimer]);
+  }, [isOpen, isLoadingOnly, startTimer]);
+
+  // --- Center-over-trigger while loading-only ---
+  //
+  // In the loading-only phase we skip the compass placement engine. A tiny
+  // "Loading…" box would flip in a different direction than the resolved menu,
+  // which is both jarring and prone to overflow. Instead we center on the
+  // trigger (via CSS-var-driven inline styles) and FLIP-animate to the final
+  // placement on transition.
+  useLayoutEffect(() => {
+    if (!isOpen || !isLoadingOnly) return;
+    if (!menuRef.current || !triggerRef.current || !lastClickEvent.current) return;
+    centerOverTrigger(
+      menuRef.current,
+      triggerRef.current,
+      lastClickEvent.current,
+      DEFAULT_MENU_Z_INDEX,
+    );
+  }, [isOpen, isLoadingOnly, items, sources]);
+
+  // --- FLIP animation from loading-only box to final placement ---
+
+  useLayoutEffect(() => {
+    if (isLoadingOnly) return;
+    const prev = pendingFlipRect.current;
+    if (!prev || !menuRef.current) return;
+    flipFromRect(menuRef.current, prev);
+    pendingFlipRect.current = null;
+  }, [isLoadingOnly, items, sources]);
 
   // --- Compass placement ---
 
-  useEffect(() => {
-    if (!isOpen || !placement || mode === 'popover') return;
+  useLayoutEffect(() => {
+    if (!isOpen || isLoadingOnly || !placement || mode === 'popover') return;
     if (!triggerRef.current || !menuRef.current || !wrapperRef.current) return;
+
+    // Clear any inline styles set by centerOverTrigger so placement can take over.
+    menuRef.current.style.cssText = '';
 
     const triggerEl = triggerRef.current;
     const menuEl = menuRef.current;
@@ -207,7 +286,6 @@ export function AlapLink({
 
     const applyNow = applyPlacementAfterLayout(triggerEl, menuEl, wrapperEl, { placement, gap, padding });
 
-    // Recompute on scroll (synchronous — layout already settled)
     const onScroll = () => applyNow();
     window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -215,7 +293,7 @@ export function AlapLink({
       window.removeEventListener('scroll', onScroll);
       clearPlacementClass(menuEl);
     };
-  }, [isOpen, placement, gap, padding, mode]);
+  }, [isOpen, isLoadingOnly, placement, gap, padding, mode, items, sources]);
 
   // --- Trigger scroll-away detection ---
 
@@ -251,7 +329,9 @@ export function AlapLink({
     const el = menuRef.current;
     const onToggle = (e: Event) => {
       if ((e as ToggleEvent).newState === 'closed') {
+        progressiveRef.current?.stop();
         setIsOpen(false);
+        setIsLoadingOnly(false);
       }
     };
     el.addEventListener('toggle', onToggle);
@@ -264,9 +344,9 @@ export function AlapLink({
     e.preventDefault();
     e.stopPropagation();
     if (mode === 'popover' && !isOpen) {
-      openMenu();
+      openMenu(e.nativeEvent);
     } else {
-      toggleMenu();
+      toggleMenu(e.nativeEvent);
     }
   };
 
@@ -274,10 +354,12 @@ export function AlapLink({
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       openedViaKeyboard.current = true;
+      // Synthesize a MouseEvent so centerOverTrigger can still read click coords.
+      const synth = new MouseEvent('click', { bubbles: true, cancelable: true });
       if (mode === 'popover' && !isOpen) {
-        openMenu();
+        openMenu(synth);
       } else {
-        toggleMenu();
+        toggleMenu(synth);
       }
     }
   };
@@ -287,6 +369,7 @@ export function AlapLink({
   const menuContent = isOpen && (
     <MenuList
       items={items}
+      sources={sources}
       listType={resolvedListType}
       maxVisibleItems={resolvedMaxVisibleItems}
       itemRefs={itemRefs}
@@ -328,6 +411,7 @@ export function AlapLink({
     onKeyDown: handleMenuKeyDown,
     onMouseLeave: startTimer,
     onMouseEnter: stopTimer,
+    'data-alap-loading-only': isLoadingOnly ? '' : undefined,
   };
 
   // --- Render: Popover mode ---
@@ -370,6 +454,7 @@ export function AlapLink({
 
 interface MenuListProps {
   items: ResolvedLink[];
+  sources: SourceState[];
   listType: string;
   maxVisibleItems: number;
   itemRefs: React.RefObject<(HTMLAnchorElement | null)[]>;
@@ -378,10 +463,13 @@ interface MenuListProps {
   onItemContext?: (detail: ItemContextDetail) => void;
 }
 
-function MenuList({ items, listType, maxVisibleItems, itemRefs, query, onItemHover, onItemContext }: MenuListProps) {
+function MenuList({ items, sources, listType, maxVisibleItems, itemRefs, query, onItemHover, onItemContext }: MenuListProps) {
   itemRefs.current = [];
   const ListTag = listType as 'ul' | 'ol';
 
+  // Only resolved items count toward the overflow cap — placeholders are
+  // transient. If the menu grows past `maxVisibleItems` after async items
+  // arrive, scroll kicks in as usual.
   const scrollStyle: CSSProperties | undefined =
     maxVisibleItems > 0 && items.length > maxVisibleItems
       ? { maxHeight: `${maxVisibleItems * REM_PER_MENU_ITEM}rem`, overflowY: 'auto' }
@@ -389,16 +477,19 @@ function MenuList({ items, listType, maxVisibleItems, itemRefs, query, onItemHov
 
   return (
     <ListTag role="presentation" style={scrollStyle}>
-      {items.map((item, i) => (
+      {items.map((item, i) => {
+        const safeCssClass = sanitizeCssClassByTier(item.cssClass, item);
+        return (
         <li
           key={item.id}
           role="none"
-          className={item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'}
+          className={safeCssClass ? `alapListElem ${safeCssClass}` : 'alapListElem'}
         >
           <a
             ref={(el) => { itemRefs.current[i] = el; }}
-            href={sanitizeUrl(item.url)}
-            target={item.targetWindow ?? 'fromAlap'}
+            href={sanitizeUrlByTier(item.url, item)}
+            target={sanitizeTargetWindowByTier(item.targetWindow, item) ?? 'fromAlap'}
+            rel="noopener noreferrer"
             role="menuitem"
             tabIndex={-1}
             onMouseEnter={onItemHover
@@ -409,13 +500,22 @@ function MenuList({ items, listType, maxVisibleItems, itemRefs, query, onItemHov
               : undefined}
           >
             {item.image ? (
-              <img src={sanitizeUrl(item.image)} alt={item.altText ?? `image for ${item.id}`} />
+              <img src={sanitizeUrlByTier(item.image, item)} alt={item.altText ?? `image for ${item.id}`} />
             ) : (
               item.label ?? item.id
             )}
           </a>
         </li>
-      ))}
+        );
+      })}
+      {sources.map((src) => {
+        const ph = placeholderDescriptor(src);
+        return (
+          <li key={`ph:${src.token}`} {...ph.attrs} className={ph.className}>
+            <a aria-disabled="true" tabIndex={-1}>{ph.label}</a>
+          </li>
+        );
+      })}
     </ListTag>
   );
 }

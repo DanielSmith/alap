@@ -45,3 +45,8 @@ src/other-languages/php/.phpunit.result.cache
 .turbo/
 examples/sites/cdn/alap.iife.js
 examples/sites/htmx/alap.iife.js
+
+# Python build artefacts (anywhere)
+__pycache__/
+*.pyc
+*.pyo

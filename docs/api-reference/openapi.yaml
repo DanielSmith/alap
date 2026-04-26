@@ -3,14 +3,14 @@ info:
   title: Alap Config API
   version: 1.0.0
   description: |
-    REST API for managing Alap link configurations. All 10 server implementations
+    REST API for managing Alap link configurations. All 11 server implementations
     (Express+SQLite, Hono+SQLite, Bun+SQLite, Laravel+SQLite, Gin+SQLite,
-    Axum+SQLite, Flask+SQLite, Django+SQLite, FastAPI+PostgreSQL,
+    Axum+SQLite, Flask+SQLite, Django+SQLite, Sinatra+SQLite, FastAPI+PostgreSQL,
     Spring Boot+SQLite) conform to this spec.
 
-    All 10 servers fully support all endpoints, including expression resolution
+    All 11 servers fully support all endpoints, including expression resolution
     via `POST /cherry-pick` and `POST /query`. Node/Bun servers use `alap/core`
-    (TypeScript); Python, PHP, Go, Rust, and Java servers use native ports of
+    (TypeScript); Python, PHP, Go, Rust, Ruby, and Java servers use native ports of
     the expression parser.
   license:
     name: Apache-2.0

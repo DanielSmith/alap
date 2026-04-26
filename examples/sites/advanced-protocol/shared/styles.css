@@ -1,0 +1,248 @@
+/**
+ * Copyright 2026 Daniel Smith — Apache 2.0
+ *
+ * Shared layout + scenario styling for every adapter in the
+ * advanced-protocol demo suite. Extends `../shared/styles.css` with:
+ *
+ *   - collapsible compass rose (native `<details>` markup)
+ *   - section heading rhythm
+ *   - placeholder row styling (visible distinction from real items)
+ *   - source-provenance coloring (static / slow / hn / flaky)
+ *   - image-hover card affordance
+ */
+
+@import '../../shared/styles.css';
+
+/* -------------------------------------------------------------------
+   Page chrome
+   ------------------------------------------------------------------- */
+
+.page-intro {
+  margin-top: 0.5rem;
+  color: #c8cff0;
+}
+
+.scenario {
+  margin: 1rem 0 2rem;
+  padding: 1rem 1.25rem;
+  background: #1f3ba0;
+  border: 1px solid #3555bb;
+  border-radius: 8px;
+}
+
+.scenario h3 {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+  color: #ffe8a0;
+  font-size: 1rem;
+}
+
+.scenario .note {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #b8c2e8;
+  line-height: 1.5;
+}
+
+.scenario p { margin: 0.4rem 0; }
+
+.adapter-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0 2rem;
+  padding: 0.6rem 0.9rem;
+  background: #182a70;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.adapter-toc strong { color: #ffd666; }
+
+/* -------------------------------------------------------------------
+   Compass rose — collapsible via <details>
+
+   The rose is a set of plain buttons (not alap triggers). Clicking a
+   direction writes `placement="NW"` (etc.) onto every alap element on
+   the page; clicking the active direction again removes it. See each
+   adapter's page for the driver (vanilla JS / Alpine / React state).
+   ------------------------------------------------------------------- */
+
+.compass-wrap {
+  margin: 1rem 0 2rem;
+  border: 1px solid #3555bb;
+  border-radius: 8px;
+  background: #1a3499;
+}
+
+.compass-wrap summary {
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  color: #ffe8a0;
+  font-weight: 500;
+  list-style: none;
+}
+
+.compass-wrap summary::-webkit-details-marker { display: none; }
+
+.compass-wrap summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.15s ease;
+}
+
+.compass-wrap[open] summary::before { transform: rotate(90deg); }
+
+.compass-wrap summary:hover { background: #204bc2; }
+
+.compass-wrap summary .compass-summary-hint {
+  margin-left: 0.5rem;
+  color: #b8c2e8;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.compass-body {
+  padding: 0.75rem 1rem 1.25rem;
+  border-top: 1px solid #3555bb;
+}
+
+.compass-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  max-width: 280px;
+  margin: 0.5rem auto 0.75rem;
+}
+
+.compass-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.3rem;
+  background: #2a47b8;
+  border-radius: 4px;
+}
+
+.compass-cell a.alap,
+.compass-cell alap-link,
+.compass-cell [role="button"] {
+  color: #ffd666;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.compass-btn {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  background: #2240a8;
+  color: #ffd666;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.compass-btn:hover { background: #2d50c0; }
+
+.compass-btn.active {
+  background: #3a6aff;
+  color: #fff;
+  border-color: #ffd666;
+  font-weight: 600;
+}
+
+.compass-driver-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #b8c2e8;
+}
+
+.compass-driver-hint code {
+  color: #ffd666;
+  background: #1a2870;
+}
+
+.compass-static-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  background: #1a2870;
+  border-radius: 4px;
+  color: #88bbff;
+}
+
+/* -------------------------------------------------------------------
+   Placeholder rows — contract: `[data-alap-placeholder]`
+   ------------------------------------------------------------------- */
+
+.alapelem [data-alap-placeholder] > a {
+  color: #b8c2e8;
+  font-style: italic;
+  cursor: default;
+}
+
+.alapelem [data-alap-placeholder="error"] > a { color: #ff8a80; }
+.alapelem [data-alap-placeholder="empty"] > a { color: #8fd5a1; }
+
+/* -------------------------------------------------------------------
+   Source-provenance color bars
+   Each source's handler tags resolved links with a `source_*` CSS class.
+   A left border makes the provenance visible in mixed menus.
+   ------------------------------------------------------------------- */
+
+.alapListElem.source_mock > a { border-left: 3px solid #ffa726; padding-left: 0.75rem; }
+.alapListElem.source_hn > a   { border-left: 3px solid #ff6f00; padding-left: 0.75rem; }
+
+/* -------------------------------------------------------------------
+   Image-hover affordance for menu items with thumbnails
+   ------------------------------------------------------------------- */
+
+.alapelem .alapListElem > a img {
+  display: block;
+  max-height: 3rem;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+/* -------------------------------------------------------------------
+   Mixed-static-and-dynamic call-out
+   ------------------------------------------------------------------- */
+
+.mixed-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: #c8cff0;
+}
+
+.mixed-legend .swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+.mixed-legend .swatch.static { background: #88bbff; }
+.mixed-legend .swatch.mock   { background: #ffa726; }
+.mixed-legend .swatch.hn     { background: #ff6f00; }
+
+/* -------------------------------------------------------------------
+   Fine-tune menu width so static + async rows align
+   ------------------------------------------------------------------- */
+
+#alapelem,
+.alapelem {
+  min-width: 240px;
+  max-width: 360px;
+}

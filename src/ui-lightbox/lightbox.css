@@ -52,6 +52,23 @@
   --alap-lightbox-transition: 0.25s;
 }
 
+/* Progressive-render placeholder — shown when the async source is still in
+   flight, errored, or empty. Panel is otherwise empty, so explicit color +
+   centering is needed against the dark panel background. */
+.alap-lightbox-panel > .alap-placeholder {
+  color: #fff;
+  font-size: 1.2rem;
+  font-style: italic;
+  opacity: 0.7;
+  padding: 3rem 2rem;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.alap-lightbox-panel > .alap-placeholder-error { opacity: 0.85; }
+
 .alap-lightbox-panel:has(.no-image) {
   background: transparent;
   box-shadow: none;

@@ -17,7 +17,7 @@
 <script lang="ts">
   import { setContext, untrack } from 'svelte';
   import { AlapEngine } from '../../core/AlapEngine';
-  import type { AlapConfig } from '../../core/types';
+  import type { AlapConfig, ProtocolHandlerRegistry } from '../../core/types';
   import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
   import { createMenuCoordinator, type AlapContextValue } from './context';
 
@@ -25,6 +25,12 @@
 
   interface Props {
     config: AlapConfig;
+    /**
+     * Protocol handler registry. Required for any expression that uses a
+     * protocol (`:web:`, `:time:`, `:hn:`, custom…). Attached once at
+     * construction — subsequent config updates don't re-read this.
+     */
+    handlers?: ProtocolHandlerRegistry;
     menuTimeout?: number;
     defaultMenuStyle?: Record<string, string>;
     defaultMenuClassName?: string;
@@ -34,7 +40,10 @@
   const props: Props = $props();
   let { children } = $derived(props);
 
-  const engine = new AlapEngine(untrack(() => props.config));
+  const engine = new AlapEngine(
+    untrack(() => props.config),
+    { handlers: untrack(() => props.handlers) },
+  );
   const menuCoordinator = createMenuCoordinator();
 
   // Keep engine in sync when config changes

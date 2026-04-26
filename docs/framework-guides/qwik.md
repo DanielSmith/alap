@@ -58,7 +58,7 @@ Children go inside the provider via Qwik's `<Slot />`:
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `query` | `string` | required | Expression to evaluate |
-| `anchorId` | `string` | — | Anchor ID for bare `@` macro |
+| `anchorId` | `string` | — | Identifier forwarded to `onTriggerHover$` / `onTriggerContext$` event details |
 | `mode` | `'dom' \| 'popover'` | `'dom'` | Rendering mode |
 | `class` | `string` | — | CSS class on trigger |
 | `menuClassName` | `string` | — | CSS class on menu container |

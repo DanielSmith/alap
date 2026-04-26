@@ -14,34 +14,40 @@
  * limitations under the License.
  */
 
-import { AlapUI } from 'alap';
+import { AlapUI, webHandler } from 'alap';
+import type { ProtocolHandler } from 'alap/core';
 import { demoConfig } from './config';
 
 /**
  * External data demo.
  *
- * The :web: protocol is async — it needs to fetch from APIs before the
- * expression parser can use the results. We create the UI first (which
- * sets up the engine), then pre-resolve all :web: expressions on that
- * engine. After that, menus open instantly from cache.
+ * The :web: protocol is async. As of 3.2 the renderer handles that on the
+ * trigger-click path — the menu opens immediately with a "Loading…" placeholder
+ * and re-renders in place when the fetch settles. No preResolve wiring needed.
+ *
+ * Config is data only — handlers live here, wired at engine construction.
  */
-async function init() {
-  // Create the UI — this sets up the engine, event handlers, everything
-  const ui = new AlapUI(demoConfig);
 
-  // Scan the page for all alap expressions that use :web:
-  const triggers = document.querySelectorAll<HTMLElement>('[data-alap-linkitems]');
-  const expressions = Array.from(triggers)
-    .map(el => el.dataset.alapLinkitems ?? '')
-    .filter(expr => expr.includes(':web:'));
+const now = Date.now();
+const DAY = 86400000;
 
-  // Pre-resolve external protocols on the UI's own engine
-  if (expressions.length > 0) {
-    await ui.getEngine().preResolve(expressions);
-  }
+const timeFilter: ProtocolHandler = (segments, link) => {
+  const ts = link.createdAt
+    ? (typeof link.createdAt === 'number' ? link.createdAt : new Date(link.createdAt).getTime())
+    : 0;
+  if (!ts) return false;
+  const match = segments[0].match(/^(\d+)([dhw])$/);
+  if (!match) return false;
+  const n = parseInt(match[1], 10);
+  const mult = match[2] === 'h' ? 3600000 : match[2] === 'w' ? 7 * DAY : DAY;
+  return (now - ts) <= n * mult;
+};
 
-  // Remove the loading indicator
-  document.body.classList.add('loaded');
-}
+new AlapUI(demoConfig, {
+  handlers: {
+    web: webHandler,
+    time: { filter: timeFilter },
+  },
+});
 
-init();
+document.body.classList.add('loaded');

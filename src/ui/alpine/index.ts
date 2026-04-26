@@ -38,10 +38,10 @@
  */
 
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig, AlapLink as AlapLinkType } from '../../core/types';
+import type { AlapConfig, AlapLink as AlapLinkType, ProtocolHandlerRegistry, ResolvedLink, SourceState } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MENU_Z_INDEX, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_PLACEMENT_GAP } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, calcPlacementAfterLayout, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, appendPlaceholders } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
 
 // Re-export core types for convenience
 export type { AlapConfig, AlapLinkType as AlapLink };
@@ -49,6 +49,12 @@ export type { AlapConfig, AlapLinkType as AlapLink };
 export interface AlapDirectiveValue {
   query: string;
   config: AlapConfig;
+  /**
+   * Protocol handler registry. Required for any expression that uses a
+   * protocol (`:web:`, `:time:`, `:hn:`, custom…). Attached to the directive's
+   * engine at construction; the engine is rebuilt when `config` changes.
+   */
+  handlers?: ProtocolHandlerRegistry;
   listType?: 'ul' | 'ol';
   menuTimeout?: number;
   maxVisibleItems?: number;
@@ -111,6 +117,9 @@ export function alapPlugin(Alpine: AlpineInstance): void {
     let engine: AlapEngine | null = null;
     let currentConfig: AlapConfig | null = null;
     let intersectionObserver: IntersectionObserver | null = null;
+    let progressive: ProgressiveRenderer | null = null;
+    let lastClickEvent: MouseEvent | null = null;
+    let lastOpts: AlapDirectiveValue | null = null;
 
     // Coordinator: close this menu when another opens
     const uid = Math.random().toString(36).slice(2, 8);
@@ -131,9 +140,9 @@ export function alapPlugin(Alpine: AlpineInstance): void {
       return null;
     }
 
-    function ensureEngine(config: AlapConfig): AlapEngine {
+    function ensureEngine(config: AlapConfig, handlers?: ProtocolHandlerRegistry): AlapEngine {
       if (!engine || config !== currentConfig) {
-        engine = new AlapEngine(config);
+        engine = new AlapEngine(config, { handlers });
         currentConfig = config;
       }
       return engine;
@@ -156,8 +165,25 @@ export function alapPlugin(Alpine: AlpineInstance): void {
       return menuEl;
     }
 
-    function openMenu(links: Array<{ id: string } & AlapLinkType>, opts: AlapDirectiveValue): void {
+    /**
+     * Rebuild the menu's contents and (re-)place it. Called once on first paint
+     * and again each time a pending async source settles. During the loading-
+     * only phase we skip the compass placement engine in favor of
+     * `centerOverTrigger`, then FLIP-animate into position on transition.
+     */
+    function renderProgressive(
+      links: ResolvedLink[],
+      sources: readonly SourceState[],
+      opts: AlapDirectiveValue,
+      isUpdate: boolean,
+      transitioningFromLoading: boolean,
+    ): void {
       const menu = ensureMenuEl();
+      const isLoadingOnly = links.length === 0 && sources.length > 0;
+
+      // Capture the previous box before mutating — used by the FLIP animation
+      // when transitioning from the tiny loading placeholder to the final menu.
+      const prevRect = isUpdate ? menu.getBoundingClientRect() : null;
 
       const listType = opts.listType ?? opts.config.settings?.listType as string ?? 'ul';
       const maxVisibleItems = opts.maxVisibleItems
@@ -165,10 +191,12 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         ?? DEFAULT_MAX_VISIBLE_ITEMS;
 
       const list = buildMenuList(links, { listType, maxVisibleItems, defaultTargetWindow: opts.config.settings?.targetWindow as string | undefined });
+      appendPlaceholders(list, sources);
       menu.innerHTML = '';
       menu.appendChild(list);
 
-      // Item event hooks
+      // Item event hooks — only real items have role="menuitem"; placeholders
+      // deliberately omit it, so this loop naturally skips them.
       const menuItems = list.querySelectorAll<HTMLAnchorElement>('a[role="menuitem"]');
       menuItems.forEach((a, index) => {
         const link = links[index];
@@ -187,8 +215,22 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         menu.classList.add(`alap_${el.id}`);
       }
 
-      if (opts.placement) {
-        // Show the menu off-screen so it can be measured, then position it in rAF.
+      if (isLoadingOnly) {
+        menu.setAttribute('data-alap-loading-only', '');
+      } else {
+        menu.removeAttribute('data-alap-loading-only');
+      }
+
+      if (isLoadingOnly) {
+        // Skip compass placement; centerOverTrigger positions via CSS-var-
+        // driven inline styles (users override via --alap-loading-*).
+        menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN;
+        clearPlacementClass(menu);
+        if (lastClickEvent) {
+          centerOverTrigger(menu, el, lastClickEvent, DEFAULT_MENU_Z_INDEX);
+        }
+      } else if (opts.placement) {
+        // Placement engine: measure off-screen, then position.
         menu.style.cssText = MENU_STYLES + MENU_STYLES_OPEN + 'visibility: hidden;';
 
         calcPlacementAfterLayout(el, menu, {
@@ -197,7 +239,6 @@ export function alapPlugin(Alpine: AlpineInstance): void {
           padding: opts.padding,
         }, (state) => {
           if (!state) {
-            // Measurement failed — fall back to trigger-relative positioning
             const rect = el.getBoundingClientRect();
             menu.style.top = `${rect.bottom + window.scrollY + DEFAULT_PLACEMENT_GAP}px`;
             menu.style.left = `${rect.left + window.scrollX}px`;
@@ -216,12 +257,14 @@ export function alapPlugin(Alpine: AlpineInstance): void {
             applyPlacementClass(menu, result.placement);
           }
           menu.style.visibility = 'visible';
-          // Focus after menu is visible and positioned
+          if (transitioningFromLoading && prevRect) {
+            flipFromRect(menu, prevRect);
+          }
           if (openedViaKeyboard) {
             const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
             if (first) first.focus();
+            openedViaKeyboard = false;
           }
-          openedViaKeyboard = false;
         });
       } else {
         // No placement engine — position directly below trigger
@@ -229,36 +272,39 @@ export function alapPlugin(Alpine: AlpineInstance): void {
         const rect = el.getBoundingClientRect();
         menu.style.top = `${rect.bottom + window.scrollY + DEFAULT_PLACEMENT_GAP}px`;
         menu.style.left = `${rect.left + window.scrollX}px`;
+        if (transitioningFromLoading && prevRect) {
+          flipFromRect(menu, prevRect);
+        }
+        if (openedViaKeyboard) {
+          const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
+          if (first) first.focus();
+          openedViaKeyboard = false;
+        }
       }
 
-      notifyMenuOpen(uid);
-      menu.setAttribute('aria-hidden', 'false');
-      el.setAttribute('aria-expanded', 'true');
-      isOpen = true;
+      if (!isUpdate) {
+        notifyMenuOpen(uid);
+        menu.setAttribute('aria-hidden', 'false');
+        el.setAttribute('aria-expanded', 'true');
+        isOpen = true;
 
-      // Observe trigger for scroll-away detection
-      if (intersectionObserver) intersectionObserver.disconnect();
-      intersectionObserver = observeTriggerOffscreen(el, closeMenu);
+        if (intersectionObserver) intersectionObserver.disconnect();
+        intersectionObserver = observeTriggerOffscreen(el, closeMenu);
 
-      // Focus first item on keyboard open only (non-placement path)
-      if (!opts.placement && openedViaKeyboard) {
-        const first = menu.querySelector<HTMLElement>('a[role="menuitem"]');
-        if (first) first.focus();
+        const timeout = opts.menuTimeout
+          ?? (opts.config.settings?.menuTimeout as number)
+          ?? DEFAULT_MENU_TIMEOUT;
+        timer = new DismissTimer(timeout, closeMenu);
+        timer.start();
       }
-      if (!opts.placement) openedViaKeyboard = false;
-
-      // Start dismiss timer
-      const timeout = opts.menuTimeout
-        ?? (opts.config.settings?.menuTimeout as number)
-        ?? DEFAULT_MENU_TIMEOUT;
-      timer = new DismissTimer(timeout, closeMenu);
-      timer.start();
     }
 
     function closeMenu(): void {
+      progressive?.stop();
       if (!menuEl) return;
       const wasOpen = isOpen;
       menuEl.style.cssText = MENU_STYLES;
+      menuEl.removeAttribute('data-alap-loading-only');
       clearPlacementClass(menuEl);
       menuEl.setAttribute('aria-hidden', 'true');
       el.setAttribute('aria-expanded', 'false');
@@ -285,11 +331,31 @@ export function alapPlugin(Alpine: AlpineInstance): void {
       const opts = getDirectiveValue();
       if (!opts) return;
 
-      const eng = ensureEngine(opts.config);
-      const links = eng.resolve(opts.query, el.id || undefined);
-      if (links.length === 0) return;
+      lastOpts = opts;
+      lastClickEvent = event;
+      const eng = ensureEngine(opts.config, opts.handlers);
 
-      openMenu(links, opts);
+      // Build (or reuse) the progressive renderer for this directive. The
+      // onRender callback fires on first paint and again each time a pending
+      // source settles; we feed its payload straight into renderProgressive().
+      if (!progressive) {
+        progressive = new ProgressiveRenderer({
+          engine: eng,
+          onRender: (renderCtx: ProgressiveRenderContext) => {
+            if (!lastOpts) return;
+            renderProgressive(
+              renderCtx.state.resolved as ResolvedLink[],
+              renderCtx.state.sources,
+              lastOpts,
+              renderCtx.isUpdate,
+              renderCtx.transitioningFromLoading,
+            );
+          },
+          cancelFetchOnDismiss: () => lastOpts?.config.settings?.cancelFetchOnDismiss === true,
+        });
+      }
+
+      progressive.start(el, opts.query, event, el.id || undefined);
     }
 
     function onTriggerKeydown(event: KeyboardEvent): void {
@@ -375,6 +441,8 @@ export function alapPlugin(Alpine: AlpineInstance): void {
       document.removeEventListener('click', onDocumentClick);
       document.removeEventListener('keydown', onDocumentKeydown);
       timer?.stop();
+      progressive?.stop();
+      progressive = null;
       menuEl?.remove();
     });
   });

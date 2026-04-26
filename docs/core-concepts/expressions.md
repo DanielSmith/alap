@@ -4,7 +4,7 @@
 
 Every Alap link has a query — a short expression that says which menu items to show. Expressions go in the `query` attribute of an `<alap-link>` (or `data-alap-linkitems` for vanilla mode).
 
-> Live version with interactive examples: https://alap.info/core-concepts/expressions
+> Live version with interactive examples: https://docs.alap.info/core-concepts/expressions
 
 ## Syntax at a glance
 

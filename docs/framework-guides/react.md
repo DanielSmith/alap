@@ -2,7 +2,7 @@
 
 **[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · **This Page** · [Vue](vue.md) · [Svelte](svelte.md) · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) · [Eleventy](eleventy.md)
 
-> Live version with interactive examples: https://alap.info/framework-guides/react
+> Live version with interactive examples: https://docs.alap.info/framework-guides/react
 
 ## Install
 
@@ -44,7 +44,7 @@ Renders a trigger that opens a menu on click.
 |------|------|---------|-------------|
 | `query` | `string` | required | Expression to evaluate |
 | `children` | `ReactNode` | required | Trigger content |
-| `anchorId` | `string` | — | Anchor ID for bare `@` macro |
+| `anchorId` | `string` | — | Identifier forwarded to `onTriggerHover` / `onTriggerContext` event details |
 | `mode` | `'dom' \| 'webcomponent' \| 'popover'` | `'dom'` | Rendering mode |
 | `className` | `string` | — | CSS class on trigger |
 | `menuClassName` | `string` | — | CSS class on menu container |

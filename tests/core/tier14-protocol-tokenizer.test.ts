@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 
 /**
  * Tier 14: Protocol tokenizer — verifies that :protocol: syntax is correctly
@@ -24,7 +24,7 @@ import { protocolConfig } from '../fixtures/links-protocols';
  */
 
 describe('Tier 14: Protocol Tokenizer', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('basic protocol parsing', () => {
     it(':time:7d: resolves to items created within 7 days', () => {
@@ -52,8 +52,8 @@ describe('Tier 14: Protocol Tokenizer', () => {
       expect(ids).toContain('acre');
     });
 
-    it(':loc: resolves to items with location metadata', () => {
-      const ids = engine.query(':loc:');
+    it(':location: resolves to items with location metadata', () => {
+      const ids = engine.query(':location:');
       // brooklyn, manhattan, goldengate have location
       expect(ids).toContain('brooklyn');
       expect(ids).toContain('manhattan');
@@ -129,8 +129,8 @@ describe('Tier 14: Protocol Tokenizer', () => {
       expect(ids).not.toContain('acre');
     });
 
-    it(':time:7d: + :loc: — time AND location', () => {
-      const ids = engine.query(':time:7d: + :loc:');
+    it(':time:7d: + :location: — time AND location', () => {
+      const ids = engine.query(':time:7d: + :location:');
       // Recent items with location
       // brooklyn (3d, has loc), goldengate (1d, has loc)
       // manhattan (20d) — too old
@@ -152,17 +152,21 @@ describe('Tier 14: Protocol Tokenizer', () => {
     });
 
     it('negative coordinates in protocol args are not parsed as WITHOUT operator', () => {
-      // :loc:40.7,-74.0:5mi: — the -74.0 must stay inside the protocol segment
+      // :location:radius:40.7,-74.0:5mi: — the -74.0 must stay inside the protocol segment
       // not be split into a minus operator
-      const ids = engine.query(':loc:40.7,-74.0:5mi:');
-      // All items with location should match (loc handler in fixture is existence-based)
-      expect(ids.length).toBeGreaterThan(0);
+      const ids = engine.query(':location:radius:40.7,-74.0:5mi:');
+      // brooklyn and manhattan are within 5mi of (40.7, -74.0); goldengate is in SF
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan');
+      expect(ids).not.toContain('goldengate');
     });
 
     it('bounding box with negative coords parses correctly', () => {
-      // :loc:40.7,-74.0:40.8,-73.9: — two coordinate pairs with negative longitudes
-      const ids = engine.query(':loc:40.7,-74.0:40.8,-73.9:');
-      expect(ids.length).toBeGreaterThan(0);
+      // :location:bbox:40.7,-74.0:40.8,-73.9: — two coordinate pairs with negative longitudes
+      const ids = engine.query(':location:bbox:40.7,-74.0:40.8,-73.9:');
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan');
+      expect(ids).not.toContain('goldengate');
     });
   });
 });

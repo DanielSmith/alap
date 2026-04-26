@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { AlapUI } from 'alap';
-import { demoConfig } from './config';
+import { AlapUI, atprotoHandler } from 'alap';
+import { buildDemoConfig } from './config';
 
 /**
  * Bluesky / AT Protocol demo.
@@ -74,17 +74,6 @@ function clearSession() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// Apply token to the protocol config
-// ═══════════════════════════════════════════════════════════════
-
-function setToken(token: string | null) {
-  const protocol = demoConfig.protocols?.atproto;
-  if (protocol) {
-    protocol.accessJwt = token;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
 // Init
 // ═══════════════════════════════════════════════════════════════
 
@@ -92,28 +81,33 @@ async function init() {
   // Check for a saved session (only exists if user opted in)
   const saved = loadSession();
   const isLoggedIn = !!saved;
-  if (saved) {
-    setToken(saved.accessJwt);
-  }
 
-  const ui = new AlapUI(demoConfig);
+  // Dynamic bits that used to mutate the config in place. The config is
+  // deep-frozen after validation, so we keep them in closure state and
+  // rebuild-and-swap the config via engine.updateConfig when they change.
+  let accessJwt: string | null = saved?.accessJwt ?? null;
+  const customSearches = new Map<string, string>();
+
+  const rebuildConfig = () => buildDemoConfig({
+    accessJwt,
+    searches: Object.fromEntries(customSearches),
+  });
+
+  const ui = new AlapUI(rebuildConfig(), { handlers: { atproto: atprotoHandler } });
   const engine = ui.getEngine();
 
-  // Collect all :atproto: expressions on the page
+  // Collect all :atproto: expressions on the page (used by the auth flow
+  // below to warm the cache after login, and by the custom search wiring).
   const triggers = document.querySelectorAll<HTMLElement>('[data-alap-linkitems]');
   const atprotoExpressions = Array.from(triggers)
     .map(el => el.dataset.alapLinkitems ?? '')
     .filter(expr => expr.includes(':atproto:'));
 
-  // Pre-resolve — if logged in, resolve everything including search.
-  // If not, skip search expressions (they'd return empty anyway).
-  const toResolve = isLoggedIn
-    ? atprotoExpressions
-    : atprotoExpressions.filter(expr => !expr.includes(':atproto:search:'));
-
-  if (toResolve.length > 0) {
-    await engine.preResolve(toResolve);
-  }
+  // As of 3.2, async protocols resolve on trigger-click with a "Loading…"
+  // placeholder, so we no longer need to preResolve at init to make the menu
+  // usable. preResolve is still available for UX polish — see activateSearch()
+  // below, which warms the cache right after login so the first click is
+  // instant rather than showing the placeholder.
 
   document.body.classList.add('loaded');
 
@@ -226,7 +220,8 @@ async function init() {
 
       const session = data as { accessJwt: string; handle: string };
 
-      setToken(session.accessJwt);
+      accessJwt = session.accessJwt;
+      engine.updateConfig(rebuildConfig());
       saveSession(session.handle, session.accessJwt, !!rememberBox?.checked);
       await activateSearch(session.handle);
     } catch {
@@ -290,20 +285,19 @@ async function init() {
         return;
       }
 
-      const protocol = demoConfig.protocols?.atproto;
-      if (!protocol?.accessJwt) {
+      if (!accessJwt) {
         customResult.textContent = 'Log in above to search posts.';
         return;
       }
 
       customResult.textContent = 'Searching...';
 
-      // Register a search alias for the user's query, then create a
-      // dynamic trigger element that uses it.
+      // Register a search alias for the user's query, rebuild the config
+      // with the new alias baked in, and swap it into the engine. The
+      // config is frozen after each build, so we can't mutate it in place.
       const aliasKey = `_custom_${Date.now()}`;
-      const searches = (protocol.searches ?? {}) as Record<string, string>;
-      searches[aliasKey] = query;
-      protocol.searches = searches;
+      customSearches.set(aliasKey, query);
+      engine.updateConfig(rebuildConfig());
 
       const expr = `:atproto:search:${aliasKey}:limit=10:`;
 
@@ -326,7 +320,9 @@ async function init() {
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      setToken(null);
+      accessJwt = null;
+      customSearches.clear();
+      engine.updateConfig(rebuildConfig());
       clearSession();
       engine.clearCache();
 

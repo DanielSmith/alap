@@ -10,8 +10,10 @@ packages:
   - plugins/rehype-alap
   - plugins/remark-alap
   - plugins/tiptap-alap
+  - examples/sites
   - examples/sites/astro-integration
   - examples/sites/eleventy
+  - examples/sites/obsidian
   - examples/sites/tiptap
   - examples/sites/vitepress
   - examples/servers/*

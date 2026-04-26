@@ -56,8 +56,25 @@ export const WEB_FETCH_TIMEOUT_MS = 10_000;
 /** Maximum response body size in bytes for :web: protocol fetch requests (1 MB) */
 export const MAX_WEB_RESPONSE_BYTES = 1_048_576;
 
+/** Maximum files a filesystem-backed protocol will enumerate per resolution */
+export const MAX_FILESYSTEM_FILES = 500;
+
 /** Maximum entries in the generate protocol cache before oldest is evicted */
 export const MAX_CACHE_ENTRIES = 50;
+
+/**
+ * Default cap on concurrent in-flight async protocol fetches.
+ * Browsers cap HTTP/1.1 at 6 per host; this keeps the engine from stacking
+ * requests above that under HTTP/2 and spreads load on external APIs.
+ */
+export const DEFAULT_MAX_CONCURRENT_FETCHES = 6;
+
+/**
+ * Default timeout (ms) for an async protocol fetch before the engine treats
+ * it as errored. Prevents a hung network request from keeping a "Loading…"
+ * placeholder on screen forever.
+ */
+export const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
 
 /** Default menu placement relative to the trigger */
 export const DEFAULT_PLACEMENT = 'SE' as const;

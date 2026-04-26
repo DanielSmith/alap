@@ -17,7 +17,8 @@
 import type { AlapConfig, AlapLink, GenerateHandler, WebKeyConfig } from '../core/types';
 import { MAX_GENERATED_LINKS, MAX_WEB_RESPONSE_BYTES, WEB_FETCH_TIMEOUT_MS } from '../constants';
 import { warn } from '../core/logger';
-import { getPath } from './shared';
+import { guardedFetch } from './guarded-fetch';
+import { getPath, readCappedJson } from './shared';
 
 /**
  * Default field mapping — tries common API field names.
@@ -176,14 +177,21 @@ export const webHandler: GenerateHandler = async (segments, config) => {
     return [];
   }
 
-  // Validate origin against allowlist (if configured)
+  // Validate origin against allowlist (if configured) and pick the fetcher.
+  // An explicit allowedOrigins list IS the author's SSRF guard — it may
+  // legitimately include loopback for dev — so allowlisted origins use the
+  // plain fetch. The allowlist-less case falls through to guardedFetch,
+  // which default-denies private/reserved addresses and re-checks resolved
+  // IPs at socket open (closes DNS rebinding).
   const allowedOrigins = protocol.allowedOrigins as string[] | undefined;
+  let fetcher: (url: string, init?: RequestInit) => Promise<Response> = guardedFetch;
   if (allowedOrigins && allowedOrigins.length > 0) {
     const origin = new URL(fetchUrl).origin;
     if (!allowedOrigins.includes(origin)) {
       warn(`:web: origin "${origin}" not in allowedOrigins for key "${key}"`);
       return [];
     }
+    fetcher = fetch;
   }
 
   let data: unknown;
@@ -191,7 +199,7 @@ export const webHandler: GenerateHandler = async (segments, config) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), WEB_FETCH_TIMEOUT_MS);
     const creds = keyConfig.credentials ? 'include' : 'omit';
-    const response = await fetch(fetchUrl, { signal: controller.signal, credentials: creds });
+    const response = await fetcher(fetchUrl, { signal: controller.signal, credentials: creds });
     clearTimeout(timeoutId);
     if (!response.ok) {
       warn(`:web: fetch failed for "${key}": ${response.status} ${response.statusText}`);
@@ -202,12 +210,12 @@ export const webHandler: GenerateHandler = async (segments, config) => {
       warn(`:web: unexpected content-type for "${key}": ${contentType} (expected application/json)`);
       return [];
     }
-    const contentLength = response.headers?.get?.('content-length');
-    if (contentLength && parseInt(contentLength, 10) > MAX_WEB_RESPONSE_BYTES) {
-      warn(`:web: response too large for "${key}": ${contentLength} bytes (max ${MAX_WEB_RESPONSE_BYTES})`);
+    const parsed = await readCappedJson(response);
+    if (parsed === null) {
+      warn(`:web: response exceeded ${MAX_WEB_RESPONSE_BYTES} bytes for "${key}"`);
       return [];
     }
-    data = await response.json();
+    data = parsed;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     const label = err instanceof DOMException && err.name === 'AbortError'

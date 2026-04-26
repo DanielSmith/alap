@@ -371,19 +371,17 @@ public class ExpressionParser {
             var sb = new StringBuilder();
             while (matcher.find()) {
                 String name = matcher.group(1);
-                String macroName = (name == null || name.isEmpty())
-                    ? (anchorId != null ? anchorId : "")
-                    : name;
-                if (macroName.isEmpty()) {
+                if (name == null || name.isEmpty()) {
+                    LOG.warning("Bare \"@\" is no longer supported — use \"@macroname\" to reference a named macro in config.macros");
                     matcher.appendReplacement(sb, "");
                     continue;
                 }
                 var macros = asMap(config.get("macros"));
-                if (macros == null || !macros.containsKey(macroName)) {
+                if (macros == null || !macros.containsKey(name)) {
                     matcher.appendReplacement(sb, "");
                     continue;
                 }
-                var macro = asMap(macros.get(macroName));
+                var macro = asMap(macros.get(name));
                 if (macro == null) {
                     matcher.appendReplacement(sb, "");
                     continue;

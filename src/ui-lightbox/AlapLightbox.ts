@@ -15,22 +15,28 @@
  */
 
 import { AlapEngine } from '../core/AlapEngine';
-import type { AlapConfig, ResolvedLink } from '../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry, ResolvedLink, SourceState } from '../core/types';
 import { RENDERER_LIGHTBOX } from '../ui/shared/coordinatedRenderer';
 import type { CoordinatedRenderer, OpenPayload } from '../ui/shared/coordinatedRenderer';
 import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
 import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
 import { openImageZoom } from '../ui/shared/imageZoom';
-import type { Placement } from '../ui/shared/placement';
-import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { parsePlacement, type Placement, type ParsedPlacement } from '../ui/shared/placement';
+import { applyOverlayLayout, computeOverlayLayout, viewportSize } from '../ui/shared/overlayPlacement';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
+import { buildPlaceholderItem } from '../ui/shared/progressivePlaceholder';
+import { ProgressiveRenderer, type ProgressiveRenderContext } from '../ui/shared/progressiveRenderer';
+import { flipFromRect } from '../ui/shared/flipAnimation';
 import { createEmbed } from '../ui-embed/AlapEmbed';
 import type { EmbedPolicy } from '../ui-embed/embedConsent';
+import { sanitizeUrlByTier, sanitizeTargetWindowByTier } from '../core/sanitizeByTier';
 
 export interface AlapLightboxOptions {
   /** CSS selector for trigger elements. Default: '.alap' */
   selector?: string;
+  /** Protocol handler registry — forwarded to the engine. See AlapEngineOptions.handlers. */
+  handlers?: ProtocolHandlerRegistry;
   /**
    * Viewport placement for the overlay panel. Uses compass directions.
    * - 'C': centered (default)
@@ -58,8 +64,9 @@ export class AlapLightbox implements CoordinatedRenderer {
   readonly rendererType = RENDERER_LIGHTBOX;
 
   private engine: AlapEngine;
+  private config: AlapConfig;
   private selector: string;
-  private placement: Placement | null;
+  private placement: ParsedPlacement | null;
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
   private currentIndex = 0;
@@ -71,16 +78,24 @@ export class AlapLightbox implements CoordinatedRenderer {
   private rapidResetTimer: ReturnType<typeof setTimeout> | null = null;
   private embedPolicy: EmbedPolicy;
   private embedAllowlist: string[] | undefined;
+  private currentSources: readonly SourceState[] = [];
+  private progressive: ProgressiveRenderer;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
   constructor(config: AlapConfig, options: AlapLightboxOptions = {}) {
-    this.engine = new AlapEngine(config);
+    this.config = config;
+    this.engine = new AlapEngine(config, { handlers: options.handlers });
     this.selector = options.selector ?? '.alap';
-    this.placement = options.placement ?? null;
+    this.placement = options.placement ? { compass: options.placement, strategy: 'flip' } : null;
     this.embedPolicy = options.embedPolicy ?? 'prompt';
     this.embedAllowlist = options.embedAllowlist;
     this.handleKeydown = this.onKeydown.bind(this);
+    this.progressive = new ProgressiveRenderer({
+      engine: this.engine,
+      cancelFetchOnDismiss: () => this.config.settings?.cancelFetchOnDismiss === true,
+      onRender: (ctx) => this.onProgressiveRender(ctx),
+    });
     this.init();
   }
 
@@ -106,13 +121,33 @@ export class AlapLightbox implements CoordinatedRenderer {
     const expression = trigger.getAttribute('data-alap-linkitems');
     if (!expression) return;
 
-    const anchorId = trigger.id || undefined;
-    this.links = this.engine.resolve(expression, anchorId);
-    if (this.links.length === 0) return;
-
-    this.currentIndex = 0;
-    this.open();
     this.activeTrigger = trigger;
+    this.progressive.start(trigger, expression, event, trigger.id || undefined);
+  }
+
+  private onProgressiveRender(ctx: ProgressiveRenderContext): void {
+    this.links = ctx.state.resolved;
+    this.currentSources = ctx.state.sources;
+    this.currentIndex = 0;
+
+    if (!this.overlay) {
+      this.open();
+      return;
+    }
+
+    // FLIP the inner panel on loading → resolved. Targeting the panel (not
+    // the backdrop) keeps the overlay's fade-in undisturbed.
+    if (ctx.transitioningFromLoading) {
+      const oldPanel = this.overlay.querySelector('.alap-lightbox-panel') as HTMLElement | null;
+      const oldRect = oldPanel?.getBoundingClientRect() ?? null;
+      this.render();
+      if (oldRect) {
+        const newPanel = this.overlay.querySelector('.alap-lightbox-panel') as HTMLElement | null;
+        if (newPanel) flipFromRect(newPanel, oldRect);
+      }
+    } else {
+      this.render();
+    }
   }
 
   // --- CoordinatedRenderer ---
@@ -130,7 +165,9 @@ export class AlapLightbox implements CoordinatedRenderer {
   }
 
   private open(): void {
-    this.close();
+    // Tear down the previous overlay DOM but keep the progressive render
+    // state — close() would abort the handle we just set up.
+    this.teardownOverlay();
 
     this.overlay = document.createElement('div');
     this.overlay.className = 'alap-lightbox-overlay';
@@ -138,9 +175,9 @@ export class AlapLightbox implements CoordinatedRenderer {
     this.overlay.setAttribute('aria-modal', 'true');
     this.overlay.setAttribute('aria-label', 'Link preview');
 
-    if (this.placement) {
-      this.overlay.style.alignItems = OVERLAY_ALIGN[this.placement];
-      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[this.placement];
+    const effective = this.resolvePlacement();
+    if (effective) {
+      applyOverlayLayout(this.overlay, computeOverlayLayout(effective, viewportSize()));
     }
 
     this.overlay.addEventListener('click', (e) => {
@@ -155,15 +192,22 @@ export class AlapLightbox implements CoordinatedRenderer {
 
   close(): HTMLElement | null {
     const trigger = this.activeTrigger;
+    // Contract 14: abort the in-flight render so late settles can't paint a closed overlay.
+    this.progressive.stop();
+    this.currentSources = [];
+    this.teardownOverlay();
+    this.activeTrigger = null;
+    return trigger;
+  }
+
+  /** Remove the overlay DOM + keydown listener, leaving progressive state untouched. */
+  private teardownOverlay(): void {
     if (this.overlay) {
       const overlay = this.overlay;
       this.overlay = null;
-
       fadeOut(overlay, 'alap-lightbox-visible');
     }
     document.removeEventListener('keydown', this.handleKeydown);
-    this.activeTrigger = null;
-    return trigger;
   }
 
   /** Build the skeleton once — called on open */
@@ -183,6 +227,20 @@ export class AlapLightbox implements CoordinatedRenderer {
     // Content panel
     const card = document.createElement('div');
     card.className = 'alap-lightbox-panel';
+
+    // Progressive state: no resolved link yet — show a placeholder inside the
+    // panel. Error > empty > loading, so a terminal state wins if multiple
+    // sources are attached.
+    if (this.links.length === 0 && this.currentSources.length > 0) {
+      const primary =
+        this.currentSources.find((s) => s.status === 'error') ??
+        this.currentSources.find((s) => s.status === 'empty') ??
+        this.currentSources[0];
+      const ph = buildPlaceholderItem(primary, 'div');
+      card.appendChild(ph);
+      this.overlay.appendChild(card);
+      return;
+    }
 
     // Image area
     const imageWrap = document.createElement('div');
@@ -337,7 +395,7 @@ export class AlapLightbox implements CoordinatedRenderer {
     if (credit && hasImage) {
       if (creditUrl) {
         const creditLink = document.createElement('a');
-        creditLink.href = creditUrl;
+        creditLink.href = sanitizeUrlByTier(creditUrl, link);
         creditLink.target = '_blank';
         creditLink.rel = 'noopener noreferrer';
         creditLink.textContent = `Photo: ${credit}`;
@@ -352,8 +410,8 @@ export class AlapLightbox implements CoordinatedRenderer {
     desc.style.display = link.description ? '' : 'none';
 
     // Visit
-    visitBtn.href = link.url;
-    visitBtn.target = link.targetWindow ?? '_blank';
+    visitBtn.href = sanitizeUrlByTier(link.url, link);
+    visitBtn.target = sanitizeTargetWindowByTier(link.targetWindow, link) ?? '_blank';
 
     // Counter + set navigator
     if (this.setNavHandle) {
@@ -438,7 +496,28 @@ export class AlapLightbox implements CoordinatedRenderer {
 
   /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
   setPlacement(placement: Placement | null): void {
-    this.placement = placement;
+    this.placement = placement ? { compass: placement, strategy: 'flip' } : null;
+  }
+
+  /**
+   * Resolve the effective placement for the overlay, in priority order:
+   *   1. Trigger's `data-alap-placement` attribute (full `ParsedPlacement`, strategy preserved).
+   *   2. Instance-level placement (constructor option or `setPlacement()`).
+   *   3. `config.settings.placement` (full `ParsedPlacement`).
+   *   4. null — overlay uses CSS default (centered).
+   *
+   * Mirrors the menu's fallback chain so `data-alap-placement` behaves the
+   * same on `<a class="alap">`, `<a class="alap-lens">`, and `<a class="alap-lightbox">`.
+   * Strategy `clamp` constrains the overlay to the viewport so long panels
+   * scroll within it rather than overflowing.
+   */
+  private resolvePlacement(): ParsedPlacement | null {
+    const triggerAttr = this.activeTrigger?.getAttribute('data-alap-placement');
+    if (triggerAttr) return parsePlacement(triggerAttr);
+    if (this.placement) return this.placement;
+    const configVal = this.config.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return null;
   }
 
   /**

@@ -21,24 +21,28 @@ import type { AlapConfig } from '../../src/core/types';
 describe('Tier 9: Resilience Against Bad Config and Input', () => {
 
   describe('missing or broken allLinks', () => {
-    it('handles missing allLinks gracefully', () => {
-      const engine = new AlapEngine({} as AlapConfig);
-      expect(engine.query('.anything')).toEqual([]);
+    // 3.2+ contract: AlapEngine auto-validates on construction, so structurally
+    // bad configs fail loudly and early instead of silently returning empty at
+    // query time. An engine that has no allLinks to reason about isn't something
+    // the library can usefully represent — better to halt than to pretend.
+
+    it('throws when allLinks is missing', () => {
+      expect(() => new AlapEngine({} as AlapConfig)).toThrow(/allLinks must be a non-null object/);
     });
 
-    it('handles null allLinks', () => {
-      const engine = new AlapEngine({ allLinks: null } as unknown as AlapConfig);
-      expect(engine.query('.anything')).toEqual([]);
+    it('throws when allLinks is null', () => {
+      expect(() => new AlapEngine({ allLinks: null } as unknown as AlapConfig))
+        .toThrow(/allLinks must be a non-null object/);
     });
 
-    it('handles allLinks set to a string', () => {
-      const engine = new AlapEngine({ allLinks: 'oops' } as unknown as AlapConfig);
-      expect(engine.query('.anything')).toEqual([]);
+    it('throws when allLinks is a string', () => {
+      expect(() => new AlapEngine({ allLinks: 'oops' } as unknown as AlapConfig))
+        .toThrow(/allLinks must be a non-null object/);
     });
 
-    it('handles allLinks set to an array', () => {
-      const engine = new AlapEngine({ allLinks: [] } as unknown as AlapConfig);
-      expect(engine.query('.anything')).toEqual([]);
+    it('throws when allLinks is an array', () => {
+      expect(() => new AlapEngine({ allLinks: [] } as unknown as AlapConfig))
+        .toThrow(/allLinks must be a non-null object/);
     });
   });
 

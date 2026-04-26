@@ -4,7 +4,7 @@
 
 Visual tools for building and managing Alap link configurations.
 
-> Live version: https://alap.info/cookbook/editors
+> Live version: https://docs.alap.info/cookbook/editors
 
 ## Overview
 
@@ -41,7 +41,7 @@ The editors use the same `ConfigStore` interface as the library:
 | Strategy | When to use |
 |----------|-------------|
 | IndexedDB | Single user, local browser storage |
-| RemoteStore | Shared configs via one of the 10 server examples |
+| RemoteStore | Shared configs via one of the 11 server examples |
 | HybridStore | Offline-first with background sync to remote |
 
 ```typescript

@@ -4,7 +4,7 @@
 
 Every Alap instance starts with a config object. At minimum you need `allLinks` — a dictionary of your links. Everything else is optional.
 
-> Live version with interactive examples: https://alap.info/getting-started/configuration
+> Live version with interactive examples: https://docs.alap.info/getting-started/configuration
 
 ## Config shape
 
@@ -70,7 +70,12 @@ allLinks: {
 }
 ```
 
-Each entry has an ID (the key), a URL, a label, and **tags**. Tags are the connective tissue — they let you describe *what a link is about* without deciding *where it should appear*. Add a new coffee shop to your library tomorrow, and every `.coffee` query picks it up automatically.
+Each entry has an ID (the key), a URL, a label, and **tags**. Both the ID and the tags are queryable:
+
+- **By ID** — `golden_gate` in an expression picks that one specific link. Good for hand-curated picks where you know exactly which item you want.
+- **By tag** — `.coffee` picks every link carrying the `coffee` tag. Tags are the connective tissue — they describe *what a link is about* without deciding *where it should appear*. Add a new coffee shop to your library tomorrow, and every `.coffee` query picks it up automatically.
+
+Mix them freely: `golden_gate, .coffee + .sf` means "the Golden Gate link, plus every SF coffee spot." IDs for precision, tags for breadth.
 
 ### Link fields
 

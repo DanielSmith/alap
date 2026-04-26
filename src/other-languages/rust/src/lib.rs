@@ -18,19 +18,25 @@
 //! refiner = '*' name (':' arg)* '*'
 //! ```
 
+pub mod link_provenance;
 mod parser;
 mod sanitize;
+pub mod sanitize_by_tier;
 mod ssrf_guard;
 pub mod types;
 mod validate;
 mod validate_config;
 
 pub use parser::ExpressionParser;
-pub use sanitize::sanitize_url;
+pub use sanitize::{
+    sanitize_url, sanitize_url_strict, sanitize_url_with_schemes, DEFAULT_SCHEMES, STRICT_SCHEMES,
+};
 pub use ssrf_guard::is_private_host;
-pub use types::{Config, Link, LinkWithId, Macro, Protocol, ProtocolHandler, RegexValidation};
+pub use types::{Config, Link, LinkWithId, Macro, Protocol, ProtocolHandler, RegexValidation, Tier};
 pub use validate::validate_regex;
-pub use validate_config::validate_config;
+pub use validate_config::{
+    sanitize_link_urls, validate_config, validate_config_with_options, ValidateOptions,
+};
 
 use sanitize::sanitize_link;
 use std::collections::HashMap;

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Protocols — DOM</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="../" target="alapDemo">&larr; Advanced Protocol Hub</a></p>
+
+  <h1>DOM Adapter &mdash; Advanced Protocols</h1>
+  <p class="page-intro">
+    Vanilla DOM adapter: plain <code>&lt;a class="alap"&gt;</code> anchors,
+    driven by <code>new AlapUI(config)</code>. No framework, no build step
+    required. Personalized around the vanilla-JS ecosystem — the async
+    queries here search HN for <em>vanilla javascript</em>, and the static
+    links are MDN / TC39 / WHATWG references.
+  </p>
+
+  <nav class="adapter-toc">
+    <strong>Jump to:</strong>
+    <a href="#compass">Compass</a>
+    <a href="#progressive">Progressive menu</a>
+    <a href="#mixed">Mixed static + async</a>
+    <a href="#error">Error / empty</a>
+    <a href="#lens">Lens</a>
+    <a href="#lightbox">Lightbox</a>
+    <a href="#dedup">In-flight dedup</a>
+  </nav>
+
+  <!-- ==================================================================
+       SECTION: Compass rose — drives placement for every alap trigger
+       below. Plain buttons, not alap anchors.
+       ================================================================== -->
+
+  <details id="compass" class="compass-wrap" open>
+    <summary>
+      Placement Compass Rose
+      <span class="compass-summary-hint">(click a direction to set placement on every trigger on this page)</span>
+    </summary>
+    <div class="compass-body">
+      <p class="note">
+        Click any direction; every <code>.alap</code> trigger on the page
+        gets that <code>data-alap-placement</code>. Click the active
+        direction again to clear and fall back to the trigger's own default.
+      </p>
+      <div id="compass-grid" class="compass-grid">
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="NW">NW</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="N">N</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="NE">NE</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="W">W</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="C">C</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="E">E</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="SW">SW</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="S">S</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="SE">SE</button></div>
+      </div>
+      <p class="compass-driver-hint">
+        Quick confirm &mdash;
+        <a class="alap compass-static-link" data-alap-linkitems=".dom + .menu" data-alap-placement="SE">Static DOM links</a>
+        (no async, opens instantly at the compass direction).
+      </p>
+    </div>
+  </details>
+
+  <!-- ==================================================================
+       SECTION: Progressive menu (pure async)
+       ================================================================== -->
+
+  <h2 id="progressive">1. Progressive Async Menu</h2>
+  <section class="scenario">
+    <h3>Deterministic <code>:slow:</code> mock</h3>
+    <p class="note">
+      Click opens a menu with "Loading…" centered over the trigger.
+      Two seconds later the item rows fade in and the menu FLIPs into
+      its final placement.
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":slow:2000:5:" data-alap-placement="SE">
+        Slow menu &mdash; 5 items in 2s
+      </a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":slow:500:8:" data-alap-placement="SE">
+        Fast menu &mdash; 8 items in 500ms
+      </a>
+    </p>
+  </section>
+
+  <section class="scenario">
+    <h3>Real data: HN search for <em>vanilla javascript</em></h3>
+    <p class="note">
+      <code>:hn:search:$vanilla_js:</code> &mdash; Algolia full-text search,
+      live off the wire. Alias defined in the config so the multi-word
+      query survives the tokenizer.
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:search:$vanilla_js:" data-alap-placement="SE">
+        Top HN stories about vanilla JS
+      </a>
+    </p>
+  </section>
+
+  <!-- ==================================================================
+       SECTION: Mixed static + async
+       ================================================================== -->
+
+  <h2 id="mixed">2. Mixed Static + Dynamic</h2>
+  <section class="scenario">
+    <h3>Static tag <code>|</code> slow protocol</h3>
+    <p class="mixed-legend">
+      <span><span class="swatch static"></span>static</span>
+      <span><span class="swatch mock"></span>mock (async)</span>
+      <span><span class="swatch hn"></span>HN (async)</span>
+    </p>
+    <p class="note">
+      The static items render instantly; the async items fall in when the
+      <code>:slow:</code> timer fires. Provenance is shown by the left
+      border on each row (see <code>source_mock</code> /
+      <code>source_hn</code> classes).
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.dom + .menu) | :slow:1500:3:" data-alap-placement="SE">
+        Static DOM links + 3 slow items
+      </a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.dom + .menu) | :hn:search:$vanilla_js:limit=4:" data-alap-placement="SE">
+        Static DOM links + 4 HN stories
+      </a>
+    </p>
+  </section>
+
+  <!-- ==================================================================
+       SECTION: Error + empty
+       ================================================================== -->
+
+  <h2 id="error">3. Error and Empty Placeholders</h2>
+  <section class="scenario">
+    <h3><code>:flaky:</code> for deterministic error / empty states</h3>
+    <p class="note">
+      Placeholder rows are marked with
+      <code>[data-alap-placeholder="error" | "empty"]</code>. A CSS rule
+      colors errors red and empties green; the default "Loading…" row is
+      italic gray.
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":flaky:error:" data-alap-placement="SE">
+        Forced error after 800ms
+      </a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":flaky:empty:" data-alap-placement="SE">
+        Empty result after 800ms
+      </a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems="(.dom + .menu) | :flaky:error: | :slow:1200:2:" data-alap-placement="SE">
+        Static + one error + one slow (mixed)
+      </a>
+    </p>
+  </section>
+
+  <!-- ==================================================================
+       SECTION: Lens (progressive metadata card)
+       ================================================================== -->
+
+  <h2 id="lens">4. Lens &mdash; Metadata Card</h2>
+  <section class="scenario">
+    <h3>Lens with progressive load</h3>
+    <p class="note">
+      The lens is activated by <code>class="alap-lens"</code>. Same
+      expression grammar as the menu; the renderer picks lens-style fields
+      (image, title, author, summary).
+    </p>
+    <p>
+      <a class="alap-lens" data-alap-linkitems="(.dom + .lens) | :slow:1500:2:">
+        DOM ecosystem lens (static + slow)
+      </a>
+    </p>
+  </section>
+
+  <!-- ==================================================================
+       SECTION: Lightbox
+       ================================================================== -->
+
+  <h2 id="lightbox">5. Lightbox &mdash; Fullscreen Media</h2>
+  <section class="scenario">
+    <h3>Lightbox with progressive load</h3>
+    <p class="note">
+      <code>class="alap-lightbox"</code> switches renderers. The lightbox
+      pre-loads its first item while the slow protocol is still in flight;
+      once the second item arrives it becomes the next slide.
+    </p>
+    <p>
+      <a class="alap-lightbox" data-alap-linkitems="(.dom + .image) | :slow:1800:1:">
+        DOM lightbox (static image + slow)
+      </a>
+    </p>
+  </section>
+
+  <!-- ==================================================================
+       SECTION: In-flight dedup
+       ================================================================== -->
+
+  <h2 id="dedup">6. In-Flight Dedup</h2>
+  <section class="scenario">
+    <h3>Two triggers, same token</h3>
+    <p class="note">
+      Both triggers below use <code>:slow:2500:4:</code>. Open one menu,
+      then (while it's still loading) open the other &mdash; the second
+      trigger subscribes to the existing in-flight request and both resolve
+      together, with a single network-style delay.
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":slow:2500:4:" data-alap-placement="SE">
+        Trigger A &mdash; slow 4 items
+      </a>
+      &nbsp;&nbsp;
+      <a class="alap" data-alap-linkitems=":slow:2500:4:" data-alap-placement="SE">
+        Trigger B &mdash; same token
+      </a>
+    </p>
+  </section>
+
+  <script type="module" src="./main.ts"></script>
+
+  <script>
+    // Compass rose drives placement on every .alap trigger on the page.
+    // Click once: set data-alap-placement to the chosen direction.
+    // Click the active direction again: remove it, trigger falls back to its own default.
+    const compassGrid = document.getElementById('compass-grid');
+    compassGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.compass-btn');
+      if (!btn) return;
+      const dir = btn.dataset.dir;
+      const wasActive = btn.classList.contains('active');
+      compassGrid.querySelectorAll('.compass-btn.active').forEach((b) => b.classList.remove('active'));
+      const triggers = document.querySelectorAll('a.alap, a.alap-lens, a.alap-lightbox');
+      if (wasActive) {
+        triggers.forEach((el) => el.removeAttribute('data-alap-placement'));
+      } else {
+        btn.classList.add('active');
+        triggers.forEach((el) => el.setAttribute('data-alap-placement', dir));
+      }
+    });
+  </script>
+</body>
+</html>

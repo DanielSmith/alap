@@ -322,21 +322,6 @@ fn unknown_macro() {
     assert!(result.is_empty());
 }
 
-#[test]
-fn bare_macro_with_anchor() {
-    let mut cfg = test_config();
-    cfg.macros.insert(
-        "myanchor".into(),
-        Macro {
-            link_items: "vwbug".into(),
-            config: None,
-        },
-    );
-    assert_eq!(
-        new_parser(&cfg).query("@", "myanchor"),
-        vec!["vwbug"]
-    );
-}
 
 // --- Tier 7: Parentheses ---
 

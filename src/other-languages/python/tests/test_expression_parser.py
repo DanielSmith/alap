@@ -232,15 +232,6 @@ class TestMacros:
         result = parser.query("@nonexistent")
         assert result == []
 
-    def test_bare_macro_with_anchor(self, parser):
-        # Bare @ uses anchorId
-        config_with_macro = {
-            **TEST_CONFIG,
-            "macros": {**TEST_CONFIG["macros"], "myanchor": {"linkItems": "vwbug"}},
-        }
-        p = ExpressionParser(config_with_macro)
-        result = p.query("@", "myanchor")
-        assert result == ["vwbug"]
 
 
 # ---------------------------------------------------------------------------

@@ -15,15 +15,37 @@
 -->
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted, type CSSProperties, type ComponentPublicInstance } from 'vue';
+import { ref, shallowRef, computed, watch, nextTick, onMounted, onUnmounted, type CSSProperties, type ComponentPublicInstance } from 'vue';
 import { useAlapContext } from './useAlap';
 import { useMenuDismiss } from './useMenuDismiss';
 import { createMenuKeyHandler } from './useMenuKeyboard';
-import type { AlapLink as AlapLinkType } from '../../core/types';
-import { sanitizeUrl } from '../../core/sanitizeUrl';
+import type { AlapLink as AlapLinkType, SourceState } from '../../core/types';
+import {
+  sanitizeUrlByTier,
+  sanitizeCssClassByTier,
+  sanitizeTargetWindowByTier,
+} from '../../core/sanitizeByTier';
+
+// Vue templates can't call multi-arg helpers inline cleanly; wrap each
+// (AlapLinkType is already imported above alongside SourceState.)
+// tier helper as a single-arg lambda over the item so the template reads
+// naturally (`:class="classFor(item)"`).
+function classFor(item: AlapLinkType): string {
+  const safe = sanitizeCssClassByTier(item.cssClass, item);
+  return safe ? `alapListElem ${safe}` : 'alapListElem';
+}
+function hrefFor(item: AlapLinkType): string {
+  return sanitizeUrlByTier(item.url, item);
+}
+function imageFor(item: AlapLinkType): string {
+  return sanitizeUrlByTier(item.image ?? '', item);
+}
+function targetFor(item: AlapLinkType): string {
+  return sanitizeTargetWindowByTier(item.targetWindow, item) ?? 'fromAlap';
+}
 import type { AlapLinkMode } from './providerKey';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
-import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, placeholderDescriptor } from '../shared';
 import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
 type ResolvedLink = { id: string } & AlapLinkType;
@@ -57,8 +79,20 @@ const props = withDefaults(defineProps<{
 const ctx = useAlapContext();
 
 const isOpen = ref(false);
-const items = ref<ResolvedLink[]>([]);
+// shallowRef so each ResolvedLink keeps its raw object identity. Vue's
+// default `ref` deep-proxies array elements, which would break the
+// WeakMap-keyed provenance lookup that sanitizeByTier relies on — the
+// proxied item is a different reference from the one validateConfig
+// stamped, and getProvenance(proxy) returns undefined (fail-closed
+// drops cssClass, clamps target). The items array is replaced as a
+// whole on each resolve cycle, so shallow reactivity is enough.
+const items = shallowRef<ResolvedLink[]>([]);
+const sources = ref<SourceState[]>([]);
+const isLoadingOnly = ref(false);
 let openedViaKeyboard = false;
+let progressive: ProgressiveRenderer | null = null;
+let pendingFlipRect: DOMRect | null = null;
+let lastClickEvent: MouseEvent | null = null;
 
 let idCounter = 0;
 const uid = ++idCounter + Math.random().toString(36).slice(2, 8);
@@ -99,39 +133,64 @@ const scrollStyle = computed<CSSProperties | undefined>(() =>
     : undefined
 );
 
+const placeholderDescriptors = computed(() =>
+  sources.value.map((src) => ({ key: `ph:${src.token}`, ...placeholderDescriptor(src) }))
+);
+
 // --- Menu coordinator (close others when this one opens) ---
 
 let unsubscribe: (() => void) | null = null;
 
 onMounted(() => {
   unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    progressive?.stop();
     isOpen.value = false;
+    isLoadingOnly.value = false;
+  });
+
+  progressive = new ProgressiveRenderer({
+    engine: ctx.engine,
+    onRender: (renderCtx: ProgressiveRenderContext) => {
+      if (renderCtx.transitioningFromLoading && menuRef.value) {
+        pendingFlipRect = menuRef.value.getBoundingClientRect();
+      }
+      if (!renderCtx.isUpdate) {
+        ctx.menuCoordinator.notifyOpen(triggerId);
+      }
+      items.value = renderCtx.state.resolved as ResolvedLink[];
+      sources.value = renderCtx.state.sources as SourceState[];
+      isLoadingOnly.value = renderCtx.isLoadingOnly;
+      isOpen.value = true;
+    },
+    cancelFetchOnDismiss: () => ctx.config?.settings?.cancelFetchOnDismiss === true,
   });
 });
 
 onUnmounted(() => {
+  progressive?.stop();
+  progressive = null;
   unsubscribe?.();
 });
 
 // --- Open / close ---
 
 function closeMenu() {
+  progressive?.stop();
   const wasOpen = isOpen.value;
+  isLoadingOnly.value = false;
   isOpen.value = false;
   if (wasOpen) triggerRef.value?.focus();
 }
 
-function openMenu() {
-  const resolved = ctx.engine.resolve(props.query, props.anchorId);
-  if (resolved.length === 0) return;
-  ctx.menuCoordinator.notifyOpen(triggerId);
-  items.value = resolved;
-  isOpen.value = true;
+function openMenu(event: MouseEvent) {
+  if (!triggerRef.value) return;
+  lastClickEvent = event;
+  progressive?.start(triggerRef.value, props.query, event, props.anchorId);
 }
 
-function toggleMenu() {
+function toggleMenu(event: MouseEvent) {
   if (isOpen.value) closeMenu();
-  else openMenu();
+  else openMenu(event);
 }
 
 // --- Dismiss (timer, click outside, escape) ---
@@ -142,8 +201,8 @@ const { startTimer, stopTimer } = useMenuDismiss(
 
 // --- Focus first item on open ---
 
-watch(isOpen, async (open) => {
-  if (open) {
+watch([isOpen, isLoadingOnly], async ([open, loading]) => {
+  if (open && !loading) {
     await nextTick();
     if (openedViaKeyboard) itemEls[0]?.focus();
     openedViaKeyboard = false;
@@ -151,24 +210,53 @@ watch(isOpen, async (open) => {
   }
 });
 
+// --- Center-over-trigger while loading-only; FLIP on transition ---
+//
+// Loading-only uses CSS-var-driven inline styles from `centerOverTrigger` so
+// a tiny placeholder doesn't flip direction differently from the resolved menu.
+// Once real items arrive, the compass watcher below takes over, and we animate
+// from the previously-measured rect to the new placement.
+watch([isOpen, isLoadingOnly, items, sources], async () => {
+  await nextTick();
+  if (!menuRef.value || !triggerRef.value) return;
+
+  if (isOpen.value && isLoadingOnly.value && lastClickEvent) {
+    centerOverTrigger(
+      menuRef.value,
+      triggerRef.value,
+      lastClickEvent,
+      DEFAULT_MENU_Z_INDEX,
+    );
+    return;
+  }
+
+  if (pendingFlipRect && !isLoadingOnly.value) {
+    flipFromRect(menuRef.value, pendingFlipRect);
+    pendingFlipRect = null;
+  }
+});
+
 // --- Compass placement ---
 
 let scrollHandler: (() => void) | null = null;
 
-watch(isOpen, async (open) => {
+watch([isOpen, isLoadingOnly, items, sources], async () => {
   // Clean up previous scroll handler
   if (scrollHandler) {
     window.removeEventListener('scroll', scrollHandler);
     scrollHandler = null;
   }
 
-  if (!open || !props.placement || props.mode === 'popover') return;
+  if (!isOpen.value || isLoadingOnly.value || !props.placement || props.mode === 'popover') return;
 
   await nextTick();
   const triggerEl = triggerRef.value;
   const menuEl = menuRef.value;
   const wrapperEl = wrapperRef.value;
   if (!triggerEl || !menuEl || !wrapperEl) return;
+
+  // Clear any inline styles set by centerOverTrigger so placement can take over.
+  menuEl.style.cssText = '';
 
   const applyNow = applyPlacementAfterLayout(triggerEl, menuEl, wrapperEl, {
     placement: props.placement!,
@@ -213,7 +301,9 @@ const handleMenuKeyDown = createMenuKeyHandler(
 
 function handlePopoverToggle(e: Event) {
   if ((e as ToggleEvent).newState === 'closed') {
+    progressive?.stop();
     isOpen.value = false;
+    isLoadingOnly.value = false;
   }
 }
 
@@ -223,9 +313,9 @@ function handleTriggerClick(e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
   if (props.mode === 'popover' && !isOpen.value) {
-    openMenu();
+    openMenu(e);
   } else {
-    toggleMenu();
+    toggleMenu(e);
   }
 }
 
@@ -233,10 +323,11 @@ function handleTriggerKeyDown(e: KeyboardEvent) {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
     openedViaKeyboard = true;
+    const synth = new MouseEvent('click', { bubbles: true, cancelable: true });
     if (props.mode === 'popover' && !isOpen.value) {
-      openMenu();
+      openMenu(synth);
     } else {
-      toggleMenu();
+      toggleMenu(synth);
     }
   }
 }
@@ -293,6 +384,7 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
       :aria-labelledby="triggerId"
       :class="mergedMenuClassName"
       :style="mergedMenuStyle"
+      :data-alap-loading-only="isLoadingOnly ? '' : null"
       popover="auto"
       @keydown="handleMenuKeyDown"
       @mouseleave="startTimer"
@@ -309,12 +401,13 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
             v-for="(item, i) in items"
             :key="item.id"
             role="none"
-            :class="item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'"
+            :class="classFor(item)"
           >
             <a
               :ref="(el) => setItemRef(el, i)"
-              :href="sanitizeUrl(item.url)"
-              :target="item.targetWindow ?? 'fromAlap'"
+              :href="hrefFor(item)"
+              :target="targetFor(item)"
+              rel="noopener noreferrer"
               role="menuitem"
               :tabindex="-1"
               @mouseenter="handleItemMouseEnter(item)"
@@ -322,11 +415,19 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
             >
               <img
                 v-if="item.image"
-                :src="sanitizeUrl(item.image)"
+                :src="imageFor(item)"
                 :alt="item.altText ?? `image for ${item.id}`"
               />
               <template v-else>{{ item.label ?? item.id }}</template>
             </a>
+          </li>
+          <li
+            v-for="desc in placeholderDescriptors"
+            :key="desc.key"
+            v-bind="desc.attrs"
+            :class="desc.className"
+          >
+            <a aria-disabled="true" :tabindex="-1">{{ desc.label }}</a>
           </li>
         </component>
       </template>
@@ -360,6 +461,7 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
       :aria-labelledby="triggerId"
       :class="mergedMenuClassName"
       :style="mergedMenuStyle"
+      :data-alap-loading-only="isLoadingOnly ? '' : null"
       @keydown="handleMenuKeyDown"
       @mouseleave="startTimer"
       @mouseenter="stopTimer"
@@ -373,12 +475,13 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
           v-for="(item, i) in items"
           :key="item.id"
           role="none"
-          :class="item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'"
+          :class="classFor(item)"
         >
           <a
             :ref="(el) => setItemRef(el, i)"
-            :href="sanitizeUrl(item.url)"
-            :target="item.targetWindow ?? 'fromAlap'"
+            :href="hrefFor(item)"
+            :target="targetFor(item)"
+            rel="noopener noreferrer"
             role="menuitem"
             :tabindex="-1"
             @mouseenter="handleItemMouseEnter(item)"
@@ -386,11 +489,22 @@ function setItemRef(el: Element | ComponentPublicInstance | null, index: number)
           >
             <img
               v-if="item.image"
-              :src="sanitizeUrl(item.image)"
+              :src="imageFor(item)"
               :alt="item.altText ?? `image for ${item.id}`"
             />
             <template v-else>{{ item.label ?? item.id }}</template>
           </a>
+        </li>
+        <li
+          v-for="src in sources"
+          :key="`ph:${src.token}`"
+          role="none"
+          aria-live="polite"
+          :data-alap-placeholder="src.status"
+          :data-alap-placeholder-token="src.token"
+          :class="`alapListElem alap-placeholder alap-placeholder-${src.status}`"
+        >
+          <a aria-disabled="true" :tabindex="-1">{{ placeholderLabel(src.status) }}</a>
         </li>
       </component>
     </div>

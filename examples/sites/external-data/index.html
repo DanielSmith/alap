@@ -97,9 +97,9 @@
       — first 8 posts
     </p>
   </div>
-  <pre><code>protocols: {
+  <pre><code>// config (data only)
+protocols: {
   web: {
-    generate: webHandler,
     keys: {
       books: {
         url: "https://openlibrary.org/search.json",
@@ -114,6 +114,9 @@
     }
   }
 }
+
+// handler (passed at engine construction)
+new AlapUI(config, { handlers: { web: webHandler } });
 
 data-alap-linkitems=":web:books:photography:"
 data-alap-linkitems=":web:books:adams:"</code></pre>

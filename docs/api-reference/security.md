@@ -2,9 +2,11 @@
 
 **[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · **This Page** · [Servers](servers.md)
 
-Alap's security model covers URL sanitization, regex validation, config validation, and parser resource limits. Although this considers some common attack vectors, it should not be taken as, or confused with, a professional third-party security audit. If you're deploying Alap in a high-trust environment, engage a security professional to review your specific integration.
+Alap's security model covers URL sanitization, regex validation, config validation, and parser resource limits.
 
-> Live version: https://alap.info/api-reference/security
+> I'm not a security expert, and Alap hasn't had a third-party audit — it's a single-maintainer open source project. Please do your own due diligence before deploying, especially when wiring up protocols on servers with local network access. How you deploy this is your responsibility.
+
+> Live version: https://docs.alap.info/api-reference/security
 
 ## URL sanitization
 
@@ -57,6 +59,65 @@ const raw = await fetch('/api/config').then(r => r.json());
 const config = validateConfig(raw);
 ```
 
+## Trust model: How Alap handles data
+
+Alap applies different levels of scrutiny based on where configuration data comes from. This ensures flexibility for developers while providing a high "defense floor" for untrusted input.
+
+- **Local Configs (Trusted):** Configs defined in your source code or repository are treated as trusted parts of your application.
+- **External Data (Sanitized):** Data from third-party APIs (like `:web:` or `:hn:`) or remote stores is treated with maximum caution. The engine automatically applies strict URL sanitization and resource caps to this data before it ever touches the DOM.
+- **Stored Data (Validated):** Data from browser storage (localStorage) is re-validated on every load to ensure it hasn't been tampered with by other scripts.
+
+## Secure integration checklist
+
+For the best protection, the standard practices are:
+
+- **Use `validateConfig()`** for any config loaded from a network or database.
+- **Set `allowedOrigins`** for the `:web:` protocol to limit Alap to specific domains.
+- **Apply a Content Security Policy (CSP)** on your host page. As a library, Alap does not ship or install a CSP for you.
+- **Keep Alap current.** Security fixes and updated URL filters ship in patch releases.
+
+## Parser resource limits
+
+
+Alap classifies every config input by its source and applies the sanitization strictness matched to that source's trustworthiness.
+
+| Tier | Source | Sanitization |
+|------|--------|--------------|
+| `author` | Checked-in developer code | Loose — permits `mailto:`, `tel:`, any scheme not explicitly dangerous |
+| `protocol:*` | Returned from a generate handler (`:web:`, `:atproto:`, `:hn:`, ...) | Strict — `http`, `https`, `mailto` only |
+| `storage:*` | Loaded from a storage adapter (`localStorage`, REST store, ...) | Strict |
+| _(unstamped)_ | Missing provenance | Routed to the strict path — same as protocol/storage |
+
+Pass `provenance` when loading a non-author config:
+
+```typescript
+const cfg = validateConfig(raw, { provenance: 'protocol:web' });
+const cfg = validateConfig(raw, { provenance: 'storage:remote' });
+```
+
+The engine calls `validateConfig` internally for hand-written configs (author-tier by default), so ergonomic code stays ergonomic.
+
+Per-tier enforcement spans URL sanitization, `cssClass` sanitization, `targetWindow` clamping, the metadata-key blocklist, and the hooks allowlist below.
+
+## Hooks allowlist
+
+`settings.hooks` serves two roles:
+
+1. **Default** — applied to links that don't set their own `hooks`.
+2. **Allowlist** — hooks on non-author-tier links are intersected against it. Hooks outside the allowlist are dropped with an operator-facing warning.
+
+If `settings.hooks` is absent and a non-author-tier link arrives with hook keys, **all** are stripped. Author-tier links keep hooks verbatim — the developer wrote them.
+
+## Config immutability
+
+The config returned by `validateConfig` is frozen, and the input is deep-cloned on entry:
+
+- Post-validation mutation of the returned object is a no-op (or throws, in strict mode). Handlers see the config the validator approved.
+- The original input object is untouched; passing the same raw config to multiple engines is safe.
+- Handler functions are kept out of the frozen config entirely. They pass separately via `new AlapEngine(config, { handlers })`, so the config itself stays pure data — serializable, auditable, freezable.
+
+Reserved keys under `meta` are stripped at validate time (see `reservedMetaKeys` in `src/core/validateConfig.ts`) so caller-controlled data can't shadow internal tokens.
+
 ## Parser resource limits
 
 The expression parser enforces hard limits to prevent denial-of-service:
@@ -77,6 +138,7 @@ The expression parser enforces hard limits to prevent denial-of-service:
 | No `eval()` or `Function()` anywhere | All of `src/` |
 | `encodeURIComponent` in REST paths | `RemoteStore.ts` |
 | Framework auto-escaping (JSX, Vue templates, Svelte) | All framework adapters |
+| `rel="noopener noreferrer"` on every menu, lens, and lightbox anchor (all tiers) | `buildMenuList.ts` + framework adapters |
 | Proper ARIA roles and keyboard navigation | All adapters |
 | Event listener cleanup on destroy/unmount | All adapters |
 | Zero runtime dependencies in core | `src/core/` |
@@ -113,6 +175,12 @@ protocols: {
 
 If `allowedOrigins` is set, any URL whose origin is not in the list is rejected before the request is made. Omit or pass an empty array to allow all origins.
 
+### Socket-level SSRF guard (DNS rebinding)
+
+Server-side Node fetches — `:web:` (when `allowedOrigins` isn't set), `:json:`, `:hn:`, and `:atproto:` — re-resolve the hostname at socket-open time and re-check the resolved IP against the private-address CIDR blocklist. The purely syntactic hostname check runs before the socket connect, so it can't reflect what the OS resolver returns at connect time; the socket-level re-check moves the decision to the moment the connection is made.
+
+Implemented via `undici.Agent`'s `connect.lookup` callback; requires Node 22+. If you've set `allowedOrigins` for `:web:`, the author-supplied allowlist serves as the guard and the default fetch path is used so a locally-configured dev host (e.g. `http://localhost:3000`) can still be reached. `:obsidian:rest:` keeps its dedicated `allowedHosts` gate — loopback is the intended destination there.
+
 ### Fetch timeout
 
 All `:web:` fetches have a `WEB_FETCH_TIMEOUT_MS` timeout (default: 10 seconds) via `AbortController`. Stalled or slow APIs cannot hang the UI indefinitely.
@@ -137,20 +205,23 @@ When `linkBase` is used to prepend a base URL to relative paths, slashes are nor
 
 ## Cross-language security parity
 
-Alap's parser exists in six languages. All share the same security baseline:
+Alap's parser exists in seven languages. All share the same security baseline:
 
-| Feature | TypeScript | Rust | Python | PHP | Go | Java |
-|---------|-----------|------|--------|-----|-----|------|
-| URL sanitization | yes | yes | yes | yes | yes | yes |
-| Prototype pollution defense | yes | yes | yes (+ dunders) | yes | yes | yes |
-| Resource limits (depth/tokens) | yes | yes | yes | yes | yes | yes |
-| ReDoS detection | syntactic | N/A (safe engine) | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2 engine) | syntactic |
-| `validateConfig` | yes | yes | yes | yes | yes | yes |
-| SSRF guard | yes | yes | yes | yes | yes | yes |
+| Feature | TypeScript | Rust | Python | PHP | Go | Java | Ruby |
+|---------|-----------|------|--------|-----|-----|------|------|
+| URL sanitization | yes | yes | yes | yes | yes | yes | yes |
+| Prototype pollution defense | yes | yes | yes (+ dunders) | yes | yes | yes | yes |
+| Resource limits (depth/tokens) | yes | yes | yes | yes | yes | yes | yes |
+| ReDoS detection | syntactic | N/A (safe engine) | syntactic | syntactic + `pcre.backtrack_limit` | N/A (RE2 engine) | syntactic | syntactic |
+| `validateConfig` | yes | yes | yes | yes | yes | yes | yes |
+| SSRF guard (syntactic) | yes | yes | yes | yes | yes | yes | yes |
+| DNS-rebinding guard (socket-level) | yes | N/A | N/A | N/A | N/A | N/A | N/A |
+
+The socket-level DNS-rebinding guard only applies where Alap itself opens sockets. That's the TypeScript library's built-in fetch protocols (`:web:`, `:json:`, `:hn:`, `:atproto:`). The other ports are parser-only — they don't ship HTTP-fetching protocols, so there's no library-level fetch path for the rebind guard to protect. Each port does export the syntactic `is_private_host(url)` helper for consumers who build their own fetch-based extensions; rebind defense in that case is the consumer's responsibility.
 
 **Language-specific defenses:**
 
-- **Python:** Blocks dunder keys (`__class__`, `__bases__`, `__mro__`, `__subclasses__`) in addition to JS prototype-pollution keys. Prevents downstream exploits if configs are passed to templating engines (Jinja2) or logging formatters.
+- **Python:** Blocks dunder keys (`__class__`, `__bases__`, `__mro__`, `__subclasses__`) in addition to JS prototype-pollution keys. Keeps configs passed downstream to templating engines (Jinja2) or logging formatters from carrying handles into Python internals.
 - **PHP:** Rejects non-array input to `validateConfig()` — enforces `json_decode($json, true)` to prevent PHP Object Injection. Wraps regex execution with a temporary `pcre.backtrack_limit` (10,000) as a circuit breaker in case the syntactic ReDoS check misses an edge case.
 - **Go:** Explicitly handles IPv4-mapped IPv6 addresses (`::ffff:127.0.0.1`) in the SSRF guard via `net.IP.To4()` conversion before CIDR checking.
 - **Rust/Go:** Regex engines are inherently safe from ReDoS (finite automata, no backtracking). Syntactic validation still checks for compilation errors.

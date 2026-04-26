@@ -2,7 +2,7 @@
 
 **[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · [React](react.md) · [Vue](vue.md) · [Svelte](svelte.md) · [SolidJS](solid.md) · **This Page** · [Alpine.js](alpine.md) · [Eleventy](eleventy.md)
 
-> Live version with interactive examples: https://alap.info/framework-guides/astro
+> Live version with interactive examples: https://docs.alap.info/framework-guides/astro
 
 ## Install
 

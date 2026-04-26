@@ -242,9 +242,15 @@ class ExpressionParser
             $before = $result;
 
             $macros = $this->config['macros'] ?? [];
-            $result = preg_replace_callback('/@(\w*)/', function ($m) use ($anchorId, $macros) {
-                $name = $m[1] !== '' ? $m[1] : ($anchorId ?? '');
-                if ($name === '') return '';
+            $result = preg_replace_callback('/@(\w*)/', function ($m) use ($macros) {
+                $name = $m[1];
+                if ($name === '') {
+                    trigger_error(
+                        'Bare "@" is no longer supported — use "@macroname" to reference a named macro in config.macros',
+                        E_USER_WARNING
+                    );
+                    return '';
+                }
                 $macro = $macros[$name] ?? null;
                 if (! is_array($macro) || ! is_string($macro['linkItems'] ?? null)) return '';
 
@@ -279,20 +285,13 @@ class ExpressionParser
             if ($ch === '(') { $tokens[] = ['type' => 'LPAREN', 'value' => '(']; $i++; continue; }
             if ($ch === ')') { $tokens[] = ['type' => 'RPAREN', 'value' => ')']; $i++; continue; }
 
-            // Class: .word (supports hyphens between word characters)
+            // Class: .word
             if ($ch === '.') {
                 $i++;
                 $word = '';
-                while ($i < $n) {
-                    if (ctype_alnum($expr[$i]) || $expr[$i] === '_') {
-                        $word .= $expr[$i];
-                        $i++;
-                    } elseif ($expr[$i] === '-' && ($i + 1) < $n && (ctype_alnum($expr[$i + 1]) || $expr[$i + 1] === '_')) {
-                        $word .= $expr[$i];
-                        $i++;
-                    } else {
-                        break;
-                    }
+                while ($i < $n && (ctype_alnum($expr[$i]) || $expr[$i] === '_')) {
+                    $word .= $expr[$i];
+                    $i++;
                 }
                 if ($word !== '') $tokens[] = ['type' => 'CLASS', 'value' => $word];
                 continue;
@@ -374,20 +373,12 @@ class ExpressionParser
                 continue;
             }
 
-            // Bare word: item ID (supports hyphens between word characters)
+            // Bare word: item ID
             if (ctype_alnum($ch) || $ch === '_') {
                 $word = '';
-                while ($i < $n) {
-                    if (ctype_alnum($expr[$i]) || $expr[$i] === '_') {
-                        $word .= $expr[$i];
-                        $i++;
-                    } elseif ($expr[$i] === '-' && ($i + 1) < $n && (ctype_alnum($expr[$i + 1]) || $expr[$i + 1] === '_')) {
-                        // Hyphen followed by word char — part of identifier
-                        $word .= $expr[$i];
-                        $i++;
-                    } else {
-                        break;
-                    }
+                while ($i < $n && (ctype_alnum($expr[$i]) || $expr[$i] === '_')) {
+                    $word .= $expr[$i];
+                    $i++;
                 }
                 if ($word !== '') {
                     $tokens[] = ['type' => 'ITEM_ID', 'value' => $word];
@@ -704,6 +695,44 @@ class ExpressionParser
     }
 
     /**
+     * Strict URL sanitizer — http / https / mailto only (plus relative
+     * URLs and empty string). Use for links whose origin has not been
+     * verified as author-tier: protocol handler results, storage-loaded
+     * configs, etc.
+     */
+    public static function sanitizeUrlStrict(string $url): string
+    {
+        return self::sanitizeUrlWithSchemes($url, ['http', 'https', 'mailto']);
+    }
+
+    /**
+     * Sanitize a URL against a configurable scheme allowlist.
+     *
+     * Runs the dangerous-scheme blocklist first (defence-in-depth:
+     * `javascript:` is blocked even when it appears in the allowlist).
+     * Relative URLs pass through unchanged regardless of the allowlist.
+     * Default allowed schemes are http / https.
+     */
+    public static function sanitizeUrlWithSchemes(string $url, ?array $allowedSchemes = null): string
+    {
+        $base = self::sanitizeUrl($url);
+        if ($base === 'about:blank') return $base;
+        if ($base === '') return $base;
+
+        $schemes = $allowedSchemes ?? ['http', 'https'];
+
+        $normalized = trim(preg_replace('/[\x00-\x1f\x7f]/', '', $base));
+        if (preg_match('/^([a-zA-Z][a-zA-Z0-9+\-.]*)\s*:/', $normalized, $m)) {
+            $scheme = strtolower($m[1]);
+            if (! in_array($scheme, $schemes, true)) {
+                return 'about:blank';
+            }
+        }
+
+        return $base;
+    }
+
+    /**
      * Return a copy of a link array with its URL sanitized.
      */
     private static function sanitizeLink(array $link): array
@@ -800,275 +829,6 @@ class ExpressionParser
         return $merged;
     }
 
-    // ------------------------------------------------------------------
-    // Config validation
-    // ------------------------------------------------------------------
-
-    /**
-     * Validate and sanitize an Alap config loaded from an untrusted source
-     * (e.g., a remote server or imported JSON file).
-     *
-     * - Verifies structural shape (allLinks is an object, links have url strings)
-     * - Sanitizes all URLs (link.url, link.image) via sanitizeUrl()
-     * - Validates and removes dangerous regex search patterns
-     * - Filters prototype-pollution keys (__proto__, constructor, prototype)
-     * - Rejects hyphens in item IDs, macro names, tag names, search pattern keys
-     *
-     * Returns a sanitized copy of the config. Does not mutate the input.
-     * Throws \InvalidArgumentException if the config is structurally invalid.
-     *
-     * @param array<string, mixed> $config
-     * @return array<string, mixed>
-     * @throws \InvalidArgumentException
-     */
-    public static function validateConfig(array $config): array
-    {
-        // Object injection defense: PHP type hint enforces array, but callers
-        // bypassing the type system (e.g., via mixed) could pass an object.
-        // This guard is intentionally redundant for defense-in-depth.
-        if (is_object($config)) {
-            throw new \InvalidArgumentException(
-                'Config must be an associative array. Use json_decode($json, true) to decode JSON.'
-            );
-        }
-
-        $blocked = ['__proto__', 'constructor', 'prototype'];
-        $allowedLinkFields = [
-            'url', 'label', 'tags', 'cssClass', 'image', 'altText',
-            'targetWindow', 'description', 'thumbnail', 'hooks',
-            'guid', 'createdAt',
-        ];
-
-        // --- allLinks (required) ---
-        if (! isset($config['allLinks']) || ! is_array($config['allLinks'])) {
-            throw new \InvalidArgumentException(
-                'Invalid config: allLinks must be a non-null associative array'
-            );
-        }
-
-        if (array_is_list($config['allLinks'])) {
-            throw new \InvalidArgumentException(
-                'Invalid config: allLinks must be an associative array, not a sequential list'
-            );
-        }
-
-        $sanitizedLinks = [];
-
-        foreach ($config['allLinks'] as $key => $link) {
-            $key = (string) $key;
-
-            if (in_array($key, $blocked, true)) {
-                continue;
-            }
-
-            if (str_contains($key, '-')) {
-                trigger_error(
-                    "validateConfig: skipping allLinks[\"{$key}\"] — hyphens are not allowed in item IDs. "
-                    . 'Use underscores instead. The "-" character is the WITHOUT operator in expressions.',
-                    E_USER_WARNING
-                );
-                continue;
-            }
-
-            if (! is_array($link) || array_is_list($link)) {
-                trigger_error(
-                    "validateConfig: skipping allLinks[\"{$key}\"] — not a valid link object",
-                    E_USER_WARNING
-                );
-                continue;
-            }
-
-            // url is required and must be a string
-            if (! isset($link['url']) || ! is_string($link['url'])) {
-                trigger_error(
-                    "validateConfig: skipping allLinks[\"{$key}\"] — missing or invalid url",
-                    E_USER_WARNING
-                );
-                continue;
-            }
-
-            // Sanitize URLs
-            $sanitizedUrl = self::sanitizeUrl($link['url']);
-            $sanitizedImage = isset($link['image']) && is_string($link['image'])
-                ? self::sanitizeUrl($link['image'])
-                : null;
-
-            // Validate tags
-            $tags = null;
-            if (array_key_exists('tags', $link)) {
-                if (is_array($link['tags']) && array_is_list($link['tags'])) {
-                    $tags = [];
-                    foreach ($link['tags'] as $tag) {
-                        if (! is_string($tag)) {
-                            continue;
-                        }
-                        if (str_contains($tag, '-')) {
-                            trigger_error(
-                                "validateConfig: allLinks[\"{$key}\"] — stripping tag \"{$tag}\" "
-                                . '(hyphens not allowed in tags). Use underscores instead.',
-                                E_USER_WARNING
-                            );
-                            continue;
-                        }
-                        $tags[] = $tag;
-                    }
-                } else {
-                    trigger_error(
-                        "validateConfig: allLinks[\"{$key}\"].tags is not an array — ignoring",
-                        E_USER_WARNING
-                    );
-                }
-            }
-
-            // Build sanitized link with whitelisted fields only
-            $sanitized = ['url' => $sanitizedUrl];
-
-            if (isset($link['label']) && is_string($link['label'])) {
-                $sanitized['label'] = $link['label'];
-            }
-            if ($tags !== null) {
-                $sanitized['tags'] = $tags;
-            }
-            if (isset($link['cssClass']) && is_string($link['cssClass'])) {
-                $sanitized['cssClass'] = $link['cssClass'];
-            }
-            if ($sanitizedImage !== null) {
-                $sanitized['image'] = $sanitizedImage;
-            }
-            if (isset($link['altText']) && is_string($link['altText'])) {
-                $sanitized['altText'] = $link['altText'];
-            }
-            if (isset($link['targetWindow']) && is_string($link['targetWindow'])) {
-                $sanitized['targetWindow'] = $link['targetWindow'];
-            }
-            if (isset($link['description']) && is_string($link['description'])) {
-                $sanitized['description'] = $link['description'];
-            }
-            if (isset($link['thumbnail']) && is_string($link['thumbnail'])) {
-                $sanitized['thumbnail'] = $link['thumbnail'];
-            }
-            if (isset($link['hooks']) && is_array($link['hooks'])) {
-                $sanitized['hooks'] = array_values(array_filter(
-                    $link['hooks'],
-                    fn($h) => is_string($h)
-                ));
-            }
-            if (isset($link['guid']) && is_string($link['guid'])) {
-                $sanitized['guid'] = $link['guid'];
-            }
-            if (array_key_exists('createdAt', $link)) {
-                $sanitized['createdAt'] = $link['createdAt'];
-            }
-
-            $sanitizedLinks[$key] = $sanitized;
-        }
-
-        // --- settings (optional) ---
-        $settings = null;
-        if (isset($config['settings']) && is_array($config['settings']) && ! array_is_list($config['settings'])) {
-            $settings = [];
-            foreach ($config['settings'] as $k => $v) {
-                if (! in_array((string) $k, $blocked, true)) {
-                    $settings[$k] = $v;
-                }
-            }
-        }
-
-        // --- macros (optional) ---
-        $macros = null;
-        if (isset($config['macros']) && is_array($config['macros']) && ! array_is_list($config['macros'])) {
-            $macros = [];
-            foreach ($config['macros'] as $k => $v) {
-                $k = (string) $k;
-                if (in_array($k, $blocked, true)) {
-                    continue;
-                }
-                if (str_contains($k, '-')) {
-                    trigger_error(
-                        "validateConfig: skipping macro \"{$k}\" — hyphens are not allowed in macro names. "
-                        . 'Use underscores instead. The "-" character is the WITHOUT operator in expressions.',
-                        E_USER_WARNING
-                    );
-                    continue;
-                }
-                if (is_array($v) && isset($v['linkItems']) && is_string($v['linkItems'])) {
-                    $macros[$k] = $v;
-                } else {
-                    trigger_error(
-                        "validateConfig: skipping macro \"{$k}\" — invalid shape",
-                        E_USER_WARNING
-                    );
-                }
-            }
-        }
-
-        // --- searchPatterns (optional) ---
-        $searchPatterns = null;
-        if (isset($config['searchPatterns']) && is_array($config['searchPatterns']) && ! array_is_list($config['searchPatterns'])) {
-            $searchPatterns = [];
-            foreach ($config['searchPatterns'] as $k => $v) {
-                $k = (string) $k;
-                if (in_array($k, $blocked, true)) {
-                    continue;
-                }
-                if (str_contains($k, '-')) {
-                    trigger_error(
-                        "validateConfig: skipping searchPattern \"{$k}\" — hyphens are not allowed in pattern keys. "
-                        . 'Use underscores instead. The "-" character is the WITHOUT operator in expressions.',
-                        E_USER_WARNING
-                    );
-                    continue;
-                }
-
-                // String shorthand
-                if (is_string($v)) {
-                    $validation = self::validateRegex($v);
-                    if ($validation['safe']) {
-                        $searchPatterns[$k] = $v;
-                    } else {
-                        trigger_error(
-                            "validateConfig: removing searchPattern \"{$k}\" — {$validation['reason']}",
-                            E_USER_WARNING
-                        );
-                    }
-                    continue;
-                }
-
-                // Object form
-                if (is_array($v) && isset($v['pattern']) && is_string($v['pattern'])) {
-                    $validation = self::validateRegex($v['pattern']);
-                    if ($validation['safe']) {
-                        $searchPatterns[$k] = $v;
-                    } else {
-                        trigger_error(
-                            "validateConfig: removing searchPattern \"{$k}\" — {$validation['reason']}",
-                            E_USER_WARNING
-                        );
-                    }
-                    continue;
-                }
-
-                trigger_error(
-                    "validateConfig: skipping searchPattern \"{$k}\" — invalid shape",
-                    E_USER_WARNING
-                );
-            }
-        }
-
-        // --- Build result ---
-        $result = ['allLinks' => $sanitizedLinks];
-        if ($settings !== null && ! empty($settings)) {
-            $result['settings'] = $settings;
-        }
-        if ($macros !== null && ! empty($macros)) {
-            $result['macros'] = $macros;
-        }
-        if ($searchPatterns !== null && ! empty($searchPatterns)) {
-            $result['searchPatterns'] = $searchPatterns;
-        }
-
-        return $result;
-    }
 
     /**
      * Validate a regex pattern for syntax errors and ReDoS risk.

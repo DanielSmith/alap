@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — Advanced Protocol Demos</title>
+  <link rel="stylesheet" href="./shared/styles.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+
+  <h1>Advanced Protocol Demos</h1>
+  <p class="page-intro">
+    Every adapter, exercising the same matrix of capabilities:
+    progressive async loading, mixed static + dynamic sources,
+    menu + lens + lightbox renderers, placement, and image-hover menus.
+    Each page is keyed to its adapter's ecosystem so you can see the
+    same feature set with flavor native to each framework.
+  </p>
+
+  <h2>Adapter pages</h2>
+  <ul>
+    <li><a href="./dom/">DOM</a> &mdash; vanilla <code>.alap</code> anchors, no framework</li>
+    <li><a href="./web-component/">Web Component</a> &mdash; <code>&lt;alap-link&gt;</code>, shadow-DOM isolated</li>
+    <li><a href="./react/">React</a> &mdash; <code>&lt;AlapLink&gt;</code> + provider + context</li>
+    <li><a href="./vue/">Vue</a> &mdash; Composition API, <code>provide</code>/<code>inject</code></li>
+    <li><a href="./svelte/">Svelte</a> &mdash; Svelte 5 runes (<code>$state</code> / <code>$effect</code>)</li>
+    <li><a href="./solid/">Solid</a> &mdash; signals, <code>createEffect</code></li>
+    <li><a href="./qwik/">Qwik</a> &mdash; <code>useSignal</code> + <code>useVisibleTask$</code></li>
+    <li><a href="./alpine/">Alpine</a> &mdash; <code>x-alap</code> directive</li>
+    <li><a href="./astro/">Astro</a> &mdash; delegates to the web component</li>
+  </ul>
+
+  <h2>Scenarios covered per adapter</h2>
+  <ol>
+    <li><strong>Progressive menu</strong> — <code>:slow:</code> mock + real HN search side by side</li>
+    <li><strong>Mixed static + async</strong> — static tag <code>|</code> slow-protocol composition</li>
+    <li><strong>Error + empty placeholders</strong> — <code>:flaky:error:</code> / <code>:flaky:empty:</code></li>
+    <li><strong>Menu with thumbnails</strong> — <code>meta.thumbnail</code> image-hover rows</li>
+    <li><strong>Lens</strong> — metadata-rich panel with progressive loading</li>
+    <li><strong>Lightbox</strong> — fullscreen media with progressive loading</li>
+    <li><strong>Placement compass rose</strong> — all 9 directions, collapsible</li>
+    <li><strong>In-flight dedup</strong> — two triggers, same token, one fetch</li>
+  </ol>
+
+  <h2>Shared pieces</h2>
+  <ul>
+    <li><code>shared/mockProtocols.ts</code> — <code>:slow:</code> and <code>:flaky:</code>, deterministic for demos</li>
+    <li><code>shared/ecosystems.ts</code> — per-adapter static links + Algolia HN alias</li>
+    <li><code>shared/buildConfig.ts</code> — config factory wiring real + mock protocols</li>
+    <li><code>shared/styles.css</code> — layout, compass, placeholder + provenance colors</li>
+  </ul>
+</body>
+</html>

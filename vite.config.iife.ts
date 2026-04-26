@@ -18,6 +18,13 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
+  define: {
+    // IIFE bundle is browser-only. Dead-codes the Node rebind guard in
+    // src/protocols/guarded-fetch.ts so undici + node:dns aren't in the
+    // output, and makes the same file throw loudly if someone loads the
+    // IIFE in Node.
+    __ALAP_IIFE__: 'true',
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/iife.ts'),

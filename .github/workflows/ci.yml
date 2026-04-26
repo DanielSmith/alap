@@ -20,13 +20,13 @@ jobs:
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm turbo run build
+      - run: pnpm turbo run build --continue
 
-      - run: pnpm turbo run test
+      - run: pnpm turbo run test --continue
 
-      - run: pnpm turbo run typecheck
+      - run: pnpm turbo run typecheck --continue

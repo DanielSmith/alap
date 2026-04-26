@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { installMenuDismiss, type MenuDismissHandle } from '../shared/baseMenuDismiss';
 
 /**
- * Manages menu dismiss behavior:
- * - Auto-dismiss timer on mouse leave
- * - Click outside to close (dom/webcomponent modes)
- * - Escape to close (dom/webcomponent modes)
- *
- * Popover mode skips click-outside and Escape — the browser handles those.
+ * React adapter around `installMenuDismiss`. The document-level listeners
+ * are attached while `isOpen` is true and torn down on close / unmount.
+ * Timer controls return for the caller to drive from mouse-enter / leave.
  */
 export function useMenuDismiss(
   isOpen: boolean,
@@ -32,48 +30,26 @@ export function useMenuDismiss(
   triggerRef: React.RefObject<HTMLElement | null>,
   menuRef: React.RefObject<HTMLElement | null>,
 ) {
-  const timerRef = useRef<number>(0);
+  const handleRef = useRef<MenuDismissHandle | null>(null);
 
-  const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = 0;
-    }
-  }, []);
-
-  const startTimer = useCallback(() => {
-    stopTimer();
-    timerRef.current = window.setTimeout(closeMenu, menuTimeout);
-  }, [stopTimer, closeMenu, menuTimeout]);
-
-  // Click outside + Escape (not needed for popover — browser handles it)
   useEffect(() => {
-    if (!isOpen || mode === 'popover') return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        menuRef.current && !menuRef.current.contains(target) &&
-        triggerRef.current && !triggerRef.current.contains(target)
-      ) {
-        closeMenu();
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeMenu();
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    if (!isOpen) return;
+    const handle = installMenuDismiss({
+      close: closeMenu,
+      getTrigger: () => triggerRef.current,
+      getMenu: () => menuRef.current,
+      mode,
+      timeoutMs: menuTimeout,
+    });
+    handleRef.current = handle;
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      handle.dispose();
+      handleRef.current = null;
     };
-  }, [isOpen, mode, closeMenu, triggerRef, menuRef]);
+  }, [isOpen, closeMenu, menuTimeout, mode, triggerRef, menuRef]);
 
-  // Cleanup timer on unmount
-  useEffect(() => stopTimer, [stopTimer]);
+  const startTimer = useCallback(() => handleRef.current?.startTimer(), []);
+  const stopTimer = useCallback(() => handleRef.current?.stopTimer(), []);
 
   return { startTimer, stopTimer };
 }

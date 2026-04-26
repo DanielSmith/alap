@@ -257,6 +257,38 @@ describe('createEmbed — plain link mode', () => {
     });
     expect(el.tagName).toBe('A');
   });
+
+  // Regression: Surface 1-1 from the 2026-04-22 security pass. Before the fix,
+  // createLink assigned the raw url to href — a :web: / :json: feed setting
+  // meta.embed = "javascript:..." would render a clickable XSS in the lens /
+  // lightbox fallback path. All three callers of createLink must be covered.
+
+  it('neutralizes javascript: URL on the unknown-provider fallback path', () => {
+    const el = createEmbed('javascript:alert(1)') as HTMLAnchorElement;
+    expect(el.className).toBe('alap-embed-link');
+    expect(el.href).toBe('about:blank');
+    // textContent preserves the original so the operator can see what was flagged.
+    expect(el.textContent).toBe('javascript:alert(1)');
+  });
+
+  it('neutralizes data: URL on the transform-returns-null fallback path', () => {
+    // youtube.com/channel/... matches the provider but transformUrl returns null,
+    // so we reach the second createLink call site in createEmbed.
+    const el = createEmbed('data:text/html,<script>alert(1)</script>') as HTMLAnchorElement;
+    expect(el.href).toBe('about:blank');
+  });
+
+  it('neutralizes vbscript: URL on the block-policy fallback path', () => {
+    const el = createEmbed('vbscript:msgbox(1)', undefined, {
+      embedPolicy: 'block',
+    }) as HTMLAnchorElement;
+    expect(el.href).toBe('about:blank');
+  });
+
+  it('passes http/https URLs through unchanged', () => {
+    const el = createEmbed('https://example.com/page') as HTMLAnchorElement;
+    expect(el.href).toBe('https://example.com/page');
+  });
 });
 
 // ── Default policy ─────────────────────────────────────────────────

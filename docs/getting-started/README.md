@@ -8,7 +8,7 @@ New to Alap? Pick the path that matches what you're building.
 |--------------|-------|
 | Get something working with minimal setup | [Bare Minimum](bare-minimum.md) |
 | Use Alap with Vue, Svelte, React, etc. | [With a Framework](with-framework.md) |
-| Use lightbox, lens, embed, live feeds | [Full Experience](full-experience.md) |
+| Use lightbox, lens, embed, live feeds | [All Together](all-together.md) |
 
 ## By topic
 

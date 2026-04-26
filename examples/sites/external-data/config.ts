@@ -15,7 +15,6 @@
  */
 
 import type { AlapConfig } from 'alap/core';
-import { webHandler } from 'alap';
 
 const now = Date.now();
 const DAY = 86400000;
@@ -32,22 +31,7 @@ export const demoConfig: AlapConfig = {
   },
 
   protocols: {
-    time: {
-      // Using the built-in time handler — included for composition demos
-      filter: (segments, link) => {
-        const ts = link.createdAt
-          ? (typeof link.createdAt === 'number' ? link.createdAt : new Date(link.createdAt).getTime())
-          : 0;
-        if (!ts) return false;
-        const match = segments[0].match(/^(\d+)([dhw])$/);
-        if (!match) return false;
-        const n = parseInt(match[1], 10);
-        const mult = match[2] === 'h' ? 3600000 : match[2] === 'w' ? 7 * DAY : DAY;
-        return (now - ts) <= n * mult;
-      },
-    },
     web: {
-      generate: webHandler,
       cache: 10, // cache all web results for 10 minutes
       keys: {
         books: {

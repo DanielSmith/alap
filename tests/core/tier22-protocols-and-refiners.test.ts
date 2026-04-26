@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 
 /**
  * Tier 22: Protocols and refiners together — full integration testing of
@@ -24,7 +24,7 @@ import { protocolConfig } from '../fixtures/links-protocols';
  */
 
 describe('Tier 22: Protocols and Refiners', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('protocol results refined', () => {
     it('.coffee + :time:7d: *sort:label* — recent coffee, sorted', () => {
@@ -61,8 +61,8 @@ describe('Tier 22: Protocols and Refiners', () => {
       expect(labels).toEqual(expected);
     });
 
-    it(':loc: *sort:label* — items with location, sorted', () => {
-      const results = engine.resolve(':loc: *sort:label*');
+    it(':location: *sort:label* — items with location, sorted', () => {
+      const results = engine.resolve(':location: *sort:label*');
       const labels = results.map(r => r.label);
       expect(labels).toEqual(['Brooklyn Bridge', 'Golden Gate', 'Manhattan Bridge']);
     });
@@ -96,8 +96,8 @@ describe('Tier 22: Protocols and Refiners', () => {
       }
     });
 
-    it('(.bridge + :loc: *sort:label* *limit:2*) — protocol in group with refiners', () => {
-      const results = engine.resolve('(.bridge + :loc: *sort:label* *limit:2*)');
+    it('(.bridge + :location: *sort:label* *limit:2*) — protocol in group with refiners', () => {
+      const results = engine.resolve('(.bridge + :location: *sort:label* *limit:2*)');
       // Bridges with location: brooklyn, manhattan, goldengate
       // Sorted: Brooklyn Bridge, Golden Gate, Manhattan Bridge → limited to 2
       expect(results).toHaveLength(2);
@@ -178,8 +178,8 @@ describe('Tier 22: Protocols and Refiners', () => {
       expect(labels).toEqual(sorted);
     });
 
-    it('(:loc: *sort:label*), (@sorted_coffee *limit:1*) — groups with different refiners', () => {
-      const results = engine.resolve('(:loc: *sort:label*), (@sorted_coffee *limit:1*)');
+    it('(:location: *sort:label*), (@sorted_coffee *limit:1*) — groups with different refiners', () => {
+      const results = engine.resolve('(:location: *sort:label*), (@sorted_coffee *limit:1*)');
       // loc sorted: Brooklyn Bridge, Golden Gate, Manhattan Bridge
       // sorted_coffee limited 1: Acre Coffee
       const labels = results.map(r => r.label);

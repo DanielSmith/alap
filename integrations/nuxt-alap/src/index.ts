@@ -84,7 +84,11 @@ export function createAlapPlugin(options: AlapPluginOptions) {
 
     // Dynamic import to avoid HTMLElement at module scope during SSR
     import('alap').then(({ registerConfig, defineAlapLink }) => {
-      registerConfig(config, configName);
+      if (configName !== undefined) {
+        registerConfig(config, configName);
+      } else {
+        registerConfig(config);
+      }
       if (webComponent) {
         defineAlapLink();
       }

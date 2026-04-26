@@ -20,10 +20,12 @@ import { getEngine, getConfig } from '../ui/shared/configRegistry';
 import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
 import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
 import { openImageZoom } from '../ui/shared/imageZoom';
-import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { applyOverlayLayout, clearOverlayLayout, computeOverlayLayout, viewportSize } from '../ui/shared/overlayPlacement';
+import { parsePlacement, type ParsedPlacement } from '../ui/shared/placement';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
 import { STYLES } from './lightbox-element.css';
+import { sanitizeUrlByTier, sanitizeTargetWindowByTier } from '../core/sanitizeByTier';
 
 // --- Constants ---
 
@@ -94,16 +96,43 @@ export class AlapLightboxElement extends HTMLElement {
     this.removeEventListener('keydown', this.onTriggerKeydown);
   }
 
-  attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void {
-    if (oldValue !== newValue && this.isOpen) {
-      this.close();
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+    if (oldValue === newValue) return;
+    // Placement changes re-style the open overlay in place; closing would be
+    // surprising for a purely cosmetic attribute.
+    if (name === 'placement' && this.isOpen) {
+      this.applyPlacementStyles();
+      return;
     }
+    if (this.isOpen) this.close();
   }
 
   // --- Attribute helpers ---
 
-  private get placement(): string | null {
-    return this.getAttribute('placement');
+  /**
+   * Resolve the effective placement for the overlay, in priority order:
+   *   1. `placement` attribute on the host (full `ParsedPlacement`).
+   *   2. `config.settings.placement` (full `ParsedPlacement`).
+   *   3. null — overlay uses CSS default (centered).
+   */
+  private resolvePlacement(): ParsedPlacement | null {
+    const attr = this.getAttribute('placement');
+    if (attr) return parsePlacement(attr);
+    const configName = this.getAttribute('config') ?? DEFAULT_CONFIG_KEY;
+    const config = getConfig(configName);
+    const configVal = config?.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return null;
+  }
+
+  private applyPlacementStyles(): void {
+    if (!this.overlay) return;
+    const effective = this.resolvePlacement();
+    if (effective) {
+      applyOverlayLayout(this.overlay, computeOverlayLayout(effective, viewportSize()));
+    } else {
+      clearOverlayLayout(this.overlay);
+    }
   }
 
   // --- Trigger ---
@@ -158,11 +187,7 @@ export class AlapLightboxElement extends HTMLElement {
     this.overlay.setAttribute('aria-modal', 'true');
     this.overlay.setAttribute('aria-label', 'Link preview');
 
-    const p = this.placement;
-    if (p && p in OVERLAY_ALIGN) {
-      this.overlay.style.alignItems = OVERLAY_ALIGN[p as keyof typeof OVERLAY_ALIGN];
-      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[p as keyof typeof OVERLAY_JUSTIFY];
-    }
+    this.applyPlacementStyles();
 
     this.render();
     fadeIn(this.overlay, this.shadowRoot!, 'visible');
@@ -360,7 +385,7 @@ export class AlapLightboxElement extends HTMLElement {
     if (photoCredit && hasImage) {
       if (photoCreditUrl) {
         const creditLink = document.createElement('a');
-        creditLink.href = photoCreditUrl;
+        creditLink.href = sanitizeUrlByTier(photoCreditUrl, link);
         creditLink.target = '_blank';
         creditLink.rel = 'noopener noreferrer';
         creditLink.textContent = `Photo: ${photoCredit}`;
@@ -382,8 +407,8 @@ export class AlapLightboxElement extends HTMLElement {
     }
 
     // Visit
-    visitBtn.href = link.url;
-    visitBtn.target = link.targetWindow ?? '_blank';
+    visitBtn.href = sanitizeUrlByTier(link.url, link);
+    visitBtn.target = sanitizeTargetWindowByTier(link.targetWindow, link) ?? '_blank';
     visitBtn.textContent = DEFAULT_VISIT_LABEL;
 
     // Counter + set navigator

@@ -101,6 +101,53 @@ pub struct Link {
     /// Arbitrary metadata for protocol handlers and refiners.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<HashMap<String, serde_json::Value>>,
+
+    /// Provenance tier — where this link came from in the trust model.
+    /// Excluded from JSON so untrusted input cannot pre-stamp a link as
+    /// author-tier; stamps are set in-memory after the ValidateConfig
+    /// whitelist pass. See the `link_provenance` module for the helper API.
+    #[serde(skip)]
+    pub provenance: Option<Tier>,
+}
+
+/// Provenance tier — where a link came from in the trust model.
+///
+/// Downstream sanitizers read this to apply strictness matched to the
+/// source's trustworthiness.
+///
+/// Loosest to strictest:
+///   - [`Tier::Author`]        — link came from the developer's hand-written config
+///   - [`Tier::StorageLocal`]  — loaded from a local storage adapter
+///   - [`Tier::StorageRemote`] — loaded from a remote config server
+///   - [`Tier::Protocol`]      — returned by a protocol handler; carries
+///                               the handler name
+///                               (e.g. `Tier::Protocol("web".into())`)
+///
+/// TypeScript stores the stamp in a `WeakMap` keyed on runtime object
+/// identity so an attacker-writable `.provenance` field on an incoming
+/// link cannot pre-stamp itself for free. The Rust port uses a struct
+/// field tagged `#[serde(skip)]` so it is excluded from JSON
+/// round-trips; stamps are set in-memory after ValidateConfig's
+/// whitelist pass, never from input.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Tier {
+    Author,
+    StorageLocal,
+    StorageRemote,
+    Protocol(String),
+}
+
+impl Tier {
+    /// Structural validity check. Rejects `Tier::Protocol(String::new())`
+    /// which represents a bare `protocol:` prefix — not a valid handler
+    /// name. All other variants are always valid at the type level.
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        match self {
+            Tier::Protocol(name) => !name.is_empty(),
+            _ => true,
+        }
+    }
 }
 
 /// A [`Link`] with its ID attached.

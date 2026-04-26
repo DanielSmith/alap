@@ -181,18 +181,6 @@ func TestUnknownMacro(t *testing.T) {
 	}
 }
 
-func TestBareMacroWithAnchor(t *testing.T) {
-	cfg := *testConfig
-	macros := make(map[string]Macro)
-	for k, v := range testConfig.Macros {
-		macros[k] = v
-	}
-	macros["myanchor"] = Macro{LinkItems: "vwbug"}
-	cfg.Macros = macros
-	p := NewParser(context.Background(), &cfg)
-	assertEq(t, p.Query("@", "myanchor"), []string{"vwbug"})
-}
-
 // --- Tier 7: Parentheses ---
 
 func TestBasicGrouping(t *testing.T) {

@@ -16,6 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { buildMenuList } from '../../../src/ui/shared/buildMenuList';
+import { stampProvenance } from '../../../src/core/linkProvenance';
 import type { AlapLink } from '../../../src/core/types';
 
 type LinkWithId = { id: string } & AlapLink;
@@ -57,11 +58,13 @@ describe('buildMenuList', () => {
     expect(img!.alt).toBe('A photo');
   });
 
-  it('applies cssClass to <li> elements', () => {
-    const links: LinkWithId[] = [
-      { id: 'styled', label: 'Styled', url: 'https://example.com', cssClass: 'highlight-blue' },
-    ];
-    const list = buildMenuList(links);
+  it('applies cssClass to <li> elements for author-tier links', () => {
+    // 3.2+ contract: only author-tier links keep their cssClass on render
+    // (see build-menu-list-tier.test.ts for the non-author cases). Stamp
+    // the fixture to match how a real config arrives through validateConfig.
+    const link: LinkWithId = { id: 'styled', label: 'Styled', url: 'https://example.com', cssClass: 'highlight-blue' };
+    stampProvenance(link, 'author');
+    const list = buildMenuList([link]);
     const li = list.querySelector('li');
     expect(li!.className).toBe('alapListElem highlight-blue');
   });

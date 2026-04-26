@@ -30,7 +30,6 @@ const mockConfig = (sources: Record<string, JsonSourceConfig>, overrides?: Recor
   settings: { listType: 'ul' },
   protocols: {
     json: {
-      generate: jsonHandler,
       sources,
       ...overrides,
     },
@@ -439,7 +438,7 @@ describe('Tier 26: :json: Protocol Handler', () => {
 
       const config = mockConfig({
         vault: {
-          url: 'https://localhost:27124/search',
+          url: 'https://api.example.com/search',
           allowedSchemes: ['http', 'https', 'obsidian'],
           fieldMap: { label: 'title', url: 'path' },
         },
@@ -621,7 +620,7 @@ describe('Tier 26: :json: Protocol Handler', () => {
 
     it('returns empty when no sources configured', async () => {
       const config: AlapConfig = {
-        protocols: { json: { generate: jsonHandler } },
+        protocols: { json: {} },
         allLinks: {},
       };
       const links = await jsonHandler(['anything'], config);

@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 
 /**
  * Tier 20: Inline refiners — refiners applied inside parenthesized groups,
@@ -24,7 +24,7 @@ import { protocolConfig } from '../fixtures/links-protocols';
  */
 
 describe('Tier 20: Inline Refiners', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('refiners inside parenthesized groups', () => {
     it('(.nyc *sort:label*) — single group sorted', () => {

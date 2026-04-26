@@ -28,7 +28,7 @@ cleanup() {
 trap 'cleanup; exit' INT TERM
 trap 'cleanup' EXIT
 
-ALL_SERVERS="express-sqlite hono-sqlite bun-sqlite flask-sqlite django-sqlite laravel-sqlite gin-sqlite axum-sqlite fastapi-postgres"
+ALL_SERVERS="express-sqlite hono-sqlite bun-sqlite flask-sqlite django-sqlite laravel-sqlite gin-sqlite axum-sqlite sinatra-sqlite java-spring fastapi-postgres"
 
 show_help() {
   echo ""
@@ -210,7 +210,7 @@ IMAGE="alap-${SERVER}"
 # --- Determine build strategy ---
 
 COMPOSE_SERVERS="fastapi-postgres"
-NEEDS_REPO_ROOT="express-sqlite hono-sqlite bun-sqlite gin-sqlite axum-sqlite"
+NEEDS_REPO_ROOT="express-sqlite hono-sqlite bun-sqlite gin-sqlite axum-sqlite sinatra-sqlite java-spring"
 IS_COMPOSE=false
 
 if echo "$COMPOSE_SERVERS" | grep -qw "$SERVER"; then

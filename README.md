@@ -1,6 +1,6 @@
 # Alap
 
-## Version 3.1, Daniel Smith - April 2026
+## Version 3.2, Daniel Smith - April 2026
 
 **Turn any link into a curated menu of destinations.**
 
@@ -23,7 +23,7 @@ When the reader clicks "landmarks," they get a menu. Your sentence stays clean. 
 
 | You are... | Start here |
 |------------|-----------|
-| A **developer** building with Alap | [For Developers](docs/start-dev.md) — install, framework setup, configuration, storage |
+| A **developer** building with Alap | [Getting Started](docs/getting-started/) — install, framework setup, configuration, storage |
 | A **writer, editor, or designer** using Alap | [For Creators](docs/start-creators.md) — concepts, expression language, editors, cookbooks |
 
 ## The Expression Language
@@ -43,8 +43,8 @@ golden, brooklyn            specific items by ID
 Protocols gather data dynamically. Refiners filter and order the results:
 
 ```
-:time:30d:                  items added in the last 30 days
-:loc:40.7,-74.0:5mi:        items within 5 miles of a point
+:time:30d:                       items added in the last 30 days
+:location:radius:40.7,-74.0:5mi: items within 5 miles of a point
 :atproto:feed:with-alap:    live posts from a Bluesky feed
 .coffee + :time:7d:         combine with tags and operators
 *sort:label* *limit:5*      sort, limit, shuffle, paginate
@@ -136,6 +136,19 @@ Turborepo caches build outputs — a second run with no changes completes in und
 | **[Full Documentation](docs/)** | Adapters, search, storage, testing, security |
 | **[FAQ](docs/FAQ.md)** | Common questions and answers |
 | **[alap.info](https://alap.info)** | Project website |
+
+## Security
+
+> **A note on scope.** I'm not a security expert. Alap hasn't been
+> through a third-party audit — it's an open source project from a
+> single maintainer. Please do your own due diligence before
+> deploying, especially when configuring protocols that fetch
+> external data or talk to local services. I'm not responsible for
+> how you deploy this.
+
+For the full picture: [SECURITY.md](SECURITY.md), the
+[threat model](docs/security/threat-model.md), and the
+[security reference](docs/api-reference/security.md).
 
 ## License
 

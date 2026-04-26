@@ -8,7 +8,7 @@ The distinction is row-level vs set-level. Tags and protocols ask "does this ind
 
 That's a different phase of the query, and it gets its own sigil: `*`.
 
-> Live version with interactive examples: https://alap.info/core-concepts/refiners
+> Live version with interactive examples: https://docs.alap.info/core-concepts/refiners
 
 ## The syntax
 
@@ -128,7 +128,7 @@ After protocols and refiners, the expression language has a clean three-phase mo
 A complete expression can use all three:
 
 ```
-.coffee + :loc:nyc:5mi: + :time:7d: *sort:label* *limit:5*
+.coffee + :location:radius:40.7,-74.0:5mi: + :time:7d: *sort:label* *limit:5*
 ```
 
 "Coffee shops within 5 miles of NYC, added this week, sorted alphabetically, top 5."

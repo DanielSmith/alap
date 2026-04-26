@@ -26,7 +26,7 @@ import type { AlapConfig } from '../../src/core/types';
 
 const mockConfig = (keys: AlapConfig['protocols']): AlapConfig => ({
   settings: { listType: 'ul' },
-  protocols: { web: { generate: webHandler, ...keys } },
+  protocols: { web: { ...keys } },
   allLinks: {},
 });
 
@@ -350,7 +350,6 @@ describe('Tier 24: :web: Protocol Handler', () => {
         settings: { listType: 'ul' },
         protocols: {
           web: {
-            generate: webHandler,
             allowedOrigins: ['https://api.example.com'],
             keys: { test: { url: 'https://api.example.com/data' } },
           },
@@ -368,7 +367,6 @@ describe('Tier 24: :web: Protocol Handler', () => {
         settings: { listType: 'ul' },
         protocols: {
           web: {
-            generate: webHandler,
             allowedOrigins: ['https://api.example.com'],
             keys: { test: { url: 'https://evil.com/data' } },
           },
@@ -401,7 +399,6 @@ describe('Tier 24: :web: Protocol Handler', () => {
         settings: { listType: 'ul' },
         protocols: {
           web: {
-            generate: webHandler,
             allowedOrigins: [],
             keys: { test: { url: 'https://any-domain.com/data' } },
           },

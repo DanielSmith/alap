@@ -1,0 +1,328 @@
+/*
+ * Copyright 2026 Daniel Smith — Apache 2.0
+ *
+ * Blue-theme styling for the Obsidian REST example. Matches the
+ * unified palette used across the rest of the example sites
+ * (`examples/sites/styles.css`).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+:root {
+  --page-max: 42rem;
+  --page-margin-y: 3rem;
+  --page-padding-x: 1.5rem;
+
+  --bg: #1a2f8a;
+  --fg: #f0f2ff;
+  --muted: #7888b8;
+  --muted-strong: #b8c4e8;
+  --accent: #88bbff;
+  --accent-warm: #ffd666;
+  --accent-warm-soft: #ffe8a0;
+
+  --card-bg: #1a2870;
+  --card-bg-strong: #141e6a;
+  --card-border: #2e48a0;
+  --card-border-strong: #4470cc;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  --radius: 6px;
+  --gap-sm: 0.6rem;
+  --pad-card: 0.75rem 1rem;
+  --pad-item: 0.45rem 1rem;
+
+  --font-base: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+  --font-size-base: 16px;
+  --font-size-item: 0.9rem;
+  --font-size-code: 0.85em;
+  --font-size-h1: 1.5rem;
+  --font-size-h2: 1.1rem;
+
+  --line-height-base: 1.7;
+
+  --menu-max-height: 50vh;
+  --fade-duration: 120ms;
+  --fade-initial: 0.6;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+body {
+  opacity: var(--fade-initial);
+  transition: opacity var(--fade-duration) ease;
+}
+body.loaded { opacity: 1; }
+
+.page {
+  max-width: var(--page-max);
+  margin: var(--page-margin-y) auto;
+  padding: 0 var(--page-padding-x);
+}
+
+.mode-banner {
+  margin: 0 0 1.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius);
+  background: var(--card-bg-strong);
+  border: 1px solid var(--card-border);
+  color: var(--muted-strong);
+  font-size: 0.92rem;
+}
+
+.mode-banner a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.mode-banner a:hover {
+  color: var(--accent-warm);
+  text-decoration: underline;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: var(--font-size-h1);
+  color: var(--accent-warm);
+}
+
+h2 {
+  margin: 2rem 0 0.75rem;
+  font-size: var(--font-size-h2);
+  color: var(--accent-warm-soft);
+}
+
+a:not(.alap):not([role="button"]) {
+  color: var(--accent);
+}
+
+a:not(.alap):not([role="button"]):hover {
+  color: var(--accent-warm);
+}
+
+.framing {
+  color: var(--muted-strong);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code);
+  background: var(--card-bg);
+  color: var(--accent);
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+.trigger-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.trigger-list li {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+}
+
+.trigger-list a.alap {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.trigger-list a.alap:hover {
+  color: var(--accent-warm);
+}
+
+.caption {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.search {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search input {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  background: var(--card-bg);
+  color: var(--fg);
+  border: 1px solid var(--card-border-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.search input:focus {
+  outline: 2px solid var(--accent-warm);
+  outline-offset: 1px;
+  border-color: var(--accent-warm);
+}
+
+.search button {
+  padding: 0.55rem 1rem;
+  background: #2240a8;
+  color: var(--fg);
+  border: 1px solid var(--card-border-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-base);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.search button:hover {
+  background: #3366d6;
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+}
+
+.chips {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted-strong);
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  margin: 0 0.15rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border-strong);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+}
+
+.search-launchers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.75rem 0 0;
+}
+
+.search-trigger {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.search-trigger:hover { color: var(--accent-warm); }
+
+.notes {
+  color: var(--muted-strong);
+  font-size: var(--font-size-item);
+}
+
+/* Alap's auto-generated menu container */
+#alapelem,
+.alapelem {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  background: #2240a8;
+  border: 1px solid var(--card-border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.25rem 0;
+  max-height: var(--menu-max-height);
+  overflow-y: auto;
+}
+
+#alapelem ul,
+#alapelem ol,
+.alapelem ul,
+.alapelem ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#alapelem li.alapListElem a,
+.alapelem li.alapListElem a {
+  display: block;
+  padding: var(--pad-item);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: var(--font-size-item);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+#alapelem li.alapListElem a:hover,
+#alapelem li.alapListElem a:focus,
+.alapelem li.alapListElem a:hover,
+.alapelem li.alapListElem a:focus {
+  background: #3366d6;
+  color: var(--accent-warm);
+  outline: none;
+}
+
+/* Core-vs-REST comparison table */
+.mode-compare {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.25rem;
+  font-size: var(--font-size-item);
+}
+
+.mode-compare thead th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--accent-warm);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.mode-compare tbody th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted-strong);
+  padding: 0.5rem 0.75rem;
+  width: 9rem;
+  vertical-align: top;
+}
+
+.mode-compare td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  color: var(--fg);
+  border-top: 1px solid var(--card-border);
+}
+
+.mode-compare tbody tr:first-child td {
+  border-top-color: var(--card-border-strong);
+}

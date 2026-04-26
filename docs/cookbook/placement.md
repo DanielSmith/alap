@@ -4,7 +4,7 @@
 
 How the menu gets positioned, how to control it, and where Alap's job ends and CSS takes over.
 
-> Live version: https://alap.info/cookbook/placement
+> Live version: https://docs.alap.info/cookbook/placement
 
 ## The placement engine
 

@@ -16,6 +16,8 @@
 
 import { openDB, type IDBPDatabase } from 'idb';
 import type { AlapConfig } from '../core/types';
+import { validateConfig } from '../core/validateConfig';
+import { deepCloneData } from '../core/deepCloneData';
 import type { ConfigStore, ConfigEntry, ConfigMeta } from './ConfigStore';
 
 const DB_NAME = 'alap-editor';
@@ -72,12 +74,14 @@ export async function createIndexedDBStore(
 
     async load(name: string): Promise<AlapConfig | null> {
       const entry = await db.get(STORE_NAME, name) as ConfigEntry | undefined;
-      return entry?.config ?? null;
+      if (!entry) return null;
+      return validateConfig(deepCloneData(entry.config), { provenance: 'storage:local' });
     },
 
     async loadEntry(name: string): Promise<ConfigEntry | null> {
       const entry = await db.get(STORE_NAME, name) as ConfigEntry | undefined;
-      return entry ?? null;
+      if (!entry) return null;
+      return { ...entry, config: validateConfig(deepCloneData(entry.config), { provenance: 'storage:local' }) };
     },
 
     async list(): Promise<string[]> {

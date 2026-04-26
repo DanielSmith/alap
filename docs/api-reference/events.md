@@ -4,7 +4,7 @@
 
 Event model, keyboard navigation, and hook filtering across all adapters.
 
-> Live version: https://alap.info/api-reference/events
+> Live version: https://docs.alap.info/api-reference/events
 
 ## Delivery by adapter
 

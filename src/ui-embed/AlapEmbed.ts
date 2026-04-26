@@ -16,6 +16,7 @@ import {
   EMBED_REFERRER_POLICY,
   EMBED_DEFAULT_MAX_WIDTH,
 } from '../constants';
+import { sanitizeUrl } from '../core/sanitizeUrl';
 import { matchProvider, transformUrl, isAllowlisted, getEmbedHeight } from './embedAllowlist';
 import type { EmbedType } from './embedAllowlist';
 import { shouldLoadEmbed, grantConsent } from './embedConsent';
@@ -184,7 +185,7 @@ function replacePlaceholder(
 function createLink(url: string): HTMLElement {
   const link = document.createElement('a');
   link.className = 'alap-embed-link';
-  link.href = url;
+  link.href = sanitizeUrl(url);
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.textContent = url;

@@ -17,6 +17,8 @@
 import type { AlapConfig, AlapLink, GenerateHandler } from '../core/types';
 import { MAX_GENERATED_LINKS, MAX_WEB_RESPONSE_BYTES, WEB_FETCH_TIMEOUT_MS } from '../constants';
 import { warn } from '../core/logger';
+import { guardedFetch } from './guarded-fetch';
+import { readCappedJson } from './shared';
 
 // ═══════════════════════════════════════════════════════════════
 // Constants
@@ -232,7 +234,7 @@ const fetchApi = async (
   }
 
   try {
-    const response = await fetch(url.toString(), {
+    const response = await guardedFetch(url.toString(), {
       signal: controller.signal,
       credentials: 'omit',
       headers,
@@ -250,13 +252,12 @@ const fetchApi = async (
       return null;
     }
 
-    const contentLength = response.headers?.get?.('content-length');
-    if (contentLength && parseInt(contentLength, 10) > MAX_WEB_RESPONSE_BYTES) {
-      warn(`:atproto: response too large: ${contentLength} bytes`);
+    const parsed = await readCappedJson(response);
+    if (parsed === null) {
+      warn(`:atproto: response exceeded ${MAX_WEB_RESPONSE_BYTES} bytes`);
       return null;
     }
-
-    return await response.json();
+    return parsed;
   } catch (err) {
     clearTimeout(timeoutId);
     const msg = err instanceof Error ? err.message : String(err);

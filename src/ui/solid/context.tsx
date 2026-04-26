@@ -16,7 +16,7 @@
 
 import { createContext, createEffect, on, useContext, type JSX } from 'solid-js';
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig } from '../../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
 import { RENDERER_MENU } from '../shared/coordinatedRenderer';
 import { getInstanceCoordinator } from '../shared/instanceCoordinator';
@@ -54,13 +54,19 @@ const AlapCtx = createContext<AlapContextValue>();
 export interface AlapProviderProps {
   config: AlapConfig;
   children: JSX.Element;
+  /**
+   * Protocol handler registry. Required for any expression that uses a
+   * protocol (`:web:`, `:time:`, `:hn:`, custom…). Attached once at
+   * construction; config updates via `props.config` don't re-read this.
+   */
+  handlers?: ProtocolHandlerRegistry;
   menuTimeout?: number;
   defaultMenuStyle?: JSX.CSSProperties;
   defaultMenuClassName?: string;
 }
 
 export function AlapProvider(props: AlapProviderProps) {
-  const engine = new AlapEngine(props.config);
+  const engine = new AlapEngine(props.config, { handlers: props.handlers });
   const menuCoordinator = createMenuCoordinator();
 
   // Keep engine in sync when config changes

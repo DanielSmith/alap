@@ -16,7 +16,7 @@
 
 import { createContext, useContext, useRef, useEffect, useCallback, type ReactNode, type CSSProperties } from 'react';
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig } from '../../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
 import { RENDERER_MENU } from '../shared/coordinatedRenderer';
 import { getInstanceCoordinator } from '../shared/instanceCoordinator';
@@ -62,6 +62,12 @@ const AlapCtx = createContext<AlapContextValue | null>(null);
 export interface AlapProviderProps {
   config: AlapConfig;
   children: ReactNode;
+  /**
+   * Protocol handler registry. Required for any expression that uses a
+   * protocol (`:web:`, `:time:`, `:hn:`, custom…). Handlers attach to the
+   * engine at construction and survive subsequent config updates.
+   */
+  handlers?: ProtocolHandlerRegistry;
   /** Menu auto-dismiss timeout in ms. Overrides config.settings.menuTimeout */
   menuTimeout?: number;
   /** Default inline styles for all menus. Overridden by per-link menuStyle. */
@@ -73,11 +79,16 @@ export interface AlapProviderProps {
 export function AlapProvider({
   config,
   children,
+  handlers,
   menuTimeout,
   defaultMenuStyle,
   defaultMenuClassName,
 }: AlapProviderProps) {
-  const engineRef = useRef<AlapEngine>(new AlapEngine(config));
+  // Handlers attach once at engine construction — they're not data, so
+  // re-running on every `handlers` prop change would either duplicate
+  // registrations (engine.registerProtocol throws on re-register) or
+  // require full engine rebuilds. Keep it simple: first render wins.
+  const engineRef = useRef<AlapEngine>(new AlapEngine(config, { handlers }));
   const coordinatorRef = useRef<MenuCoordinator>(createMenuCoordinator());
 
   useEffect(() => {

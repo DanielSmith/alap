@@ -2,7 +2,7 @@
 
 **[Framework Guides](README.md):** [Vanilla DOM](vanilla-dom.md) · [Web Component](web-component.md) · [React](react.md) · **This Page** · [Svelte](svelte.md) · [SolidJS](solid.md) · [Astro](astro.md) · [Alpine.js](alpine.md) · [Eleventy](eleventy.md)
 
-> Live version with interactive examples: https://alap.info/framework-guides/vue
+> Live version with interactive examples: https://docs.alap.info/framework-guides/vue
 
 ## Install
 
@@ -47,7 +47,7 @@ Same Provider/Link/Hook pattern as React. Vue-specific differences:
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `query` | `string` | required | Expression to evaluate |
-| `anchorId` | `string` | — | Anchor ID for bare `@` macro |
+| `anchorId` | `string` | — | Identifier forwarded to `trigger-hover` / `trigger-context` event details |
 | `mode` | `'dom' \| 'webcomponent' \| 'popover'` | `'dom'` | Rendering mode |
 | `menuClassName` | `string` | — | CSS class on menu container |
 | `listType` | `'ul' \| 'ol'` | from config | List element type |

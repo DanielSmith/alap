@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-import { createSignal, createEffect, onCleanup, For, Show, type JSX } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup, For, Show, type JSX } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { useAlapContext } from './context';
-import type { AlapLink as AlapLinkType } from '../../core/types';
-import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
-import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { AlapLink as AlapLinkType, SourceState } from '../../core/types';
+import {
+  sanitizeUrlByTier,
+  sanitizeCssClassByTier,
+  sanitizeTargetWindowByTier,
+} from '../../core/sanitizeByTier';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, placeholderDescriptor } from '../shared';
 import { DEFAULT_MENU_Z_INDEX, REM_PER_MENU_ITEM } from '../../constants';
 
 export type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
@@ -60,6 +64,8 @@ export function AlapLink(props: AlapLinkProps) {
 
   const [isOpen, setIsOpen] = createSignal(false);
   const [items, setItems] = createSignal<ResolvedLink[]>([]);
+  const [sources, setSources] = createSignal<SourceState[]>([]);
+  const [isLoadingOnly, setIsLoadingOnly] = createSignal(false);
 
   const triggerId = uid();
   const menuId = uid();
@@ -68,6 +74,10 @@ export function AlapLink(props: AlapLinkProps) {
   let menuEl: HTMLDivElement | undefined;
   let wrapperEl: HTMLSpanElement | undefined;
   const itemEls: HTMLAnchorElement[] = [];
+
+  let progressive: ProgressiveRenderer | null = null;
+  let pendingFlipRect: DOMRect | null = null;
+  let lastClickEvent: MouseEvent | null = null;
 
   let timerId = 0;
 
@@ -111,39 +121,88 @@ export function AlapLink(props: AlapLinkProps) {
   // --- Menu coordinator (close others when this one opens) ---
 
   const unsubscribe = ctx.menuCoordinator.subscribe(triggerId, () => {
+    progressive?.stop();
     setIsOpen(false);
+    setIsLoadingOnly(false);
+  });
+
+  // --- Progressive rendering ---
+
+  onMount(() => {
+    progressive = new ProgressiveRenderer({
+      engine: ctx.engine,
+      onRender: (renderCtx: ProgressiveRenderContext) => {
+        if (renderCtx.transitioningFromLoading && menuEl) {
+          pendingFlipRect = menuEl.getBoundingClientRect();
+        }
+        if (!renderCtx.isUpdate) {
+          ctx.menuCoordinator.notifyOpen(triggerId);
+        }
+        setItems(renderCtx.state.resolved as ResolvedLink[]);
+        setSources(renderCtx.state.sources as SourceState[]);
+        setIsLoadingOnly(renderCtx.isLoadingOnly);
+        setIsOpen(true);
+      },
+      cancelFetchOnDismiss: () => ctx.config?.settings?.cancelFetchOnDismiss === true,
+    });
   });
 
   // --- Open / close ---
 
-  function openMenu() {
-    const resolved = ctx.engine.resolve(props.query, props.anchorId);
-    if (resolved.length === 0) return;
-    ctx.menuCoordinator.notifyOpen(triggerId);
-    setItems(resolved);
-    setIsOpen(true);
+  function openMenu(event: MouseEvent) {
+    if (!triggerEl) return;
+    lastClickEvent = event;
+    progressive?.start(triggerEl, props.query, event, props.anchorId);
   }
 
   function closeMenu() {
+    progressive?.stop();
     const wasOpen = isOpen();
+    setIsLoadingOnly(false);
     setIsOpen(false);
     stopTimer();
     if (wasOpen) triggerEl?.focus();
   }
 
-  function toggleMenu() {
+  function toggleMenu(event: MouseEvent) {
     if (isOpen()) closeMenu();
-    else openMenu();
+    else openMenu(event);
   }
 
   // --- Focus first item on open ---
 
   createEffect(() => {
-    if (isOpen()) {
+    if (isOpen() && !isLoadingOnly()) {
       if (openedViaKeyboard && itemEls[0]) itemEls[0].focus();
       openedViaKeyboard = false;
       startTimer();
     }
+  });
+
+  // --- Center-over-trigger while loading-only; FLIP on transition ---
+  //
+  // Loading-only uses CSS-var-driven inline styles from `centerOverTrigger`.
+  // A tiny "Loading…" box would flip direction differently from the resolved
+  // menu, so we skip compass placement until items arrive, then FLIP-animate.
+  createEffect(() => {
+    // Track: touch reactive deps so this re-runs on transitions.
+    items(); sources();
+    const loading = isLoadingOnly();
+    const open = isOpen();
+
+    queueMicrotask(() => {
+      if (!menuEl || !triggerEl) return;
+
+      if (open && loading && lastClickEvent) {
+        centerOverTrigger(menuEl, triggerEl, lastClickEvent, DEFAULT_MENU_Z_INDEX);
+        return;
+      }
+
+      if (pendingFlipRect && !loading) {
+        flipFromRect(menuEl, pendingFlipRect);
+        pendingFlipRect = null;
+      }
+    });
   });
 
   // --- Click outside + Escape (dom/webcomponent modes) ---
@@ -181,7 +240,9 @@ export function AlapLink(props: AlapLinkProps) {
     const el = menuEl;
     const onToggle = (e: Event) => {
       if ((e as ToggleEvent).newState === 'closed') {
+        progressive?.stop();
         setIsOpen(false);
+        setIsLoadingOnly(false);
       }
     };
     el.addEventListener('toggle', onToggle);
@@ -191,13 +252,19 @@ export function AlapLink(props: AlapLinkProps) {
   // --- Compass placement ---
 
   createEffect(() => {
-    if (!isOpen() || !props.placement || mode() === 'popover') return;
+    // Re-run when items/sources settle so placement tracks the menu's grown size.
+    items(); sources();
+
+    if (!isOpen() || isLoadingOnly() || !props.placement || mode() === 'popover') return;
     if (!triggerEl || !menuEl || !wrapperEl) return;
 
     const tEl = triggerEl;
     const mEl = menuEl;
     const wEl = wrapperEl;
     const p = props.placement;
+
+    // Clear any inline styles set by centerOverTrigger so placement can take over.
+    mEl.style.cssText = '';
 
     const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
       placement: p,
@@ -228,6 +295,8 @@ export function AlapLink(props: AlapLinkProps) {
 
   onCleanup(() => {
     stopTimer();
+    progressive?.stop();
+    progressive = null;
     unsubscribe();
   });
 
@@ -277,9 +346,9 @@ export function AlapLink(props: AlapLinkProps) {
     e.preventDefault();
     e.stopPropagation();
     if (mode() === 'popover' && !isOpen()) {
-      openMenu();
+      openMenu(e);
     } else {
-      toggleMenu();
+      toggleMenu(e);
     }
   }
 
@@ -287,10 +356,11 @@ export function AlapLink(props: AlapLinkProps) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       openedViaKeyboard = true;
+      const synth = new MouseEvent('click', { bubbles: true, cancelable: true });
       if (mode() === 'popover' && !isOpen()) {
-        openMenu();
+        openMenu(synth);
       } else {
-        toggleMenu();
+        toggleMenu(synth);
       }
     }
   }
@@ -313,15 +383,18 @@ export function AlapLink(props: AlapLinkProps) {
     return (
       <Dynamic component={resolvedListType()} role="presentation" style={scrollStyle()}>
         <For each={items()}>
-          {(item, i) => (
+          {(item, i) => {
+            const safeCssClass = sanitizeCssClassByTier(item.cssClass, item);
+            return (
             <li
               role="none"
-              class={item.cssClass ? `alapListElem ${item.cssClass}` : 'alapListElem'}
+              class={safeCssClass ? `alapListElem ${safeCssClass}` : 'alapListElem'}
             >
               <a
                 ref={(el) => { itemEls[i()] = el; }}
-                href={sanitizeUrl(item.url)}
-                target={item.targetWindow ?? 'fromAlap'}
+                href={sanitizeUrlByTier(item.url, item)}
+                target={sanitizeTargetWindowByTier(item.targetWindow, item) ?? 'fromAlap'}
+                rel="noopener noreferrer"
                 role="menuitem"
                 tabIndex={-1}
                 onMouseEnter={props.onItemHover
@@ -332,13 +405,24 @@ export function AlapLink(props: AlapLinkProps) {
                   : undefined}
               >
                 {item.image ? (
-                  <img src={sanitizeUrl(item.image)} alt={item.altText ?? `image for ${item.id}`} />
+                  <img src={sanitizeUrlByTier(item.image, item)} alt={item.altText ?? `image for ${item.id}`} />
                 ) : (
                   item.label ?? item.id
                 )}
               </a>
             </li>
-          )}
+            );
+          }}
+        </For>
+        <For each={sources()}>
+          {(src) => {
+            const desc = placeholderDescriptor(src);
+            return (
+              <li {...desc.attrs} class={desc.className}>
+                <a aria-disabled="true" tabIndex={-1}>{desc.label}</a>
+              </li>
+            );
+          }}
         </For>
       </Dynamic>
     );
@@ -371,6 +455,7 @@ export function AlapLink(props: AlapLinkProps) {
     'aria-labelledby': triggerId,
     get class() { return mergedMenuClassName(); },
     get style() { return mergedMenuStyle(); },
+    get 'data-alap-loading-only'() { return isLoadingOnly() ? '' : undefined; },
     onKeyDown: handleMenuKeyDown,
     onMouseLeave: startTimer,
     onMouseEnter: stopTimer,

@@ -5,7 +5,7 @@
 # Usage:
 #   ./smoke-test.sh express-sqlite     # Dockerfile-only server
 #   ./smoke-test.sh fastapi-postgres   # docker-compose server
-#   ./smoke-test.sh all                # test all 9 servers
+#   ./smoke-test.sh all                # test all 11 servers
 #
 # Podman:
 #   DOCKER=podman ./smoke-test.sh all
@@ -13,8 +13,8 @@
 # Each test: build → start → CRUD + search + cherry-pick + query → stop → report
 #
 # Disk usage warning:
-#   Building all 9 servers pulls base images for Node, Python, PHP, Go, Rust,
-#   and Bun. A full "all" run can consume 15–25 GB of container storage.
+#   Building all 11 servers pulls base images for Node, Python, PHP, Go, Rust,
+#   Ruby, Java, and Bun. A full "all" run can consume 15–25 GB of container storage.
 #   Run `podman system prune -f` or `docker system prune -f` after testing
 #   to reclaim disk space.
 #
@@ -101,7 +101,7 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 COMPOSE_SERVERS="fastapi-postgres"
 
 # All servers in order
-ALL_SERVERS="express-sqlite hono-sqlite bun-sqlite flask-sqlite django-sqlite laravel-sqlite gin-sqlite axum-sqlite fastapi-postgres"
+ALL_SERVERS="express-sqlite hono-sqlite bun-sqlite flask-sqlite django-sqlite laravel-sqlite gin-sqlite axum-sqlite sinatra-sqlite java-spring fastapi-postgres"
 
 assert_status() {
   local label="$1" expected="$2" actual="$3"
@@ -250,7 +250,7 @@ start_server() {
   # Servers that need servers/ as build context (shared/ dependency)
   local NEEDS_PARENT="flask-sqlite django-sqlite fastapi-postgres"
   # Servers that need repo root as build context (multi-stage lib build, parser crates)
-  local NEEDS_REPO_ROOT="express-sqlite hono-sqlite bun-sqlite gin-sqlite axum-sqlite"
+  local NEEDS_REPO_ROOT="express-sqlite hono-sqlite bun-sqlite gin-sqlite axum-sqlite sinatra-sqlite java-spring"
 
   if is_compose "$name"; then
     if echo "$NEEDS_PARENT" | grep -qw "$name"; then
@@ -330,9 +330,15 @@ test_server() {
   # For compose servers, find the app container; for standalone, it's alap-smoke-${name}
   local container="alap-smoke-${name}"
   if is_compose "$name"; then
-    # Compose names containers as <project>-<service>-1; project defaults to directory name
-    container=$($DOCKER ps --filter "publish=3000" --format '{{.Names}}' 2>/dev/null | head -1)
-    [ -z "$container" ] && container="alap-smoke-${name}"  # fallback
+    # Compose names containers as <project>-<service>-1; project defaults to directory name.
+    # The trailing `|| true` on each stage keeps `set -euo pipefail` from exiting
+    # the script if podman ps momentarily returns nothing or head -1 closes its
+    # pipe early (SIGPIPE). We tolerate an empty lookup — fallback below covers it.
+    local cand
+    cand=$({ $DOCKER ps --filter "publish=3000" --format '{{.Names}}' 2>/dev/null || true; } | { head -1 || true; } || true)
+    if [ -n "$cand" ]; then
+      container="$cand"
+    fi
   fi
   echo "  Waiting for http://localhost:3000/configs (max 10m, idle limit 5m)..."
   if ! wait_for_server 3000 "$container"; then

@@ -8,7 +8,7 @@ How the Alap expression language works — from simple tag queries to protocol f
 | [Expression Spec](../api-reference/spec.md) | Formal grammar, operator semantics, machine-friendly worked examples |
 | [Macros](macros.md) | Named queries with `@`, nesting, the bare `@`, Markdown escape hatch |
 | [Search Patterns](search-patterns.md) | Regex search with `/pattern/`, field codes, age/sort/limit options |
-| [Protocols](protocols.md) | Dimensional queries (`:time:30d:`, `:loc:args:`), handler contract, source chains |
+| [Protocols](protocols.md) | Dimensional queries (`:time:30d:`, `:location:radius:args:`), handler contract, source chains |
 | [Refiners](refiners.md) | Set-level shaping (`*sort*`, `*limit:N*`, `*shuffle*`), inline refiners, pagination |
 | [Styling](styling.md) | CSS custom properties, `::part()` selectors, dark mode, transitions, effects |
 

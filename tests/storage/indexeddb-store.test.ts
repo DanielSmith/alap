@@ -155,4 +155,62 @@ describe('IndexedDBStore', () => {
     expect(await store.load('a')).toBeNull();
     expect(await store.load('b')).toEqual(testConfig2);
   });
+
+  // Regression: Surface 5-1 from the 2026-04-22 security pass. IndexedDB
+  // persists configs across tabs and reloads. Without revalidation on load,
+  // a prior-page XSS or a sibling tab on the same origin could poison
+  // IndexedDB with a config that has a dangerous href or exotic keys, and
+  // the next page load would drink it in. RemoteStore.load already validates;
+  // IndexedDBStore.load now matches that contract.
+
+  it('sanitizes dangerous URLs from stored configs on load', async () => {
+    // Write raw (bypassing save) to simulate a poisoned record from a
+    // different writer (prior XSS, sibling tab, manual devtools injection).
+    const poisoned: AlapConfig = {
+      allLinks: {
+        evil: {
+          label: 'Click me',
+          url: 'javascript:alert(1)' as unknown as string,
+          tags: ['phishing'],
+        },
+      },
+    };
+    await store.save('poisoned', poisoned);
+
+    const loaded = await store.load('poisoned');
+    expect(loaded).not.toBeNull();
+    expect(loaded!.allLinks.evil.url).toBe('about:blank');
+  });
+
+  it('strips prototype-pollution keys from stored configs on load', async () => {
+    const polluted = {
+      allLinks: {
+        good: { label: 'Good', url: 'https://example.com', tags: [] },
+        __proto__: { label: 'Bad', url: 'https://evil.com', tags: [] },
+      },
+    } as unknown as AlapConfig;
+    await store.save('polluted', polluted);
+
+    const loaded = await store.load('polluted');
+    expect(loaded).not.toBeNull();
+    expect(Object.prototype.hasOwnProperty.call(loaded!.allLinks, '__proto__')).toBe(false);
+    expect(loaded!.allLinks.good).toBeDefined();
+  });
+
+  it('loadEntry applies the same validation as load', async () => {
+    const poisoned: AlapConfig = {
+      allLinks: {
+        evil: {
+          label: 'Click me',
+          url: 'vbscript:msgbox(1)' as unknown as string,
+          tags: [],
+        },
+      },
+    };
+    await store.save('entry_poisoned', poisoned);
+
+    const entry = await store.loadEntry('entry_poisoned');
+    expect(entry).not.toBeNull();
+    expect(entry!.config.allLinks.evil.url).toBe('about:blank');
+  });
 });

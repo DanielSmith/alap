@@ -7,6 +7,7 @@
 
 import { AlapUI } from 'alap';
 import type { ItemHoverDetail } from 'alap';
+import { jsonHandler } from '../../../src/protocols/json';
 import { demoConfig } from './config';
 
 // --- Hover preview panel ---
@@ -47,31 +48,15 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') hoverPanel.classList.remove('visible');
 });
 
-// --- Collect :json: expressions ---
-
-function collectExpressions(selector: string): string[] {
-  const triggers = document.querySelectorAll<HTMLElement>(selector);
-  return Array.from(triggers)
-    .map(el => el.dataset.alapLinkitems ?? '')
-    .filter(expr => expr.includes(':json:'));
-}
-
 // --- Init ---
+// Async protocols resolve on trigger-click (3.2+) — no preResolve needed.
 
-async function init() {
-  const menu = new AlapUI(demoConfig, {
-    selector: '.alap',
-    onItemHover(detail) {
-      showHoverPreview(detail);
-    },
-  });
+const menu = new AlapUI(demoConfig, {
+  selector: '.alap',
+  handlers: { json: jsonHandler },
+  onItemHover(detail) {
+    showHoverPreview(detail);
+  },
+});
 
-  const exprs = collectExpressions('.alap');
-  if (exprs.length > 0) {
-    await menu.getEngine().preResolve(exprs);
-  }
-
-  Object.assign(globalThis, { menu, demoConfig });
-}
-
-init();
+Object.assign(globalThis, { menu, demoConfig });

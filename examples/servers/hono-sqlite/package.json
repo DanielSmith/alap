@@ -9,13 +9,15 @@
     "seed": "node seed.js"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.14",
     "alap": "workspace:*",
-    "@hono/node-server": "^1.13.0",
     "better-sqlite3": "^11.10.0",
-    "hono": "^4.6.0"
+    "hono": "^4.12.14"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["better-sqlite3"]
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   },
   "author": "Daniel Smith",
   "license": "Apache-2.0"

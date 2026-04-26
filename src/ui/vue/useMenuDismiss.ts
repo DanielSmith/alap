@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import { watch, onUnmounted, type Ref } from 'vue';
+import { onUnmounted, watch, type Ref } from 'vue';
+import { installMenuDismiss, type MenuDismissHandle } from '../shared/baseMenuDismiss';
 
 /**
- * Manages menu dismiss behavior:
- * - Auto-dismiss timer on mouse leave
- * - Click outside to close (dom/webcomponent modes)
- * - Escape to close (dom/webcomponent modes)
- *
- * Popover mode skips click-outside and Escape — the browser handles those.
+ * Vue adapter around `installMenuDismiss`. Document-level listeners are
+ * attached while `isOpen` is true and torn down on close / unmount.
  */
 export function useMenuDismiss(
   isOpen: Ref<boolean>,
@@ -32,52 +29,31 @@ export function useMenuDismiss(
   triggerEl: Ref<HTMLElement | null>,
   menuEl: Ref<HTMLElement | null>,
 ) {
-  let timer = 0;
+  let handle: MenuDismissHandle | null = null;
 
-  function stopTimer() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = 0;
+  function tearDown() {
+    if (handle) {
+      handle.dispose();
+      handle = null;
     }
   }
 
-  function startTimer() {
-    stopTimer();
-    timer = window.setTimeout(closeMenu, menuTimeout);
-  }
-
-  // Click outside + Escape (not needed for popover — browser handles it)
   watch(isOpen, (open) => {
-    if (!open || mode === 'popover') return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        menuEl.value && !menuEl.value.contains(target) &&
-        triggerEl.value && !triggerEl.value.contains(target)
-      ) {
-        closeMenu();
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeMenu();
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    // Cleanup when menu closes or component unmounts
-    const stop = watch(isOpen, (nowOpen) => {
-      if (!nowOpen) {
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('keydown', handleEscape);
-        stop();
-      }
+    tearDown();
+    if (!open) return;
+    handle = installMenuDismiss({
+      close: closeMenu,
+      getTrigger: () => triggerEl.value,
+      getMenu: () => menuEl.value,
+      mode,
+      timeoutMs: menuTimeout,
     });
   });
 
-  onUnmounted(stopTimer);
+  onUnmounted(tearDown);
 
-  return { startTimer, stopTimer };
+  return {
+    startTimer: () => handle?.startTimer(),
+    stopTimer: () => handle?.stopTimer(),
+  };
 }

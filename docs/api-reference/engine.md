@@ -4,7 +4,7 @@
 
 Core engine classes and helper functions. No DOM dependency — safe for Node.js.
 
-> Live version: https://alap.info/api-reference/engine
+> Live version: https://docs.alap.info/api-reference/engine
 
 ## Which import do I use?
 
@@ -59,12 +59,50 @@ const engine = new AlapEngine(config);
 | Method | Signature | Description |
 |--------|-----------|-------------|
 | `query()` | `(expression: string, anchorId?: string) => string[]` | Expression to deduplicated array of item IDs |
-| `resolve()` | `(expression: string, anchorId?: string) => ResolvedLink[]` | Expression to full link objects |
-| `resolveAsync()` | `(expression: string, anchorId?: string) => Promise<ResolvedLink[]>` | Pre-resolves generate protocols, then evaluates |
-| `preResolve()` | `(expressions: string[]) => Promise<void>` | Pre-resolve multiple expressions (warm the cache for generate protocols) |
+| `resolve()` | `(expression: string, anchorId?: string) => ResolvedLink[]` | Sync: expression to full link objects (returns `[]` for unresolved async tokens) |
+| `resolveProgressive()` | `(expression: string, anchorId?: string) => ProgressiveState` | Sync return with async side effect — see below |
+| `resolveAsync()` | `(expression: string, anchorId?: string) => Promise<ResolvedLink[]>` | Awaits generate protocols, then returns resolved links |
+| `preResolve()` | `(expressions: string[]) => Promise<void>` | Optional: warm the cache for generate protocols before first click |
+| `abortInFlight()` | `(token: string) => void` | Cancel a currently-fetching protocol token (for `cancelFetchOnDismiss`) |
 | `getLinks()` | `(ids: string[]) => ResolvedLink[]` | IDs to full link objects |
+| `clearGenerated()` | `() => void` | Remove all temp IDs injected by async resolution |
 | `updateConfig()` | `(config: AlapConfig) => void` | Replace configuration |
-| `clearCache()` | `() => void` | Clear cached generate protocol results |
+| `clearCache()` | `() => void` | Clear cached generate protocol results (and error cache) |
+
+### Progressive resolution (3.2+)
+
+`resolveProgressive()` is what the shipped renderers (`AlapUI`, `AlapLens`, `AlapLightbox`) call on trigger-click. It returns synchronously with whatever's available right now, and — as a side effect — starts any fetches that are still cold.
+
+```typescript
+interface ProgressiveState {
+  resolved: ResolvedLink[];   // static matches + already-cached async sources
+  sources: SourceState[];     // one entry per async source that's loading, errored, or settled-empty
+}
+
+interface SourceState {
+  token: string;                       // e.g. "hn:search:ai_papers"
+  status: 'loading' | 'error' | 'empty';
+  promise?: Promise<void>;             // only when status === 'loading'
+  error?: Error;                       // only when status === 'error'
+}
+```
+
+Re-invoke on each loading source's `promise` settlement to pick up the new state. Duplicate fetches for the same token collapse via an in-flight map; concurrency is capped by `settings.maxConcurrentFetches` (default 6) and each fetch is bounded by `settings.fetchTimeout` (default 30s).
+
+```typescript
+const state = engine.resolveProgressive(':hn:top: | .coffee');
+render(state.resolved);                       // show what we have
+for (const src of state.sources) {
+  if (src.status === 'loading') {
+    src.promise!.then(() => {
+      const fresh = engine.resolveProgressive(':hn:top: | .coffee');
+      render(fresh.resolved);
+    });
+  }
+}
+```
+
+### Examples
 
 ```typescript
 import { AlapEngine } from 'alap/core';
@@ -75,17 +113,15 @@ const engine = new AlapEngine(config);
 const ids = engine.query('.coffee + .sf');
 // → ['bluebottle']
 
-// Get full link objects
+// Get full link objects (sync — returns [] for cold async tokens)
 const links = engine.resolve('.coffee');
 // → [{ id: 'bluebottle', url: '...', label: 'Blue Bottle', tags: ['coffee', 'sf'] }, ...]
 
-// Use anchorId for bare @ macros
-const fromMacro = engine.query('@', 'nycbridges');
-
-// Async: expressions with generate protocols (e.g. :web:)
+// Async: headless/programmatic resolution of generate protocols
 const books = await engine.resolveAsync(':web:books:architecture:limit=5:');
 
-// Pre-resolve: warm the cache for multiple expressions at once
+// Optional: warm the cache ahead of time (e.g. on hover, for UX polish —
+// shipped renderers don't need this, they handle async progressively)
 await engine.preResolve([':web:books:', ':web:music:', ':atproto:feed:']);
 
 // Update config at runtime

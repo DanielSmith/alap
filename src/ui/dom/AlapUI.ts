@@ -15,14 +15,14 @@
  */
 
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig, AlapLink, ResolvedLink } from '../../core/types';
+import type { AlapConfig, AlapLink, ProtocolHandlerRegistry, ResolvedLink, SourceState } from '../../core/types';
 import { RENDERER_MENU } from '../shared/coordinatedRenderer';
 import type { CoordinatedRenderer, OpenPayload } from '../shared/coordinatedRenderer';
 import { getInstanceCoordinator } from '../shared/instanceCoordinator';
 import { warn } from '../../core/logger';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS, DEFAULT_MENU_Z_INDEX, DEFAULT_PLACEMENT, DEFAULT_PLACEMENT_GAP, DEFAULT_VIEWPORT_PADDING } from '../../constants';
-import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen } from '../shared';
-import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, Size } from '../shared';
+import { buildMenuList, handleMenuKeyboard, DismissTimer, resolveExistingUrlMode, injectExistingUrl, computePlacement, parsePlacement, applyPlacementClass, clearPlacementClass, observeTriggerOffscreen, appendPlaceholders, flipFromRect, centerOverTrigger, ProgressiveRenderer } from '../shared';
+import type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ParsedPlacement, PlacementResult, ProgressiveRenderContext, Size } from '../shared';
 
 export type { AlapEventHooks, TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail };
 
@@ -32,6 +32,9 @@ export interface AlapUIOptions {
 
   /** Menu auto-dismiss timeout in ms. Overrides config.settings.menuTimeout */
   menuTimeout?: number;
+
+  /** Protocol handler registry — forwarded to the engine. See AlapEngineOptions.handlers. */
+  handlers?: ProtocolHandlerRegistry;
 
   /** Event hook callbacks */
   onTriggerHover?: AlapEventHooks['onTriggerHover'];
@@ -50,6 +53,7 @@ export class AlapUI implements CoordinatedRenderer {
   private selector: string;
   private activeTrigger: HTMLElement | null = null;
   private hooks: AlapEventHooks;
+  private progressive: ProgressiveRenderer;
 
   // Bound handlers (so we can remove them)
   private handleBodyClick: (e: MouseEvent) => void;
@@ -67,7 +71,7 @@ export class AlapUI implements CoordinatedRenderer {
 
   constructor(config: AlapConfig, options: AlapUIOptions = {}) {
     this.config = config;
-    this.engine = new AlapEngine(config);
+    this.engine = new AlapEngine(config, { handlers: options.handlers });
     this.selector = options.selector ?? '.alap';
     this.hooks = {
       onTriggerHover: options.onTriggerHover,
@@ -82,6 +86,12 @@ export class AlapUI implements CoordinatedRenderer {
 
     this.timer = new DismissTimer(menuTimeout, () => this.closeMenu());
     this.instanceId = `alapui_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+    this.progressive = new ProgressiveRenderer({
+      engine: this.engine,
+      cancelFetchOnDismiss: () => this.config.settings?.cancelFetchOnDismiss === true,
+      onRender: (ctx) => this.onProgressiveRender(ctx),
+    });
 
     // Pre-bind handlers
     this.handleBodyClick = this.onBodyClick.bind(this);
@@ -178,29 +188,55 @@ export class AlapUI implements CoordinatedRenderer {
     event.stopPropagation();
 
     // Use currentTarget (the element the listener is on), not target
-    // (which could be a child element inside a div/span trigger)
+    // (which could be a child element inside a div/span trigger).
     const trigger = event.currentTarget as HTMLElement;
     const expression = trigger.getAttribute('data-alap-linkitems');
     if (!expression) return;
 
     const anchorId = trigger.id || undefined;
-    let links = this.engine.resolve(expression, anchorId);
-    if (links.length === 0) return;
 
-    const existingMode = resolveExistingUrlMode(
-      trigger,
-      this.config.settings?.existingUrl as 'prepend' | 'append' | 'ignore' | undefined,
-    );
-    links = injectExistingUrl(links, trigger, existingMode);
-
-    if (this.activeTrigger) {
-      this.activeTrigger.setAttribute('aria-expanded', 'false');
+    // Edge case: the expression resolves to nothing and has no async sources,
+    // but the trigger's own href should still surface as a single menu item
+    // (existingUrl mode). `ProgressiveRenderer.start` would skip rendering in
+    // this case — handle it synchronously before delegating.
+    const probe = this.engine.resolveProgressive(expression, anchorId);
+    if (probe.resolved.length === 0 && probe.sources.length === 0) {
+      const existingMode = resolveExistingUrlMode(
+        trigger,
+        this.config.settings?.existingUrl as 'prepend' | 'append' | 'ignore' | undefined,
+      );
+      const fallback = injectExistingUrl([], trigger, existingMode);
+      if (fallback.length > 0) {
+        this.progressive.stop();
+        if (this.activeTrigger !== trigger) {
+          if (this.activeTrigger) this.activeTrigger.setAttribute('aria-expanded', 'false');
+          this.activeTrigger = trigger;
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+        this.renderMenu(fallback, [], trigger, event, false);
+      }
+      return;
     }
 
-    this.activeTrigger = trigger;
-    trigger.setAttribute('aria-expanded', 'true');
+    this.progressive.start(trigger, expression, event, anchorId);
+  }
 
-    this.renderMenu(links, trigger, event);
+  private onProgressiveRender(ctx: ProgressiveRenderContext): void {
+    const existingMode = resolveExistingUrlMode(
+      ctx.trigger,
+      this.config.settings?.existingUrl as 'prepend' | 'append' | 'ignore' | undefined,
+    );
+    const resolved = injectExistingUrl(ctx.state.resolved, ctx.trigger, existingMode);
+
+    if (this.activeTrigger !== ctx.trigger) {
+      if (this.activeTrigger) {
+        this.activeTrigger.setAttribute('aria-expanded', 'false');
+      }
+      this.activeTrigger = ctx.trigger;
+      ctx.trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    this.renderMenu(resolved, ctx.state.sources, ctx.trigger, ctx.event, ctx.isUpdate);
   }
 
   // --- Positioning ---
@@ -234,8 +270,10 @@ export class AlapUI implements CoordinatedRenderer {
 
   private renderMenu(
     links: Array<{ id: string } & AlapLink>,
+    sources: readonly SourceState[],
     trigger: HTMLElement,
     event: MouseEvent,
+    isUpdate: boolean = false,
   ): void {
     if (!this.container) return;
 
@@ -257,10 +295,31 @@ export class AlapUI implements CoordinatedRenderer {
     const maxVisibleItems = (this.config.settings?.maxVisibleItems as number) ?? DEFAULT_MAX_VISIBLE_ITEMS;
     const list = buildMenuList(links, { listType, maxVisibleItems, defaultTargetWindow: this.config.settings?.targetWindow as string | undefined });
 
+    // Tail-append one placeholder <li> per loading/error/empty source. Placeholders
+    // live outside the refiner pipeline, so they always sit after all resolved items.
+    appendPlaceholders(list, sources);
+
+    // Capture the container's current box BEFORE swapping content — used by
+    // the FLIP animation below when transitioning loading → real content.
+    const prevRect = isUpdate ? this.container.getBoundingClientRect() : null;
+    const wasLoadingOnly = isUpdate && this.container.hasAttribute('data-alap-loading-only');
+    const isLoadingOnly = links.length === 0 && sources.length > 0;
+
+    if (isLoadingOnly) {
+      this.container.setAttribute('data-alap-loading-only', '');
+    } else {
+      this.container.removeAttribute('data-alap-loading-only');
+    }
+
     this.container.innerHTML = '';
     this.container.appendChild(list);
 
-    // Item event hooks
+    // Item-level listeners — reattach every render, since innerHTML clearing
+    // also drops any previous listeners.
+    for (const a of list.querySelectorAll<HTMLAnchorElement>('a[role="menuitem"]')) {
+      a.addEventListener('click', () => this.closeMenu());
+    }
+
     if (this.hooks.onItemHover || this.hooks.onItemContext) {
       const expression = trigger.getAttribute('data-alap-linkitems') ?? '';
       const menuItems = list.querySelectorAll<HTMLAnchorElement>('a[role="menuitem"]');
@@ -283,12 +342,65 @@ export class AlapUI implements CoordinatedRenderer {
       });
     }
 
-    // Menu events
-    this.container.addEventListener('mouseleave', this.handleMenuLeave);
-    this.container.addEventListener('mouseenter', this.handleMenuEnter);
-    this.container.addEventListener('keydown', this.handleMenuKeydown);
+    // Container-level listeners — attached once on first paint only, since
+    // the container element persists across re-renders and addEventListener
+    // doesn't deduplicate. Placement code below DOES run on every render so
+    // the final menu size re-chooses the correct compass direction.
+    if (!isUpdate) {
+      this.container.addEventListener('mouseleave', this.handleMenuLeave);
+      this.container.addEventListener('mouseenter', this.handleMenuEnter);
+      this.container.addEventListener('keydown', this.handleMenuKeydown);
+    }
 
     // --- Position the menu ---
+    // Loading-only state: float the menu centered over the trigger, skipping
+    // the compass placement engine. When the real items arrive on re-render,
+    // we'll recompute placement normally and FLIP-animate into position.
+    if (isLoadingOnly) {
+      centerOverTrigger(this.container, trigger, event, DEFAULT_MENU_Z_INDEX);
+      clearPlacementClass(this.container);
+      this.menuNaturalSize = null;
+      this.lastPlacement = null;
+    } else {
+      this.positionWithPlacement(trigger, event);
+    }
+
+    // FLIP transition: when loading-only → real content, animate the container
+    // from where the "Loading…" indicator was to its real placed position.
+    // Duration/easing come from CSS vars — users override via
+    // `--alap-transition-duration` / `--alap-transition-easing` on `.alapelem`.
+    if (isUpdate && wasLoadingOnly && !isLoadingOnly && prevRect) {
+      flipFromRect(this.container, prevRect);
+    }
+
+    // Observe trigger for scroll-away detection
+    this.stopIntersectionObserver();
+    if (this.activeTrigger && !isLoadingOnly) {
+      this.intersectionObserver = observeTriggerOffscreen(
+        this.activeTrigger,
+        () => this.closeMenu(),
+      );
+    }
+
+    if (!isUpdate) {
+      // Notify coordinator on first paint only — closes other menu instances
+      getInstanceCoordinator().notifyOpen(this.instanceId);
+    }
+
+    // Focus first item on keyboard open only
+    if (this.openedViaKeyboard) {
+      const firstItem = this.container.querySelector<HTMLElement>('a[role="menuitem"]');
+      if (firstItem) firstItem.focus();
+    }
+    this.openedViaKeyboard = false;
+
+    // Start dismiss timer (restart on each render keeps it alive while async content streams in)
+    this.timer.stop();
+    this.timer.start();
+  }
+
+  private positionWithPlacement(trigger: HTMLElement, event: MouseEvent): void {
+    if (!this.container) return;
     const viewportAdjust = this.config.settings?.viewportAdjust !== false;
 
     if (viewportAdjust) {
@@ -474,6 +586,8 @@ export class AlapUI implements CoordinatedRenderer {
 
   private closeMenu(): void {
     if (!this.container) return;
+    // Contract 14: late-arriving fetch settlements must not re-render a dismissed menu.
+    this.progressive.stop();
     this.container.style.display = 'none';
     this.container.style.maxHeight = '';
     this.container.style.maxWidth = '';
@@ -528,7 +642,7 @@ export class AlapUI implements CoordinatedRenderer {
       clientY: rect?.bottom ?? 0,
     } as MouseEvent;
 
-    this.renderMenu(links, trigger ?? document.body, syntheticEvent);
+    this.renderMenu(links, [], trigger ?? document.body, syntheticEvent);
   }
 
   /** Re-scan the DOM for new trigger elements */

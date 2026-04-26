@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-import type { AlapConfig, AlapSearchPattern, AlapSearchOptions, AlapLink } from './types';
+import type {
+  AlapConfig,
+  AlapSearchPattern,
+  AlapSearchOptions,
+  AlapLink,
+  GenerateHandler,
+  ProtocolHandler,
+} from './types';
 import {
   MAX_DEPTH, MAX_TOKENS, MAX_MACRO_EXPANSIONS,
   MAX_REGEX_QUERIES, MAX_SEARCH_RESULTS, REGEX_TIMEOUT_MS,
   MAX_REFINERS,
 } from '../constants';
 import { warn } from './logger';
+import { cloneProvenance } from './linkProvenance';
 import { validateRegex } from './validateRegex';
 import { resolveProtocol } from '../protocols/resolve';
 import { applyRefiners as runRefiners, parseRefinerStep } from '../refiners/RefinerPipeline';
+import type { LinkCatalog } from './linkCatalog';
+import { staticCatalog } from './linkCatalog';
 
 type TokenType =
   | 'ITEM_ID'
@@ -52,16 +62,29 @@ interface ParseResult {
 
 export class ExpressionParser {
   private config: AlapConfig;
+  private catalog: LinkCatalog;
   private depth: number = 0;
   private regexCount: number = 0;
   private generatedIds: Map<string, string[]> = new Map();
+  /** Handler lookup callback provided by the engine. Undefined when the parser
+   *  is constructed standalone (tests). Threaded into resolveProtocol so
+   *  filter handlers resolve from the engine's registry rather than config. */
+  private getHandlers?: (name: string) => { generate?: GenerateHandler; filter?: ProtocolHandler } | undefined;
 
-  constructor(config: AlapConfig) {
+  constructor(
+    config: AlapConfig,
+    getHandlers?: (name: string) => { generate?: GenerateHandler; filter?: ProtocolHandler } | undefined,
+    catalog?: LinkCatalog,
+  ) {
     this.config = config;
+    this.getHandlers = getHandlers;
+    this.catalog = catalog ?? staticCatalog(config.allLinks);
   }
 
-  updateConfig(config: AlapConfig): void {
+  updateConfig(config: AlapConfig, catalog?: LinkCatalog): void {
     this.config = config;
+    if (catalog) this.catalog = catalog;
+    else this.catalog = staticCatalog(config.allLinks);
   }
 
   /**
@@ -79,8 +102,6 @@ export class ExpressionParser {
     if (!expression || typeof expression !== 'string') return [];
     const input = expression.trim();
     if (!input) return [];
-    if (!this.config.allLinks || typeof this.config.allLinks !== 'object') return [];
-
     const expanded = this.expandMacros(input, anchorId);
     if (!expanded) return [];
 
@@ -101,11 +122,8 @@ export class ExpressionParser {
    * Find all item IDs carrying a given class (tag).
    */
   searchByClass(className: string): string[] {
-    const allLinks = this.config.allLinks;
-    if (!allLinks || typeof allLinks !== 'object') return [];
-
     const result: string[] = [];
-    for (const [id, link] of Object.entries(allLinks)) {
+    for (const [id, link] of this.catalog.entries()) {
       if (!link || !Array.isArray(link.tags)) continue;
       if (link.tags.includes(className)) {
         result.push(id);
@@ -154,9 +172,6 @@ export class ExpressionParser {
     const opts: AlapSearchOptions = spec.options ?? {};
     const fields = this.parseFieldCodes(fieldOpts || opts.fields || 'a');
 
-    const allLinks = this.config.allLinks;
-    if (!allLinks || typeof allLinks !== 'object') return [];
-
     const now = Date.now();
     const maxAge = opts.age ? this.parseAge(opts.age) : 0;
     const limit = opts.limit ?? MAX_SEARCH_RESULTS;
@@ -164,7 +179,7 @@ export class ExpressionParser {
 
     const result: Array<{ id: string; createdAt: number }> = [];
 
-    for (const [id, link] of Object.entries(allLinks)) {
+    for (const [id, link] of this.catalog.entries()) {
       if (!link || typeof link !== 'object') continue;
 
       // Timeout guard
@@ -206,7 +221,7 @@ export class ExpressionParser {
    * Resolve a protocol expression. Delegates to protocols/resolve.ts.
    */
   private resolveProtocol(value: string): string[] {
-    return resolveProtocol(value, this.config, this.generatedIds);
+    return resolveProtocol(value, this.config, this.catalog, this.generatedIds, this.getHandlers);
   }
 
   /**
@@ -216,11 +231,13 @@ export class ExpressionParser {
   private applyRefiners(ids: string[], refiners: Token[]): string[] {
     if (refiners.length === 0) return ids;
 
-    const allLinks = this.config.allLinks;
     const links = ids
       .map(id => {
-        const link = allLinks[id];
-        return link ? { id, ...link } : null;
+        const link = this.catalog.get(id);
+        if (!link) return null;
+        const refined = { id, ...link };
+        cloneProvenance(link, refined);
+        return refined;
       })
       .filter((l): l is { id: string } & AlapLink => l !== null);
 
@@ -303,12 +320,14 @@ export class ExpressionParser {
     while (result.includes('@') && rounds < MAX_MACRO_EXPANSIONS) {
       const before = result;
       result = result.replace(/@(\w*)/g, (_match, name: string) => {
-        const macroName = name || anchorId || '';
-        if (!macroName) return '';
+        if (!name) {
+          warn('Bare "@" is no longer supported — use "@macroname" to reference a named macro in config.macros');
+          return '';
+        }
 
-        const macro = this.config.macros?.[macroName];
+        const macro = this.config.macros?.[name];
         if (!macro || typeof macro.linkItems !== 'string') {
-          warn(`Macro "@${macroName}" not found in config.macros`);
+          warn(`Macro "@${name}" not found in config.macros`);
           return '';
         }
         return macro.linkItems;
@@ -568,7 +587,7 @@ export class ExpressionParser {
 
     switch (token.type) {
       case 'ITEM_ID': {
-        const link = this.config.allLinks[token.value];
+        const link = this.catalog.get(token.value);
         if (!link || typeof link !== 'object') {
           warn(`Item ID "${token.value}" not found in config.allLinks`);
         }

@@ -82,7 +82,7 @@ The `<alap-link>` web component works in any framework that supports custom elem
 | **Ember** | Ember supports custom elements natively |
 | **Stencil** | Web component to web component — works directly |
 
-Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [Web Component](framework-guides/web-component.md) provides the full experience with no adapter code.
+Alap ships native adapters for React, Vue, Svelte, SolidJS, Qwik, Astro, and Alpine because those frameworks benefit from deep integration. For everything else, the [Web Component](framework-guides/web-component.md) covers the same surface with no adapter code.
 
 ### How big is the library?
 
@@ -160,7 +160,7 @@ The merge is shallow per section: `allLinks`, `macros`, `settings`, and `searchP
 Yes. Protocol expressions extend the query language with dimensional filtering:
 
 ```
-.coffee + :loc:40.7,-74.0:5mi:    → coffee within 5 miles
+.coffee + :location:radius:40.7,-74.0:5mi:    → coffee within 5 miles
 (:time:7d: + .featured), .pinned  → featured from last week, plus pinned
 ```
 
@@ -182,9 +182,9 @@ See [Refiners](core-concepts/refiners.md).
 
 No, and deliberately so. It's a query language, not a programming language. No variables, no loops, no conditionals, no unbounded recursion. Every expression terminates. There's a max nesting depth (32), max token count (1024), and max macro expansion rounds (10). It's closer to CSS selectors or SQL's `WHERE` clause than to a general-purpose language.
 
-### Is the expression parser safe from malicious input?
+### How does the parser handle untrusted input?
 
-It has been hardened against known attack vectors, though it has not undergone a third-party security audit. See [Security](api-reference/security.md) for the full list of guardrails (URL sanitization, ReDoS protection, config validation, parser resource limits). Work with a security pro, especially with anything mission critical.  Do your due diligence, etc.
+I'm not a security expert, and Alap hasn't had a third-party audit — it's a single-maintainer open source project. The parser is hardened against the usual concerns: URL sanitization, ReDoS protection, config validation, parser resource limits. See [Security](api-reference/security.md) for the full list of guardrails. Please do your own due diligence before deploying, especially when wiring up protocols on servers with local network access. How you deploy this is your responsibility.
 
 ---
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Protocols — Qwik</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="../" target="alapDemo">&larr; Advanced Protocol Hub</a></p>
+
+  <h1>Qwik Adapter &mdash; Advanced Protocols</h1>
+  <p class="page-intro">
+    Qwik's resumability model requires its own optimizer plugin
+    (<code>@builder.io/qwik/optimizer</code>) and a dedicated Vite config.
+    The Qwik adapter itself (<code>alap/qwik</code>) is tested against the
+    same <code>ProgressiveRenderer</code> infrastructure as every other
+    adapter &mdash; see <code>tests/ui/qwik/qwik-adapter.test.ts</code>
+    for 16 tests covering menu / dismissal / keyboard / placement.
+  </p>
+
+  <p class="page-intro">
+    To run a Qwik page with Alap, scaffold a standard Qwik City project:
+  </p>
+
+  <pre><code>npm create qwik@latest
+
+# in your project's .tsx file:
+import { AlapProvider, AlapLink } from 'alap/qwik';
+
+&lt;AlapProvider config={myConfig}&gt;
+  &lt;AlapLink query=":slow:2000:5:" placement="SE"&gt;
+    Slow menu
+  &lt;/AlapLink&gt;
+&lt;/AlapProvider&gt;</code></pre>
+
+  <p class="page-intro">
+    All other scenarios from the advanced-protocol matrix work unchanged &mdash;
+    the Qwik adapter ports the same <code>ProgressiveRenderer</code> pattern
+    used by React, Vue, Svelte, Solid, and Alpine.
+  </p>
+</body>
+</html>

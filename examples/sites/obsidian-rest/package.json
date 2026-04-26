@@ -1,0 +1,13 @@
+{
+  "name": "alap-example-obsidian-rest",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Alap v3.2 — Obsidian REST API menus example (Node server + browser page)",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "alap": "workspace:*"
+  }
+}

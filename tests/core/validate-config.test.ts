@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { validateConfig } from '../../src/core/validateConfig';
+import { validateConfig, sanitizeLinkUrls } from '../../src/core/validateConfig';
 
 describe('validateConfig', () => {
   // --- Valid configs pass through ---
@@ -284,6 +284,39 @@ describe('validateConfig', () => {
     expect(Object.prototype.hasOwnProperty.call(result.macros, '__proto__')).toBe(false);
   });
 
+  it('drops __proto__ and constructor from allLinks[id].meta in validateConfig', () => {
+    const config = {
+      allLinks: {
+        a: JSON.parse(
+          '{"url": "/a", "meta": {"__proto__": {"polluted": "xss"}, "constructor": {"polluted": "xss"}, "legit": "ok"}}',
+        ),
+      },
+    };
+    const result = validateConfig(config);
+    const meta = result.allLinks.a.meta!;
+    expect(meta.legit).toBe('ok');
+    expect(Object.prototype.hasOwnProperty.call(meta, '__proto__')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(meta, 'constructor')).toBe(false);
+    // The prototype chain must not have been tainted.
+    expect(Object.getPrototypeOf(meta)).toBe(Object.prototype);
+    expect((meta as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('sanitizeLinkUrls drops __proto__ from link.meta (protocol-injection path)', () => {
+    // Re-create the shape AlapEngine.injectLinks would hand to sanitizeLinkUrls:
+    // a link with meta keys that would otherwise hit the prototype setter.
+    const hostile = JSON.parse(
+      '{"url": "https://example.com", "meta": {"__proto__": {"polluted": true}, "constructor": {"polluted": true}, "photoCredit": "real"}}',
+    );
+    const sanitized = sanitizeLinkUrls(hostile);
+    const meta = sanitized.meta!;
+    expect(meta.photoCredit).toBe('real');
+    expect(Object.prototype.hasOwnProperty.call(meta, '__proto__')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(meta, 'constructor')).toBe(false);
+    expect(Object.getPrototypeOf(meta)).toBe(Object.prototype);
+    expect((meta as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
   // --- Macros validation ---
 
   it('skips macros with missing linkItems', () => {
@@ -392,5 +425,72 @@ describe('validateConfig', () => {
     const original = JSON.parse(JSON.stringify(config));
     validateConfig(config);
     expect(config).toEqual(original);
+  });
+
+  // --- allowedSchemes: author can declare, non-author tiers get stripped ---
+
+  describe('allowedSchemes (per-link sanitizer widening)', () => {
+    it('preserves allowedSchemes on author-tier links', () => {
+      const cfg = validateConfig({
+        allLinks: {
+          a: { url: '/a', allowedSchemes: ['obsidian'] },
+        },
+      });
+      expect(cfg.allLinks.a.allowedSchemes).toEqual(['obsidian']);
+    });
+
+    it('strips allowedSchemes from storage:remote-tier links (defense-in-depth)', () => {
+      const cfg = validateConfig(
+        {
+          allLinks: {
+            a: { url: '/a', allowedSchemes: ['javascript'] },
+          },
+        },
+        { provenance: 'storage:remote' },
+      );
+      expect(cfg.allLinks.a.allowedSchemes).toBeUndefined();
+    });
+
+    it('strips allowedSchemes from storage:local-tier links', () => {
+      const cfg = validateConfig(
+        {
+          allLinks: {
+            a: { url: '/a', allowedSchemes: ['vscode', 'slack'] },
+          },
+        },
+        { provenance: 'storage:local' },
+      );
+      expect(cfg.allLinks.a.allowedSchemes).toBeUndefined();
+    });
+
+    it('filters non-string entries from author-tier allowedSchemes', () => {
+      const cfg = validateConfig({
+        allLinks: {
+          a: {
+            url: '/a',
+            allowedSchemes: ['obsidian', 42, null, '', 'vscode'] as unknown as string[],
+          },
+        },
+      });
+      expect(cfg.allLinks.a.allowedSchemes).toEqual(['obsidian', 'vscode']);
+    });
+
+    it('drops the field entirely when allowedSchemes is not an array', () => {
+      const cfg = validateConfig({
+        allLinks: {
+          a: { url: '/a', allowedSchemes: 'obsidian' as unknown as string[] },
+        },
+      });
+      expect(cfg.allLinks.a.allowedSchemes).toBeUndefined();
+    });
+
+    it('drops the field entirely when filtering produces an empty array', () => {
+      const cfg = validateConfig({
+        allLinks: {
+          a: { url: '/a', allowedSchemes: [42, null, ''] as unknown as string[] },
+        },
+      });
+      expect(cfg.allLinks.a.allowedSchemes).toBeUndefined();
+    });
   });
 });

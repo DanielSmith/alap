@@ -219,16 +219,6 @@ public class ExpressionParserTest {
         assertEquals(List.of(), parser.query("@nonexistent"), "unknown macro");
     }
 
-    static void testBareMacroWithAnchor() {
-        Map<String, Object> config = new LinkedHashMap<>(testConfig());
-        Map<String, Object> macros = new LinkedHashMap<>(ExpressionParser.asMap(config.get("macros")));
-        macros.put("myanchor", Map.of("linkItems", "vwbug"));
-        config.put("macros", macros);
-
-        ExpressionParser parser = new ExpressionParser(config);
-        assertEquals(List.of("vwbug"), parser.query("@", "myanchor"), "bare @ with anchor");
-    }
-
     // ------------------------------------------------------------------
     // Tier 7 — Parentheses
     // ------------------------------------------------------------------
@@ -902,7 +892,6 @@ public class ExpressionParserTest {
         run(ExpressionParserTest::testNamedMacro);
         run(ExpressionParserTest::testMacroWithOperators);
         run(ExpressionParserTest::testUnknownMacro);
-        run(ExpressionParserTest::testBareMacroWithAnchor);
 
         section("Tier 7 — Parentheses");
         run(ExpressionParserTest::testBasicGrouping);

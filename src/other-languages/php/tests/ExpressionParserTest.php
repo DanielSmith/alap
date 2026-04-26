@@ -157,14 +157,6 @@ class ExpressionParserTest extends TestCase
         $this->assertSame([], $this->parser->query('@nonexistent'));
     }
 
-    public function testBareMacroWithAnchor(): void
-    {
-        $config = self::$config;
-        $config['macros']['myanchor'] = ['linkItems' => 'vwbug'];
-        $p = new ExpressionParser($config);
-        $this->assertSame(['vwbug'], $p->query('@', 'myanchor'));
-    }
-
     // --- Tier 7: Parentheses ---
 
     public function testBasicGrouping(): void
@@ -460,48 +452,49 @@ class ExpressionParserTest extends TestCase
         $this->assertCount(3, $result);
     }
 
-    // --- Hyphenated identifiers ---
+    // --- Hyphen is always the WITHOUT operator ---
 
-    public function testHyphenatedItemId(): void
+    public function testHyphenIsTreatedAsWithoutOperator(): void
     {
+        // "vw-bug" is parsed as "vw" MINUS "bug", not as the identifier "vw-bug".
         $config = [
             'allLinks' => [
-                'vw-bug' => ['label' => 'VW Bug', 'url' => 'https://example.com/vw-bug', 'tags' => ['car']],
-                'bmw-e36' => ['label' => 'BMW E36', 'url' => 'https://example.com/bmw-e36', 'tags' => ['car']],
+                'vw' => ['label' => 'VW', 'url' => 'https://example.com/vw', 'tags' => ['car']],
+                'bug' => ['label' => 'Bug', 'url' => 'https://example.com/bug', 'tags' => ['car']],
             ],
         ];
         $parser = new ExpressionParser($config);
-        $this->assertSame(['vw-bug'], $parser->query('vw-bug'));
+        $this->assertSame(['vw'], $parser->query('vw-bug'));
     }
 
-    public function testHyphenatedItemIdInCommaList(): void
+    public function testUnderscoresInIdentifiers(): void
     {
         $config = [
             'allLinks' => [
-                'vw-bug' => ['label' => 'VW Bug', 'url' => 'https://example.com/vw-bug', 'tags' => ['car']],
-                'bmw-e36' => ['label' => 'BMW E36', 'url' => 'https://example.com/bmw-e36', 'tags' => ['car']],
+                'vw_bug' => ['label' => 'VW Bug', 'url' => 'https://example.com/vw-bug', 'tags' => ['car']],
+                'bmw_e36' => ['label' => 'BMW E36', 'url' => 'https://example.com/bmw-e36', 'tags' => ['car']],
             ],
         ];
         $parser = new ExpressionParser($config);
-        $result = $parser->query('vw-bug, bmw-e36');
-        $this->assertSame(['vw-bug', 'bmw-e36'], $result);
+        $result = $parser->query('vw_bug, bmw_e36');
+        $this->assertSame(['vw_bug', 'bmw_e36'], $result);
     }
 
-    public function testHyphenatedClassTag(): void
+    public function testUnderscoresInClassTags(): void
     {
         $config = [
             'allLinks' => [
-                'a' => ['label' => 'A', 'url' => 'https://a.com', 'tags' => ['new-york']],
-                'b' => ['label' => 'B', 'url' => 'https://b.com', 'tags' => ['san-francisco']],
+                'a' => ['label' => 'A', 'url' => 'https://a.com', 'tags' => ['new_york']],
+                'b' => ['label' => 'B', 'url' => 'https://b.com', 'tags' => ['san_francisco']],
             ],
         ];
         $parser = new ExpressionParser($config);
-        $this->assertSame(['a'], $parser->query('.new-york'));
+        $this->assertSame(['a'], $parser->query('.new_york'));
     }
 
     public function testHyphenAsOperatorWithSpaces(): void
     {
-        // "foo - .tag" should treat - as MINUS operator, not part of identifier
+        // "foo - .tag" should treat - as MINUS operator
         $result = $this->parser->query('.nyc - .bridge');
         $this->assertNotContains('brooklyn', $result);
         $this->assertContains('highline', $result);

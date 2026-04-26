@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 
 /**
  * Tier 17: Protocol composition — protocols combined with tags, operators,
@@ -24,7 +24,7 @@ import { protocolConfig } from '../fixtures/links-protocols';
  */
 
 describe('Tier 17: Protocol Composition', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('protocol AND tag', () => {
     it('.coffee + :time:7d: — recent coffee shops', () => {
@@ -44,8 +44,8 @@ describe('Tier 17: Protocol Composition', () => {
       expect(ids).not.toContain('bmwe36');
     });
 
-    it('.bridge + :loc: — bridges with location data', () => {
-      const ids = engine.query('.bridge + :loc:');
+    it('.bridge + :location: — bridges with location data', () => {
+      const ids = engine.query('.bridge + :location:');
       // bridges: brooklyn, manhattan, goldengate
       // all three have location data
       expect(ids.sort()).toEqual(['brooklyn', 'goldengate', 'manhattan']);
@@ -76,8 +76,8 @@ describe('Tier 17: Protocol Composition', () => {
       expect(ids).not.toContain('vwbug');
     });
 
-    it(':loc: | :price:0:10: — items with location OR cheap', () => {
-      const ids = engine.query(':loc: | :price:0:10:');
+    it(':location: | :price:0:10: — items with location OR cheap', () => {
+      const ids = engine.query(':location: | :price:0:10:');
       // loc: brooklyn, manhattan, goldengate
       // cheap: aqus, bluebottle, acre
       expect(ids.length).toBe(6);
@@ -131,8 +131,8 @@ describe('Tier 17: Protocol Composition', () => {
       expect(ids).not.toContain('acre');
     });
 
-    it('((:loc: + .nyc) | .car) — nested group with protocol', () => {
-      const ids = engine.query('((:loc: + .nyc) | .car)');
+    it('((:location: + .nyc) | .car) — nested group with protocol', () => {
+      const ids = engine.query('((:location: + .nyc) | .car)');
       // loc + nyc: brooklyn, manhattan (goldengate is sf)
       // | car: vwbug, bmwe36, miata
       expect(ids).toContain('brooklyn');
@@ -163,8 +163,8 @@ describe('Tier 17: Protocol Composition', () => {
   });
 
   describe('complex multi-feature compositions', () => {
-    it('(:time:30d: + .nyc) - :loc: — recent NYC without location', () => {
-      const ids = engine.query('(:time:30d: + .nyc) - :loc:');
+    it('(:time:30d: + .nyc) - :location: — recent NYC without location', () => {
+      const ids = engine.query('(:time:30d: + .nyc) - :location:');
       // recent nyc: brooklyn (3d), highline (2d), bluebottle (4d), manhattan (20d)
       // minus loc: remove brooklyn, manhattan (have location)
       expect(ids).toContain('highline');
@@ -173,8 +173,8 @@ describe('Tier 17: Protocol Composition', () => {
       expect(ids).not.toContain('manhattan');
     });
 
-    it(':loc: + :time:7d: + .bridge — triple intersection', () => {
-      const ids = engine.query(':loc: + :time:7d: + .bridge');
+    it(':location: + :time:7d: + .bridge — triple intersection', () => {
+      const ids = engine.query(':location: + :time:7d: + .bridge');
       // loc: brooklyn, manhattan, goldengate
       // + time:7d: brooklyn (3d), goldengate (1d)
       // + bridge: brooklyn, goldengate

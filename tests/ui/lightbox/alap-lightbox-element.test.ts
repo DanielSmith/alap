@@ -887,4 +887,68 @@ describe('Web Component — <alap-lightbox>', () => {
       expect(getOverlay(el)).toBeNull();
     });
   });
+
+  // ===========================================================================
+  // Placement
+  // ===========================================================================
+
+  describe('placement', () => {
+    function createWithPlacement(query: string, placement: string): AlapLightboxElement {
+      const el = createElement(query);
+      el.setAttribute('placement', placement);
+      return el;
+    }
+
+    it('reads placement attribute on the host', () => {
+      const el = createWithPlacement('brooklyn', 'NW');
+      clickElement(el);
+      const overlay = getOverlay(el)!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+      expect(overlay.style.justifyContent).toBe('flex-start');
+    });
+
+    it('parses strategy suffix and applies compass only', () => {
+      const el = createWithPlacement('brooklyn', 'SE, clamp');
+      clickElement(el);
+      const overlay = getOverlay(el)!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('flex-end');
+    });
+
+    it('falls back to config.settings.placement', () => {
+      registerConfig({ ...lightboxTestConfig, settings: { ...lightboxTestConfig.settings, placement: 'S' } });
+      const el = createElement('brooklyn');
+      clickElement(el);
+      const overlay = getOverlay(el)!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('center');
+    });
+
+    it('re-styles in place when placement attribute changes while open', () => {
+      const el = createWithPlacement('brooklyn', 'NW');
+      clickElement(el);
+      const overlay = getOverlay(el)!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+
+      el.setAttribute('placement', 'SE');
+
+      // Same overlay instance — should not have closed.
+      expect(getOverlay(el)).toBe(overlay);
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('flex-end');
+    });
+
+    it('clears inline styles when placement is removed while open', () => {
+      const el = createWithPlacement('brooklyn', 'NW');
+      clickElement(el);
+      const overlay = getOverlay(el)!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+
+      el.removeAttribute('placement');
+
+      expect(getOverlay(el)).toBe(overlay);
+      expect(overlay.style.alignItems).toBe('');
+      expect(overlay.style.justifyContent).toBe('');
+    });
+  });
 });

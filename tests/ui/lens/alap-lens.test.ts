@@ -1134,4 +1134,64 @@ describe('AlapLens', () => {
       });
     });
   });
+
+  // ===========================================================================
+  // Placement
+  // ===========================================================================
+
+  describe('placement', () => {
+    it('reads data-alap-placement from the trigger', () => {
+      const trigger = createTrigger('t1', 'mrrobot');
+      trigger.setAttribute('data-alap-placement', 'NW');
+      lens = new AlapLens(lensTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+      expect(overlay.style.justifyContent).toBe('flex-start');
+    });
+
+    it('parses strategy suffix and applies compass only', () => {
+      const trigger = createTrigger('t1', 'mrrobot');
+      trigger.setAttribute('data-alap-placement', 'SE, clamp');
+      lens = new AlapLens(lensTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('flex-end');
+    });
+
+    it('trigger attribute wins over constructor option', () => {
+      const trigger = createTrigger('t1', 'mrrobot');
+      trigger.setAttribute('data-alap-placement', 'N');
+      lens = new AlapLens(lensTestConfig, { placement: 'SE' });
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-start');
+      expect(overlay.style.justifyContent).toBe('center');
+    });
+
+    it('falls back to config.settings.placement when no trigger attr', () => {
+      const trigger = createTrigger('t1', 'mrrobot');
+      const config = { ...lensTestConfig, settings: { ...lensTestConfig.settings, placement: 'S' } };
+      lens = new AlapLens(config);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('flex-end');
+      expect(overlay.style.justifyContent).toBe('center');
+    });
+
+    it('falls back to centered default when nothing is configured', () => {
+      const trigger = createTrigger('t1', 'mrrobot');
+      lens = new AlapLens(lensTestConfig);
+      clickTrigger(trigger);
+
+      const overlay = getOverlay()!;
+      expect(overlay.style.alignItems).toBe('');
+      expect(overlay.style.justifyContent).toBe('');
+    });
+  });
 });

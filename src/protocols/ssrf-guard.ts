@@ -109,3 +109,15 @@ export function isPrivateHost(url: string): boolean {
 
   return false;
 }
+
+/**
+ * Throw if {@link isPrivateHost} would refuse `url`. A thin convenience over
+ * {@link isPrivateHost} for call sites that want a pre-fetch guard expressed
+ * as an assertion: one line, fails closed, message names the offending URL
+ * so operators can trace misconfigured bases.
+ */
+export function assertSafeUrl(url: string): void {
+  if (isPrivateHost(url)) {
+    throw new Error(`refusing unsafe URL (private/reserved host): ${url}`);
+  }
+}

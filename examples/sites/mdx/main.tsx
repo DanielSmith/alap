@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import '../../styles.css';
+import '../styles.css';
+import '../shared/styles.css';
+import '../shared/nav.css';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 

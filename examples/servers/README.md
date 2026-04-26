@@ -1,8 +1,8 @@
 # Server Examples
 
-10 REST API servers implementing the same Alap Config API contract. Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
+11 REST API servers implementing the same Alap Config API contract. Swap backends without changing client code — editors, web apps, and `RemoteStore` work with any of them.
 
-The point: Alap is language-agnostic. The same 7 endpoints work whether you prefer Node, Python, PHP, Go, Rust, Java, or Bun.
+The point: Alap is language-agnostic. The same 7 endpoints work whether you prefer Node, Python, PHP, Go, Rust, Ruby, Java, or Bun.
 
 ## Server Matrix
 
@@ -16,10 +16,11 @@ The point: Alap is language-agnostic. The same 7 endpoints work whether you pref
 | [flask-sqlite](flask-sqlite/) | Python + Flask | SQLite | No | Yes (Python port) |
 | [django-sqlite](django-sqlite/) | Python + Django 5.1 | SQLite | No | Yes (Python port) |
 | [axum-sqlite](axum-sqlite/) | Rust + Axum | SQLite | No | Yes (Rust port) |
+| [sinatra-sqlite](sinatra-sqlite/) | Ruby + Sinatra | SQLite | No | Yes (Ruby port) |
 | [java-spring](java-spring/) | Java 21 + Spring Boot 3.4 | SQLite | No | Yes (Java port) |
 | [fastapi-postgres](fastapi-postgres/) | Python + FastAPI | PostgreSQL | Yes (Postgres 16) | Yes (Python port) |
 
-All 10 servers implement all 7 endpoints. Python, PHP, Go, Rust, and Java servers include native ports of the Alap expression parser — no Node.js sidecar required.
+All 11 servers implement all 7 endpoints. Python, PHP, Go, Rust, Ruby, and Java servers include native ports of the Alap expression parser — no Node.js sidecar required.
 
 ## API Contract
 
@@ -51,11 +52,12 @@ pnpm docker:hono      # Hono + SQLite
 podman run -p 3000:3000 alap-express
 ```
 
-**Go, Rust, Java** — build from repo root (they need their parser sources):
+**Go, Rust, Ruby, Java** — build from repo root (they need their parser sources):
 
 ```bash
 podman build -t alap-gin -f examples/servers/gin-sqlite/Dockerfile .
 podman build -t alap-axum -f examples/servers/axum-sqlite/Dockerfile .
+podman build -t alap-sinatra -f examples/servers/sinatra-sqlite/Dockerfile .
 podman build -t alap-java-spring -f examples/servers/java-spring/Dockerfile .
 podman run -p 3000:3000 alap-gin
 ```
@@ -94,6 +96,7 @@ cd django-sqlite && pip install -r requirements.txt && python manage.py migrate 
 cd laravel-sqlite && composer install && php artisan migrate --seed && php artisan serve --port=3000
 cd gin-sqlite && go run seed.go && go run main.go
 cd axum-sqlite && cargo run --bin seed && cargo run
+cd sinatra-sqlite && bundle install && ruby seed.rb && ruby server.rb
 cd java-spring && mvn spring-boot:run
 ```
 
@@ -123,7 +126,7 @@ cd bun-sqlite && ../run-server.sh     # auto-detect from cwd
 
 ```bash
 ./smoke-test.sh express-sqlite     # test one (10 assertions)
-./smoke-test.sh all                # test all 10 sequentially
+./smoke-test.sh all                # test all 11 sequentially
 DOCKER=podman ./smoke-test.sh all  # use Podman instead of Docker
 ```
 

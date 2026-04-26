@@ -17,18 +17,25 @@
 import {
   component$,
   useSignal,
+  useStore,
   useVisibleTask$,
   useId,
+  noSerialize,
   $,
   Slot,
+  type NoSerialize,
   type QRL,
   type CSSProperties,
 } from '@builder.io/qwik';
 import { useAlapContext } from './context';
-import type { AlapLink as AlapLinkType } from '../../core/types';
-import { sanitizeUrl } from '../../core/sanitizeUrl';
-import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail } from '../shared';
-import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen } from '../shared';
+import type { AlapLink as AlapLinkType, SourceState } from '../../core/types';
+import {
+  sanitizeUrlByTier,
+  sanitizeCssClassByTier,
+  sanitizeTargetWindowByTier,
+} from '../../core/sanitizeByTier';
+import type { TriggerHoverDetail, TriggerContextDetail, ItemHoverDetail, ItemContextDetail, ProgressiveRenderContext } from '../shared';
+import { applyPlacementAfterLayout, clearPlacementClass, observeTriggerOffscreen, ProgressiveRenderer, flipFromRect, centerOverTrigger, placeholderDescriptor } from '../shared';
 import {
   REM_PER_MENU_ITEM,
   DEFAULT_MENU_Z_INDEX,
@@ -75,6 +82,8 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
 
   const isOpen = useSignal(false);
   const items = useSignal<ResolvedLink[]>([]);
+  const sources = useSignal<SourceState[]>([]);
+  const isLoadingOnly = useSignal(false);
 
   const triggerId = useId();
   const menuId = useId();
@@ -86,6 +95,12 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
 
   const timerId = useSignal(0);
   const openedViaKeyboard = useSignal(false);
+
+  // Qwik serializes component state across server/client, so runtime-only
+  // objects (renderer instance, DOMRect, MouseEvent) go through noSerialize.
+  const progressiveBox = useStore<{ current: NoSerialize<ProgressiveRenderer> | undefined }>({ current: undefined });
+  const pendingFlipBox = useStore<{ current: NoSerialize<DOMRect> | undefined }>({ current: undefined });
+  const lastClickBox = useStore<{ current: NoSerialize<MouseEvent> | undefined }>({ current: undefined });
 
   const mode = props.mode ?? 'dom';
   const resolvedListType = props.listType ?? ctx.defaultListType;
@@ -110,7 +125,9 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   });
 
   const closeMenu = $(() => {
+    progressiveBox.current?.stop();
     const wasOpen = isOpen.value;
+    isLoadingOnly.value = false;
     isOpen.value = false;
     stopTimer();
     if (wasOpen) triggerRef.value?.focus();
@@ -128,35 +145,74 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
 
   // --- Open / close ---
 
-  const openMenu = $(() => {
-    if (!ctx.engine) return;
-    const resolved = ctx.engine.resolve(props.query, props.anchorId);
-    if (resolved.length === 0) return;
-    items.value = resolved;
-    isOpen.value = true;
+  const openMenu = $((event: MouseEvent) => {
+    if (!ctx.engine || !triggerRef.value) return;
+    lastClickBox.current = noSerialize(event);
+    progressiveBox.current?.start(triggerRef.value, props.query, event, props.anchorId);
   });
 
-  const toggleMenu = $(() => {
+  const toggleMenu = $((event: MouseEvent) => {
     if (isOpen.value) closeMenu();
-    else openMenu();
+    else openMenu(event);
+  });
+
+  // --- Browser-only setup: initialize ProgressiveRenderer on client ---
+
+  useVisibleTask$(({ cleanup }) => {
+    const renderer = new ProgressiveRenderer({
+      engine: () => ctx.engine,
+      onRender: (renderCtx: ProgressiveRenderContext) => {
+        if (renderCtx.transitioningFromLoading && menuRef.value) {
+          pendingFlipBox.current = noSerialize(menuRef.value.getBoundingClientRect());
+        }
+        items.value = renderCtx.state.resolved as ResolvedLink[];
+        sources.value = renderCtx.state.sources as SourceState[];
+        isLoadingOnly.value = renderCtx.isLoadingOnly;
+        isOpen.value = true;
+      },
+      cancelFetchOnDismiss: () => ctx.config?.settings?.cancelFetchOnDismiss === true,
+    });
+    progressiveBox.current = noSerialize(renderer);
+
+    cleanup(() => {
+      renderer.stop();
+      progressiveBox.current = undefined;
+    });
   });
 
   // --- Browser-only effects: dismissal, focus, placement ---
 
-
   useVisibleTask$(({ track, cleanup }) => {
     const open = track(() => isOpen.value);
+    const loading = track(() => isLoadingOnly.value);
+    track(() => items.value);
+    track(() => sources.value);
     if (!open) return;
 
-    // Focus first item on keyboard open only
-    requestAnimationFrame(() => {
-      const firstItem = itemRefs.value[0];
-      if (firstItem) {
-        if (openedViaKeyboard.value) firstItem.focus();
-        openedViaKeyboard.value = false;
-        startTimer();
-      }
-    });
+    // Focus first item on keyboard open only (skip while loading-only).
+    if (!loading) {
+      requestAnimationFrame(() => {
+        const firstItem = itemRefs.value[0];
+        if (firstItem) {
+          if (openedViaKeyboard.value) firstItem.focus();
+          openedViaKeyboard.value = false;
+          startTimer();
+        }
+      });
+    }
+
+    // Loading-only: center the menu over the trigger via CSS-var-driven inline
+    // styles. Skips compass placement because a tiny placeholder would flip
+    // differently than the full menu. When items arrive, the compass branch
+    // below runs and the pending rect triggers a FLIP animation.
+    if (loading && menuRef.value && triggerRef.value && lastClickBox.current) {
+      centerOverTrigger(
+        menuRef.value,
+        triggerRef.value,
+        lastClickBox.current,
+        DEFAULT_MENU_Z_INDEX,
+      );
+    }
 
     // Click outside + escape (dom mode only)
     if (mode !== 'popover') {
@@ -183,13 +239,16 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
       });
     }
 
-    // Compass placement
-    if (props.placement && mode !== 'popover') {
+    // Compass placement (only once real items are present).
+    if (!loading && props.placement && mode !== 'popover') {
       const tEl = triggerRef.value;
       const mEl = menuRef.value;
       const wEl = wrapperRef.value;
 
       if (tEl && mEl && wEl) {
+        // Clear any inline styles set by centerOverTrigger so placement can take over.
+        mEl.style.cssText = '';
+
         const applyNow = applyPlacementAfterLayout(tEl, mEl, wEl, {
           placement: props.placement!,
           gap: props.gap,
@@ -206,6 +265,12 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
       }
     }
 
+    // FLIP animation on transition from loading → resolved.
+    if (!loading && pendingFlipBox.current && menuRef.value) {
+      flipFromRect(menuRef.value, pendingFlipBox.current);
+      pendingFlipBox.current = undefined;
+    }
+
     // Trigger scroll-away detection
     if (mode !== 'popover' && triggerRef.value) {
       const observer = observeTriggerOffscreen(triggerRef.value, () => closeMenu());
@@ -220,7 +285,9 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
     const el = menuRef.value;
     const onToggle = (e: Event) => {
       if ((e as ToggleEvent).newState === 'closed') {
+        progressiveBox.current?.stop();
         isOpen.value = false;
+        isLoadingOnly.value = false;
       }
     };
     el.addEventListener('toggle', onToggle);
@@ -241,9 +308,9 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
     e.preventDefault();
     e.stopPropagation();
     if (mode === 'popover' && !isOpen.value) {
-      openMenu();
+      openMenu(e);
     } else {
-      toggleMenu();
+      toggleMenu(e);
     }
   });
 
@@ -251,10 +318,11 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       openedViaKeyboard.value = true;
+      const synth = new MouseEvent('click', { bubbles: true, cancelable: true });
       if (mode === 'popover' && !isOpen.value) {
-        openMenu();
+        openMenu(synth);
       } else {
-        toggleMenu();
+        toggleMenu(synth);
       }
     }
   });
@@ -309,16 +377,19 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
   // --- Shared menu item renderer ---
 
   const renderItems = () =>
-    items.value.map((item, i) => (
+    items.value.map((item, i) => {
+      const safeCssClass = sanitizeCssClassByTier(item.cssClass, item);
+      return (
       <li
         key={item.id}
         role="none"
-        class={item.cssClass ? `${MENU_ITEM_CLASS} ${item.cssClass}` : MENU_ITEM_CLASS}
+        class={safeCssClass ? `${MENU_ITEM_CLASS} ${safeCssClass}` : MENU_ITEM_CLASS}
       >
         <a
           ref={(el: Element) => { itemRefs.value[i] = el as HTMLAnchorElement; }}
-          href={sanitizeUrl(item.url)}
-          target={item.targetWindow ?? DEFAULT_LINK_TARGET}
+          href={sanitizeUrlByTier(item.url, item)}
+          target={sanitizeTargetWindowByTier(item.targetWindow, item) ?? DEFAULT_LINK_TARGET}
+          rel="noopener noreferrer"
           role="menuitem"
           tabIndex={-1}
           onMouseEnter$={props.onItemHover$
@@ -329,13 +400,14 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
             : undefined}
         >
           {item.image ? (
-            <img src={sanitizeUrl(item.image)} alt={item.altText ?? `image for ${item.id}`} />
+            <img src={sanitizeUrlByTier(item.image, item)} alt={item.altText ?? `image for ${item.id}`} />
           ) : (
             item.label ?? item.id
           )}
         </a>
       </li>
-    ));
+      );
+    });
 
   // --- Render ---
 
@@ -366,10 +438,21 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
     'aria-labelledby': triggerId,
     class: mergedMenuClassName,
     style: mergedMenuStyle,
+    'data-alap-loading-only': isLoadingOnly.value ? '' : undefined,
     onKeyDown$: handleMenuKeyDown,
     onMouseLeave$: startTimer,
     onMouseEnter$: stopTimer,
   };
+
+  const renderPlaceholders = () =>
+    sources.value.map((src) => {
+      const desc = placeholderDescriptor(src);
+      return (
+        <li key={`ph:${src.token}`} {...desc.attrs} class={desc.className}>
+          <a aria-disabled="true" tabIndex={-1}>{desc.label}</a>
+        </li>
+      );
+    });
 
   if (mode === 'popover') {
     return (
@@ -381,6 +464,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
           {isOpen.value && (
             <ListTag role="presentation" style={scrollStyle}>
               {renderItems()}
+              {renderPlaceholders()}
             </ListTag>
           )}
         </div>
@@ -397,6 +481,7 @@ export const AlapLink = component$<AlapLinkProps>((props) => {
         <div {...menuContainerProps}>
           <ListTag role="presentation" style={scrollStyle}>
             {renderItems()}
+            {renderPlaceholders()}
           </ListTag>
         </div>
       )}

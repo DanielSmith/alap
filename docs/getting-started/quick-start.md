@@ -4,7 +4,7 @@
 
 Build a working Alap link in 2 minutes.
 
-> Live version with interactive examples: https://alap.info/getting-started/quick-start
+> Live version with interactive examples: https://docs.alap.info/getting-started/quick-start
 
 ## The CDN path (no build tools)
 

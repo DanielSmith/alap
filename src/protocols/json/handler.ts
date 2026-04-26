@@ -19,7 +19,8 @@ import type { JsonSourceConfig } from './types';
 import { MAX_GENERATED_LINKS, MAX_WEB_RESPONSE_BYTES, WEB_FETCH_TIMEOUT_MS } from '../../constants';
 import { warn } from '../../core/logger';
 import { sanitizeUrlWithSchemes } from '../../core/sanitizeUrl';
-import { getPath, stripHtml } from '../shared';
+import { guardedFetch } from '../guarded-fetch';
+import { getPath, readCappedJson, stripHtml } from '../shared';
 import { getFieldValue } from './getFieldValue';
 import { isTemplate, interpolateTemplate } from './interpolateTemplate';
 
@@ -281,6 +282,21 @@ const mapItem = (
     }
   }
 
+  // Stamp the source's allowedSchemes onto the link so the renderer's
+  // strict-tier sanitizer (sanitizeUrlByTier) honors the same widening
+  // it pre-sanitized with above. Without this stamp, the URL would
+  // round-trip through sanitizeUrlWithSchemes here (allowing the extra
+  // schemes), then get stripped to about:blank again at render time
+  // because the renderer falls back to the strict baseline. The
+  // library-side SCHEME_CEILING bounds what schemes can ever flow
+  // through regardless of what the source declares.
+  //
+  // Only sources from the author's own protocol config can declare
+  // allowedSchemes — the field doesn't come from remote responses.
+  if (allowedSchemes && allowedSchemes.length > 0) {
+    link.allowedSchemes = [...allowedSchemes];
+  }
+
   return link;
 };
 
@@ -337,7 +353,7 @@ export const jsonHandler: GenerateHandler = async (segments, config) => {
       fetchOptions.headers = { ...sourceConfig.headers };
     }
 
-    const response = await fetch(fetchUrl, fetchOptions);
+    const response = await guardedFetch(fetchUrl, fetchOptions);
     clearTimeout(timeoutId);
 
     if (!response.ok) {
@@ -351,13 +367,12 @@ export const jsonHandler: GenerateHandler = async (segments, config) => {
       return [];
     }
 
-    const contentLength = response.headers?.get?.('content-length');
-    if (contentLength && parseInt(contentLength, 10) > MAX_WEB_RESPONSE_BYTES) {
-      warn(`:json: response too large for "${source}": ${contentLength} bytes (max ${MAX_WEB_RESPONSE_BYTES})`);
+    const parsed = await readCappedJson(response);
+    if (parsed === null) {
+      warn(`:json: response exceeded ${MAX_WEB_RESPONSE_BYTES} bytes for "${source}"`);
       return [];
     }
-
-    data = await response.json();
+    data = parsed;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     const label = err instanceof DOMException && err.name === 'AbortError'

@@ -4,7 +4,7 @@
 
 All TypeScript interfaces for the Alap configuration and engine.
 
-> Live version: https://alap.info/api-reference/types
+> Live version: https://docs.alap.info/api-reference/types
 
 ## `AlapConfig`
 

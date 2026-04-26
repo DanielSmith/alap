@@ -4,7 +4,7 @@
 
 Alap menus are keyboard-navigable, screen-reader-announced, and focus-managed out of the box. You don't configure this — it's built into every adapter.
 
-> Live version: https://alap.info/cookbook/accessibility
+> Live version: https://docs.alap.info/cookbook/accessibility
 
 ## What the trigger announces
 

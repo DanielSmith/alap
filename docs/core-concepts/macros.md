@@ -4,7 +4,7 @@
 
 A macro is a named query. You define it once in your config, and use it anywhere with `@`.
 
-> Live version with interactive examples: https://alap.info/core-concepts/macros
+> Live version with interactive examples: https://docs.alap.info/core-concepts/macros
 
 ```json
 {
@@ -68,16 +68,6 @@ You can also use macros inside other macros:
 ```
 
 Cycle protection prevents infinite recursion. The engine limits macro expansion to 10 levels.
-
-## The bare `@`
-
-If a trigger element has a DOM `id`, bare `@` expands to a macro matching that ID:
-
-```html
-<a id="favorites" class="alap" data-alap-linkitems="@">my links</a>
-```
-
-This looks up the macro named `favorites`. Useful when the element's identity and its macro naturally share a name — navigation items, user-specific menus, section-specific link sets.
 
 ## The Markdown escape hatch
 

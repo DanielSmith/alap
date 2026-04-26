@@ -1,0 +1,12 @@
+# Obsidian creates this folder on first open (workspace layout,
+# appearance, plugin enablement). It's per-user and shouldn't be
+# committed even when a maintainer opens the generated vault locally
+# to sanity-check the conversion.
+.obsidian/
+
+# Obsidian's "trash" folder — notes deleted inside Obsidian end up
+# here by default.
+.trash/
+
+# macOS directory metadata
+.DS_Store

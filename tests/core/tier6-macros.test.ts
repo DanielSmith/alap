@@ -72,14 +72,4 @@ describe('Tier 6: Macros', () => {
     ]);
   });
 
-  it('bare @ uses provided anchor ID', () => {
-    // @ with anchorId "cars" should expand macro "cars"
-    const result = engine.query('@', 'cars');
-    expect(result.sort()).toEqual(['bmwe36', 'vwbug']);
-  });
-
-  it('bare @ with no matching macro returns empty', () => {
-    const result = engine.query('@', 'nonexistent');
-    expect(result).toEqual([]);
-  });
 });

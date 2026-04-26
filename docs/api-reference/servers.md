@@ -2,9 +2,9 @@
 
 **[API Reference](README.md):** [Engine](engine.md) · [Types](types.md) · [Config Registry](config-registry.md) · [Placement](placement.md) · [Lightbox](lightbox.md) · [Lens](lens.md) · [Embeds](embeds.md) · [Coordinators](coordinators.md) · [Storage](storage.md) · [Events](events.md) · [Security](security.md) · **This Page**
 
-10 server examples implementing the same REST API contract. Swap backends without code changes — clients (editors, web apps, `RemoteStore`) work with any of them.
+11 server examples implementing the same REST API contract. Swap backends without code changes — clients (editors, web apps, `RemoteStore`) work with any of them.
 
-> Live version: https://alap.info/api-reference/servers
+> Live version: https://docs.alap.info/api-reference/servers
 
 ## API contract
 
@@ -35,7 +35,7 @@ POST   /query                → { expression, configName?, configs? } → { res
 
 ### Cherry-pick and query
 
-These endpoints resolve Alap expressions server-side. Node/Bun servers use `AlapEngine` from `alap/core`. Python, PHP, Go, Rust, and Java servers use native ports of the expression parser. All servers sanitize URLs in responses.
+These endpoints resolve Alap expressions server-side. Node/Bun servers use `AlapEngine` from `alap/core`. Python, PHP, Go, Rust, Ruby, and Java servers use native ports of the expression parser. All servers sanitize URLs in responses.
 
 ## Server matrix
 
@@ -115,4 +115,4 @@ const store = createRemoteStore({ baseUrl: 'http://localhost:3000' });
 const config = await store.load('demo');
 ```
 
-Any of the 10 servers works as the backend. Pick the language and framework that fits your stack.
+Any of the 11 servers works as the backend. Pick the language and framework that fits your stack.

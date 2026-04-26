@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Protocols — Astro</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="../" target="alapDemo">&larr; Advanced Protocol Hub</a></p>
+
+  <h1>Astro Adapter &mdash; Advanced Protocols</h1>
+  <p class="page-intro">
+    Astro's <code>&lt;AlapLink&gt;</code> component is a thin wrapper
+    around <code>&lt;alap-link&gt;</code> &mdash; the web component does
+    all the work, which means the full progressive-rendering matrix ships
+    for free when Astro hydrates on the client. This page uses the
+    <code>&lt;alap-link&gt;</code> / <code>&lt;alap-lens&gt;</code> /
+    <code>&lt;alap-lightbox&gt;</code> custom elements directly so it can
+    run outside Astro's build. Personalized around the Astro ecosystem
+    &mdash; async queries search HN for <em>astro islands</em>, static
+    links cover astro.build, Starlight, and Content Collections.
+  </p>
+
+  <p class="page-intro">
+    For a full Astro-native example that uses the <code>.astro</code>
+    component, see <a href="../../astro-integration/" target="alapDemo">examples/sites/astro-integration/</a>.
+  </p>
+
+  <nav class="adapter-toc">
+    <strong>Jump to:</strong>
+    <a href="#compass">Compass</a>
+    <a href="#progressive">Progressive menu</a>
+    <a href="#mixed">Mixed static + async</a>
+    <a href="#error">Error / empty</a>
+    <a href="#lens">Lens</a>
+    <a href="#lightbox">Lightbox</a>
+    <a href="#dedup">In-flight dedup</a>
+  </nav>
+
+  <details id="compass" class="compass-wrap" open>
+    <summary>
+      Placement Compass Rose
+      <span class="compass-summary-hint">(click a direction to set placement on every element on this page)</span>
+    </summary>
+    <div class="compass-body">
+      <div id="compass-grid" class="compass-grid">
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="NW">NW</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="N">N</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="NE">NE</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="W">W</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="C">C</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="E">E</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="SW">SW</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="S">S</button></div>
+        <div class="compass-cell"><button type="button" class="compass-btn" data-dir="SE">SE</button></div>
+      </div>
+      <p class="compass-driver-hint">
+        Quick confirm &mdash;
+        <alap-link query=".astro + .menu" placement="SE" class="compass-static-link">Static Astro links</alap-link>
+        (no async, opens instantly at the compass direction).
+      </p>
+    </div>
+  </details>
+
+  <h2 id="progressive">1. Progressive Async Menu</h2>
+  <section class="scenario">
+    <p><alap-link query=":slow:2000:5:" placement="SE">Slow menu &mdash; 5 items in 2s</alap-link></p>
+    <p><alap-link query=":slow:500:8:" placement="SE">Fast menu &mdash; 8 items in 500ms</alap-link></p>
+  </section>
+
+  <section class="scenario">
+    <h3>Real data: HN search for <em>astro islands</em></h3>
+    <p><alap-link query=":hn:search:$astro_islands:" placement="SE">Top HN stories about Astro islands</alap-link></p>
+  </section>
+
+  <h2 id="mixed">2. Mixed Static + Dynamic</h2>
+  <section class="scenario">
+    <p class="mixed-legend">
+      <span><span class="swatch static"></span>static</span>
+      <span><span class="swatch mock"></span>mock (async)</span>
+      <span><span class="swatch hn"></span>HN (async)</span>
+    </p>
+    <p><alap-link query="(.astro + .menu) | :slow:1500:3:" placement="SE">Static Astro refs + 3 slow items</alap-link></p>
+    <p><alap-link query="(.astro + .menu) | :hn:search:$astro_islands:limit=4:" placement="SE">Static Astro refs + 4 HN stories</alap-link></p>
+  </section>
+
+  <h2 id="error">3. Error and Empty Placeholders</h2>
+  <section class="scenario">
+    <p><alap-link query=":flaky:error:" placement="SE">Forced error after 800ms</alap-link></p>
+    <p><alap-link query=":flaky:empty:" placement="SE">Empty result after 800ms</alap-link></p>
+    <p><alap-link query="(.astro + .menu) | :flaky:error: | :slow:1200:2:" placement="SE">Static + error + slow</alap-link></p>
+  </section>
+
+  <h2 id="lens">4. Lens &mdash; Metadata Card</h2>
+  <section class="scenario">
+    <p>
+      <alap-lens query="(.astro + .lens) | :slow:1500:2:">
+        Astro ecosystem lens (static + slow)
+      </alap-lens>
+    </p>
+  </section>
+
+  <h2 id="lightbox">5. Lightbox &mdash; Fullscreen Media</h2>
+  <section class="scenario">
+    <p>
+      <alap-lightbox query="(.astro + .image) | :slow:1800:1:">
+        Astro lightbox (rocket hero + slow)
+      </alap-lightbox>
+    </p>
+  </section>
+
+  <h2 id="dedup">6. In-Flight Dedup</h2>
+  <section class="scenario">
+    <p>
+      <alap-link query=":slow:2500:4:" placement="SE">Trigger A &mdash; slow 4 items</alap-link>
+      &nbsp;&nbsp;
+      <alap-link query=":slow:2500:4:" placement="SE">Trigger B &mdash; same token</alap-link>
+    </p>
+  </section>
+
+  <script type="module" src="./main.ts"></script>
+
+  <script>
+    const compassGrid = document.getElementById('compass-grid');
+    compassGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.compass-btn');
+      if (!btn) return;
+      const dir = btn.dataset.dir;
+      const wasActive = btn.classList.contains('active');
+      compassGrid.querySelectorAll('.compass-btn.active').forEach((b) => b.classList.remove('active'));
+      const triggers = document.querySelectorAll('alap-link, alap-lens, alap-lightbox');
+      if (wasActive) {
+        triggers.forEach((el) => el.removeAttribute('placement'));
+      } else {
+        btn.classList.add('active');
+        triggers.forEach((el) => el.setAttribute('placement', dir));
+      }
+    });
+  </script>
+</body>
+</html>

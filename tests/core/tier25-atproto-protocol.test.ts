@@ -30,7 +30,7 @@ import type { AlapConfig } from '../../src/core/types';
 const mockConfig = (overrides?: Record<string, unknown>): AlapConfig => ({
   settings: { listType: 'ul' },
   protocols: {
-    atproto: { generate: atprotoHandler, cache: 5, ...overrides },
+    atproto: { cache: 5, ...overrides },
   },
   allLinks: {},
 });

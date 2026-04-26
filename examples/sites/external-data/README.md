@@ -12,9 +12,9 @@ Demonstrates the `:web:` generate protocol — fetching data from APIs and compo
 ## Config highlights
 
 ```javascript
+// config (data only)
 protocols: {
   web: {
-    generate: webHandler,
     keys: {
       books: {
         url: "https://openlibrary.org/search.json",
@@ -28,11 +28,15 @@ protocols: {
     }
   }
 }
+
+// handler (passed at engine construction)
+import { AlapUI, webHandler } from "alap";
+new AlapUI(config, { handlers: { web: webHandler } });
 ```
 
 ## How it works
 
-The `:web:` protocol is async — it fetches from APIs before the parser runs. The `main.ts` scans the page for `:web:` expressions, pre-resolves them all in parallel, then initializes the UI. After that, menus open instantly from cache.
+The `:web:` protocol is async. As of 3.2 the renderer opens immediately with a `Loading…` placeholder and re-renders in place when the fetch settles — no pre-resolve step is required. `main.ts` can still call `engine.preResolve()` to warm the cache up front (e.g. on `mouseenter`, or once the page is otherwise idle), but it's optional.
 
 ## Run
 

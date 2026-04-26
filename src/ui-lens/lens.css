@@ -179,6 +179,23 @@
   transition: height var(--alap-lens-resize-transition) ease-in-out;
 }
 
+/* Progressive-render placeholder — shown when async sources are still in
+   flight, errored, or empty. The panel is otherwise empty, so the placeholder
+   needs explicit color + centering against the dark panel background. */
+.alap-lens-panel > .alap-placeholder {
+  color: var(--alap-lens-label-color);
+  font-size: 1.2rem;
+  font-style: italic;
+  opacity: 0.7;
+  padding: 3rem 2rem;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.alap-lens-panel > .alap-placeholder-error { opacity: 0.85; }
+
 /* Fade transition — content fades out/in, panel stays put */
 
 .alap-lens-panel-fading .alap-lens-image-wrap,

@@ -94,7 +94,7 @@ Consent is stored per-domain in localStorage. The `EmbedPolicy` controls behavio
 
 | Policy | Behavior |
 |--------|----------|
-| `'prompt'` | Show placeholder; load only after user clicks to grant consent |
+| `'prompt'` | **Privacy-first (default):** Shows a placeholder and only loads the iframe after the user clicks to grant consent. |
 | `'allow'` | Always load for allowlisted domains |
 | `'block'` | Never load; ignores stored consent |
 
@@ -164,3 +164,13 @@ interface EmbedProvider {
 | CodeSandbox | codesandbox.io | interactive | `codesandbox.io/embed/{id}` |
 
 YouTube uses the `youtube-nocookie.com` domain for privacy-enhanced embedding.
+
+## Security posture
+
+Embeds are scoped by three layers working together:
+
+- **Provider allowlist.** `isAllowlisted()` gates which URLs `createEmbed` accepts. The built-in list covers only the supported providers above; extend it per-page via the `customAllowlist` argument if needed.
+- **Per-domain consent.** `createEmbed` returns a placeholder until `grantConsent(domain)` opts in — domain by domain, revocable at any time.
+- **Iframe hardening.** Iframes render with `referrerpolicy="strict-origin-when-cross-origin"`, `loading="lazy"`, and a locked `allow` attribute scoped to the providers' oembed needs. `sandbox` is intentionally not set — several providers fail in sandboxed iframes; hardening relies on the `allow` policy and the provider allowlist instead. See [Security in the cookbook](../cookbook/embeds.md#security) for the full list.
+
+Embeds are protected by Alap's standard URL sanitization. For more on how Alap ensures that data from different sources is handled safely, see our [Security Trust Model](security.md#trust-model-how-alap-handles-data).

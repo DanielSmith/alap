@@ -26,7 +26,7 @@ import {
   noSerialize,
 } from '@builder.io/qwik';
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig } from '../../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
 
 export interface AlapContextValue {
@@ -42,13 +42,20 @@ export const AlapCtx = createContextId<AlapContextValue>('alap-context');
 
 export interface AlapProviderProps {
   config: AlapConfig;
+  /**
+   * Protocol handler registry. Required for any expression that uses a
+   * protocol (`:web:`, `:time:`, `:hn:`, custom…). Qwik rebuilds the
+   * engine on every config change, so handlers are re-supplied to each
+   * new instance — keep the registry stable across renders.
+   */
+  handlers?: ProtocolHandlerRegistry;
   menuTimeout?: number;
   defaultMenuClassName?: string;
 }
 
 export const AlapProvider = component$<AlapProviderProps>((props) => {
   const store = useStore<AlapContextValue>({
-    engine: noSerialize(new AlapEngine(props.config)),
+    engine: noSerialize(new AlapEngine(props.config, { handlers: props.handlers })),
     config: props.config,
     menuTimeout:
       props.menuTimeout
@@ -64,7 +71,7 @@ export const AlapProvider = component$<AlapProviderProps>((props) => {
   useTask$(({ track }) => {
     const cfg = track(() => props.config);
     store.config = cfg;
-    store.engine = noSerialize(new AlapEngine(cfg));
+    store.engine = noSerialize(new AlapEngine(cfg, { handlers: props.handlers }));
     store.menuTimeout =
       props.menuTimeout
       ?? (cfg.settings?.menuTimeout as number)

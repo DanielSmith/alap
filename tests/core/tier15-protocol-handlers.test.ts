@@ -16,16 +16,16 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 import type { AlapConfig } from '../../src/core/types';
 
 /**
  * Tier 15: Protocol handlers — tests the behavior of each protocol handler
- * (time, price, loc) including edge cases and error handling.
+ * (time, price, location) including edge cases and error handling.
  */
 
 describe('Tier 15: Protocol Handlers', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('time protocol', () => {
     it(':time:7d: returns items created within 7 days', () => {
@@ -112,7 +112,7 @@ describe('Tier 15: Protocol Handlers', () => {
           },
         },
       };
-      const e = new AlapEngine(config);
+      const e = new AlapEngine(config, { handlers: protocolHandlers });
       const ids = e.query(':time:7d:');
       expect(ids).toContain('withDate');
       expect(ids).not.toContain('noDate');
@@ -164,21 +164,61 @@ describe('Tier 15: Protocol Handlers', () => {
     });
   });
 
-  describe('loc protocol', () => {
-    it(':loc: returns items that have location metadata', () => {
-      const ids = engine.query(':loc:');
+  describe('location protocol', () => {
+    it(':location: returns items that have location metadata', () => {
+      const ids = engine.query(':location:');
       expect(ids).toContain('brooklyn');
       expect(ids).toContain('manhattan');
       expect(ids).toContain('goldengate');
       expect(ids.length).toBe(3);
     });
 
-    it(':loc: excludes items without location', () => {
-      const ids = engine.query(':loc:');
+    it(':location: excludes items without location', () => {
+      const ids = engine.query(':location:');
       expect(ids).not.toContain('highline');
       expect(ids).not.toContain('vwbug');
       expect(ids).not.toContain('aqus');
       expect(ids).not.toContain('acre');
+    });
+
+    it(':location:radius:lat,lng:5mi: returns items within 5 miles', () => {
+      // Brooklyn Bridge (40.7061, -73.9969) is the anchor
+      const ids = engine.query(':location:radius:40.7061,-73.9969:5mi:');
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan'); // ~0.5mi away
+      expect(ids).not.toContain('goldengate'); // SF, ~2500mi away
+    });
+
+    it(':location:radius: with km unit', () => {
+      const ids = engine.query(':location:radius:40.7061,-73.9969:10km:');
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan');
+      expect(ids).not.toContain('goldengate');
+    });
+
+    it(':location:radius: returns nothing when radius is too small', () => {
+      const ids = engine.query(':location:radius:0,0:1mi:');
+      expect(ids).toEqual([]);
+    });
+
+    it(':location:bbox:sw:ne: returns items inside the box', () => {
+      // NYC bbox covers brooklyn + manhattan but not SF
+      const ids = engine.query(':location:bbox:40.6,-74.1:40.8,-73.9:');
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan');
+      expect(ids).not.toContain('goldengate');
+    });
+
+    it(':location:bbox: corner order is normalized', () => {
+      // Pass NE,SW instead of SW,NE — handler should min/max them
+      const ids = engine.query(':location:bbox:40.8,-73.9:40.6,-74.1:');
+      expect(ids).toContain('brooklyn');
+      expect(ids).toContain('manhattan');
+    });
+
+    it(':location:unknown: returns empty for unknown sub-mode', () => {
+      const ids = engine.query(':location:unknown:foo:');
+      expect(ids).toEqual([]);
     });
   });
 
@@ -204,16 +244,15 @@ describe('Tier 15: Protocol Handlers', () => {
 
     it('protocol handler that throws is caught gracefully', () => {
       const config: AlapConfig = {
-        protocols: {
-          bomb: {
-            handler: () => { throw new Error('kaboom'); },
-          },
-        },
         allLinks: {
           item: { label: 'Test', url: 'https://example.com' },
         },
       };
-      const e = new AlapEngine(config);
+      const e = new AlapEngine(config, {
+        handlers: {
+          bomb: { filter: () => { throw new Error('kaboom'); } },
+        },
+      });
       const ids = e.query(':bomb:');
       expect(ids).toEqual([]);
     });

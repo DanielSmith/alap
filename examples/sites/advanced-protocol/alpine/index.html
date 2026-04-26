@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Protocols — Alpine</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../../shared/nav.css">
+  <style>
+    [x-alap] {
+      color: #88bbff;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    [x-alap]:hover { color: #ffd666; }
+  </style>
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="../" target="alapDemo">&larr; Advanced Protocol Hub</a></p>
+
+  <div x-data="advancedDemo">
+    <h1>Alpine Adapter &mdash; Advanced Protocols</h1>
+    <p class="page-intro">
+      <code>x-alap</code> directive &mdash; every trigger evaluates a
+      <code>{ query, config }</code> object. Lens and lightbox are
+      embedded web components. Personalized around the Alpine ecosystem
+      &mdash; async queries search HN for <em>alpine.js</em>, static links
+      cover alpinejs.dev, Livewire, and Caleb Porzio's blog.
+    </p>
+
+    <nav class="adapter-toc">
+      <strong>Jump to:</strong>
+      <a href="#compass">Compass</a>
+      <a href="#progressive">Progressive menu</a>
+      <a href="#mixed">Mixed static + async</a>
+      <a href="#error">Error / empty</a>
+      <a href="#lens">Lens</a>
+      <a href="#lightbox">Lightbox</a>
+      <a href="#dedup">In-flight dedup</a>
+    </nav>
+
+    <details id="compass" class="compass-wrap" open>
+      <summary>
+        Placement Compass Rose
+        <span class="compass-summary-hint">(click a direction to set placement on every trigger on this page)</span>
+      </summary>
+      <div class="compass-body">
+        <p class="note">
+          Click any direction; every <code>x-alap</code> trigger on the
+          page reads <code>placement: dir || 'SE'</code> from Alpine state
+          &mdash; changing <code>dir</code> cascades to them all.
+        </p>
+        <div class="compass-grid">
+          <template x-for="d in ['NW','N','NE','W','C','E','SW','S','SE']" :key="d">
+            <div class="compass-cell">
+              <button type="button" class="compass-btn" :class="{ active: dir === d }" x-text="d" @click="setDir(d)"></button>
+            </div>
+          </template>
+        </div>
+        <p class="compass-driver-hint">
+          Quick confirm &mdash;
+          <span class="compass-static-link" x-alap="{ query: '.alpine + .menu', config, handlers, placement: p('SE') }">Static Alpine links</span>
+          (no async, opens instantly at the compass direction).
+        </p>
+      </div>
+    </details>
+
+    <h2 id="progressive">1. Progressive Async Menu</h2>
+    <section class="scenario">
+      <h3>Deterministic <code>:slow:</code> mock</h3>
+      <p class="note">
+        The Alpine directive wires <code>ProgressiveRenderer</code> to the
+        trigger &mdash; same contract as every other adapter, just via
+        Alpine's directive lifecycle.
+      </p>
+      <p><span x-alap="{ query: ':slow:2000:5:', config, handlers, placement: p('SE') }">Slow menu &mdash; 5 items in 2s</span></p>
+      <p><span x-alap="{ query: ':slow:500:8:', config, handlers, placement: p('SE') }">Fast menu &mdash; 8 items in 500ms</span></p>
+    </section>
+
+    <section class="scenario">
+      <h3>Real data: HN search for <em>alpine.js</em></h3>
+      <p><span x-alap="{ query: ':hn:search:$alpine_js:', config, handlers, placement: p('SE') }">Top HN stories about Alpine.js</span></p>
+    </section>
+
+    <h2 id="mixed">2. Mixed Static + Dynamic</h2>
+    <section class="scenario">
+      <p class="mixed-legend">
+        <span><span class="swatch static"></span>static</span>
+        <span><span class="swatch mock"></span>mock (async)</span>
+        <span><span class="swatch hn"></span>HN (async)</span>
+      </p>
+      <p><span x-alap="{ query: '(.alpine + .menu) | :slow:1500:3:', config, handlers, placement: p('SE') }">Static Alpine refs + 3 slow items</span></p>
+      <p><span x-alap="{ query: '(.alpine + .menu) | :hn:search:$alpine_js:limit=4:', config, handlers, placement: p('SE') }">Static Alpine refs + 4 HN stories</span></p>
+    </section>
+
+    <h2 id="error">3. Error and Empty Placeholders</h2>
+    <section class="scenario">
+      <p><span x-alap="{ query: ':flaky:error:', config, handlers, placement: p('SE') }">Forced error after 800ms</span></p>
+      <p><span x-alap="{ query: ':flaky:empty:', config, handlers, placement: p('SE') }">Empty result after 800ms</span></p>
+      <p><span x-alap="{ query: '(.alpine + .menu) | :flaky:error: | :slow:1200:2:', config, handlers, placement: p('SE') }">Static + error + slow</span></p>
+    </section>
+
+    <h2 id="lens">4. Lens &mdash; Metadata Card</h2>
+    <section class="scenario">
+      <p>
+        <alap-lens query="(.alpine + .lens) | :slow:1500:2:">
+          Alpine ecosystem lens (static + slow)
+        </alap-lens>
+      </p>
+    </section>
+
+    <h2 id="lightbox">5. Lightbox &mdash; Fullscreen Media</h2>
+    <section class="scenario">
+      <p>
+        <alap-lightbox query="(.alpine + .image) | :slow:1800:1:">
+          Alpine lightbox (pattern image + slow)
+        </alap-lightbox>
+      </p>
+    </section>
+
+    <h2 id="dedup">6. In-Flight Dedup</h2>
+    <section class="scenario">
+      <p>
+        <span x-alap="{ query: ':slow:2500:4:', config, handlers, placement: p('SE') }">Trigger A &mdash; slow 4 items</span>
+        &nbsp;&nbsp;
+        <span x-alap="{ query: ':slow:2500:4:', config, handlers, placement: p('SE') }">Trigger B &mdash; same token</span>
+      </p>
+    </section>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

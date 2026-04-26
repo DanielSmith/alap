@@ -4,6 +4,8 @@
 
 Alap's embed module renders iframes for known providers with per-domain consent management. It works standalone or integrates with the lightbox and lens renderers.
 
+> Alap is a single-maintainer open source project that hasn't been through a third-party audit. Please do your own due diligence — especially when wiring up protocols on servers with local network access.
+
 > Live version: https://examples.alap.info/embed/
 
 ## Supported providers
@@ -138,7 +140,11 @@ const lens = new AlapLens(config, {
 });
 ```
 
-## Security
+## Security posture
+
+- Embed providers are an explicit per-domain allowlist. A link with an unknown `meta.embed` host falls through to a normal anchor; third-party content is never inlined uninvited.
+- Each domain is opt-in twice: once when the integrator adds it to the provider list, and again when the visitor confirms the per-domain consent prompt the renderer shows on first interaction.
+- Embed URLs go through the strict-tier sanitizer and are wrapped in the provider's iframe template — raw `iframe`/`script` markup from link metadata is never rendered.
 
 Iframes use a locked-down Permissions Policy matching the providers' own oembed recommendations:
 

@@ -1,0 +1,16 @@
+/* HN-local styles. Paired with ../shared/styles.css (linked separately). */
+
+body:not(.loaded) .example { opacity: 0.5; }
+body.loaded .example { opacity: 1; transition: opacity 0.3s; }
+
+/* Constrain menus — HN titles can be long. */
+.alapelem { max-width: 480px; }
+.alapListElem a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Visual source indicator — :hn: stamps `source_hn` on every link.
+   Orange (#ff6600) is HN's brand colour, matched in protocols.md. */
+.alapListElem.source_hn { border-left: 3px solid #ff6600; }

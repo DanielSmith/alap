@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 
 /**
  * Tier 18: Refiner tokenizer — verifies that *refiner* syntax is correctly
@@ -24,7 +24,7 @@ import { protocolConfig } from '../fixtures/links-protocols';
  */
 
 describe('Tier 18: Refiner Tokenizer', () => {
-  const engine = new AlapEngine(protocolConfig);
+  const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
   describe('basic refiner parsing', () => {
     it('.coffee *sort:label* returns results sorted by label', () => {

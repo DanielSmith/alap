@@ -73,6 +73,7 @@ Each adapter follows the same pattern: `<AlapProvider>` wraps `<AlapLink>` compo
 | [cdn](cdn/) | 9130 | Zero-build `<script>` tag setup — no npm, no bundler |
 | [htmx](htmx/) | 9220 | htmx + web component — HTML over the wire, zero framework |
 | [lightbox](lightbox/) | — | Lightbox renderer — fullscreen overlay instead of dropdown, thumbnail previews |
+| [all-together](all-together/) | — | Menu + lightbox + lens sharing one config, coordinated by `RendererCoordinator` with back-stack Escape |
 
 ## Development
 

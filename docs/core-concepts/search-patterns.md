@@ -6,7 +6,7 @@ Tags work when you know what you're looking for — you tagged things deliberate
 
 That's regex search. It sits alongside tags, item IDs, and macros as a first-class part of the expression language.
 
-> Live version with interactive examples: https://alap.info/core-concepts/search-patterns
+> Live version with interactive examples: https://docs.alap.info/core-concepts/search-patterns
 
 ## How it works
 

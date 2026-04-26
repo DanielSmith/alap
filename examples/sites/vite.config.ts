@@ -22,6 +22,9 @@ const alapRoot = resolve(sitesRoot, '../..');
 // Examples that have their own build systems — skip for the Vite build
 const SKIP = new Set([
   'astro-integration', 'eleventy', 'hugo', 'vitepress',  // own build systems
+  'obsidian',                                              // own Node server (server.mjs, port 9178); /main.mjs absolute path
+  'obsidian-rest',                                         // own Node server (server.mjs, port 9179); /main.mjs absolute path
+  'obsidian-shared',                                       // shared content (vault + sources) — not a runnable example
   'mdx',                                                   // needs @mdx-js/rollup plugin
   // 'lightbox' — imports from src/ui-lightbox (resolved via Vite aliases)
   'shared',                                                // not an example
@@ -84,6 +87,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         gallery: resolve(sitesRoot, 'index.html'),
+        notFound: resolve(sitesRoot, '404.html'),
         ...entries,
       },
     },
@@ -91,7 +95,7 @@ export default defineConfig({
   plugins: [
     vue(),
     svelte(),
-    solid({ include: [resolve(alapRoot, 'src/ui/solid/**'), resolve(sitesRoot, 'solid/**'), resolve(sitesRoot, 'ui-sandbox/solid/**')], solid: { generate: 'dom' } }),
+    solid({ include: [resolve(alapRoot, 'src/ui/solid/**'), resolve(sitesRoot, 'solid/**'), resolve(sitesRoot, 'ui-sandbox/solid/**'), resolve(sitesRoot, 'advanced-protocol/solid/**')], solid: { generate: 'dom' } }),
     {
       // Copy static files for self-contained examples (cdn, htmx)
       // that use IIFE scripts and HTML fragments Vite can't bundle.

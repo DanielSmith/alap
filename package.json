@@ -1,6 +1,6 @@
 {
   "name": "alap",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Dynamic menus for links — one click, multiple destinations",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -42,6 +42,11 @@
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js",
       "require": "./dist/storage/index.cjs"
+    },
+    "./protocols/obsidian": {
+      "types": "./dist/protocols/obsidian/index.d.ts",
+      "import": "./dist/protocols/obsidian/index.js",
+      "require": "./dist/protocols/obsidian/index.cjs"
     },
     "./astro": {
       "types": "./dist/ui/astro/index.d.ts",
@@ -118,13 +123,20 @@
     "dev": "vite serve examples/sites --config vite.config.ts",
     "build": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/ && tsc --emitDeclarationOnly --outDir dist && tsc -p tsconfig.solid.json --emitDeclarationOnly --outDir dist && tsc -p tsconfig.qwik.json --emitDeclarationOnly --outDir dist",
     "build:lib": "vite build && vite build --config vite.config.iife.ts && cp src/ui-lightbox/lightbox.css src/ui-lens/lens.css src/ui-embed/embed.css src/ui/shared/rendererTransitions.css dist/",
-    "copy:iife": "for dir in examples/sites/*/; do [ -f \"${dir}alap.iife.js\" ] && cp dist/alap.iife.js \"$dir\"; done; true",
-    "build:all": "pnpm turbo run build",
+    "copy:iife": "cp dist/alap.iife.js examples/sites/cdn/ && cp dist/alap.iife.js examples/sites/htmx/",
+    "build:all": "pnpm turbo run build --continue",
     "test": "vitest run",
     "test:all": "turbo run test",
     "test:watch": "vitest",
+    "test:scripts": "python3 -m pytest scripts/tests/",
+    "vault:docs": "python3 scripts/vault_docs.py",
+    "vault:demo": "python3 scripts/vault_demo.py",
+    "vault:convert": "python3 scripts/vault_convert.py",
+    "feed:to-md": "python3 scripts/feed_to_md.py",
     "typecheck": "tsc --noEmit",
     "typecheck:all": "turbo run typecheck",
+    "clean": "rm -rf dist dist-tgz .turbo tsconfig.tsbuildinfo",
+    "clean:all": "pnpm -r exec rm -rf dist .turbo && rm -rf dist-tgz tsconfig.tsbuildinfo",
     "pack:lib": "pnpm run build:lib && pnpm pack --pack-destination ./dist-tgz",
     "test:packaging": "vitest run --config vitest.packaging.ts",
     "docker:express": "pnpm run pack:lib && podman build -t alap-express -f examples/servers/express-sqlite/Dockerfile .",
@@ -154,7 +166,7 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
@@ -164,7 +176,8 @@
       "lodash": ">=4.18.0",
       "esbuild": ">=0.25.0",
       "defu": ">=6.1.5",
-      "vite": ">=6.4.2 <7.0.0"
+      "vite": ">=6.4.2 <7.0.0",
+      "liquidjs": ">=10.25.7"
     },
     "onlyBuiltDependencies": [
       "better-sqlite3",
@@ -180,6 +193,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/svelte": "^5.3.1",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-vue": "^6.0.5",
@@ -208,5 +222,8 @@
     "vite-plugin-solid": "^2.11.10",
     "vitest": "^3.0.0",
     "vue": "^3.5.30"
+  },
+  "dependencies": {
+    "undici": "^7.24.6"
   }
 }

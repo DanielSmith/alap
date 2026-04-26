@@ -16,10 +16,10 @@
 
 import { describe, it, expect } from 'vitest';
 import { AlapEngine } from '../../src/core/AlapEngine';
-import { protocolConfig } from '../fixtures/links-protocols';
+import { protocolConfig, protocolHandlers } from '../fixtures/links-protocols';
 import type { AlapConfig } from '../../src/core/types';
 
-const engine = new AlapEngine(protocolConfig);
+const engine = new AlapEngine(protocolConfig, { handlers: protocolHandlers });
 
 describe('Tier 21: Refiner & Protocol Edge Cases (Security)', () => {
 
@@ -103,16 +103,17 @@ describe('Tier 21: Refiner & Protocol Edge Cases (Security)', () => {
           b: { label: 'B', url: '/b', meta: { value: 'bad' } },
           c: { label: 'C', url: '/c', meta: { value: 'good' } },
         },
-        protocols: {
+      };
+      const e = new AlapEngine(config, {
+        handlers: {
           fragile: {
-            handler: (segments, link) => {
+            filter: (segments, link) => {
               if ((link.meta?.value as string) === 'bad') throw new Error('boom');
               return true;
             },
           },
         },
-      };
-      const e = new AlapEngine(config);
+      });
       const ids = e.query(':fragile:');
       // b threw, a and c passed
       expect(ids).toContain('a');
@@ -144,11 +145,8 @@ describe('Tier 21: Refiner & Protocol Edge Cases (Security)', () => {
         allLinks: {
           noMeta: { label: 'No Meta', url: '/no-meta' },
         },
-        protocols: {
-          time: protocolConfig.protocols!.time,
-        },
       };
-      const e = new AlapEngine(config);
+      const e = new AlapEngine(config, { handlers: { time: protocolHandlers.time } });
       const ids = e.query(':time:7d:');
       expect(ids).toEqual([]);
     });
@@ -158,12 +156,10 @@ describe('Tier 21: Refiner & Protocol Edge Cases (Security)', () => {
         allLinks: {
           bad: { label: 'Bad', url: '/bad', meta: { timestamp: 'not-a-date', price: 'free' } },
         },
-        protocols: {
-          time: protocolConfig.protocols!.time,
-          price: protocolConfig.protocols!.price,
-        },
       };
-      const e = new AlapEngine(config);
+      const e = new AlapEngine(config, {
+        handlers: { time: protocolHandlers.time, price: protocolHandlers.price },
+      });
       expect(e.query(':time:7d:')).toEqual([]);
       expect(e.query(':price:0:10:')).toEqual([]);
     });
@@ -171,7 +167,7 @@ describe('Tier 21: Refiner & Protocol Edge Cases (Security)', () => {
 
   describe('composition stress', () => {
     it('many protocols in one expression', () => {
-      const ids = engine.query(':time:30d: + :price:0:50000: + :loc:');
+      const ids = engine.query(':time:30d: + :price:0:50000: + :location:');
       // Only items with timestamp within 30d AND price AND location
       // vwbug: 5d, price 15k, no location → excluded (no location)
       // brooklyn: 3d, no price, has location → excluded (no price)

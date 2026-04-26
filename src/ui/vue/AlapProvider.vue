@@ -17,18 +17,25 @@
 <script setup lang="ts">
 import { provide, shallowRef, watch, computed, type CSSProperties } from 'vue';
 import { AlapEngine } from '../../core/AlapEngine';
-import type { AlapConfig } from '../../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry } from '../../core/types';
 import { DEFAULT_MENU_TIMEOUT, DEFAULT_MAX_VISIBLE_ITEMS } from '../../constants';
 import { AlapKey, type AlapContextValue, createMenuCoordinator } from './providerKey';
 
 const props = defineProps<{
   config: AlapConfig;
+  /**
+   * Protocol handler registry. Required for any expression that uses a
+   * protocol (`:web:`, `:time:`, `:hn:`, custom…). Attached at construction
+   * and preserved across config updates.
+   */
+  handlers?: ProtocolHandlerRegistry;
   menuTimeout?: number;
   defaultMenuStyle?: CSSProperties;
   defaultMenuClassName?: string;
 }>();
 
-const engineRef = shallowRef(new AlapEngine(props.config));
+// Handlers pass through at construction; updateConfig later leaves them in place.
+const engineRef = shallowRef(new AlapEngine(props.config, { handlers: props.handlers }));
 const menuCoordinator = createMenuCoordinator();
 
 watch(() => props.config, (cfg) => {

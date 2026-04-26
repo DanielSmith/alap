@@ -17,6 +17,7 @@
 import type { AlapConfig } from '../core/types';
 import type { ConfigStore, ConfigEntry } from './ConfigStore';
 import { validateConfig } from '../core/validateConfig';
+import { deepCloneData } from '../core/deepCloneData';
 
 export interface RemoteStoreOptions {
   /** Base URL of the config API (e.g. "https://api.example.com") */
@@ -76,7 +77,7 @@ export function createRemoteStore(options: RemoteStoreOptions): ConfigStore {
         throw new Error(`Failed to load config "${name}": ${res.status} ${res.statusText}`);
       }
       const entry: ConfigEntry = await res.json();
-      return validateConfig(entry.config);
+      return validateConfig(deepCloneData(entry.config), { provenance: 'storage:remote' });
     },
 
     async loadEntry(name: string): Promise<ConfigEntry | null> {
@@ -86,7 +87,7 @@ export function createRemoteStore(options: RemoteStoreOptions): ConfigStore {
         throw new Error(`Failed to load config "${name}": ${res.status} ${res.statusText}`);
       }
       const entry: ConfigEntry = await res.json();
-      return { ...entry, config: validateConfig(entry.config) };
+      return { ...entry, config: validateConfig(deepCloneData(entry.config), { provenance: 'storage:remote' }) };
     },
 
     async list(): Promise<string[]> {

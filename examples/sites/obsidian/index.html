@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — Obsidian vault menus</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="/lightbox.css">
+</head>
+<body>
+  <main class="page">
+    <p class="mode-banner">
+      <strong>Filesystem mode</strong> — reads vault Markdown directly off disk; no plugin required.
+      Want the live-from-Obsidian version? Try
+      <a href="http://localhost:9179/">REST mode (<code>:obsidian:rest:</code>)</a>.
+    </p>
+
+    <header>
+      <h1>Obsidian vault &rarr; Alap menus</h1>
+      <p class="framing">
+        <em>This isn't a doc reader &mdash;
+        <a href="https://docs.alap.info">docs.alap.info</a> has that,
+        with proper VitePress search. This page is a demo of the
+        <code>:obsidian:core:</code> protocol: the same expression
+        machinery works against <strong>any</strong> vault you point it
+        at &mdash; your own notes, a team wiki, a shared project folder.
+        The vault here is a mix of the project's own docs and a few
+        small topical sources (birds, cooking, films, novels, Bach,
+        and an untrusted-content sample), all real markdown already
+        on disk. Clone the repo, point <code>vaultPath</code> at your
+        own vault, and every trigger on this page resolves against
+        your content instead.</em>
+      </p>
+    </header>
+
+    <section>
+      <h2>Core vs REST &mdash; which mode and why</h2>
+      <p>
+        Two ways to wire <code>:obsidian:</code> into a page. Same
+        expression syntax, very different operational shape.
+      </p>
+      <table class="mode-compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Core (this page)</th>
+            <th>REST (<a href="http://localhost:9179/">port 9179</a>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Reads from</th>
+            <td>Markdown files on disk.</td>
+            <td>The Obsidian app's Local REST API plugin.</td>
+          </tr>
+          <tr>
+            <th scope="row">Setup</th>
+            <td>Node server + vault path. Obsidian doesn't need to be installed or running.</td>
+            <td>Install the Local REST API plugin in Obsidian, configure an API key, and point the Node server at it.</td>
+          </tr>
+          <tr>
+            <th scope="row">Search</th>
+            <td>Substring grep over <code>title</code>, <code>tags</code>, <code>body</code>, <code>path</code>.</td>
+            <td>Obsidian's own search engine &mdash; relevance ranking, full-text, fuzzy matching, the metadata cache (backlinks, tag aliases, link graph).</td>
+          </tr>
+          <tr>
+            <th scope="row">Best for</th>
+            <td>When you don't want the search server itself to depend on Obsidian running &mdash; the markdown directory might not even be an Obsidian vault. Simple substring matches are enough.</td>
+            <td>When Obsidian is already running on the same machine and you want richer search (relevance ranking, full-text, fuzzy) or to leverage Obsidian's own indexes (backlinks, link graph, plugin-aware content like Dataview).</td>
+          </tr>
+          <tr>
+            <th scope="row">Click-through</th>
+            <td colspan="2">Same in both modes: results carry <code>obsidian://open?vault=…&amp;file=…</code> URIs, so clicking opens the note in Obsidian if you have it installed locally. Override <code>linkTemplate</code> in the protocol config to emit different URLs (e.g., a public-web preview).</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The expression syntax is identical &mdash;
+        <code>:obsidian:core:foo:</code> here,
+        <code>:obsidian:rest:foo:</code> over there. Switching modes
+        is changing one segment, not rewriting the page.
+      </p>
+    </section>
+
+    <section>
+      <h2>Three menus, three capabilities</h2>
+      <ul class="trigger-list">
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:framework_guides:">
+            Framework guides
+          </a>
+          <p class="caption">Substring search &mdash; matches the <code>framework_guides</code> tag in note frontmatter.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:api_reference: *sort:label*">
+            API reference, sorted
+          </a>
+          <p class="caption">Single-protocol query + refiner &mdash; api-reference notes, sorted alphabetically.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core: *sort:label* *limit:5*">
+            First 5 docs alphabetical
+          </a>
+          <p class="caption">Empty query + refiners &mdash; lists everything, sorted, capped at 5.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Browse by topic</h2>
+      <p class="framing">
+        Beyond the alap-docs content, the vault now includes five
+        small topical collections converted from different SSG
+        sources under
+        <code>obsidian-shared/sources/</code>. Each menu below
+        searches just that topic.
+      </p>
+      <ul class="trigger-list">
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:cardinal:">
+            Cardinal
+          </a>
+          <p class="caption">From <code>birds/</code> &mdash; Hugo source, Wikipedia content.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:carbonara:">
+            Carbonara
+          </a>
+          <p class="caption">From <code>cooking/</code> &mdash; Jekyll source.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:Hitchcock:">
+            Hitchcock films
+          </a>
+          <p class="caption">From <code>films/</code> &mdash; MkDocs source.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:Austen:">
+            Austen
+          </a>
+          <p class="caption">From <code>novels/</code> &mdash; Docusaurus source.</p>
+        </li>
+        <li>
+          <a class="alap" data-alap-linkitems=":obsidian:core:Goldberg:">
+            Goldberg Variations
+          </a>
+          <p class="caption">From <code>bach/</code> &mdash; plain markdown source.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Search the docs</h2>
+      <form id="search-form" class="search">
+        <input type="text" id="search-input" placeholder="e.g. lightbox, react, tag, security…" autocomplete="off">
+        <button type="submit">Search &rarr;</button>
+      </form>
+      <p class="chips">
+        Try:
+        <button type="button" class="chip" data-query="lightbox">lightbox</button>
+        <button type="button" class="chip" data-query="react">react</button>
+        <button type="button" class="chip" data-query="tag">tag</button>
+        <button type="button" class="chip" data-query="atproto">atproto</button>
+        <button type="button" class="chip" data-query="css">css</button>
+        <button type="button" class="chip" data-query="server">server</button>
+      </p>
+      <a class="alap search-trigger" id="search-trigger"
+         data-alap-linkitems=":obsidian:core::"
+         hidden>Search results</a>
+    </section>
+
+    <section>
+      <h2>Where the vault lives</h2>
+      <p class="notes">
+        Both example sites (this one and <code>obsidian-rest/</code>)
+        share the vault at
+        <code>examples/sites/obsidian-shared/AlapDocs/</code>. The
+        directory name doubles as the Obsidian vault name &mdash;
+        opening that folder in the Obsidian app gives you a vault
+        called "AlapDocs" without renaming, which matches the
+        <code>obsidian://open?vault=AlapDocs</code> URIs the server
+        emits.
+      </p>
+      <p class="notes">
+        The alap-docs portion is regenerated from
+        <code>alap/docs/</code> via <code>pnpm -w run vault:docs</code>;
+        the topical demo subdirectories (<code>birds/</code>,
+        <code>cooking/</code>, <code>films/</code>,
+        <code>novels/</code>, <code>bach/</code>) come from
+        <code>pnpm -w run vault:demo</code>, which converts the
+        source flavours under
+        <code>examples/sites/obsidian-shared/sources/</code>. Edits
+        made directly in the generated vault won't survive the next
+        regen.
+      </p>
+    </section>
+
+    <section>
+      <h2>Clicking a result</h2>
+      <p class="notes">
+        Each link's URL is an <code>obsidian://open?vault=&hellip;&amp;file=&hellip;</code>
+        URI. If you have Obsidian installed with the vault configured,
+        your browser will hand the URL to it and the note will open
+        directly.
+      </p>
+    </section>
+  </main>
+
+  <script src="/alap.iife.js"></script>
+  <script type="module" src="/main.mjs"></script>
+</body>
+</html>

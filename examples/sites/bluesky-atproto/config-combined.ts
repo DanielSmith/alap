@@ -15,7 +15,6 @@
  */
 
 import type { AlapConfig } from 'alap/core';
-import { atprotoHandler, webHandler } from 'alap';
 
 /**
  * Three sources, one menu.
@@ -28,8 +27,14 @@ import { atprotoHandler, webHandler } from 'alap';
  *
  * A single expression can pull from all three and merge the results
  * into one menu.
+ *
+ * Config is a factory because :atproto: needs the optional accessJwt
+ * baked in at construction time — the engine deep-freezes the config
+ * after validation, so handing a session token in later (via mutation)
+ * wouldn't work.
  */
-export const combinedConfig: AlapConfig = {
+export function buildCombinedConfig(options: { accessJwt?: string | null } = {}): AlapConfig {
+  return {
   settings: {
     listType: 'ul',
     menuTimeout: 5000,
@@ -41,7 +46,6 @@ export const combinedConfig: AlapConfig = {
 
   protocols: {
     web: {
-      generate: webHandler,
       cache: 10,
       keys: {
         books: {
@@ -78,9 +82,8 @@ export const combinedConfig: AlapConfig = {
       },
     },
     atproto: {
-      generate: atprotoHandler,
       cache: 5,
-      accessJwt: null,
+      accessJwt: options.accessJwt ?? null,
     },
   },
 
@@ -110,4 +113,5 @@ export const combinedConfig: AlapConfig = {
       description: 'Encrypted communications',
     },
   },
-};
+  };
+}

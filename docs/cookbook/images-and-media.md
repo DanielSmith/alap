@@ -4,7 +4,7 @@
 
 Alap menu items can display images instead of text, show thumbnails on hover, and carry rich metadata for custom interactions.
 
-> Live version: https://alap.info/cookbook/images-and-media
+> Live version: https://docs.alap.info/cookbook/images-and-media
 
 ## Image items
 

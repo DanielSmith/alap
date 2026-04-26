@@ -16,13 +16,15 @@
 
 import type { ResolvedLink } from '../core/types';
 import { warn } from '../core/logger';
-import { getEngine } from '../ui/shared/configRegistry';
-import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { getEngine, getConfig } from '../ui/shared/configRegistry';
+import { applyOverlayLayout, clearOverlayLayout, computeOverlayLayout, viewportSize } from '../ui/shared/overlayPlacement';
+import { parsePlacement, type ParsedPlacement } from '../ui/shared/placement';
 import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
 import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
 import { openImageZoom } from '../ui/shared/imageZoom';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
+import { sanitizeUrlByTier, sanitizeTargetWindowByTier } from '../core/sanitizeByTier';
 import { STYLES } from './lens-element.css';
 
 // --- Constants ---
@@ -125,10 +127,15 @@ export class AlapLensElement extends HTMLElement {
     this.removeEventListener('keydown', this.onTriggerKeydown);
   }
 
-  attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void {
-    if (oldValue !== newValue && this.isOpen) {
-      this.close();
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+    if (oldValue === newValue) return;
+    // Placement changes re-style the open overlay in place; closing would be
+    // surprising for a purely cosmetic attribute.
+    if (name === 'placement' && this.isOpen) {
+      this.applyPlacementStyles();
+      return;
     }
+    if (this.isOpen) this.close();
   }
 
   // --- Attribute helpers ---
@@ -165,8 +172,30 @@ export class AlapLensElement extends HTMLElement {
     return DEFAULT_TAG_SWITCH_TOOLTIP;
   }
 
-  private get placement(): string | null {
-    return this.getAttribute('placement');
+  /**
+   * Resolve the effective compass direction for the overlay, in priority order:
+   *   1. `placement` attribute on the host (parsed; strategy discarded).
+   *   2. `config.settings.placement` (parsed; strategy discarded).
+   *   3. null — overlay uses CSS default (centered).
+   */
+  private resolvePlacement(): ParsedPlacement | null {
+    const attr = this.getAttribute('placement');
+    if (attr) return parsePlacement(attr);
+    const configName = this.getAttribute('config') ?? DEFAULT_CONFIG_KEY;
+    const config = getConfig(configName);
+    const configVal = config?.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return null;
+  }
+
+  private applyPlacementStyles(): void {
+    if (!this.overlay) return;
+    const effective = this.resolvePlacement();
+    if (effective) {
+      applyOverlayLayout(this.overlay, computeOverlayLayout(effective, viewportSize()));
+    } else {
+      clearOverlayLayout(this.overlay);
+    }
   }
 
   // --- Trigger ---
@@ -222,11 +251,7 @@ export class AlapLensElement extends HTMLElement {
     this.overlay.setAttribute('aria-label', 'Item details');
 
     // Apply placement
-    const p = this.placement;
-    if (p && p in OVERLAY_ALIGN) {
-      this.overlay.style.alignItems = OVERLAY_ALIGN[p as keyof typeof OVERLAY_ALIGN];
-      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[p as keyof typeof OVERLAY_JUSTIFY];
-    }
+    this.applyPlacementStyles();
 
     this.overlay.addEventListener('click', (e) => {
       if (e.target === this.overlay) this.close();
@@ -375,7 +400,7 @@ export class AlapLensElement extends HTMLElement {
         const creditUrl = link.meta?.photoCreditUrl as string | undefined;
         if (creditUrl) {
           const creditLink = document.createElement('a');
-          creditLink.href = creditUrl;
+          creditLink.href = sanitizeUrlByTier(creditUrl, link);
           creditLink.target = '_blank';
           creditLink.rel = 'noopener noreferrer';
           creditLink.textContent = `Photo: ${creditName}`;
@@ -466,7 +491,9 @@ export class AlapLensElement extends HTMLElement {
       if (value == null || value === '') continue;
 
       const displayHint = meta[`${key}${DISPLAY_HINT_SUFFIX}`] as string | undefined;
-      const rendered = this.renderMetaField(key, value, displayHint);
+      // Thread the parent link into the field renderer so renderLinks can
+      // sanitize each meta-URL by the parent's provenance tier (Surface 1-2).
+      const rendered = this.renderMetaField(key, value, displayHint, link);
       if (rendered) {
         metaSection.appendChild(rendered);
       }
@@ -486,8 +513,8 @@ export class AlapLensElement extends HTMLElement {
       const visitBtn = document.createElement('a');
       visitBtn.className = 'visit';
       visitBtn.setAttribute('part', 'visit');
-      visitBtn.href = link.url;
-      visitBtn.target = link.targetWindow ?? '_blank';
+      visitBtn.href = sanitizeUrlByTier(link.url, link);
+      visitBtn.target = sanitizeTargetWindowByTier(link.targetWindow, link) ?? '_blank';
       visitBtn.rel = 'noopener noreferrer';
       visitBtn.textContent = this.visitLabel;
       actions.appendChild(visitBtn);
@@ -692,7 +719,12 @@ export class AlapLensElement extends HTMLElement {
 
   // --- Meta field rendering ---
 
-  private renderMetaField(key: string, value: unknown, displayHint?: string): HTMLElement | null {
+  private renderMetaField(
+    key: string,
+    value: unknown,
+    displayHint: string | undefined,
+    parentLink: ResolvedLink,
+  ): HTMLElement | null {
     const displayName = this.formatMetaKey(key);
     const hint = displayHint ?? this.detectDisplayType(value);
 
@@ -700,7 +732,7 @@ export class AlapLensElement extends HTMLElement {
       case DISPLAY_LIST:
         return this.renderChips(displayName, value as string[]);
       case DISPLAY_LINKS:
-        return this.renderLinks(displayName, value as string[]);
+        return this.renderLinks(displayName, value as string[], parentLink);
       case DISPLAY_TEXT:
         return this.renderTextBlock(displayName, value as string);
       case DISPLAY_VALUE:
@@ -780,7 +812,7 @@ export class AlapLensElement extends HTMLElement {
     return row;
   }
 
-  private renderLinks(label: string, urls: string[]): HTMLElement {
+  private renderLinks(label: string, urls: string[], parentLink: ResolvedLink): HTMLElement {
     const row = document.createElement('div');
     row.className = 'meta-row meta-row-links';
 
@@ -796,7 +828,11 @@ export class AlapLensElement extends HTMLElement {
     for (const url of visible) {
       const a = document.createElement('a');
       a.className = 'meta-link';
-      a.href = url;
+      // Surface 1-2 mirror on the web-component path: each meta URL
+      // inherits the parent link's provenance tier. protocol:* parents
+      // pull their meta anchors through the strict sanitizer; javascript:
+      // lands as about:blank.
+      a.href = sanitizeUrlByTier(url, parentLink);
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       try {

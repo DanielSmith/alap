@@ -21,6 +21,12 @@ import solid from 'vite-plugin-solid';
 import { resolve } from 'path';
 
 export default defineConfig({
+  define: {
+    // ESM/CJS builds + vitest runs: not the IIFE bundle.
+    // Used by src/protocols/guarded-fetch.ts to decide whether the Node
+    // rebind guard branch should exist in the output.
+    __ALAP_IIFE__: 'false',
+  },
   resolve: {
     alias: {
       'alap/slim': resolve(__dirname, 'src/slim.ts'),
@@ -33,6 +39,7 @@ export default defineConfig({
       'alap/astro': resolve(__dirname, 'src/ui/astro/index.ts'),
       'alap/storage': resolve(__dirname, 'src/storage/index.ts'),
       'alap/qwik': resolve(__dirname, 'src/ui/qwik/index.ts'),
+      'alap/protocols/obsidian': resolve(__dirname, 'src/protocols/obsidian/index.ts'),
       'alap': resolve(__dirname, 'src/index.ts'),
       'rehype-alap': resolve(__dirname, 'plugins/rehype-alap/src/index.ts'),
     },
@@ -51,11 +58,12 @@ export default defineConfig({
         'alpine/index': resolve(__dirname, 'src/ui/alpine/index.ts'),
         'solid/index': resolve(__dirname, 'src/ui/solid/index.ts'),
         'qwik/index': resolve(__dirname, 'src/ui/qwik/index.ts'),
+        'protocols/obsidian/index': resolve(__dirname, 'src/protocols/obsidian/index.ts'),
       },
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'vue', /^svelte($|\/)/, /^solid-js($|\/)/, /^@builder\.io\/qwik($|\/)/, 'idb'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'vue', /^svelte($|\/)/, /^solid-js($|\/)/, /^@builder\.io\/qwik($|\/)/, 'idb', /^node:/, 'yaml', 'fast-glob', 'undici'],
     },
   },
   plugins: [

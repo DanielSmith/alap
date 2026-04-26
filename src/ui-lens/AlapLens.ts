@@ -15,17 +15,21 @@
  */
 
 import { AlapEngine } from '../core/AlapEngine';
-import type { AlapConfig, ResolvedLink } from '../core/types';
+import type { AlapConfig, ProtocolHandlerRegistry, ResolvedLink, SourceState } from '../core/types';
 import { RENDERER_LENS } from '../ui/shared/coordinatedRenderer';
 import type { CoordinatedRenderer, OpenPayload } from '../ui/shared/coordinatedRenderer';
-import type { Placement } from '../ui/shared/placement';
-import { OVERLAY_ALIGN, OVERLAY_JUSTIFY } from '../ui/shared/overlayPlacement';
+import { parsePlacement, type Placement, type ParsedPlacement } from '../ui/shared/placement';
+import { applyOverlayLayout, computeOverlayLayout, viewportSize } from '../ui/shared/overlayPlacement';
 import { handleOverlayKeydown } from '../ui/shared/overlayKeyboard';
 import { fadeIn, fadeOut } from '../ui/shared/overlayTransition';
 import { openImageZoom } from '../ui/shared/imageZoom';
 import { createSetNavigator } from '../ui/shared/setNavigator';
 import type { SetNavHandle } from '../ui/shared/setNavigator';
+import { buildPlaceholderItem } from '../ui/shared/progressivePlaceholder';
+import { ProgressiveRenderer, type ProgressiveRenderContext } from '../ui/shared/progressiveRenderer';
+import { flipFromRect } from '../ui/shared/flipAnimation';
 import { createEmbed } from '../ui-embed/AlapEmbed';
+import { sanitizeUrlByTier, sanitizeTargetWindowByTier } from '../core/sanitizeByTier';
 import type { EmbedPolicy } from '../ui-embed/embedConsent';
 
 // --- Options ---
@@ -33,6 +37,8 @@ import type { EmbedPolicy } from '../ui-embed/embedConsent';
 export interface AlapLensOptions {
   /** CSS selector for trigger elements. Default: DEFAULT_SELECTOR */
   selector?: string;
+  /** Protocol handler registry — forwarded to the engine. See AlapEngineOptions.handlers. */
+  handlers?: ProtocolHandlerRegistry;
   /** Label for the visit/navigate button. Default: DEFAULT_VISIT_LABEL */
   visitLabel?: string;
   /** Label for the close button. Default: DEFAULT_CLOSE_LABEL */
@@ -208,7 +214,7 @@ export class AlapLens implements CoordinatedRenderer {
   private copyable: boolean;
   private panelCloseButton: boolean;
   private tagSwitchTooltip: number;
-  private placement: Placement | null;
+  private placement: ParsedPlacement | null;
   private transition: TransitionMode;
   private overlay: HTMLElement | null = null;
   private links: ResolvedLink[] = [];
@@ -224,11 +230,16 @@ export class AlapLens implements CoordinatedRenderer {
   private drawerExpanded = false;
   private embedPolicy: EmbedPolicy;
   private embedAllowlist: string[] | undefined;
+  private config: AlapConfig;
+  /** Placeholder state for the current progressive render (only one in flight at a time). */
+  private currentSources: readonly SourceState[] = [];
+  private progressive: ProgressiveRenderer;
 
   private handleKeydown: (e: KeyboardEvent) => void;
 
   constructor(config: AlapConfig, options: AlapLensOptions = {}) {
-    this.engine = new AlapEngine(config);
+    this.config = config;
+    this.engine = new AlapEngine(config, { handlers: options.handlers });
     this.selector = options.selector ?? DEFAULT_SELECTOR;
     this.visitLabel = options.visitLabel ?? DEFAULT_VISIT_LABEL;
     this.closeLabel = options.closeLabel ?? DEFAULT_CLOSE_LABEL;
@@ -236,11 +247,16 @@ export class AlapLens implements CoordinatedRenderer {
     this.copyable = options.copyable ?? true;
     this.panelCloseButton = options.panelCloseButton ?? false;
     this.tagSwitchTooltip = options.tagSwitchTooltip ?? DEFAULT_TAG_SWITCH_TOOLTIP;
-    this.placement = options.placement ?? null;
+    this.placement = options.placement ? { compass: options.placement, strategy: 'flip' } : null;
     this.transition = options.transition ?? DEFAULT_TRANSITION;
     this.embedPolicy = options.embedPolicy ?? 'prompt';
     this.embedAllowlist = options.embedAllowlist;
     this.handleKeydown = this.onKeydown.bind(this);
+    this.progressive = new ProgressiveRenderer({
+      engine: this.engine,
+      cancelFetchOnDismiss: () => this.config.settings?.cancelFetchOnDismiss === true,
+      onRender: (ctx) => this.onProgressiveRender(ctx),
+    });
     this.init();
   }
 
@@ -266,15 +282,37 @@ export class AlapLens implements CoordinatedRenderer {
     const expression = trigger.getAttribute('data-alap-linkitems');
     if (!expression) return;
 
-    const anchorId = trigger.id || undefined;
-    this.links = this.engine.resolve(expression, anchorId);
-    if (this.links.length === 0) return;
+    this.activeTrigger = trigger;
+    this.progressive.start(trigger, expression, event, trigger.id || undefined);
+  }
 
-    this.originalLinks = [...this.links];
+  private onProgressiveRender(ctx: ProgressiveRenderContext): void {
+    this.links = ctx.state.resolved;
+    this.originalLinks = [...ctx.state.resolved];
+    this.currentSources = ctx.state.sources;
     this.currentIndex = 0;
     this.activeTag = null;
-    this.open();
-    this.activeTrigger = trigger;
+
+    if (!this.overlay) {
+      this.open();
+      return;
+    }
+
+    // On loading → resolved transition, FLIP-animate the panel from its
+    // loading-only footprint to the final content's footprint. Target the
+    // panel (content box) rather than the overlay (full-viewport backdrop)
+    // so the backdrop's fade-in isn't disturbed.
+    if (ctx.transitioningFromLoading) {
+      const oldPanel = this.overlay.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+      const oldRect = oldPanel?.getBoundingClientRect() ?? null;
+      this.render();
+      if (oldRect) {
+        const newPanel = this.overlay.querySelector(`.${CSS.panel}`) as HTMLElement | null;
+        if (newPanel) flipFromRect(newPanel, oldRect);
+      }
+    } else {
+      this.render();
+    }
   }
 
   // --- CoordinatedRenderer ---
@@ -296,7 +334,9 @@ export class AlapLens implements CoordinatedRenderer {
   // --- Overlay lifecycle ---
 
   private open(): void {
-    this.close();
+    // Tear down any previous overlay DOM but keep the current progressive
+    // render state — close() would abort the handle we just set up.
+    this.teardownOverlay();
 
     this.overlay = document.createElement('div');
     this.overlay.className = CSS.overlay;
@@ -304,9 +344,9 @@ export class AlapLens implements CoordinatedRenderer {
     this.overlay.setAttribute('aria-modal', ARIA.modal);
     this.overlay.setAttribute('aria-label', ARIA.dialogLabel);
 
-    if (this.placement) {
-      this.overlay.style.alignItems = OVERLAY_ALIGN[this.placement];
-      this.overlay.style.justifyContent = OVERLAY_JUSTIFY[this.placement];
+    const effective = this.resolvePlacement();
+    if (effective) {
+      applyOverlayLayout(this.overlay, computeOverlayLayout(effective, viewportSize()));
     }
 
     this.overlay.addEventListener('click', (e) => {
@@ -321,25 +361,29 @@ export class AlapLens implements CoordinatedRenderer {
 
   close(): HTMLElement | null {
     const trigger = this.activeTrigger;
-    if (this.overlay) {
-      const overlay = this.overlay;
-      this.overlay = null;
-
-      fadeOut(overlay, CSS.overlayVisible);
-    }
-    document.removeEventListener('keydown', this.handleKeydown);
+    // Contract 14: abort the in-flight render so late settles can't paint a closed overlay.
+    this.progressive.stop();
+    this.currentSources = [];
+    this.teardownOverlay();
     this.activeTrigger = null;
     this.drawerExpanded = false;
     return trigger;
+  }
+
+  /** Remove the overlay DOM and its keydown listener without touching progressive state. */
+  private teardownOverlay(): void {
+    if (this.overlay) {
+      const overlay = this.overlay;
+      this.overlay = null;
+      fadeOut(overlay, CSS.overlayVisible);
+    }
+    document.removeEventListener('keydown', this.handleKeydown);
   }
 
   // --- Rendering ---
 
   private render(): void {
     if (!this.overlay) return;
-
-    const link = this.links[this.currentIndex];
-    const total = this.links.length;
 
     this.overlay.innerHTML = '';
 
@@ -348,6 +392,23 @@ export class AlapLens implements CoordinatedRenderer {
 
     const panel = document.createElement('div');
     panel.className = CSS.panel;
+
+    // Progressive state: no resolved link yet — show a placeholder inside the
+    // panel. Priority: error > empty > loading, so a terminal state wins if
+    // multiple sources are attached to the expression.
+    if (this.links.length === 0 && this.currentSources.length > 0) {
+      const primary =
+        this.currentSources.find((s) => s.status === 'error') ??
+        this.currentSources.find((s) => s.status === 'empty') ??
+        this.currentSources[0];
+      const ph = buildPlaceholderItem(primary, 'div');
+      panel.appendChild(ph);
+      this.overlay.appendChild(panel);
+      return;
+    }
+
+    const link = this.links[this.currentIndex];
+    const total = this.links.length;
 
     // Image stays directly on panel (outside the drawer)
     this.renderImage(panel, link);
@@ -446,7 +507,7 @@ export class AlapLens implements CoordinatedRenderer {
         const creditUrl = link.meta?.photoCreditUrl as string | undefined;
         if (creditUrl) {
           const creditLink = document.createElement('a');
-          creditLink.href = creditUrl;
+          creditLink.href = sanitizeUrlByTier(creditUrl, link);
           creditLink.target = '_blank';
           creditLink.rel = 'noopener noreferrer';
           creditLink.textContent = `Photo: ${creditName}`;
@@ -540,7 +601,12 @@ export class AlapLens implements CoordinatedRenderer {
       if (value == null || value === '') continue;
 
       const displayHint = meta[`${key}${DISPLAY_HINT_SUFFIX}`] as string | undefined;
-      const rendered = this.renderMetaField(key, value, displayHint);
+      // Thread the parent link through so renderLinks (and any future meta
+      // renderer that emits anchors) can sanitize URLs by the parent's tier.
+      // A `_display:"links"` meta array on a `protocol:web` response is the
+      // Surface 1-2 XSS vector — the array's strings inherit the parent's
+      // provenance because they came in with the same handler response.
+      const rendered = this.renderMetaField(key, value, displayHint, link);
       if (rendered) {
         metaSection.appendChild(rendered);
       }
@@ -558,8 +624,8 @@ export class AlapLens implements CoordinatedRenderer {
     if (link.url) {
       const visitBtn = document.createElement('a');
       visitBtn.className = CSS.visit;
-      visitBtn.href = link.url;
-      visitBtn.target = link.targetWindow ?? DEFAULT_TARGET;
+      visitBtn.href = sanitizeUrlByTier(link.url, link);
+      visitBtn.target = sanitizeTargetWindowByTier(link.targetWindow, link) ?? DEFAULT_TARGET;
       visitBtn.rel = 'noopener noreferrer';
       visitBtn.textContent = this.visitLabel;
       actions.appendChild(visitBtn);
@@ -761,7 +827,12 @@ export class AlapLens implements CoordinatedRenderer {
 
   // --- Meta field rendering ---
 
-  private renderMetaField(key: string, value: unknown, displayHint?: string): HTMLElement | null {
+  private renderMetaField(
+    key: string,
+    value: unknown,
+    displayHint: string | undefined,
+    parentLink: ResolvedLink,
+  ): HTMLElement | null {
     const displayName = this.formatMetaKey(key);
     const hint = displayHint ?? this.detectDisplayType(value);
 
@@ -769,7 +840,7 @@ export class AlapLens implements CoordinatedRenderer {
       case DISPLAY_LIST:
         return this.renderChips(displayName, value as string[]);
       case DISPLAY_LINKS:
-        return this.renderLinks(displayName, value as string[]);
+        return this.renderLinks(displayName, value as string[], parentLink);
       case DISPLAY_TEXT:
         return this.renderTextBlock(displayName, value as string);
       case DISPLAY_VALUE:
@@ -843,7 +914,7 @@ export class AlapLens implements CoordinatedRenderer {
     return row;
   }
 
-  private renderLinks(label: string, urls: string[]): HTMLElement {
+  private renderLinks(label: string, urls: string[], parentLink: ResolvedLink): HTMLElement {
     const row = document.createElement('div');
     row.className = `${CSS.metaRow} ${CSS.metaRowLinks}`;
 
@@ -859,8 +930,13 @@ export class AlapLens implements CoordinatedRenderer {
     for (const url of visible) {
       const a = document.createElement('a');
       a.className = CSS.metaLink;
-      a.href = url;
-      a.target = DEFAULT_TARGET;
+      // Each meta-URL inherits the parent link's provenance tier — a
+      // `_display:"links"` array arrived in the same handler response as
+      // its parent, so they share trust. Surface 1-2: without this,
+      // a `protocol:web` response carrying `{ related: ['javascript:…'] }`
+      // would render clickable `javascript:` anchors.
+      a.href = sanitizeUrlByTier(url, parentLink);
+      a.target = sanitizeTargetWindowByTier(parentLink.targetWindow, parentLink) ?? DEFAULT_TARGET;
       a.rel = 'noopener noreferrer';
       try {
         const parsed = new URL(url);
@@ -1084,7 +1160,29 @@ export class AlapLens implements CoordinatedRenderer {
 
   /** Change viewport placement at runtime. Pass null to revert to CSS default (centered). */
   setPlacement(placement: Placement | null): void {
-    this.placement = placement;
+    this.placement = placement ? { compass: placement, strategy: 'flip' } : null;
+  }
+
+  /**
+   * Resolve the effective placement for the overlay, in priority order:
+   *   1. Trigger's `data-alap-placement` attribute (full `ParsedPlacement`, strategy preserved).
+   *   2. Instance-level placement (constructor option or `setPlacement()`).
+   *   3. `config.settings.placement` (full `ParsedPlacement`).
+   *   4. null — overlay uses CSS default (centered).
+   *
+   * Mirrors the menu's fallback chain so `data-alap-placement` behaves the
+   * same on `<a class="alap">`, `<a class="alap-lens">`, and `<a class="alap-lightbox">`.
+   * Strategy tokens (`flip`, `clamp`) flow through to the overlay layout —
+   * `clamp` sets `max-height`/`max-width` on the overlay so long panels scroll
+   * within the viewport rather than overflowing.
+   */
+  private resolvePlacement(): ParsedPlacement | null {
+    const triggerAttr = this.activeTrigger?.getAttribute('data-alap-placement');
+    if (triggerAttr) return parsePlacement(triggerAttr);
+    if (this.placement) return this.placement;
+    const configVal = this.config.settings?.placement;
+    if (typeof configVal === 'string') return parsePlacement(configVal);
+    return null;
   }
 
   /**

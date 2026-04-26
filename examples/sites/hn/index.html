@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap v3 — Hacker News</title>
+  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="../shared/nav.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+
+  <h1>Alap v3 &mdash; Hacker News</h1>
+  <p>
+    The <code>:hn:</code> protocol turns Hacker News into a live link source. Zero
+    auth, zero server. HN exposes two public JSON APIs —
+    <code>hacker-news.firebaseio.com</code> for listings / items / users, and
+    <code>hn.algolia.com</code> for full-text search. Both serve CORS headers,
+    so the page calls them directly in the browser.
+  </p>
+  <p class="note">
+    Every link is stamped with <code>source_hn</code> on its CSS class and
+    <code>meta.source: 'hn'</code>, so mixed-source menus can distinguish
+    where each entry came from. The orange left-border below is that class.
+  </p>
+
+  <h2>Listings</h2>
+  <p class="note">
+    Each sub-mode hits a different HN endpoint. <code>:hn:top:</code>
+    maps to <code>topstories.json</code>, <code>:hn:new:</code> to
+    <code>newstories.json</code>, and so on.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:top:">Top stories</a>
+      &mdash; front page
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:new:limit=5:">Newest (5)</a>
+      &mdash; <code>limit=5</code> named arg
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:best:">Best stories</a>
+      &mdash; all-time highlights rolling window
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:ask:">Ask HN</a>
+      &mdash; question threads
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:show:">Show HN</a>
+      &mdash; project launches
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:job:">Jobs</a>
+      &mdash; YC company postings
+    </p>
+  </div>
+
+  <h2>User submissions</h2>
+  <p class="note">
+    <code>:hn:user:username:</code> fetches the user record then hydrates
+    their submitted items.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:user:pg:limit=5:">pg's recent submissions</a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:user:todsacerdoti:limit=5:">todsacerdoti's recent submissions</a>
+    </p>
+  </div>
+
+  <h2>Search via Algolia</h2>
+  <p class="note">
+    Multi-word queries can't appear inline (the tokenizer splits on spaces),
+    so they're aliased in <code>config.protocols.hn.searches</code> and
+    referenced as <code>$preset</code>. See the <code>config.ts</code> source.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap-lens" data-alap-linkitems=":hn:search:$ai_papers:limit=10:">AI papers</a>
+      &mdash; alias: <code>"artificial intelligence papers"</code> (opens as a lens)
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:search:$rust_release:limit=10:">Rust releases</a>
+      &mdash; alias: <code>"rust release"</code>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:search:$typescript:limit=10:">TypeScript strict mode</a>
+      &mdash; alias: <code>"typescript strict mode"</code>
+    </p>
+  </div>
+
+  <h2>Specific items</h2>
+  <p class="note">
+    <code>:hn:items:id1:id2:...:</code> fetches zero or more specific
+    stories by id. Each id is its own positional segment, same shape as
+    any protocol's <code>:proto:mode:arg1:arg2:</code>. Non-numeric
+    positionals are dropped; no ids is a no-op. Capped at 6 per call &mdash;
+    HN's API has no batch endpoint, so each id is a separate fetch.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:items:8863:">Dropbox launch (one item)</a>
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:items:8863:121003:1:">Classic HN stories (three items)</a>
+      &mdash; Dropbox launch + Arc Effect + HN item #1
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:items:">Empty items (no-op)</a>
+      &mdash; menu will have no HN entries
+    </p>
+  </div>
+
+  <h2>Composition</h2>
+  <p class="note">
+    <code>:hn:</code> results are just <code>AlapLink</code> objects, so
+    they compose with tags, macros, <code>:time:</code>, and everything
+    else in the expression grammar.
+  </p>
+  <div class="example">
+    <p>
+      <a class="alap" data-alap-linkitems="@my_reads, :hn:top:limit=5:">My reads, then top HN</a>
+      &mdash; macro then live data (comma = "also")
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=":hn:new:limit=30: + :time:6h:">New stories in the last 6 hours</a>
+      &mdash; generate protocol composed with the <code>:time:</code> filter
+    </p>
+    <p>
+      <a class="alap" data-alap-linkitems=".hn_curated | (:hn:top:limit=5:)">Curated HN links OR top 5 live</a>
+      &mdash; static tags <code>|</code> live protocol results
+    </p>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

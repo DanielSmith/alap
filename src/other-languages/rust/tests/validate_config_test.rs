@@ -2,7 +2,10 @@
 // Licensed under the Apache License, Version 2.0
 // See https://www.apache.org/licenses/LICENSE-2.0
 
-use alap::validate_config;
+use alap::link_provenance;
+use alap::{
+    sanitize_link_urls, validate_config, validate_config_with_options, Link, Tier, ValidateOptions,
+};
 use serde_json::json;
 
 // --- Structural validity ---
@@ -386,4 +389,315 @@ fn drops_constructor_keys_from_settings() {
     let cfg = validate_config(input).unwrap();
     assert!(!cfg.settings.contains_key("constructor"));
     assert!(cfg.settings.contains_key("listType"));
+}
+
+// ---------------------------------------------------------------------------
+// 3.2 additions
+// ---------------------------------------------------------------------------
+
+fn minimal_raw() -> serde_json::Value {
+    json!({
+        "allLinks": {
+            "alpha": { "url": "https://example.com/alpha", "label": "Alpha" }
+        }
+    })
+}
+
+// --- Provenance stamping ---
+
+#[test]
+fn provenance_defaults_to_author() {
+    let cfg = validate_config(minimal_raw()).unwrap();
+    let link = cfg.all_links.get("alpha").unwrap();
+    assert!(link_provenance::is_author_tier(link));
+}
+
+#[test]
+fn provenance_storage_local_stamp() {
+    let cfg = validate_config_with_options(
+        minimal_raw(),
+        ValidateOptions {
+            provenance: Tier::StorageLocal,
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("alpha").unwrap();
+    assert!(link_provenance::is_storage_tier(link));
+    assert_eq!(link_provenance::get(link), Some(&Tier::StorageLocal));
+}
+
+#[test]
+fn provenance_storage_remote_stamp() {
+    let cfg = validate_config_with_options(
+        minimal_raw(),
+        ValidateOptions {
+            provenance: Tier::StorageRemote,
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("alpha").unwrap();
+    assert_eq!(link_provenance::get(link), Some(&Tier::StorageRemote));
+}
+
+#[test]
+fn provenance_protocol_stamp() {
+    let cfg = validate_config_with_options(
+        minimal_raw(),
+        ValidateOptions {
+            provenance: Tier::Protocol("web".into()),
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("alpha").unwrap();
+    assert!(link_provenance::is_protocol_tier(link));
+}
+
+#[test]
+fn invalid_provenance_option_rejected() {
+    let result = validate_config_with_options(
+        minimal_raw(),
+        ValidateOptions {
+            provenance: Tier::Protocol(String::new()),
+        },
+    );
+    assert!(result.is_err());
+}
+
+// --- Hooks allowlist ---
+
+#[test]
+fn hooks_author_keeps_all_verbatim() {
+    let input = json!({
+        "allLinks": {
+            "a": { "url": "/a", "hooks": ["hover", "click", "anything"] }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(
+        link.hooks,
+        Some(vec!["hover".to_string(), "click".into(), "anything".into()])
+    );
+}
+
+#[test]
+fn hooks_non_author_without_allowlist_strips_all() {
+    let input = json!({
+        "allLinks": {
+            "a": { "url": "/a", "hooks": ["hover", "click"] }
+        }
+    });
+    let cfg = validate_config_with_options(
+        input,
+        ValidateOptions {
+            provenance: Tier::StorageRemote,
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(link.hooks, None);
+}
+
+#[test]
+fn hooks_non_author_intersects_allowlist() {
+    let input = json!({
+        "settings": { "hooks": ["hover"] },
+        "allLinks": {
+            "a": { "url": "/a", "hooks": ["hover", "attacker_chosen"] }
+        }
+    });
+    let cfg = validate_config_with_options(
+        input,
+        ValidateOptions {
+            provenance: Tier::Protocol("web".into()),
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(link.hooks, Some(vec!["hover".to_string()]));
+}
+
+#[test]
+fn hooks_non_author_fully_stripped_when_none_match() {
+    let input = json!({
+        "settings": { "hooks": ["approved_hook"] },
+        "allLinks": {
+            "a": { "url": "/a", "hooks": ["evil", "worse"] }
+        }
+    });
+    let cfg = validate_config_with_options(
+        input,
+        ValidateOptions {
+            provenance: Tier::StorageRemote,
+        },
+    )
+    .unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(link.hooks, None);
+}
+
+// --- Meta URL sanitization ---
+
+#[test]
+fn meta_url_key_sanitized() {
+    let input = json!({
+        "allLinks": {
+            "a": {
+                "url": "/a",
+                "meta": { "iconUrl": "javascript:alert(1)" }
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let meta = cfg.all_links.get("a").unwrap().meta.as_ref().unwrap();
+    assert_eq!(
+        meta.get("iconUrl").and_then(|v| v.as_str()),
+        Some("about:blank")
+    );
+}
+
+#[test]
+fn meta_url_case_insensitive_match() {
+    let input = json!({
+        "allLinks": {
+            "a": {
+                "url": "/a",
+                "meta": {
+                    "ImageURL": "javascript:alert(1)",
+                    "AvatarUrl": "data:text/html,x"
+                }
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let meta = cfg.all_links.get("a").unwrap().meta.as_ref().unwrap();
+    assert_eq!(meta.get("ImageURL").and_then(|v| v.as_str()), Some("about:blank"));
+    assert_eq!(meta.get("AvatarUrl").and_then(|v| v.as_str()), Some("about:blank"));
+}
+
+#[test]
+fn meta_non_url_key_untouched() {
+    let input = json!({
+        "allLinks": {
+            "a": {
+                "url": "/a",
+                "meta": { "author": "Someone", "rank": 1, "body": "plain text" }
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let meta = cfg.all_links.get("a").unwrap().meta.as_ref().unwrap();
+    assert_eq!(meta.get("author").and_then(|v| v.as_str()), Some("Someone"));
+    assert_eq!(meta.get("rank").and_then(|v| v.as_i64()), Some(1));
+}
+
+#[test]
+fn meta_blocked_keys_recursed() {
+    let input = json!({
+        "allLinks": {
+            "a": {
+                "url": "/a",
+                "meta": {
+                    "__proto__": { "bad": true },
+                    "__class__": { "bad": true },
+                    "legit": "ok"
+                }
+            }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let meta = cfg.all_links.get("a").unwrap().meta.as_ref().unwrap();
+    assert!(!meta.contains_key("__proto__"));
+    assert!(!meta.contains_key("__class__"));
+    assert_eq!(meta.get("legit").and_then(|v| v.as_str()), Some("ok"));
+}
+
+// --- Thumbnail sanitization (the 3.2 audit bug fix) ---
+
+#[test]
+fn thumbnail_sanitized() {
+    let input = json!({
+        "allLinks": {
+            "a": { "url": "/a", "thumbnail": "javascript:alert(1)" }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(link.thumbnail.as_deref(), Some("about:blank"));
+}
+
+#[test]
+fn thumbnail_valid_url_preserved() {
+    let input = json!({
+        "allLinks": {
+            "a": { "url": "/a", "thumbnail": "https://example.com/thumb.jpg" }
+        }
+    });
+    let cfg = validate_config(input).unwrap();
+    let link = cfg.all_links.get("a").unwrap();
+    assert_eq!(link.thumbnail.as_deref(), Some("https://example.com/thumb.jpg"));
+}
+
+// --- sanitize_link_urls helper (direct) ---
+
+#[test]
+fn sanitize_link_urls_direct_url() {
+    let mut link = Link {
+        url: "javascript:alert(1)".into(),
+        ..Default::default()
+    };
+    sanitize_link_urls(&mut link);
+    assert_eq!(link.url, "about:blank");
+}
+
+#[test]
+fn sanitize_link_urls_direct_image() {
+    let mut link = Link {
+        url: "/a".into(),
+        image: Some("data:text/html,x".into()),
+        ..Default::default()
+    };
+    sanitize_link_urls(&mut link);
+    assert_eq!(link.image.as_deref(), Some("about:blank"));
+}
+
+#[test]
+fn sanitize_link_urls_direct_thumbnail() {
+    let mut link = Link {
+        url: "/a".into(),
+        thumbnail: Some("vbscript:bad".into()),
+        ..Default::default()
+    };
+    sanitize_link_urls(&mut link);
+    assert_eq!(link.thumbnail.as_deref(), Some("about:blank"));
+}
+
+#[test]
+fn sanitize_link_urls_direct_meta_url() {
+    let mut meta = std::collections::HashMap::new();
+    meta.insert("coverUrl".to_string(), serde_json::Value::String("javascript:bad".into()));
+    let mut link = Link {
+        url: "/a".into(),
+        meta: Some(meta),
+        ..Default::default()
+    };
+    sanitize_link_urls(&mut link);
+    let meta_after = link.meta.as_ref().unwrap();
+    assert_eq!(meta_after.get("coverUrl").and_then(|v| v.as_str()), Some("about:blank"));
+}
+
+#[test]
+fn sanitize_link_urls_direct_strips_blocked_meta_keys() {
+    let mut meta = std::collections::HashMap::new();
+    meta.insert("__proto__".to_string(), json!({"x": 1}));
+    meta.insert("ok".to_string(), serde_json::Value::String("keep".into()));
+    let mut link = Link {
+        url: "/a".into(),
+        meta: Some(meta),
+        ..Default::default()
+    };
+    sanitize_link_urls(&mut link);
+    let meta_after = link.meta.as_ref().unwrap();
+    assert!(!meta_after.contains_key("__proto__"));
+    assert_eq!(meta_after.get("ok").and_then(|v| v.as_str()), Some("keep"));
 }

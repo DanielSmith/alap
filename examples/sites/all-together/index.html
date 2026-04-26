@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#1a2f8a">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alap — All Together</title>
+  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/nav.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="has-site-nav">
+  <nav class="site-nav">
+    <a href="https://alap.info" class="nav-brand">Alap</a>
+    <div class="nav-links">
+      <a href="https://docs.alap.info/getting-started/">Docs</a>
+      <a href="https://docs.alap.info/api-reference/">API</a>
+      <a href="https://examples.alap.info">Examples</a>
+      <a href="https://github.com/DanielSmith/alap">GitHub</a>
+    </div>
+  </nav>
+  <p><a href="/" target="alapDemo">&larr; Examples Gallery</a></p>
+
+  <h1>All Together</h1>
+  <p>Menu, lightbox, and lens wired to the same dataset and coordinated by
+    <code>RendererCoordinator</code>. Escape walks back through whichever
+    renderers you've opened.</p>
+
+  <h2>Three renderers, one dataset</h2>
+  <p>Each trigger resolves the same expression; the selector class decides
+    which renderer paints the result. The menu stays text-only here so the
+    lightbox and lens carry the visual weight.</p>
+
+  <div class="example">
+    <p>
+      <a class="alap-menu" data-alap-linkitems=".bridge">bridges (menu)</a> ·
+      <a class="alap-lightbox" data-alap-linkitems=".bridge">bridges (lightbox)</a> ·
+      <a class="alap-lens" data-alap-linkitems=".bridge">bridges (lens)</a>
+    </p>
+    <p>
+      <a class="alap-menu" data-alap-linkitems="@tour">the tour (menu)</a> ·
+      <a class="alap-lightbox" data-alap-linkitems="@tour">the tour (lightbox)</a> ·
+      <a class="alap-lens" data-alap-linkitems="@tour">the tour (lens)</a>
+    </p>
+  </div>
+
+  <details class="src">
+    <summary>View source — HTML triggers</summary>
+<pre><code>&lt;a class="alap-menu"     data-alap-linkitems=".bridge"&gt;bridges (menu)&lt;/a&gt;
+&lt;a class="alap-lightbox" data-alap-linkitems=".bridge"&gt;bridges (lightbox)&lt;/a&gt;
+&lt;a class="alap-lens"     data-alap-linkitems=".bridge"&gt;bridges (lens)&lt;/a&gt;
+
+&lt;a class="alap-menu"     data-alap-linkitems="@tour"&gt;the tour (menu)&lt;/a&gt;
+&lt;a class="alap-lightbox" data-alap-linkitems="@tour"&gt;the tour (lightbox)&lt;/a&gt;
+&lt;a class="alap-lens"     data-alap-linkitems="@tour"&gt;the tour (lens)&lt;/a&gt;</code></pre>
+  </details>
+
+  <details class="src">
+    <summary>View source — config</summary>
+<pre><code>export const demoConfig: AlapConfig = {
+  settings: {
+    listType: 'ul',
+    menuTimeout: 5000,
+  },
+  macros: {
+    tour: { linkItems: '.bridge, .park, .coffee' },
+  },
+  allLinks: {
+    brooklyn: {
+      label: 'Brooklyn Bridge',
+      url: 'https://en.wikipedia.org/wiki/Brooklyn_Bridge',
+      tags: ['nyc', 'bridge', 'landmark'],
+      description: 'A hybrid cable-stayed / suspension bridge linking Manhattan and Brooklyn, opened 1883.',
+      thumbnail: '../shared/img/brooklyn.jpg',
+      image: '../shared/img/brooklyn.jpg',
+      meta: { opened: 1883, length: '1,825 m', architect: 'John Augustus Roebling' },
+    },
+    golden_gate: {
+      label: 'Golden Gate Bridge',
+      url: 'https://en.wikipedia.org/wiki/Golden_Gate_Bridge',
+      tags: ['sf', 'bridge', 'landmark'],
+      description: 'Suspension bridge spanning the Golden Gate strait, San Francisco. Opened 1937.',
+      thumbnail: '../shared/img/goldengate.jpg',
+      image: '../shared/img/goldengate.jpg',
+      meta: { opened: 1937, length: '2,737 m', architect: 'Joseph Strauss' },
+    },
+    tower: {
+      label: 'Tower Bridge',
+      url: 'https://en.wikipedia.org/wiki/Tower_Bridge',
+      tags: ['london', 'bridge', 'landmark'],
+      description: 'A combined bascule and suspension bridge over the River Thames. Opened 1894.',
+      thumbnail: '../shared/img/towerbridge.jpg',
+      image: '../shared/img/towerbridge.jpg',
+      meta: { opened: 1894, length: '244 m', architect: 'Horace Jones' },
+    },
+    oberbaum: {
+      label: 'Oberbaum Bridge',
+      url: 'https://en.wikipedia.org/wiki/Oberbaum_Bridge',
+      tags: ['berlin', 'bridge', 'landmark'],
+      description: 'Two-tier bridge over the Spree, once the border between East and West Berlin.',
+      thumbnail: '../shared/img/oberbaum.jpg',
+      image: '../shared/img/oberbaum.jpg',
+      meta: { opened: 1896, length: '154 m' },
+    },
+    highline: {
+      label: 'The High Line',
+      url: 'https://en.wikipedia.org/wiki/High_Line',
+      tags: ['nyc', 'park', 'landmark'],
+      description: 'An elevated linear park built on a disused freight rail line.',
+      thumbnail: '../shared/img/highline.jpg',
+      image: '../shared/img/highline.jpg',
+      meta: { opened: 2009, length: '2.33 km' },
+    },
+    bluebottle: {
+      label: 'Blue Bottle Coffee',
+      url: 'https://bluebottlecoffee.com',
+      tags: ['sf', 'coffee'],
+      description: 'Oakland-founded specialty roaster with slow-brew cafes worldwide.',
+      thumbnail: '../shared/img/bluebottle.jpg',
+      image: '../shared/img/bluebottle.jpg',
+      meta: { founded: 2002, headquarters: 'Oakland, CA' },
+    },
+  },
+};</code></pre>
+  </details>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

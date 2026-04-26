@@ -124,4 +124,4 @@ See the difference: <alap-lightbox query=".bridge">browse bridges in lightbox</a
 
 - [Configuration](configuration.md) — the full config object
 - [Using with a framework](with-framework.md) — Vue, Svelte, React, etc.
-- [Full experience](full-experience.md) — lightbox, lens, and beyond
+- [All together](all-together.md) — lightbox, lens, and beyond
